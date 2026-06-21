@@ -33,6 +33,9 @@ export const ROAD_ORDER: Road[] = ['passable', 'risky', 'impassable'];
 
 export const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
 
+/** Passability rank, worst → best. Used to pick a road's overall condition from its reports. */
+export const ROAD_RANK: Record<Road, number> = { impassable: 3, risky: 2, passable: 1 };
+
 /** Categorical line colors for the per-district water-level chart, assigned by district index. */
 export const DISTRICT_COLORS: string[] = ['#0EA5E9', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#14B8A6', '#EF4444', '#6366F1'];
 

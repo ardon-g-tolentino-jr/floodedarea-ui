@@ -12,6 +12,7 @@ import {
   computeStatus,
   enrichReports,
   type EnrichedReport,
+  type RoadEntry,
   REPORT_RADIUS_KM,
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
@@ -27,6 +28,7 @@ import SosModal from './components/panels/SosModal';
 import Toast, { type ToastData } from './components/panels/Toast';
 import NotifyModal, { type NotifyPrefs, DEFAULT_NOTIFY_PREFS } from './components/panels/NotifyModal';
 import WaterLevelModal from './components/panels/WaterLevelModal';
+import RoadConditionsModal from './components/panels/RoadConditionsModal';
 import AdminPanel from './components/panels/AdminPanel';
 import LoginView from './views/LoginView';
 
@@ -93,6 +95,7 @@ const App: React.FC = () => {
   const [notifyPrefs, setNotifyPrefs] = React.useState<NotifyPrefs>(loadNotifyPrefs);
   const [notifyOpen, setNotifyOpen] = React.useState(false);
   const [waterChartOpen, setWaterChartOpen] = React.useState(false);
+  const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -462,6 +465,15 @@ const App: React.FC = () => {
   const toggleFilter = (s: Severity): void => setFilters((f) => ({ ...f, [s]: !f[s] }));
   const toggleRoad = (r: Road): void => setRoadFilters((f) => ({ ...f, [r]: !f[r] }));
 
+  // From the road-conditions directory: open the road's report on the map and close the modal.
+  const openRoadOnMap = (entry: RoadEntry): void => {
+    setRoadsModalOpen(false);
+    setTab('nearby');
+    setSelEvacId(null);
+    setSelectedReportId(entry.reportId);
+    setMapFocus({ lat: entry.latitude, lng: entry.longitude, key: Date.now() });
+  };
+
   const highCount = filterCounts.high;
   const totalCount = active.length;
 
@@ -566,6 +578,7 @@ const App: React.FC = () => {
           roadFilters={roadFilters}
           roadCounts={roadCounts}
           onToggleRoad={toggleRoad}
+          onOpenRoads={() => setRoadsModalOpen(true)}
           reportRadiusKm={reportRadiusKm}
           onChangeRadius={setReportRadiusKm}
           monitorRadiusKm={monitorRadiusKm}
@@ -612,6 +625,15 @@ const App: React.FC = () => {
 
       {waterChartOpen && (
         <WaterLevelModal reports={reportList} isMobile={isMobile} onClose={() => setWaterChartOpen(false)} />
+      )}
+
+      {roadsModalOpen && (
+        <RoadConditionsModal
+          reports={active}
+          isMobile={isMobile}
+          onSelectRoad={openRoadOnMap}
+          onClose={() => setRoadsModalOpen(false)}
+        />
       )}
 
       {adminOpen && isAdmin && (

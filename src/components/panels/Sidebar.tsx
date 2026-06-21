@@ -27,6 +27,7 @@ interface SidebarProps {
   roadFilters: Record<Road, boolean>;
   roadCounts: Record<Road, number>;
   onToggleRoad: (r: Road) => void;
+  onOpenRoads: () => void;
   reportRadiusKm: number;
   onChangeRadius: (km: number) => void;
   monitorRadiusKm: number;
@@ -87,7 +88,7 @@ const CollapsibleSection: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, reportRadiusKm, onChangeRadius, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, reportRadiusKm, onChangeRadius, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -183,6 +184,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           );
         })}
       </div>
+      <button
+        onClick={onOpenRoads}
+        style={{ width: '100%', marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 12px', borderRadius: 11, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-primary-deep)', fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}
+      >
+        <span style={{ fontSize: 13 }}>⌕</span> Search roads by condition
+      </button>
       </CollapsibleSection>
 
       {/* AFFECTED-AREA RADIUS */}

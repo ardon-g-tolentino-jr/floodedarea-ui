@@ -1,9 +1,9 @@
 // Derived view model for the flood map + sidebar, ported from the design's renderVals().
 // Pure functions over the live API data + the user's location.
 
-import type { FloodReport, LatLng, Severity } from '../types';
+import type { FloodReport, LatLng, Road, Severity } from '../types';
 import { kmBetween } from './geo';
-import { SEV_META, type SevMeta } from './floodMeta';
+import { ROAD_RANK, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 
 export const REPORT_RADIUS_KM = 0.3; // default affected radius drawn around each report (300 m)
@@ -67,6 +67,85 @@ export function enrichReports(
       expired: r.status === 'resolved' || expiresInMin <= 0,
     };
   });
+}
+
+/** One road's aggregated condition, rolled up from every report that mentions it. */
+export interface RoadEntry {
+  key: string;
+  name: string;
+  district: string;
+  road: Road;            // worst (most impassable) condition reported
+  severity: Severity;    // worst severity reported
+  depthCm: number;       // depth of the representative (worst) report
+  reportCount: number;   // how many reports contributed
+  latitude: number;
+  longitude: number;
+  reportId: number;      // representative report — clicking opens its detail card
+  time: string;          // relative time of the most recent contributing report
+}
+
+export interface DistrictRoads {
+  district: string;
+  roads: RoadEntry[];
+}
+
+/**
+ * Roll up reports into a per-district directory of roads with their current condition.
+ * Reports sharing a district + name (case-insensitively) collapse into one road; its condition
+ * takes the worst passability/severity reported, and the representative report is the worst one
+ * (ties broken by most recent). Roads sort worst-condition-first; districts sort alphabetically.
+ */
+export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
+  const groups = new Map<string, FloodReport[]>();
+  for (const r of reports) {
+    const key = `${r.district.trim().toLowerCase()}|${r.name.trim().toLowerCase()}`;
+    const bucket = groups.get(key);
+    if (bucket) bucket.push(r);
+    else groups.set(key, [r]);
+  }
+
+  const entries: RoadEntry[] = [];
+  for (const [key, rs] of groups) {
+    // Representative = worst passability, then worst severity, then most recently updated.
+    const rep = [...rs].sort(
+      (a, b) =>
+        ROAD_RANK[b.road] - ROAD_RANK[a.road] ||
+        SEV_RANK[b.severity] - SEV_RANK[a.severity] ||
+        new Date(b.updatedAt ?? b.createdAt).getTime() - new Date(a.updatedAt ?? a.createdAt).getTime()
+    )[0];
+    const newest = rs.reduce((acc, r) =>
+      new Date(r.createdAt).getTime() > new Date(acc.createdAt).getTime() ? r : acc
+    );
+    entries.push({
+      key,
+      name: rep.name,
+      district: rep.district,
+      road: rep.road,
+      severity: rep.severity,
+      depthCm: rep.depthCm,
+      reportCount: rs.length,
+      latitude: rep.latitude,
+      longitude: rep.longitude,
+      reportId: rep.id,
+      time: timeAgo(newest.createdAt),
+    });
+  }
+
+  const byDistrict = new Map<string, RoadEntry[]>();
+  for (const e of entries) {
+    const bucket = byDistrict.get(e.district);
+    if (bucket) bucket.push(e);
+    else byDistrict.set(e.district, [e]);
+  }
+
+  return [...byDistrict.entries()]
+    .map(([district, roads]) => ({
+      district,
+      roads: roads.sort(
+        (a, b) => ROAD_RANK[b.road] - ROAD_RANK[a.road] || a.name.localeCompare(b.name)
+      ),
+    }))
+    .sort((a, b) => a.district.localeCompare(b.district));
 }
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
