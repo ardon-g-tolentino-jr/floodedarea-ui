@@ -233,7 +233,15 @@ const App: React.FC = () => {
     return c;
   }, [active]);
 
-  // Impassable road segments — drawn on the map and counted in the sidebar summary.
+  // Road segments shown on the map, gated by the per-status ROADS chips so toggling a
+  // passability category hides both its road lines and its report dots (the dots are filtered
+  // via `visible` above).
+  const visibleRoadSegments = React.useMemo(
+    () => roadList.filter((s) => roadFilters[s.status]),
+    [roadList, roadFilters]
+  );
+
+  // Impassable road segments — counted in the sidebar summary (always the true count).
   const impassableRoads = React.useMemo(
     () => roadList.filter((s) => s.status === 'impassable'),
     [roadList]
@@ -490,7 +498,7 @@ const App: React.FC = () => {
             userLoc={userLoc}
             reports={visible}
             centers={centerList}
-            roadSegments={roadList}
+            roadSegments={visibleRoadSegments}
             showRoads={showRoads}
             showShelters={showShelters}
             reportRadiusKm={reportRadiusKm}
