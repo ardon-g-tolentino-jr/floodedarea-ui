@@ -527,6 +527,7 @@ const App: React.FC = () => {
               canRemove={selectedReport.mine}
               removing={removing}
               onRemove={() => void removeReport(selectedReport.id)}
+              onShowLocation={() => setMapFocus({ lat: selectedReport.latitude, lng: selectedReport.longitude, key: Date.now() })}
               onClose={() => setSelectedReportId(null)}
             />
           )}

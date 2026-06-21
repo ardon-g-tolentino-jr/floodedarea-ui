@@ -11,6 +11,7 @@ interface ReportDetailCardProps {
   canRemove: boolean;
   removing: boolean;
   onRemove: () => void;
+  onShowLocation: () => void;
   onClose: () => void;
 }
 
@@ -21,7 +22,7 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onClose }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, onClose }) => {
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const sev = report.sev;
   const tm = TREND_META[report.trend];
@@ -103,7 +104,14 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         )}
 
         {canRemove && (
-          confirmRemove ? (
+          <>
+            <button
+              onClick={onShowLocation}
+              style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: '1.5px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+            >
+              📍 Show my location
+            </button>
+            {confirmRemove ? (
             <div style={{ marginTop: 11, padding: '11px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 11 }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: '#B91C1C', lineHeight: 1.4 }}>Remove this report? It will disappear from the map for everyone.</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
@@ -130,7 +138,8 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             >
               Remove my report
             </button>
-          )
+          )}
+          </>
         )}
       </div>
     </div>
