@@ -9,6 +9,10 @@ server {
     gzip on;
     gzip_types text/css application/javascript application/json image/svg+xml;
 
+    # Allow the Google OAuth popup to postMessage its result back to this window
+    # (mirrors the Vite dev server header in vite.config.ts).
+    add_header Cross-Origin-Opener-Policy "same-origin-allow-popups" always;
+
     # Static assets with SPA fallback (no router on the server — index.html handles routes).
     location / {
         try_files $uri $uri/ /index.html;
