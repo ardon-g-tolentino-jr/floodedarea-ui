@@ -36,6 +36,20 @@ export const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 }
 /** Passability rank, worst → best. Used to pick a road's overall condition from its reports. */
 export const ROAD_RANK: Record<Road, number> = { impassable: 3, risky: 2, passable: 1 };
 
+/**
+ * Water-depth thresholds (cm) for road passability, aligned with the DEPTH_TICKS body references
+ * (knee ≈ 50, waist ≈ 100): at/above waist-ish water vehicles can't pass; knee-to-waist is risky.
+ */
+export const ROAD_IMPASSABLE_CM = 90;
+export const ROAD_RISKY_CM = 50;
+
+/** Infer a road's passability from observed water depth. */
+export function roadFromDepth(depthCm: number): Road {
+  if (depthCm >= ROAD_IMPASSABLE_CM) return 'impassable';
+  if (depthCm >= ROAD_RISKY_CM) return 'risky';
+  return 'passable';
+}
+
 /** Categorical line colors for the per-district water-level chart, assigned by district index. */
 export const DISTRICT_COLORS: string[] = ['#0EA5E9', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#14B8A6', '#EF4444', '#6366F1'];
 

@@ -21,17 +21,47 @@ interface SeverityPickerProps {
   isMobile: boolean;
   busy: boolean;
   reporterName: string;
-  onPick: (sev: Severity, depthCm: number, identify: boolean) => void;
+  /** Road auto-detected from the pin (reverse-geocoded); prefills the editable road field. */
+  detectedRoad: string | null;
+  /** True while the reverse-geocode lookup is in flight. */
+  detecting: boolean;
+  onPick: (sev: Severity, depthCm: number, identify: boolean, road: string) => void;
   onCancel: () => void;
 }
 
-const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporterName, onPick, onCancel }) => {
+const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporterName, detectedRoad, detecting, onPick, onCancel }) => {
   // Step 1: choose a category. Step 2: dial in the depth (seeded from the category's preset).
   const [sev, setSev] = React.useState<Severity | null>(null);
   const [depth, setDepth] = React.useState(0);
   // Whether to attach the reporter's name to the report (vs. posting anonymously).
   const [identify, setIdentify] = React.useState(true);
   const nameLabel = reporterName.trim() || 'My name';
+
+  // Editable road name, prefilled from the reverse-geocoded detection. Keep syncing with new
+  // detections until the reporter edits it themselves.
+  const [road, setRoad] = React.useState(detectedRoad ?? '');
+  const roadEdited = React.useRef(false);
+  React.useEffect(() => {
+    if (!roadEdited.current && detectedRoad) setRoad(detectedRoad);
+  }, [detectedRoad]);
+
+  const roadField = (
+    <div style={{ padding: '13px 15px 4px' }}>
+      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 6 }}>
+        ROAD / STREET
+      </label>
+      <input
+        value={road}
+        disabled={busy}
+        onChange={(e) => { roadEdited.current = true; setRoad(e.target.value); }}
+        placeholder={detecting ? 'Detecting street…' : 'e.g. Lilac Street'}
+        style={{ width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', outline: 'none', background: busy ? '#F8FAFC' : '#fff' }}
+      />
+      <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>
+        {detecting ? 'Finding the street from your pin…' : 'Auto-detected from the pin — edit if it’s wrong.'}
+      </div>
+    </div>
+  );
 
   const chooseSeverity = (s: Severity): void => {
     setSev(s);
@@ -142,7 +172,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: '10px 12px 14px' }}>
           <button
             disabled={busy}
-            onClick={() => onPick(sev, depth, identify)}
+            onClick={() => onPick(sev, depth, identify, road.trim())}
             style={{ border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}
           >
             {busy ? 'Posting…' : 'Post flood report'}
@@ -161,6 +191,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
 
   const card = (
     <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+      {roadField}
       {sev == null ? categoryStep : depthStep}
     </div>
   );

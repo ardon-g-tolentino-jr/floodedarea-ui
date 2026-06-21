@@ -6,6 +6,7 @@ import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStat
 import { useActivityStream } from './hooks/useActivityStream';
 import { mutations } from './api/queries';
 import type { GeoResult } from './api/geocode';
+import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
 import {
@@ -54,7 +55,7 @@ function loadLivePref(): boolean {
 }
 
 const DEFAULT_LOCATION: LatLng = { lat: 14.66, lng: 121.12 }; // Marikina Heights
-const REGION_LABEL = 'Marikina · Metro Manila';
+const REGION_LABEL = 'Philippines';
 
 type PendingPin = LatLng & { atYou: boolean };
 
@@ -82,6 +83,10 @@ const App: React.FC = () => {
   // UI state
   const [mode, setMode] = React.useState<'idle' | 'report'>('idle');
   const [pending, setPending] = React.useState<PendingPin | null>(null);
+  // Road auto-detected from the pending pin via reverse geocoding (which street it's on).
+  const [detectedRoad, setDetectedRoad] = React.useState<{ road: string | null; district: string | null }>({ road: null, district: null });
+  const [detectingRoad, setDetectingRoad] = React.useState(false);
+  const geocodeReqId = React.useRef(0);
   const [selectedReportId, setSelectedReportId] = React.useState<number | null>(null);
   const [selEvacId, setSelEvacId] = React.useState<number | null>(null);
   const [tab, setTab] = React.useState<'nearby' | 'activity'>('nearby');
@@ -296,6 +301,19 @@ const App: React.FC = () => {
     return false;
   };
 
+  // Reverse-geocode a pin location to the street it sits on, guarding against stale responses
+  // when the pin moves quickly. Feeds the editable road field in the report dialog.
+  const runReverseGeocode = React.useCallback((loc: LatLng): void => {
+    const myId = ++geocodeReqId.current;
+    setDetectingRoad(true);
+    setDetectedRoad({ road: null, district: null });
+    void reverseGeocode(loc.lat, loc.lng).then((r) => {
+      if (myId !== geocodeReqId.current) return;
+      setDetectedRoad({ road: r.road, district: r.district });
+      setDetectingRoad(false);
+    });
+  }, []);
+
   const startReport = (): void => {
     if (!requireAuth('Sign in to report a flood in your area.')) return;
     // Anti-spam: one live report per person. While the user's last report is still within its
@@ -317,6 +335,7 @@ const App: React.FC = () => {
     // Drop the pin at the user's location and recenter the map there.
     setPending({ ...userLoc, atYou: true });
     setMapFocus({ ...userLoc, key: Date.now() });
+    runReverseGeocode(userLoc);
     // Refresh the GPS fix so the pin/centering reflect where they actually are right now
     // (the on-mount fix may be stale, or fell back to the default monitoring area).
     if (navigator.geolocation) {
@@ -326,7 +345,10 @@ const App: React.FC = () => {
           setUserLoc(loc);
           // Only re-pin/recenter if they haven't already moved the pin themselves.
           setPending((p) => {
-            if (p && p.atYou) setMapFocus({ ...loc, key: Date.now() });
+            if (p && p.atYou) {
+              setMapFocus({ ...loc, key: Date.now() });
+              runReverseGeocode(loc);
+            }
             return p && p.atYou ? { ...loc, atYou: true } : p;
           });
         },
@@ -339,21 +361,28 @@ const App: React.FC = () => {
   const cancelReport = (): void => {
     setMode('idle');
     setPending(null);
+    setDetectedRoad({ road: null, district: null });
+    setDetectingRoad(false);
   };
 
   const onMapClick = (latlng: LatLng): void => {
     if (mode !== 'report') return;
     setPending({ ...latlng, atYou: false });
+    runReverseGeocode(latlng);
   };
 
-  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean): Promise<void> => {
+  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean, road: string): Promise<void> => {
     if (!pending) return;
     const preset = SEVERITY_PRESET[sev];
     setBusyPick(true);
     try {
+      // The road name identifies WHICH street is flooded (reverse-geocoded from the pin, then
+      // editable by the reporter). Fall back to the detected road, then a generic label.
+      const roadName =
+        road || detectedRoad.road || (identify ? (auth?.name?.trim() ? `${auth.name.trim()}’s spot` : 'Near dropped pin') : 'Near dropped pin');
       const created = await mutations.createReport({
-        name: identify ? (auth?.name?.trim() || 'Your report') : 'Anonymous',
-        district: pending.atYou ? 'Your location' : 'Pinned location',
+        name: roadName,
+        district: detectedRoad.district ?? 'Unknown area',
         latitude: pending.lat,
         longitude: pending.lng,
         severity: sev,
@@ -364,6 +393,7 @@ const App: React.FC = () => {
       await reports.refetch(true);
       setMode('idle');
       setPending(null);
+      setDetectedRoad({ road: null, district: null });
       setTab('activity');
       setSelectedReportId(created.id);
       showToast('Flood report posted — thank you!');
@@ -509,7 +539,7 @@ const App: React.FC = () => {
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}
         onWaterChart={() => setWaterChartOpen(true)}
-        onRescueChart={() => setRescueChartOpen(true)}
+        onRescueChart={() => { setRescueChartOpen(true); void rescues.refetch(true); }}
         isAdmin={!!isAdmin}
         onAdmin={() => setAdminOpen(true)}
       />
@@ -576,7 +606,15 @@ const App: React.FC = () => {
           )}
 
           {mode === 'report' && pending && (
-            <SeverityPicker isMobile={isMobile} busy={busyPick} reporterName={auth?.name ?? ''} onPick={(s, d, id) => void pickSeverity(s, d, id)} onCancel={cancelReport} />
+            <SeverityPicker
+              isMobile={isMobile}
+              busy={busyPick}
+              reporterName={auth?.name ?? ''}
+              detectedRoad={detectedRoad.road}
+              detecting={detectingRoad}
+              onPick={(s, d, id, road) => void pickSeverity(s, d, id, road)}
+              onCancel={cancelReport}
+            />
           )}
         </div>
 
@@ -651,7 +689,13 @@ const App: React.FC = () => {
       )}
 
       {rescueChartOpen && (
-        <RescueChartModal rescues={rescueList} isMobile={isMobile} onClose={() => setRescueChartOpen(false)} />
+        <RescueChartModal
+          rescues={rescueList}
+          loading={rescues.loading && rescueList.length === 0}
+          error={rescues.error}
+          isMobile={isMobile}
+          onClose={() => setRescueChartOpen(false)}
+        />
       )}
 
       {adminOpen && isAdmin && (

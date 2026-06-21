@@ -74,6 +74,9 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ reports, isMo
                       </span>
                       <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
                         {r.depthCm} cm · {r.reportCount === 1 ? '1 report' : `${r.reportCount} reports`} · {r.time}
+                        {!r.confirmed && (
+                          <span style={{ color: '#B45309', fontWeight: 700 }}> · unconfirmed</span>
+                        )}
                       </span>
                     </span>
                     <span

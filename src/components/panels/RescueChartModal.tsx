@@ -5,18 +5,29 @@ import { rescueCountsByDistrict } from '../../utils/viewModel';
 
 interface RescueChartModalProps {
   rescues: RescueRequest[];
+  loading?: boolean;
+  error?: Error | null;
   isMobile: boolean;
   onClose: () => void;
 }
 
 /** Horizontal bar chart of how many rescue requests were sent per district. */
-const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, isMobile, onClose }) => {
+const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, error, isMobile, onClose }) => {
   const rows = React.useMemo(() => rescueCountsByDistrict(rescues), [rescues]);
   const total = rescues.length;
   const max = rows.reduce((m, r) => Math.max(m, r.count), 0) || 1;
 
   const body =
-    rows.length === 0 ? (
+    error && rows.length === 0 ? (
+      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#B91C1C', fontSize: 13, lineHeight: 1.5 }}>
+        Couldn’t load rescue requests.
+        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>Check the backend is running, then reopen.</div>
+      </div>
+    ) : loading && rows.length === 0 ? (
+      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
+        Loading rescue requests…
+      </div>
+    ) : rows.length === 0 ? (
       <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
         No rescue requests yet.
       </div>

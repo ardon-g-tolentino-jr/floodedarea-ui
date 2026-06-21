@@ -6,6 +6,7 @@
 // query length. See https://operations.osmfoundation.org/policies/nominatim/.
 
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
 
 // Bias results toward Metro Manila & Rizal: viewbox is lon1,lat1,lon2,lat2 (NW → SE).
 const METRO_VIEWBOX = '120.9,14.85,121.5,14.25';
@@ -64,4 +65,72 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
     lat: Number(r.lat),
     lng: Number(r.lon),
   }));
+}
+
+/** The road a flood pin sits on, plus its district, resolved from coordinates. */
+export interface ReverseResult {
+  road: string | null;
+  district: string | null;
+  label: string | null;
+}
+
+interface NominatimAddress {
+  road?: string;
+  pedestrian?: string;
+  footway?: string;
+  residential?: string;
+  neighbourhood?: string;
+  suburb?: string;
+  village?: string;
+  town?: string;
+  city_district?: string;
+  city?: string;
+  municipality?: string;
+  state?: string;
+}
+
+interface NominatimReverseRow {
+  display_name?: string;
+  address?: NominatimAddress;
+  error?: string;
+}
+
+/**
+ * Reverse-geocode coordinates to the named road they sit on (e.g. "Lilac Street") plus a
+ * district label, so a flood pin can be attributed to a specific street. Uses the same Nominatim
+ * host as `searchPlaces` (CORS-friendly, no key). Returns nulls on network error/abort/no match —
+ * the caller falls back to a generic label.
+ */
+export async function reverseGeocode(lat: number, lng: number, signal?: AbortSignal): Promise<ReverseResult> {
+  const empty: ReverseResult = { road: null, district: null, label: null };
+
+  const params = new URLSearchParams({
+    format: 'jsonv2',
+    lat: String(lat),
+    lon: String(lng),
+    zoom: '17', // street level
+    addressdetails: '1',
+  });
+
+  let res: Response;
+  try {
+    res = await fetch(`${NOMINATIM_REVERSE_URL}?${params.toString()}`, {
+      signal,
+      headers: { Accept: 'application/json' },
+    });
+  } catch {
+    return empty; // network error or aborted
+  }
+
+  if (!res.ok) return empty;
+
+  const row = (await res.json()) as NominatimReverseRow;
+  if (row.error || !row.address) return empty;
+  const a = row.address;
+
+  const road = a.road ?? a.pedestrian ?? a.footway ?? a.residential ?? a.neighbourhood ?? null;
+  const area = a.suburb ?? a.village ?? a.town ?? a.city_district ?? a.city ?? a.municipality ?? null;
+  const district = [area, a.state].filter(Boolean).join(', ') || null;
+
+  return { road, district, label: row.display_name ?? null };
 }

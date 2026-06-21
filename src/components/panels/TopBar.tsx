@@ -72,30 +72,21 @@ const TopBar: React.FC<TopBarProps> = ({
         >
           <div style={{ width: 13, height: 13, background: '#fff', borderRadius: '50% 50% 50% 0', transform: 'rotate(45deg)' }} />
         </div>
-        <div style={{ lineHeight: 1.1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-.02em' }}>FloodedArea</span>
-            {!isMobile && (
-              <span
-                title={`Build ${BUILD_COMMIT} · ${new Date(BUILD_TIME).toLocaleString()}`}
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                  color: 'var(--bw-faint)',
-                  background: 'var(--bw-bg-subtle)',
-                  border: '1px solid var(--bw-line-soft)',
-                  padding: '1px 6px',
-                  borderRadius: 6,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {BUILD_LABEL}
-              </span>
-            )}
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>
-            {isMobile ? BUILD_LABEL : regionLabel}
+        <div style={{ lineHeight: 1.2 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-.02em' }}>FloodedArea</div>
+          <div style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{regionLabel}</div>
+          <div
+            title={`Build ${BUILD_COMMIT} · ${new Date(BUILD_TIME).toLocaleString()}`}
+            style={{
+              fontSize: 9.5,
+              fontWeight: 700,
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              color: 'var(--bw-faint)',
+              whiteSpace: 'nowrap',
+              marginTop: 1,
+            }}
+          >
+            {BUILD_LABEL}
           </div>
         </div>
       </div>
