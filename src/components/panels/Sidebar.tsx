@@ -3,9 +3,9 @@ import type { Road, Severity } from '../../types';
 import {
   type EnrichedReport,
   type SafetyStatus,
-  REPORT_RADIUS_MAX,
-  REPORT_RADIUS_MIN,
-  REPORT_RADIUS_STEP,
+  WATER_RISE_MAX,
+  WATER_RISE_MIN,
+  WATER_RISE_STEP,
   MONITOR_RADIUS_MAX,
   MONITOR_RADIUS_MIN,
   MONITOR_RADIUS_STEP,
@@ -28,8 +28,8 @@ interface SidebarProps {
   roadCounts: Record<Road, number>;
   onToggleRoad: (r: Road) => void;
   onOpenRoads: () => void;
-  reportRadiusKm: number;
-  onChangeRadius: (km: number) => void;
+  projectedRiseCm: number;
+  onChangeRise: (cm: number) => void;
   monitorRadiusKm: number;
   onChangeMonitor: (km: number) => void;
   notifyOn: boolean;
@@ -88,7 +88,7 @@ const CollapsibleSection: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, reportRadiusKm, onChangeRadius, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -192,26 +192,34 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       </button>
       </CollapsibleSection>
 
-      {/* AFFECTED-AREA RADIUS */}
+      {/* AFFECTED AREA — predictive water-rise projection */}
       <CollapsibleSection
-        title="AFFECTED-AREA RADIUS"
+        title="AFFECTED AREA"
         open={openSections.affected}
         onToggle={() => toggleSection('affected')}
-        right={<span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--bw-primary-deep)' }}>{fmtRadius(reportRadiusKm)}</span>}
+        right={
+          <span style={{ fontSize: 12.5, fontWeight: 800, color: projectedRiseCm > 0 ? 'var(--bw-primary-deep)' : 'var(--bw-muted)' }}>
+            {projectedRiseCm > 0 ? `+${projectedRiseCm} cm` : 'Now'}
+          </span>
+        }
       >
+        <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.4, marginBottom: 9 }}>
+          Each report’s ring grows with its water depth. Drag to project how much higher the water
+          rises — the dashed rings show how far flooding could spread.
+        </div>
         <input
           type="range"
-          min={REPORT_RADIUS_MIN}
-          max={REPORT_RADIUS_MAX}
-          step={REPORT_RADIUS_STEP}
-          value={reportRadiusKm}
-          onChange={(e) => onChangeRadius(parseFloat(e.target.value))}
-          aria-label="Affected-area radius in kilometers"
+          min={WATER_RISE_MIN}
+          max={WATER_RISE_MAX}
+          step={WATER_RISE_STEP}
+          value={projectedRiseCm}
+          onChange={(e) => onChangeRise(parseFloat(e.target.value))}
+          aria-label="Projected additional water rise in centimeters"
           style={{ width: '100%', accentColor: 'var(--bw-primary)', cursor: 'pointer' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--bw-muted)', marginTop: 1 }}>
-          <span>Precise ({fmtRadius(REPORT_RADIUS_MIN)})</span>
-          <span>Broad ({fmtRadius(REPORT_RADIUS_MAX)})</span>
+          <span>Now (+0)</span>
+          <span>+{WATER_RISE_MAX} cm</span>
         </div>
       </CollapsibleSection>
 

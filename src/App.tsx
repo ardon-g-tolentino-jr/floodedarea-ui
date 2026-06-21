@@ -14,7 +14,7 @@ import {
   enrichReports,
   type EnrichedReport,
   type RoadEntry,
-  REPORT_RADIUS_KM,
+  WATER_RISE_DEFAULT,
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
 import TopBar from './components/panels/TopBar';
@@ -92,7 +92,7 @@ const App: React.FC = () => {
   const [tab, setTab] = React.useState<'nearby' | 'activity'>('nearby');
   const [filters, setFilters] = React.useState<Record<Severity, boolean>>({ high: true, medium: true, low: true });
   const [roadFilters, setRoadFilters] = React.useState<Record<Road, boolean>>({ passable: true, risky: true, impassable: true });
-  const [reportRadiusKm, setReportRadiusKm] = React.useState<number>(REPORT_RADIUS_KM);
+  const [projectedRiseCm, setProjectedRiseCm] = React.useState<number>(WATER_RISE_DEFAULT);
   const [monitorRadiusKm, setMonitorRadiusKm] = React.useState<number>(MONITOR_RADIUS_KM);
   const [showShelters, setShowShelters] = React.useState(true);
   const [showRoads, setShowRoads] = React.useState(true);
@@ -169,8 +169,8 @@ const App: React.FC = () => {
   const rescueList = rescues.data ?? [];
 
   const enriched = React.useMemo(
-    () => enrichReports(reportList, userLoc, auth?.userId ?? null, reportRadiusKm, now),
-    [reportList, userLoc, auth?.userId, reportRadiusKm, now]
+    () => enrichReports(reportList, userLoc, auth?.userId ?? null, now),
+    [reportList, userLoc, auth?.userId, now]
   );
 
   // Only reports posted within the last 30 min count as "live" — expired ones drop off the
@@ -557,7 +557,7 @@ const App: React.FC = () => {
             roadSegments={visibleRoadSegments}
             showRoads={showRoads}
             showShelters={showShelters}
-            reportRadiusKm={reportRadiusKm}
+            projectedRiseCm={projectedRiseCm}
             monitorRadiusKm={monitorRadiusKm}
             selectedReportId={selectedReportId}
             selEvacId={selEvacId}
@@ -631,8 +631,8 @@ const App: React.FC = () => {
           roadCounts={roadCounts}
           onToggleRoad={toggleRoad}
           onOpenRoads={() => setRoadsModalOpen(true)}
-          reportRadiusKm={reportRadiusKm}
-          onChangeRadius={setReportRadiusKm}
+          projectedRiseCm={projectedRiseCm}
+          onChangeRise={setProjectedRiseCm}
           monitorRadiusKm={monitorRadiusKm}
           onChangeMonitor={setMonitorRadiusKm}
           notifyOn={notifyPrefs.enabled}

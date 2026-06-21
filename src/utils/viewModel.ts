@@ -6,10 +6,25 @@ import { kmBetween } from './geo';
 import { ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 
-export const REPORT_RADIUS_KM = 0.3; // default affected radius drawn around each report (300 m)
-export const REPORT_RADIUS_MIN = 0.2; // 200 m
-export const REPORT_RADIUS_MAX = 1; // 1 km
-export const REPORT_RADIUS_STEP = 0.1; // 100 m
+// Affected-area model: a report's affected radius grows with its water depth (deeper water
+// spreads further). Linear (~3 m of spread per cm of depth), clamped to a sane band.
+export const AFFECTED_M_PER_CM = 3;
+export const AFFECTED_MIN_M = 60; // floor so shallow reports still show a ring
+export const AFFECTED_MAX_M = 2000; // ceiling so a very deep report doesn't swamp the map
+
+/** Affected-area radius (km) for a given water depth — proportional to depth, clamped. */
+export function affectedRadiusKm(depthCm: number): number {
+  const m = Math.min(AFFECTED_MAX_M, Math.max(AFFECTED_MIN_M, depthCm * AFFECTED_M_PER_CM));
+  return m / 1000;
+}
+
+// Predictive "what if water keeps rising" control: how many cm of extra depth to project. At 0
+// the map shows current affected areas; higher values widen each ring to its projected reach.
+export const WATER_RISE_MIN = 0; // cm
+export const WATER_RISE_MAX = 100; // cm
+export const WATER_RISE_STEP = 5; // cm
+export const WATER_RISE_DEFAULT = 0;
+
 export const MONITOR_RADIUS_KM = 3; // default "monitoring area" boundary around the user
 export const MONITOR_RADIUS_MIN = 1; // 1 km
 export const MONITOR_RADIUS_MAX = 20; // 20 km
@@ -23,6 +38,7 @@ export const REPORT_TTL_MIN = 30;
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
   distKm: number;
+  affectedKm: number; // affected-area radius derived from this report's depth
   edgeKm: number;
   time: string;
   mine: boolean;
@@ -44,11 +60,12 @@ export function enrichReports(
   reports: FloodReport[],
   userLoc: LatLng,
   authUserId: number | null,
-  reportRadiusKm: number = REPORT_RADIUS_KM,
   now: number = Date.now()
 ): EnrichedReport[] {
   return reports.map((r) => {
     const distKm = kmBetween(userLoc, { lat: r.latitude, lng: r.longitude });
+    // Affected radius scales with this report's depth (not a uniform slider).
+    const affectedKm = affectedRadiusKm(r.depthCm);
     // Anchor the TTL on the last activity (confirm/re-report bumps `updatedAt`), so confirmations
     // reset the timer. Fall back to createdAt if updatedAt is missing/unparseable.
     const lastActivity = new Date(r.updatedAt ?? r.createdAt).getTime();
@@ -59,7 +76,8 @@ export function enrichReports(
       ...r,
       sev: SEV_META[r.severity],
       distKm,
-      edgeKm: distKm - reportRadiusKm,
+      affectedKm,
+      edgeKm: distKm - affectedKm,
       time: timeAgo(r.createdAt),
       mine: authUserId != null && r.reporterUserId === authUserId,
       ageMin,

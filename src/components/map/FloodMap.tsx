@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { EvacuationCenter, LatLng, RoadSegment } from '../../types';
 import { ROAD_META } from '../../utils/floodMeta';
-import { type EnrichedReport } from '../../utils/viewModel';
+import { affectedRadiusKm, type EnrichedReport } from '../../utils/viewModel';
 
 export interface MapFocus extends LatLng {
   /** Bumped on every search so re-selecting the same place still re-flies the map. */
@@ -21,7 +21,8 @@ interface FloodMapProps {
   roadSegments: RoadSegment[];
   showRoads: boolean;
   showShelters: boolean;
-  reportRadiusKm: number;
+  /** Projected extra water rise (cm) for the predictive outer ring; 0 = current state only. */
+  projectedRiseCm: number;
   monitorRadiusKm: number;
   selectedReportId: number | null;
   selEvacId: number | null;
@@ -94,7 +95,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
   roadSegments,
   showRoads,
   showShelters,
-  reportRadiusKm,
+  projectedRiseCm,
   monitorRadiusKm,
   selectedReportId,
   selEvacId,
@@ -149,24 +150,31 @@ const FloodMap: React.FC<FloodMapProps> = ({
           );
         })}
 
-      {/* Flood reports */}
+      {/* Flood reports. Affected area is drawn as outline-only rings (no fill): a solid ring at
+          the radius implied by the CURRENT depth, and — when projecting a water rise — a wider
+          dashed ring at the radius the flood would reach at depth + projectedRiseCm. */}
       {reports.map((r) => {
         const sel = r.id === selectedReportId;
+        const projectedKm = projectedRiseCm > 0 ? affectedRadiusKm(r.depthCm + projectedRiseCm) : null;
         return (
           <React.Fragment key={r.id}>
+            {/* Predicted widening if water keeps rising (outer dashed ring) */}
+            {projectedKm != null && projectedKm > r.affectedKm && (
+              <Circle
+                center={[r.latitude, r.longitude]}
+                radius={projectedKm * 1000}
+                pathOptions={{ color: '#64748B', weight: 1.5, dashArray: '2 6', fill: false }}
+                eventHandlers={{ click: () => onSelectReport(r.id) }}
+              />
+            )}
+            {/* Current affected area (solid outline, no color fill) */}
             <Circle
               center={[r.latitude, r.longitude]}
-              radius={reportRadiusKm * 1000}
-              pathOptions={{
-                color: r.sev.color,
-                weight: sel ? 3 : 2,
-                dashArray: sel ? undefined : '5 7',
-                fillColor: r.sev.color,
-                fillOpacity: sel ? 0.22 : 0.13,
-              }}
+              radius={r.affectedKm * 1000}
+              pathOptions={{ color: '#475569', weight: sel ? 2.5 : 1.5, fill: false }}
               eventHandlers={{ click: () => onSelectReport(r.id) }}
             />
-            {/* Outer ring encodes flood SEVERITY; inner dot encodes ROAD passability. */}
+            {/* Center marker: ring encodes flood SEVERITY; inner dot encodes ROAD passability. */}
             <CircleMarker
               center={[r.latitude, r.longitude]}
               radius={sel ? 9 : 8}
