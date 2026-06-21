@@ -1,0 +1,18 @@
+# Builds the FloodedArea UI image and serves it on :8080, reverse-proxying /api to the
+# backend. Run the API (floodedarea-api) separately; by default this points at an API
+# listening on the host's :8083. Override API_UPSTREAM to target another host/network.
+services:
+  ui:
+    build:
+      context: .
+      args:
+        # VITE_* are baked at build time — rebuild to change them.
+        VITE_API_URL: /api
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    ports:
+      - "8080:80"
+    environment:
+      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:8083}
+    extra_hosts:
+      # Lets the container reach an API running on the host (Linux parity with Docker Desktop).
+      - "host.docker.internal:host-gateway"

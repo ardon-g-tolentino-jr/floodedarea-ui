@@ -1,5 +1,5 @@
 node_modules
-dist
+# dist/ is committed and shipped — see README "Build & deploy".
 .env
 .env.local
 *.local
