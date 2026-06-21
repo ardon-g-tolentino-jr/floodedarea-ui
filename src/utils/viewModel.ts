@@ -1,7 +1,7 @@
 // Derived view model for the flood map + sidebar, ported from the design's renderVals().
 // Pure functions over the live API data + the user's location.
 
-import type { FloodReport, LatLng, Road, Severity } from '../types';
+import type { FloodReport, LatLng, RescueRequest, Road, Severity } from '../types';
 import { kmBetween } from './geo';
 import { ROAD_RANK, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
@@ -146,6 +146,23 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       ),
     }))
     .sort((a, b) => a.district.localeCompare(b.district));
+}
+
+export interface RescueDistrictCount {
+  district: string;
+  count: number;
+}
+
+/** Tally rescue requests per district, busiest first (ties broken alphabetically). */
+export function rescueCountsByDistrict(rescues: RescueRequest[]): RescueDistrictCount[] {
+  const counts = new Map<string, number>();
+  for (const r of rescues) {
+    const d = r.district?.trim() || 'Unknown area';
+    counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([district, count]) => ({ district, count }))
+    .sort((a, b) => b.count - a.count || a.district.localeCompare(b.district));
 }
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };

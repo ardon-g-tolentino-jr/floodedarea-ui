@@ -86,6 +86,28 @@ export interface NewReport {
   road: Road;
 }
 
+/**
+ * A citizen SOS rescue request, pinned to the sender's coordinates and attributed to a district
+ * (the nearest reported area) so requests can be tallied per district.
+ */
+export interface RescueRequest {
+  id: number;
+  latitude: number;
+  longitude: number;
+  district: string;
+  note: string | null;
+  status: RescueStatus;
+  createdAt: string;
+}
+
+/** Payload for sending a rescue request (the sender is taken from the JWT). */
+export interface NewRescue {
+  latitude: number;
+  longitude: number;
+  district: string;
+  note?: string;
+}
+
 /** Admin payloads — what the management forms submit to baha-api (id/timestamps are server-set). */
 export interface NewCenter {
   name: string;

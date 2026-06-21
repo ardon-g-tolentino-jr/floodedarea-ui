@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { EvacuationCenter, FloodAlert, FloodReport, Hotline, RoadSegment, Severity } from '../types';
+import type { EvacuationCenter, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -20,4 +20,8 @@ export function useAlerts(): FetchResult<FloodAlert[]> {
 
 export function useRoadStatus(): FetchResult<RoadSegment[]> {
   return useFetch(() => rawApi.roadStatus(), []);
+}
+
+export function useRescues(): FetchResult<RescueRequest[]> {
+  return useFetch(() => rawApi.rescues(), []);
 }

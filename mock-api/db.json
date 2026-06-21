@@ -227,5 +227,70 @@
       "createdAt": "2026-06-20T04:00:00Z",
       "updatedAt": "2026-06-20T16:58:17.147Z"
     }
+  ],
+  "rescues": [
+    {
+      "id": 1,
+      "latitude": 14.6965,
+      "longitude": 121.1218,
+      "district": "San Mateo, Rizal",
+      "note": null,
+      "status": "pending",
+      "createdAt": "2026-06-20T05:10:00Z"
+    },
+    {
+      "id": 2,
+      "latitude": 14.6507,
+      "longitude": 121.1029,
+      "district": "Marikina",
+      "note": null,
+      "status": "dispatched",
+      "createdAt": "2026-06-20T05:25:00Z"
+    },
+    {
+      "id": 3,
+      "latitude": 14.6512,
+      "longitude": 121.104,
+      "district": "Marikina",
+      "note": null,
+      "status": "pending",
+      "createdAt": "2026-06-20T05:40:00Z"
+    },
+    {
+      "id": 4,
+      "latitude": 14.5764,
+      "longitude": 121.0851,
+      "district": "Pasig",
+      "note": null,
+      "status": "resolved",
+      "createdAt": "2026-06-20T05:55:00Z"
+    },
+    {
+      "id": 5,
+      "latitude": 14.6965,
+      "longitude": 121.122,
+      "district": "San Mateo, Rizal",
+      "note": null,
+      "status": "pending",
+      "createdAt": "2026-06-20T06:05:00Z"
+    },
+    {
+      "id": 6,
+      "latitude": 14.5786,
+      "longitude": 121.118,
+      "district": "Cainta, Rizal",
+      "note": null,
+      "status": "pending",
+      "createdAt": "2026-06-20T06:20:00Z"
+    },
+    {
+      "id": 7,
+      "latitude": 14.652,
+      "longitude": 121.1051,
+      "district": "Marikina",
+      "note": null,
+      "status": "pending",
+      "createdAt": "2026-06-20T06:35:00Z"
+    }
   ]
 }

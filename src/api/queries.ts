@@ -8,7 +8,9 @@ import type {
   NewCenter,
   NewHotline,
   NewReport,
+  NewRescue,
   ReportStatus,
+  RescueRequest,
   RoadSegment,
   Severity,
 } from '../types';
@@ -21,6 +23,7 @@ export const rawApi = {
   hotlines: () => api.get<Hotline[]>('/hotlines'),
   alerts: () => api.get<FloodAlert[]>('/alerts'),
   roadStatus: () => api.get<RoadSegment[]>('/road-status'),
+  rescues: () => api.get<RescueRequest[]>('/rescue'),
 };
 
 /** POST/PATCH/DELETE mutations. */
@@ -31,8 +34,7 @@ export const mutations = {
   updateReport: (id: number, body: Partial<NewReport & { status: ReportStatus }>) =>
     api.patch<FloodReport>(`/reports/${id}`, body),
   deleteReport: (id: number) => api.delete<void>(`/reports/${id}`),
-  createRescue: (body: { latitude: number; longitude: number; note?: string }) =>
-    api.post<unknown>('/rescue', body),
+  createRescue: (body: NewRescue) => api.post<RescueRequest>('/rescue', body),
 
   // ── Admin: evacuation centers ──
   createCenter: (body: NewCenter) => api.post<EvacuationCenter>('/centers', body),

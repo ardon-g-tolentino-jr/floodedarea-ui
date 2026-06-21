@@ -2,7 +2,7 @@ import React from 'react';
 import type { AlertLevel, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, Road, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAlerts, useCenters, useHotlines, useReports, useRoadStatus } from './hooks/useDomainData';
+import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStatus } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { mutations } from './api/queries';
 import type { GeoResult } from './api/geocode';
@@ -29,6 +29,7 @@ import Toast, { type ToastData } from './components/panels/Toast';
 import NotifyModal, { type NotifyPrefs, DEFAULT_NOTIFY_PREFS } from './components/panels/NotifyModal';
 import WaterLevelModal from './components/panels/WaterLevelModal';
 import RoadConditionsModal from './components/panels/RoadConditionsModal';
+import RescueChartModal from './components/panels/RescueChartModal';
 import AdminPanel from './components/panels/AdminPanel';
 import LoginView from './views/LoginView';
 
@@ -66,6 +67,7 @@ const App: React.FC = () => {
   const hotlines = useHotlines();
   const alerts = useAlerts();
   const roads = useRoadStatus();
+  const rescues = useRescues();
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
 
@@ -96,6 +98,7 @@ const App: React.FC = () => {
   const [notifyOpen, setNotifyOpen] = React.useState(false);
   const [waterChartOpen, setWaterChartOpen] = React.useState(false);
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
+  const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -144,6 +147,8 @@ const App: React.FC = () => {
   useActivityStream((event) => {
     if (event.startsWith('alert')) {
       void alerts.refetch(true);
+    } else if (event.startsWith('rescue')) {
+      void rescues.refetch(true);
     } else {
       // Report activity may shift map-matched road status too.
       void reports.refetch(true);
@@ -156,6 +161,7 @@ const App: React.FC = () => {
   const hotlineList = hotlines.data ?? [];
   const alertList = alerts.data ?? [];
   const roadList = roads.data ?? [];
+  const rescueList = rescues.data ?? [];
 
   const enriched = React.useMemo(
     () => enrichReports(reportList, userLoc, auth?.userId ?? null, reportRadiusKm, now),
@@ -404,7 +410,14 @@ const App: React.FC = () => {
     }
     setSending(true);
     try {
-      await mutations.createRescue({ latitude: userLoc.lat, longitude: userLoc.lng });
+      // Attribute the request to the nearest reported district so it can be tallied per district.
+      const nearest = [...enriched].sort((a, b) => a.distKm - b.distKm)[0];
+      await mutations.createRescue({
+        latitude: userLoc.lat,
+        longitude: userLoc.lng,
+        district: nearest?.district ?? 'Unknown area',
+      });
+      await rescues.refetch(true);
       setSosOpen(false);
       showToast('Rescue request sent with your location. Stay safe.');
     } catch {
@@ -496,6 +509,7 @@ const App: React.FC = () => {
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}
         onWaterChart={() => setWaterChartOpen(true)}
+        onRescueChart={() => setRescueChartOpen(true)}
         isAdmin={!!isAdmin}
         onAdmin={() => setAdminOpen(true)}
       />
@@ -634,6 +648,10 @@ const App: React.FC = () => {
           onSelectRoad={openRoadOnMap}
           onClose={() => setRoadsModalOpen(false)}
         />
+      )}
+
+      {rescueChartOpen && (
+        <RescueChartModal rescues={rescueList} isMobile={isMobile} onClose={() => setRescueChartOpen(false)} />
       )}
 
       {adminOpen && isAdmin && (

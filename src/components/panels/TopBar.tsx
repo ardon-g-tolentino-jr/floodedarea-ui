@@ -17,6 +17,7 @@ interface TopBarProps {
   onNotify: () => void;
   notifyOn: boolean;
   onWaterChart: () => void;
+  onRescueChart: () => void;
   isAdmin: boolean;
   onAdmin: () => void;
 }
@@ -34,6 +35,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onNotify,
   notifyOn,
   onWaterChart,
+  onRescueChart,
   isAdmin,
   onAdmin,
 }) => {
@@ -143,6 +145,27 @@ const TopBar: React.FC<TopBarProps> = ({
           }}
         >
           📈
+        </button>
+
+        <button
+          onClick={onRescueChart}
+          title="Rescue requests by district"
+          aria-label="Rescue requests by district"
+          style={{
+            width: 40,
+            height: 40,
+            flex: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #DCE3E9',
+            background: '#fff',
+            borderRadius: 11,
+            fontSize: 16,
+            cursor: 'pointer',
+          }}
+        >
+          🛟
         </button>
 
         <button

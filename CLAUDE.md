@@ -81,10 +81,11 @@ capabilities via baha-api (not all surfaced in this UI).
 ## Mock backend
 
 `mock-api/server.cjs` is a json-server mock mirroring baha-api for offline work. Reads/writes
-for `/reports /centers /hotlines /alerts` come from `mock-api/db.json`. Auth, `/reports/:id/confirm`,
-`/rescue`, and `/sse/activity` are **stubbed** (auth accepts anything; an email starting with
-`admin` returns role `ADMIN`; SSE opens but emits no further events). Edit `db.json` to change
-seed data.
+for `/reports /centers /hotlines /alerts /rescue` come from `mock-api/db.json`. Auth,
+`/reports/:id/confirm`, and `/sse/activity` are **stubbed** (auth accepts anything; an email
+starting with `admin` returns role `ADMIN`; SSE opens but emits no further events). `/rescue`
+persists requests to `db.json` and broadcasts a `rescue-created` SSE event. Edit `db.json` to
+change seed data.
 
 ## Note on `design/`
 

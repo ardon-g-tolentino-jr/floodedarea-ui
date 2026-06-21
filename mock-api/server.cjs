@@ -2,8 +2,8 @@
 // Run with `npm run mock` (port 3001) and point the UI at it:
 //   VITE_API_URL=http://localhost:3001 npm run dev   (or just `npm run dev:mock`)
 //
-// Reads/writes for /reports, /centers, /hotlines, /alerts come from db.json.
-// Auth + confirm + rescue + SSE are stubbed so the full UI flow works without a backend.
+// Reads/writes for /reports, /centers, /hotlines, /alerts, /rescue come from db.json.
+// Auth + confirm + SSE are stubbed so the full UI flow works without a backend.
 // /road-status is a static stub too: it synthesizes a short road segment through each non-passable
 // report rather than doing real map-matching (which baha-api performs in production).
 
@@ -99,15 +99,36 @@ server.get('/road-status', (_req, res) => {
   res.json(segments);
 });
 
-// ── SOS rescue (stub) ──
-server.post('/rescue', (req, res) => res.status(201).json({ id: 1, status: 'pending', ...req.body }));
-
 // ── SSE — tracks open clients so dev endpoints can broadcast live events ──
 const sseClients = new Set();
 function broadcast(event, data) {
   const frame = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
   for (const client of sseClients) client.write(frame);
 }
+
+// ── SOS rescue — persist requests (with district) so the per-district chart has data, and
+// broadcast over SSE so the chart updates live. baha-api persists these server-side. ──
+server.get('/rescue', (_req, res) => {
+  res.json(router.db.get('rescues').value() || []);
+});
+
+server.post('/rescue', (req, res) => {
+  const db = router.db;
+  const ids = db.get('rescues').map('id').value();
+  const id = ids.length ? Math.max(...ids) + 1 : 1;
+  const rescue = {
+    id,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    district: req.body.district || 'Unknown area',
+    note: req.body.note || null,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+  db.get('rescues').push(rescue).write();
+  broadcast('rescue-created', { id });
+  res.status(201).json(rescue);
+});
 
 server.get('/sse/activity', (_req, res) => {
   res.writeHead(200, {
