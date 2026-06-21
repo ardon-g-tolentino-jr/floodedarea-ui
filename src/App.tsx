@@ -297,7 +297,26 @@ const App: React.FC = () => {
     setSelectedReportId(null);
     setSelEvacId(null);
     setMode('report');
+    // Drop the pin at the user's location and recenter the map there.
     setPending({ ...userLoc, atYou: true });
+    setMapFocus({ ...userLoc, key: Date.now() });
+    // Refresh the GPS fix so the pin/centering reflect where they actually are right now
+    // (the on-mount fix may be stale, or fell back to the default monitoring area).
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setUserLoc(loc);
+          // Only re-pin/recenter if they haven't already moved the pin themselves.
+          setPending((p) => {
+            if (p && p.atYou) setMapFocus({ ...loc, key: Date.now() });
+            return p && p.atYou ? { ...loc, atYou: true } : p;
+          });
+        },
+        () => {/* keep the current location */},
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
   };
 
   const cancelReport = (): void => {
