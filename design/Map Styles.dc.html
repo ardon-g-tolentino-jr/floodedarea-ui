@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{margin:0}
+  *{box-sizing:border-box}
+</style>
+</helmet>
+
+<div style="width:max-content;min-width:100%;min-height:100vh;box-sizing:border-box;padding:48px;background:#E7E5DF;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#16202E">
+
+  <div style="margin-bottom:8px;font-size:11px;font-weight:800;letter-spacing:.14em;color:#9A968C">BAHAWATCH · MAP STYLE OPTIONS</div>
+  <div style="font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px">Four ways to render the map</div>
+  <div style="font-size:14px;color:#6B6B63;max-width:720px;line-height:1.5;margin-bottom:34px;text-wrap:pretty">Same flood data, same 10&nbsp;km monitoring area and reporting logic underneath — only the map canvas changes. Pick a direction and I'll swap it into the live app. (All are offline mockups; a real live map is a separate, internet-connected build.)</div>
+
+  <div style="display:flex;gap:48px;align-items:flex-start">
+
+    <!-- A · STYLIZED -->
+    <div style="flex:none;width:600px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#6B6B63;margin-bottom:10px">A · STYLIZED &nbsp;<span style="color:#0EA5E9">CURRENT</span></div>
+      <div style="background:#fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px">
+        <div style="position:relative;width:560px;height:420px;border-radius:14px;overflow:hidden;background:#E5EBE3;background-image:repeating-linear-gradient(0deg,rgba(110,130,118,.09) 0 1px,transparent 1px 44px),repeating-linear-gradient(90deg,rgba(110,130,118,.09) 0 1px,transparent 1px 44px)">
+          <div style="position:absolute;left:60px;top:280px;width:120px;height:95px;background:rgba(120,170,120,.22);border-radius:46% 54% 60% 40%"></div>
+          <div style="position:absolute;left:420px;top:60px;width:130px;height:110px;background:rgba(120,170,120,.20);border-radius:54% 46% 40% 60%"></div>
+          <svg viewBox="0 0 560 420" style="position:absolute;inset:0;width:100%;height:100%">
+            <path d="M285 -10 C 255 60, 320 110, 278 170 C 245 230, 330 250, 295 320 C 270 380, 258 400, 275 440" fill="none" stroke="#A9D6EC" stroke-width="15" stroke-linecap="round"/>
+            <path d="M285 -10 C 255 60, 320 110, 278 170 C 245 230, 330 250, 295 320 C 270 380, 258 400, 275 440" fill="none" stroke="#C7E6F5" stroke-width="6" stroke-linecap="round"/>
+            <path d="M90 50 C 180 110, 230 140, 278 170" fill="none" stroke="#A9D6EC" stroke-width="10" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;left:120px;top:160px;font-size:10px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.34)">QUEZON CITY</div>
+          <div style="position:absolute;left:250px;top:198px;font-size:11px;font-weight:800;letter-spacing:.18em;color:rgba(60,75,90,.42)">MARIKINA</div>
+          <div style="position:absolute;left:360px;top:300px;font-size:10px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">CAINTA</div>
+          <!-- boundary -->
+          <div style="position:absolute;left:83px;top:20px;width:370px;height:370px;border-radius:50%;border:2px dashed rgba(14,165,233,.5);background:radial-gradient(circle,rgba(14,165,233,.05),rgba(14,165,233,0) 70%)"></div>
+          <!-- flood circles -->
+          <div style="position:absolute;left:179px;top:94px;width:112px;height:112px;border-radius:50%;border:2px dashed #EF4444;background:radial-gradient(circle,rgba(239,68,68,.34),rgba(239,68,68,.16) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:244px;top:149px;width:112px;height:112px;border-radius:50%;border:2px dashed #EF4444;background:radial-gradient(circle,rgba(239,68,68,.34),rgba(239,68,68,.16) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:148px;top:198px;width:104px;height:104px;border-radius:50%;border:2px dashed #F59E0B;background:radial-gradient(circle,rgba(245,158,11,.34),rgba(245,158,11,.16) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:302px;top:257px;width:96px;height:96px;border-radius:50%;border:2px dashed #16A34A;background:radial-gradient(circle,rgba(22,163,74,.32),rgba(22,163,74,.15) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:228px;top:228px;width:14px;height:14px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 7px rgba(14,165,233,.6)"></div>
+          <div style="position:absolute;left:14px;top:14px;padding:3px 9px;background:#0EA5E9;color:#fff;font-size:9.5px;font-weight:800;border-radius:999px">10 km radius</div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:15px;font-weight:800">Stylized terrain</div>
+          <div style="font-size:12.5px;color:#6B6B63;line-height:1.5;margin-top:3px">Soft illustrated land, river basin & district names. Friendly and on-brand.</div>
+          <div style="margin-top:9px;font-size:11px;font-weight:700;color:#0E7490;background:#E3F4FC;display:inline-block;padding:4px 10px;border-radius:999px">Best for: general public</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B · REALISTIC STREETS -->
+    <div style="flex:none;width:600px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#6B6B63;margin-bottom:10px">B · REALISTIC STREET MAP</div>
+      <div style="background:#fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px">
+        <div style="position:relative;width:560px;height:420px;border-radius:14px;overflow:hidden;background:#EBEDEF;background-image:repeating-linear-gradient(0deg,rgba(150,158,166,.16) 0 1px,transparent 1px 30px),repeating-linear-gradient(90deg,rgba(150,158,166,.16) 0 1px,transparent 1px 30px)">
+          <!-- blocks / parks -->
+          <div style="position:absolute;left:40px;top:60px;width:90px;height:70px;background:#E4E7EA;border-radius:3px"></div>
+          <div style="position:absolute;left:420px;top:70px;width:110px;height:90px;background:#D7E7D2;border-radius:5px"></div>
+          <div style="position:absolute;left:70px;top:300px;width:120px;height:80px;background:#D7E7D2;border-radius:5px"></div>
+          <svg viewBox="0 0 560 420" style="position:absolute;inset:0;width:100%;height:100%">
+            <!-- river -->
+            <path d="M300 -10 C 270 70, 330 120, 290 190 C 255 255, 320 280, 285 360 C 270 400, 268 410, 280 440" fill="none" stroke="#AECBE0" stroke-width="16" stroke-linecap="round"/>
+            <!-- road casings -->
+            <g stroke="#C4CACF">
+              <path d="M-10 210 L 570 205" stroke-width="20" stroke-linecap="round"/>
+              <path d="M270 -10 L 285 430" stroke-width="18" stroke-linecap="round"/>
+              <path d="M40 400 L 520 60" stroke-width="14" stroke-linecap="round"/>
+            </g>
+            <!-- highway casing -->
+            <path d="M10 120 C 200 140, 360 90, 560 150" fill="none" stroke="#E8B96A" stroke-width="16" stroke-linecap="round"/>
+            <!-- road fills -->
+            <g stroke="#FFFFFF">
+              <path d="M-10 210 L 570 205" stroke-width="13" stroke-linecap="round"/>
+              <path d="M270 -10 L 285 430" stroke-width="11" stroke-linecap="round"/>
+              <path d="M40 400 L 520 60" stroke-width="8" stroke-linecap="round"/>
+            </g>
+            <path d="M10 120 C 200 140, 360 90, 560 150" fill="none" stroke="#FCDFA8" stroke-width="9" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;left:300px;top:188px;font-size:9px;font-weight:700;color:#8A929A;transform:rotate(-2deg)">Marcos Hwy</div>
+          <div style="position:absolute;left:120px;top:96px;font-size:9px;font-weight:700;color:#B79248;transform:rotate(-6deg)">Sumulong Hwy</div>
+          <div style="position:absolute;left:300px;top:300px;font-size:9px;font-weight:700;color:#8A929A;transform:rotate(90deg);transform-origin:left">A. Bonifacio Ave</div>
+          <!-- boundary -->
+          <div style="position:absolute;left:83px;top:20px;width:370px;height:370px;border-radius:50%;border:2px dashed rgba(14,165,233,.55)"></div>
+          <!-- flood circles -->
+          <div style="position:absolute;left:179px;top:94px;width:112px;height:112px;border-radius:50%;border:2px solid rgba(239,68,68,.6);background:radial-gradient(circle,rgba(239,68,68,.38),rgba(239,68,68,.18) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:244px;top:149px;width:112px;height:112px;border-radius:50%;border:2px solid rgba(239,68,68,.6);background:radial-gradient(circle,rgba(239,68,68,.38),rgba(239,68,68,.18) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:148px;top:198px;width:104px;height:104px;border-radius:50%;border:2px solid rgba(245,158,11,.6);background:radial-gradient(circle,rgba(245,158,11,.38),rgba(245,158,11,.18) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:302px;top:257px;width:96px;height:96px;border-radius:50%;border:2px solid rgba(22,163,74,.6);background:radial-gradient(circle,rgba(22,163,74,.36),rgba(22,163,74,.16) 55%,transparent 72%)"></div>
+          <div style="position:absolute;left:228px;top:228px;width:14px;height:14px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 7px rgba(14,165,233,.6)"></div>
+          <div style="position:absolute;left:14px;top:14px;padding:5px 10px;background:rgba(255,255,255,.95);border:1px solid #E0E4E8;color:#16202E;font-size:9.5px;font-weight:800;border-radius:8px;box-shadow:0 2px 6px rgba(15,23,42,.1)">Marikina City</div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:15px;font-weight:800">Realistic street map</div>
+          <div style="font-size:12.5px;color:#6B6B63;line-height:1.5;margin-top:3px">Looks like a real map app — named roads, blocks, landmarks. Most familiar to read.</div>
+          <div style="margin-top:9px;font-size:11px;font-weight:700;color:#0E7490;background:#E3F4FC;display:inline-block;padding:4px 10px;border-radius:999px">Best for: public & drivers</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C · GRID SECTORS -->
+    <div style="flex:none;width:600px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#6B6B63;margin-bottom:10px">C · GRID SECTORS</div>
+      <div style="background:#fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px">
+        <div style="position:relative;width:560px;height:420px;border-radius:14px;overflow:hidden;background:#F3F5F7">
+          <!-- colored cells (cell 80x84, offset by 36px left / 28 top for labels) -->
+          <div style="position:absolute;left:36px;top:28px;width:524px;height:392px">
+            <div style="position:absolute;left:148px;top:80px;width:74px;height:78px;background:rgba(239,68,68,.55);border-radius:3px"></div>
+            <div style="position:absolute;left:222px;top:80px;width:74px;height:78px;background:rgba(239,68,68,.55);border-radius:3px"></div>
+            <div style="position:absolute;left:222px;top:158px;width:74px;height:78px;background:rgba(239,68,68,.4);border-radius:3px"></div>
+            <div style="position:absolute;left:148px;top:158px;width:74px;height:78px;background:rgba(245,158,11,.5);border-radius:3px"></div>
+            <div style="position:absolute;left:296px;top:158px;width:74px;height:78px;background:rgba(245,158,11,.42);border-radius:3px"></div>
+            <div style="position:absolute;left:296px;top:236px;width:74px;height:78px;background:rgba(22,163,74,.45);border-radius:3px"></div>
+            <div style="position:absolute;left:370px;top:236px;width:74px;height:78px;background:rgba(22,163,74,.34);border-radius:3px"></div>
+            <!-- grid lines -->
+            <svg viewBox="0 0 524 392" style="position:absolute;inset:0;width:100%;height:100%">
+              <g stroke="#D3DAE0" stroke-width="1">
+                <path d="M74 0 V392 M148 0 V392 M222 0 V392 M296 0 V392 M370 0 V392 M444 0 V392"/>
+                <path d="M0 78 H524 M0 158 H524 M0 236 H524 M0 314 H524"/>
+              </g>
+              <rect x="0" y="0" width="524" height="392" fill="none" stroke="#C2CAD1" stroke-width="1.5"/>
+            </svg>
+            <!-- cell labels -->
+            <div style="position:absolute;left:152px;top:84px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.9)">C2</div>
+            <div style="position:absolute;left:226px;top:84px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.9)">D2</div>
+            <div style="position:absolute;left:152px;top:162px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;color:rgba(120,80,10,.8)">C3</div>
+            <!-- you -->
+            <div style="position:absolute;left:192px;top:200px;width:13px;height:13px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 6px rgba(14,165,233,.6)"></div>
+            <!-- boundary outline -->
+            <div style="position:absolute;left:47px;top:-8px;width:370px;height:370px;border-radius:50%;border:2px dashed rgba(14,165,233,.45)"></div>
+          </div>
+          <!-- column letters -->
+          <div style="position:absolute;left:36px;top:6px;width:524px;display:flex;font-family:ui-monospace,monospace;font-size:11px;font-weight:700;color:#8893A0"><div style="width:74px;text-align:center">A</div><div style="width:74px;text-align:center">B</div><div style="width:74px;text-align:center">C</div><div style="width:74px;text-align:center">D</div><div style="width:74px;text-align:center">E</div><div style="width:74px;text-align:center">F</div><div style="width:74px;text-align:center">G</div></div>
+          <!-- row numbers -->
+          <div style="position:absolute;left:10px;top:28px;height:392px;display:flex;flex-direction:column;font-family:ui-monospace,monospace;font-size:11px;font-weight:700;color:#8893A0"><div style="height:78px;display:flex;align-items:center">1</div><div style="height:78px;display:flex;align-items:center">2</div><div style="height:78px;display:flex;align-items:center">3</div><div style="height:78px;display:flex;align-items:center">4</div><div style="height:78px;display:flex;align-items:center">5</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:15px;font-weight:800">Grid sectors</div>
+          <div style="font-size:12.5px;color:#6B6B63;line-height:1.5;margin-top:3px">Area split into lettered sectors; whole cells flag severity. Coordinate by zone (“flooding in D2”).</div>
+          <div style="margin-top:9px;font-size:11px;font-weight:700;color:#0E7490;background:#E3F4FC;display:inline-block;padding:4px 10px;border-radius:999px">Best for: LGU / responders</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- D · HEX TILES -->
+    <div style="flex:none;width:600px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#6B6B63;margin-bottom:10px">D · HEX TILES</div>
+      <div style="background:#fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px">
+        <div style="position:relative;width:560px;height:420px;border-radius:14px;overflow:hidden;background:#EEF1F3">
+          <sc-for list="{{ hexes }}" as="h" hint-placeholder-count="54">
+            <div style="{{ h.style }}"></div>
+          </sc-for>
+          <!-- boundary -->
+          <div style="position:absolute;left:90px;top:30px;width:360px;height:360px;border-radius:50%;border:2px dashed rgba(14,165,233,.5)"></div>
+          <!-- you -->
+          <div style="position:absolute;left:228px;top:228px;width:14px;height:14px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 7px rgba(14,165,233,.6);z-index:3"></div>
+          <div style="position:absolute;left:14px;top:14px;padding:3px 9px;background:#0EA5E9;color:#fff;font-size:9.5px;font-weight:800;border-radius:999px;z-index:3">10 km radius</div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:15px;font-weight:800">Hex tiles</div>
+          <div style="font-size:12.5px;color:#6B6B63;line-height:1.5;margin-top:3px">Region tiled in hexes that light up by severity. Fastest to scan a whole area at a glance.</div>
+          <div style="margin-top:9px;font-size:11px;font-weight:700;color:#0E7490;background:#E3F4FC;display:inline-block;padding:4px 10px;border-radius:999px">Best for: quick triage</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const pts = [
+      { x: 235, y: 150, s: 'high' },
+      { x: 300, y: 205, s: 'high' },
+      { x: 205, y: 250, s: 'medium' },
+      { x: 350, y: 305, s: 'low' }
+    ];
+    const col = { high: '#EF4444', medium: '#F59E0B', low: '#16A34A' };
+    const clip = 'polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)';
+    const hs = 58, vs = 48.8, w = 53, h = 60;
+    const hexes = [];
+    for (let row = 0; row < 6; row++) {
+      for (let c = 0; c < 9; c++) {
+        const x = c * hs + (row % 2 ? hs / 2 : 0) + 4;
+        const y = row * vs + 4;
+        const cx = x + w / 2, cy = y + h / 2;
+        let best = 999, bs = null;
+        pts.forEach(p => { const d = Math.hypot(cx - p.x, cy - p.y); if (d < 56 && d < best) { best = d; bs = p.s; } });
+        hexes.push({
+          style: {
+            position: 'absolute', left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px',
+            clipPath: clip, background: bs ? col[bs] : '#DFE5E9', opacity: bs ? 0.92 : 1
+          }
+        });
+      }
+    }
+    return { hexes };
+  }
+}
+</script>
+</body>
+</html>

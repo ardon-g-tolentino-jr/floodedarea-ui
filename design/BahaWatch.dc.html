@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{margin:0}
+  *{box-sizing:border-box}
+  input{font-family:inherit}
+  button{font-family:inherit}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#CFD8DF;border-radius:9px}
+  @keyframes floodPulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes youPulse{0%{transform:scale(.55);opacity:.55}80%{transform:scale(2.7);opacity:0}100%{opacity:0}}
+  @keyframes toastIn{from{transform:translate(-50%,18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  @keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="display:flex;flex-direction:column;height:100vh;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#F4F7F9;color:#16202E;overflow:hidden">
+
+  <!-- TOP BAR -->
+  <div style="{{ topBarStyle }}">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(150deg,#0EA5E9,#0369A1);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(3,105,161,.3);flex:none">
+        <div style="width:13px;height:13px;background:#fff;border-radius:50% 50% 50% 0;transform:rotate(45deg)"></div>
+      </div>
+      <div style="line-height:1.1">
+        <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">FloodWatch</div>
+        <div style="font-size:11px;color:#7C8B98;font-weight:600">{{ regionLabel }}</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSearch }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;max-width:440px;margin:0 8px;display:flex;align-items:center;gap:9px;padding:0 14px;height:40px;background:#F1F5F8;border:1px solid #E6EBF0;border-radius:11px">
+        <div style="width:15px;height:15px;border:2px solid #9AA8B4;border-radius:50%;position:relative;flex:none">
+          <div style="position:absolute;width:7px;height:2px;background:#9AA8B4;bottom:-3px;right:-4px;transform:rotate(45deg);border-radius:2px"></div>
+        </div>
+        <input placeholder="Search a barangay, street or landmark…" style="border:0;background:transparent;outline:none;font-size:13.5px;width:100%;color:#16202E"/>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;align-items:center;gap:9px;margin-left:auto">
+      <sc-if value="{{ showShare }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onShare }}" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 15px;border:1px solid #DCE3E9;background:#fff;border-radius:11px;font-size:13px;font-weight:700;color:#3A4856;cursor:pointer">
+          <span style="font-size:14px">⤴</span> Share
+        </button>
+      </sc-if>
+      <button onClick="{{ onSOS }}" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 16px;border:0;background:#EF4444;border-radius:11px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(239,68,68,.32)">
+        SOS
+      </button>
+      <sc-if value="{{ showBarReport }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onReport }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 17px;border:0;background:#0EA5E9;border-radius:11px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(14,165,233,.32)">
+          <span style="font-size:16px;font-weight:700">+</span> Report flood
+        </button>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- ALERT RIBBON -->
+  <sc-if value="{{ showAlert }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;display:flex;align-items:center;gap:11px;padding:9px 16px;background:#FFF4E0;border-bottom:1px solid #F6E2BC;font-size:12.5px;font-weight:600;color:#92600B;z-index:35">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#F59E0B;color:#fff;border-radius:6px;font-size:12px;font-weight:800;flex:none">!</span>
+      <span style="text-wrap:pretty"><b>Orange Rainfall Warning</b> in effect for eastern Metro Manila &amp; Rizal — flooding likely in low-lying and riverside areas. Avoid the Marikina River basin.</span>
+      <button onClick="{{ onCloseAlert }}" style="margin-left:auto;border:0;background:transparent;color:#B07D1C;font-size:18px;line-height:1;cursor:pointer;flex:none">×</button>
+    </div>
+  </sc-if>
+
+  <!-- BODY -->
+  <div style="{{ bodyStyle }}" ref="{{ bodyRef }}">
+
+    <!-- MAP SECTION -->
+    <div style="{{ mapOuterStyle }}">
+      <div style="{{ mapWrapStyle }}">
+
+        <!-- GEO LAYER (scales to fit on mobile) -->
+        <div style="{{ geoStyle }}">
+
+          <!-- blocks & parks -->
+          <div style="position:absolute;left:70px;top:84px;width:140px;height:96px;background:#E3E6E9;border-radius:4px"></div>
+          <div style="position:absolute;left:690px;top:108px;width:172px;height:140px;background:#D9E8D3;border-radius:8px"></div>
+          <div style="position:absolute;left:118px;top:470px;width:162px;height:112px;background:#D9E8D3;border-radius:8px"></div>
+          <div style="position:absolute;left:556px;top:540px;width:152px;height:102px;background:#E3E6E9;border-radius:4px"></div>
+          <div style="position:absolute;left:744px;top:430px;width:124px;height:92px;background:#E3E6E9;border-radius:4px"></div>
+          <div style="position:absolute;left:300px;top:560px;width:120px;height:84px;background:#E3E6E9;border-radius:4px"></div>
+
+          <!-- river, roads & highways -->
+          <svg viewBox="0 0 920 680" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+            <path d="M470 -20 C 430 80, 515 150, 458 240 C 410 320, 525 360, 482 470 C 450 560, 430 610, 452 700" fill="none" stroke="#AECBE0" stroke-width="20" stroke-linecap="round"/>
+            <g stroke="#C4CACF">
+              <path d="M-10 350 L 930 342" stroke-width="24" stroke-linecap="round"/>
+              <path d="M-10 196 L 930 188" stroke-width="20" stroke-linecap="round"/>
+              <path d="M232 -10 L 250 690" stroke-width="22" stroke-linecap="round"/>
+              <path d="M692 -10 L 708 690" stroke-width="20" stroke-linecap="round"/>
+              <path d="M60 662 L 862 88" stroke-width="16" stroke-linecap="round"/>
+            </g>
+            <path d="M10 128 C 320 164, 600 108, 930 184" fill="none" stroke="#E8B96A" stroke-width="18" stroke-linecap="round"/>
+            <g stroke="#FFFFFF">
+              <path d="M-10 350 L 930 342" stroke-width="15" stroke-linecap="round"/>
+              <path d="M-10 196 L 930 188" stroke-width="12" stroke-linecap="round"/>
+              <path d="M232 -10 L 250 690" stroke-width="13" stroke-linecap="round"/>
+              <path d="M692 -10 L 708 690" stroke-width="12" stroke-linecap="round"/>
+              <path d="M60 662 L 862 88" stroke-width="9" stroke-linecap="round"/>
+            </g>
+            <path d="M10 128 C 320 164, 600 108, 930 184" fill="none" stroke="#FCDFA8" stroke-width="10" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;left:585px;top:325px;font-size:10px;font-weight:700;color:#8A929A;transform:rotate(-1deg);pointer-events:none">Marcos Highway</div>
+          <div style="position:absolute;left:320px;top:128px;font-size:10px;font-weight:700;color:#B79248;transform:rotate(-7deg);pointer-events:none">Sumulong Hwy</div>
+          <div style="position:absolute;left:256px;top:430px;font-size:10px;font-weight:700;color:#8A929A;pointer-events:none">A. Bonifacio Ave</div>
+
+          <!-- district labels -->
+          <sc-if value="{{ showDistricts }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;pointer-events:none">
+              <div style="position:absolute;left:150px;top:250px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">QUEZON CITY</div>
+              <div style="position:absolute;left:392px;top:312px;font-size:12px;font-weight:800;letter-spacing:.18em;color:rgba(60,75,90,.4)">MARIKINA</div>
+              <div style="position:absolute;left:392px;top:78px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">SAN MATEO</div>
+              <div style="position:absolute;left:560px;top:60px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.3)">RODRIGUEZ</div>
+              <div style="position:absolute;left:730px;top:300px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">ANTIPOLO</div>
+              <div style="position:absolute;left:648px;top:486px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">CAINTA</div>
+              <div style="position:absolute;left:512px;top:560px;font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(60,75,90,.32)">PASIG</div>
+              <div style="position:absolute;left:300px;top:520px;font-size:10px;font-weight:700;letter-spacing:.22em;color:rgba(90,140,170,.55)">MARIKINA RIVER</div>
+            </div>
+          </sc-if>
+
+          <!-- 10km monitoring boundary -->
+          <div style="{{ boundaryStyle }}"></div>
+          <div style="{{ boundaryLabelStyle }}">{{ boundaryLabel }}</div>
+
+          <!-- FLOOD LAYER -->
+          <sc-for list="{{ visible }}" as="r" hint-placeholder-count="6">
+            <div style="position:absolute;inset:0;pointer-events:none">
+              <div style="{{ r.circleStyle }}" onClick="{{ r.onSelect }}"></div>
+              <div style="{{ r.dotStyle }}" onClick="{{ r.onSelect }}"></div>
+              <div style="{{ r.labelStyle }}">
+                <span style="{{ r.swatchStyle }};width:7px;height:7px;border-radius:50%;display:inline-block"></span>
+                {{ r.name }} · {{ r.depthCm }}cm
+              </div>
+            </div>
+          </sc-for>
+
+          <!-- EVACUATION CENTERS -->
+          <sc-if value="{{ showShelters }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ evac }}" as="e" hint-placeholder-count="5">
+              <div style="position:absolute;inset:0;pointer-events:none">
+                <div style="{{ e.markerStyle }}" onClick="{{ e.onSelect }}">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg>
+                </div>
+                <div style="{{ e.statusDotStyle }}"></div>
+                <div style="{{ e.labelStyle }}">{{ e.name }}</div>
+              </div>
+            </sc-for>
+          </sc-if>
+
+          <!-- SAFE ROUTE -->
+          <sc-if value="{{ route }}" hint-placeholder-val="{{ false }}">
+            <svg viewBox="0 0 920 680" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4">
+              <path d="{{ route.path }}" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="{{ route.path }}" fill="none" stroke="#0E7490" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.5 9"></path>
+            </svg>
+            <div style="{{ route.targetStyle }}"></div>
+          </sc-if>
+
+          <!-- YOUR LOCATION -->
+          <div style="position:absolute;left:372px;top:362px;width:40px;height:40px;border-radius:50%;background:rgba(14,165,233,.35);animation:youPulse 2.6s ease-out infinite;pointer-events:none"></div>
+          <div style="position:absolute;left:385px;top:375px;width:14px;height:14px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 7px rgba(14,165,233,.6);z-index:5;pointer-events:none"></div>
+          <div style="position:absolute;left:406px;top:373px;padding:3px 8px;background:#0EA5E9;color:#fff;font-size:10.5px;font-weight:800;border-radius:7px;white-space:nowrap;z-index:5;pointer-events:none;box-shadow:0 2px 6px rgba(14,165,233,.4)">You</div>
+
+          <!-- PENDING PIN -->
+          <sc-if value="{{ pending }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ pending.pinStyle }}"></div>
+          </sc-if>
+        </div>
+
+        <!-- CHROME LAYER (full size, never scaled) -->
+        <!-- AREA CHIP -->
+        <div style="position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:9px;padding:8px 12px;background:rgba(255,255,255,.95);backdrop-filter:blur(4px);border:1px solid #E6EBF0;border-radius:12px;box-shadow:0 3px 12px rgba(15,23,42,.1);z-index:12">
+          <div style="width:9px;height:9px;border-radius:50%;background:#0EA5E9"></div>
+          <div style="line-height:1.2">
+            <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;color:#90A0AC">MONITORING AREA</div>
+            <div style="font-size:13px;font-weight:800">{{ youAreaLabel }}</div>
+          </div>
+        </div>
+
+        <!-- FILTER CHIPS (desktop, on map) -->
+        <sc-if value="{{ showMapFilters }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:12">
+            <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="3">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">
+                <span style="{{ c.dotStyle }}"></span>{{ c.label }}<span style="opacity:.6;font-weight:700">{{ c.count }}</span>
+              </button>
+            </sc-for>
+            <button onClick="{{ onToggleShelters }}" style="{{ sheltersChipStyle }}">
+              <span style="width:13px;height:13px;border-radius:4px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:9px;height:9px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></span>Shelters
+            </button>
+          </div>
+        </sc-if>
+
+        <!-- LEGEND -->
+        <sc-if value="{{ showLegend }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;bottom:16px;left:16px;padding:13px 15px;background:rgba(255,255,255,.96);backdrop-filter:blur(4px);border:1px solid #E6EBF0;border-radius:14px;box-shadow:0 4px 16px rgba(15,23,42,.1);z-index:12;width:208px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#90A0AC;margin-bottom:9px">FLOOD SEVERITY</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:13px;height:13px;border-radius:50%;background:#EF4444;flex:none"></span><span style="font-size:12px;font-weight:700">High</span><span style="font-size:11px;color:#8593A0;margin-left:auto">chest-deep+</span></div>
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:13px;height:13px;border-radius:50%;background:#F59E0B;flex:none"></span><span style="font-size:12px;font-weight:700">Medium</span><span style="font-size:11px;color:#8593A0;margin-left:auto">knee–waist</span></div>
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:13px;height:13px;border-radius:50%;background:#16A34A;flex:none"></span><span style="font-size:12px;font-weight:700">Low</span><span style="font-size:11px;color:#8593A0;margin-left:auto">ankle-deep</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #EDF1F4">
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:14px;height:14px;border-radius:5px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:9px;height:9px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></span><span style="font-size:12px;font-weight:700">Evacuation center</span></div>
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:16px;height:4px;border-radius:3px;background:#0E7490;flex:none"></span><span style="font-size:12px;font-weight:700">Safe route</span></div>
+            </div>
+            <div style="margin-top:10px;padding-top:9px;border-top:1px solid #EDF1F4;font-size:10.5px;color:#8593A0;line-height:1.4">Each circle ≈ {{ reportRadiusKm }} km affected radius. Dashed = approximate.</div>
+          </div>
+        </sc-if>
+
+        <!-- ZOOM / LOCATE (decorative) -->
+        <sc-if value="{{ showZoom }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:12">
+            <div style="display:flex;flex-direction:column;background:#fff;border:1px solid #E6EBF0;border-radius:11px;overflow:hidden;box-shadow:0 3px 10px rgba(15,23,42,.1)">
+              <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#4A5763;cursor:pointer;border-bottom:1px solid #EDF1F4">+</div>
+              <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#4A5763;cursor:pointer">−</div>
+            </div>
+            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #E6EBF0;border-radius:11px;box-shadow:0 3px 10px rgba(15,23,42,.1);cursor:pointer">
+              <div style="width:13px;height:13px;border:2.5px solid #0EA5E9;border-radius:50%"></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- REPORT MODE -->
+        <sc-if value="{{ reportMode }}" hint-placeholder-val="{{ true }}">
+          <div style="display:contents">
+            <div onClick="{{ onMapClick }}" style="position:absolute;inset:0;cursor:crosshair;z-index:15;background:rgba(14,165,233,.06)"></div>
+            <div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:26;display:flex;align-items:center;gap:9px;max-width:94%;padding:10px 13px;background:#0F172A;color:#fff;border-radius:13px;box-shadow:0 8px 24px rgba(15,23,42,.35);font-size:12.5px;font-weight:700">
+              <span style="width:8px;height:8px;border-radius:50%;background:#0EA5E9;box-shadow:0 0 0 4px rgba(14,165,233,.3);flex:none"></span>
+              <span style="white-space:nowrap;line-height:1.3">{{ reportHint }}</span>
+              <button onClick="{{ onCancelReport }}" style="border:0;background:rgba(255,255,255,.14);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex:none">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- SEVERITY PICKER (anchored desktop / bottom sheet mobile) -->
+        <sc-if value="{{ pending }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ pending.popStyle }}">
+            <div style="background:#fff;border-radius:15px;box-shadow:0 12px 36px rgba(15,23,42,.28);overflow:hidden;border:1px solid #E6EBF0">
+              <div style="padding:13px 15px 10px">
+                <div style="font-size:13.5px;font-weight:800">How deep is the flooding here?</div>
+                <div style="font-size:11.5px;color:#8593A0;margin-top:2px">Pick a level — your report posts instantly.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;padding:0 12px 14px">
+                <button onClick="{{ onPickHigh }}" style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1.5px solid #FBD2D2;background:#FEF4F4;border-radius:11px;cursor:pointer;text-align:left">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#EF4444;flex:none"></span>
+                  <span><span style="font-size:13px;font-weight:800;color:#16202E;display:block">High</span><span style="font-size:11px;color:#8593A0">Chest-deep or more · impassable</span></span>
+                </button>
+                <button onClick="{{ onPickMedium }}" style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1.5px solid #F8E2BB;background:#FFFAF0;border-radius:11px;cursor:pointer;text-align:left">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#F59E0B;flex:none"></span>
+                  <span><span style="font-size:13px;font-weight:800;color:#16202E;display:block">Medium</span><span style="font-size:11px;color:#8593A0">Knee to waist · risky to cross</span></span>
+                </button>
+                <button onClick="{{ onPickLow }}" style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1.5px solid #BFE8CC;background:#F2FCF5;border-radius:11px;cursor:pointer;text-align:left">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#16A34A;flex:none"></span>
+                  <span><span style="font-size:13px;font-weight:800;color:#16202E;display:block">Low</span><span style="font-size:11px;color:#8593A0">Ankle-deep · passable with care</span></span>
+                </button>
+                <button onClick="{{ onCancelPin }}" style="border:0;background:transparent;color:#8593A0;font-size:12px;font-weight:700;padding:6px;cursor:pointer">Move pin / cancel</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- SELECTED DETAIL (anchored desktop / bottom sheet mobile) -->
+        <sc-if value="{{ sel }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ sel.detailStyle }}">
+            <div style="background:#fff;border-radius:16px;box-shadow:0 14px 40px rgba(15,23,42,.3);overflow:hidden;border:1px solid #E6EBF0">
+              <div style="{{ sel.headStyle }}">
+                <div style="display:flex;align-items:flex-start;gap:9px">
+                  <span style="{{ sel.swatchStyle }};width:14px;height:14px;border-radius:50%;margin-top:3px;flex:none"></span>
+                  <div style="flex:1">
+                    <div style="font-size:15px;font-weight:800;line-height:1.15">{{ sel.name }}</div>
+                    <div style="font-size:11.5px;color:#8593A0;font-weight:600">{{ sel.district }} · {{ sel.edgeLabel }}</div>
+                  </div>
+                  <button onClick="{{ onCloseDetail }}" style="border:0;background:#F1F5F8;color:#7C8B98;width:26px;height:26px;border-radius:7px;font-size:15px;cursor:pointer;flex:none">×</button>
+                </div>
+                <div style="{{ sel.badgeStyle }}">{{ sel.sm.label }} flooding · {{ sel.depthCm }} cm</div>
+              </div>
+              <div style="padding:13px 15px">
+                <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#90A0AC;margin-bottom:7px">WATER DEPTH</div>
+                <div style="position:relative;height:10px;background:#EEF2F5;border-radius:6px;overflow:hidden;margin-bottom:4px">
+                  <div style="{{ sel.barFillStyle }};position:absolute;left:0;top:0;height:100%;border-radius:6px"></div>
+                </div>
+                <div style="position:relative;height:26px;margin-bottom:10px">
+                  <sc-for list="{{ sel.ticks }}" as="t" hint-placeholder-count="4">
+                    <div style="{{ t.style }};position:absolute;transform:translateX(-50%);text-align:center">
+                      <div style="width:1px;height:5px;background:#C3CDD6;margin:0 auto"></div>
+                      <div style="font-size:9px;color:#90A0AC;font-weight:700;white-space:nowrap">{{ t.l }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#90A0AC;margin:2px 0 6px">WATER LEVEL · LAST 6 HOURS</div>
+                <div style="background:#F7FAFB;border-radius:11px;padding:10px 10px 6px;margin-bottom:10px">
+                  <svg viewBox="0 0 100 36" preserveAspectRatio="none" style="width:100%;height:46px;display:block">
+                    <path d="{{ sel.sparkArea }}" fill="{{ sel.sparkFill }}"></path>
+                    <path d="{{ sel.sparkLine }}" fill="none" stroke="{{ sel.sm.color }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
+                  </svg>
+                  <div style="display:flex;justify-content:space-between;font-size:9px;color:#A4B0BB;font-weight:700;margin-top:3px"><span>−6h</span><span>−4h</span><span>−2h</span><span>now</span></div>
+                </div>
+                <div style="{{ sel.trendNoteStyle }}">{{ sel.trendNote }}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px">
+                  <div style="background:#F7FAFB;border-radius:11px;padding:9px 11px">
+                    <div style="font-size:10px;color:#90A0AC;font-weight:700;margin-bottom:3px">TREND</div>
+                    <div style="{{ sel.tmStyle }};font-size:13px;font-weight:800;display:flex;align-items:center;gap:5px"><span>{{ sel.tm.sym }}</span>{{ sel.tm.label }}</div>
+                  </div>
+                  <div style="background:#F7FAFB;border-radius:11px;padding:9px 11px">
+                    <div style="font-size:10px;color:#90A0AC;font-weight:700;margin-bottom:3px">ROADS</div>
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800"><span style="{{ sel.rmDotStyle }};width:9px;height:9px;border-radius:50%"></span>{{ sel.rm.label }}</div>
+                  </div>
+                  <div style="background:#F7FAFB;border-radius:11px;padding:9px 11px">
+                    <div style="font-size:10px;color:#90A0AC;font-weight:700;margin-bottom:3px">CONFIRMED BY</div>
+                    <div style="font-size:13px;font-weight:800">{{ sel.reportsCount }} reports</div>
+                  </div>
+                  <div style="background:#F7FAFB;border-radius:11px;padding:9px 11px">
+                    <div style="font-size:10px;color:#90A0AC;font-weight:700;margin-bottom:3px">LAST UPDATE</div>
+                    <div style="font-size:13px;font-weight:800">{{ sel.time }}</div>
+                  </div>
+                </div>
+                <div style="{{ sel.adviceStyle }}">{{ sel.advice }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- EVACUATION DETAIL -->
+        <sc-if value="{{ selEvac }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ selEvac.detailStyle }}">
+            <div style="background:#fff;border-radius:16px;box-shadow:0 14px 40px rgba(15,23,42,.3);overflow:hidden;border:1px solid #E6EBF0">
+              <div style="padding:14px 15px 12px;border-bottom:1px solid #EDF1F4">
+                <div style="display:flex;align-items:flex-start;gap:10px">
+                  <div style="width:30px;height:30px;border-radius:9px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></div>
+                  <div style="flex:1">
+                    <div style="font-size:15px;font-weight:800;line-height:1.15">{{ selEvac.name }}</div>
+                    <div style="font-size:11.5px;color:#8593A0;font-weight:600">Evacuation center · {{ selEvac.distLabel }} away · ~{{ selEvac.walkMin }} min walk</div>
+                  </div>
+                  <button onClick="{{ onCloseEvac }}" style="border:0;background:#F1F5F8;color:#7C8B98;width:26px;height:26px;border-radius:7px;font-size:15px;cursor:pointer;flex:none">×</button>
+                </div>
+                <div style="{{ selEvac.stBadgeStyle }}">{{ selEvac.st.label }} · {{ selEvac.pct }}% full</div>
+              </div>
+              <div style="padding:13px 15px">
+                <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#90A0AC;margin-bottom:7px">CAPACITY</div>
+                <div style="position:relative;height:10px;background:#EEF2F5;border-radius:6px;overflow:hidden;margin-bottom:6px">
+                  <div style="{{ selEvac.barStyle }};position:absolute;left:0;top:0;height:100%;border-radius:6px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#475563;margin-bottom:13px"><span>{{ selEvac.spotsLeft }} spaces left</span><span style="color:#9AA8B4">{{ selEvac.occ }} / {{ selEvac.cap }}</span></div>
+                <div style="display:flex;gap:9px">
+                  <button onClick="{{ selEvac.onRoute }}" style="flex:1;border:0;background:#0E7490;color:#fff;padding:12px;border-radius:11px;font-size:13.5px;font-weight:800;cursor:pointer">Show safe route</button>
+                  <a href="tel:{{ selEvac.contact }}" style="display:flex;align-items:center;justify-content:center;text-decoration:none;border:1.5px solid #DCE3E9;color:#0E5063;padding:0 16px;border-radius:11px;font-size:13.5px;font-weight:800">Call</a>
+                </div>
+                <div style="margin-top:9px;font-size:11.5px;color:#8593A0">Hotline: <b style="color:#16202E">{{ selEvac.contact }}</b></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div style="{{ sidebarStyle }}">
+
+      <!-- STATUS -->
+      <div style="flex:none;padding:18px 18px 14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.13em;color:#90A0AC;margin-bottom:9px">YOUR SAFETY STATUS</div>
+        <div style="{{ status.cardStyle }};border-radius:16px;padding:15px 16px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+            <span style="{{ status.badgeStyle }}">{{ status.badge }}</span>
+            <span style="font-size:11.5px;color:#8593A0;font-weight:600;margin-left:auto">Updated live</span>
+          </div>
+          <div style="{{ status.titleStyle }};font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.2">{{ status.title }}</div>
+          <div style="font-size:13px;color:#475563;margin-top:6px;line-height:1.45;text-wrap:pretty">{{ status.line }}</div>
+          <div style="font-size:12px;color:#7C8B98;margin-top:7px;line-height:1.4;text-wrap:pretty">{{ status.sub }}</div>
+          <sc-if value="{{ status.eta }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:11px;padding-top:10px;border-top:1px solid rgba(15,23,42,.08);font-size:12px;font-weight:700;color:#475563;display:flex;gap:7px;line-height:1.4"><span style="flex:none">⏱</span><span>{{ status.eta }}</span></div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- ROUTE / SHELTER CTA -->
+      <div style="flex:none;padding:0 18px 14px">
+        <sc-if value="{{ route }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#ECF7FA;border:1px solid #BBE0E8;border-radius:14px;padding:13px 14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+              <span style="width:18px;height:18px;border-radius:5px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></span>
+              <span style="font-size:13px;font-weight:800;color:#0E5063">Safe route active</span>
+              <button onClick="{{ onClearRoute }}" style="margin-left:auto;border:0;background:transparent;color:#0E7490;font-size:12px;font-weight:800;cursor:pointer">Clear</button>
+            </div>
+            <div style="font-size:12.5px;color:#3C4B53;line-height:1.45">To <b>{{ route.name }}</b> · {{ route.km }} km · ~{{ route.min }} min walk</div>
+            <sc-if value="{{ route.detoured }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#0E7490;font-weight:700;margin-top:3px">↳ Routed around high-flood areas</div></sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noRoute }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onRouteNearest }}" style="width:100%;border:1.5px solid #0E7490;background:#fff;color:#0E5063;padding:11px;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+            <span style="width:16px;height:16px;border-radius:4px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:10px;height:10px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></span>
+            Find the safest route to a shelter
+          </button>
+        </sc-if>
+      </div>
+
+      <!-- FILTER CHIPS (mobile, in panel) -->
+      <sc-if value="{{ showSidebarFilters }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;padding:0 18px 12px;display:flex;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.onClick }}" style="{{ c.style }}">
+              <span style="{{ c.dotStyle }}"></span>{{ c.label }}<span style="opacity:.6;font-weight:700">{{ c.count }}</span>
+            </button>
+          </sc-for>
+          <button onClick="{{ onToggleShelters }}" style="{{ sheltersChipStyle }}">
+            <span style="width:13px;height:13px;border-radius:4px;background:#0E7490;display:flex;align-items:center;justify-content:center;flex:none"><svg viewBox="0 0 24 24" style="width:9px;height:9px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"></path></svg></span>Shelters
+          </button>
+        </div>
+      </sc-if>
+
+      <!-- SUMMARY + TABS -->
+      <div style="flex:none;padding:0 18px 12px">
+        <div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#7C8B98;font-weight:600;margin-bottom:11px">
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:#EF4444"></span><b style="color:#16202E">{{ highCount }}</b> high</span>
+          <span style="color:#D5DDE3">·</span>
+          <span><b style="color:#16202E">{{ totalCount }}</b> active reports nearby</span>
+        </div>
+        <div style="display:flex;gap:4px;padding:4px;background:#F1F5F8;border-radius:12px">
+          <div onClick="{{ onTabNearby }}" style="{{ tabNearbyStyle }}">Nearby</div>
+          <div onClick="{{ onTabActivity }}" style="{{ tabActivityStyle }}">Live activity</div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div style="{{ listStyle }}">
+        <sc-for list="{{ currentList }}" as="r" hint-placeholder-count="6">
+          <div onClick="{{ r.onSelect }}" style="{{ r.itemStyle }}">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="{{ r.swatchStyle }};width:10px;height:10px;border-radius:50%;flex:none"></span>
+              <span style="font-size:14px;font-weight:800;letter-spacing:-.01em">{{ r.name }}</span>
+              <sc-if value="{{ r.mine }}" hint-placeholder-val="{{ true }}"><span style="font-size:9.5px;font-weight:800;color:#0EA5E9;background:#E3F4FC;padding:2px 6px;border-radius:6px">YOURS</span></sc-if>
+              <span style="font-size:11px;color:#9AA8B4;font-weight:600;margin-left:auto">{{ r.time }}</span>
+            </div>
+            <div style="font-size:11.5px;color:#8593A0;font-weight:600;margin:4px 0 9px 18px">{{ r.district }} · {{ r.distLabel }} away</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-left:18px">
+              <span style="{{ r.depthPillStyle }};font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px">{{ r.depthCm }} cm</span>
+              <span style="{{ r.tmStyle }};font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:4px"><span>{{ r.tm.sym }}</span>{{ r.tm.label }}</span>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#5A6875"><span style="{{ r.rmDotStyle }};width:8px;height:8px;border-radius:50%"></span>{{ r.rm.label }}</span>
+              <span style="font-size:11px;color:#9AA8B4;font-weight:600">{{ r.reportsCount }}× confirmed</span>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ listEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:30px 10px;color:#9AA8B4;font-size:13px">No reports match the active filters.</div>
+        </sc-if>
+      </div>
+
+      <!-- FOOTER -->
+      <div style="flex:none;padding:13px 18px;border-top:1px solid #EDF1F4;display:flex;align-items:center;gap:11px;background:#FBFCFD">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:800">In danger right now?</div>
+          <div style="font-size:11px;color:#8593A0">Emergency hotlines &amp; rescue request</div>
+        </div>
+        <button onClick="{{ onSOS }}" style="border:0;background:#EF4444;color:#fff;padding:9px 16px;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(239,68,68,.28)">Get help</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE FAB -->
+  <sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ onReport }}" style="position:fixed;right:16px;bottom:20px;z-index:45;display:flex;align-items:center;gap:8px;height:52px;padding:0 22px;border:0;background:#0EA5E9;color:#fff;border-radius:26px;font-size:15px;font-weight:800;box-shadow:0 8px 22px rgba(14,165,233,.45);cursor:pointer">
+      <span style="font-size:20px;font-weight:700">+</span> Report flood
+    </button>
+  </sc-if>
+
+  <!-- MOBILE SHEET BACKDROPS -->
+  <sc-if value="{{ pendingMobile }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCancelPin }}" style="position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:43"></div>
+  </sc-if>
+  <sc-if value="{{ selMobile }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseDetail }}" style="position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:43"></div>
+  </sc-if>
+  <sc-if value="{{ selEvacMobile }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseEvac }}" style="position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:43"></div>
+  </sc-if>
+
+  <!-- SOS MODAL -->
+  <sc-if value="{{ sosOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseSOS }}" style="position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:60;display:flex;align-items:center;justify-content:center;padding:18px">
+      <div onClick="{{ stop }}" style="width:420px;max-width:100%;max-height:90vh;overflow-y:auto;background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.4);animation:popIn .16s ease-out">
+        <div style="background:linear-gradient(135deg,#EF4444,#DC2626);padding:18px 20px;color:#fff;display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none">!</div>
+          <div style="flex:1"><div style="font-size:18px;font-weight:800">Emergency help</div><div style="font-size:12px;opacity:.9">Philippines · Metro Manila &amp; Rizal</div></div>
+          <button onClick="{{ onCloseSOS }}" style="border:0;background:rgba(255,255,255,.18);color:#fff;width:28px;height:28px;border-radius:8px;font-size:17px;cursor:pointer">×</button>
+        </div>
+        <div style="padding:16px 20px">
+          <button onClick="{{ onShare }}" style="width:100%;border:0;background:#EF4444;color:#fff;padding:14px;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:14px;box-shadow:0 6px 16px rgba(239,68,68,.3)">Send rescue request with my location</button>
+          <div style="font-size:10px;font-weight:800;letter-spacing:.12em;color:#90A0AC;margin-bottom:9px">CALL A HOTLINE</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;padding:11px 13px;background:#F7FAFB;border-radius:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:800">National Emergency</div><div style="font-size:11.5px;color:#8593A0">Police · Fire · Rescue</div></div><div style="font-size:18px;font-weight:800;color:#EF4444">911</div></div>
+            <div style="display:flex;align-items:center;padding:11px 13px;background:#F7FAFB;border-radius:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:800">NDRRMC</div><div style="font-size:11.5px;color:#8593A0">Disaster response</div></div><div style="font-size:15px;font-weight:800;color:#16202E">(02) 8911-1406</div></div>
+            <div style="display:flex;align-items:center;padding:11px 13px;background:#F7FAFB;border-radius:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:800">Marikina Rescue 161</div><div style="font-size:11.5px;color:#8593A0">Local flood rescue</div></div><div style="font-size:18px;font-weight:800;color:#16202E">161</div></div>
+            <div style="display:flex;align-items:center;padding:11px 13px;background:#F7FAFB;border-radius:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:800">Philippine Red Cross</div><div style="font-size:11.5px;color:#8593A0">Medical &amp; relief</div></div><div style="font-size:18px;font-weight:800;color:#16202E">143</div></div>
+          </div>
+          <div style="font-size:11px;color:#9AA8B4;margin-top:13px;text-align:center;line-height:1.4">If you are in immediate danger, move to the highest safe floor and call 911.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TOAST -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:14px;padding:12px 18px;background:#0F172A;color:#fff;border-radius:13px;box-shadow:0 12px 34px rgba(15,23,42,.4);font-size:13.5px;font-weight:700;animation:toastIn .2s ease-out;max-width:92vw">
+      <span style="display:inline-flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:#22C55E;flex:none"></span>{{ toast.msg }}</span>
+      <sc-if value="{{ toast.onAction }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toast.onAction }}" style="border:0;background:rgba(255,255,255,.16);color:#fff;padding:6px 13px;border-radius:9px;font-size:12.5px;font-weight:800;cursor:pointer;flex:none">{{ toast.actionLabel }}</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;regionLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Marikina · Metro Manila&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;youAreaLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Marikina Heights&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;monitorRadiusKm&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:3,&quot;max&quot;:14,&quot;tsType&quot;:&quot;number&quot;},&quot;reportRadiusKm&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:4,&quot;min&quot;:1,&quot;max&quot;:5,&quot;step&quot;:0.5,&quot;tsType&quot;:&quot;number&quot;},&quot;showDistrictLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  SCALE = 27; CX = 430; CY = 330;
+  youX = 392; youY = 382;
+  _bodyRef = React.createRef();
+  _rootRef = React.createRef();
+  state = {
+    mode: 'idle', pendingPin: null, tab: 'nearby',
+    filters: { high: true, medium: true, low: true },
+    selectedId: null, sosOpen: false, toast: null, nextId: 100, showAlert: true,
+    isMobile: false, mapScale: 1,
+    showShelters: true, selEvacId: null, routeToId: null,
+    centers: [
+      { id: 'c1', name: 'Marikina Sports Center', x: 300, y: 332, cap: 1200, occ: 740, contact: '(02) 8646-1631' },
+      { id: 'c2', name: 'Sta. Elena High School', x: 312, y: 196, cap: 800, occ: 800, contact: '(02) 8997-1100' },
+      { id: 'c3', name: 'Concepcion Covered Court', x: 232, y: 470, cap: 600, occ: 522, contact: '161' },
+      { id: 'c4', name: 'Cainta Municipal Hall', x: 712, y: 540, cap: 450, occ: 138, contact: '(02) 8656-1500' },
+      { id: 'c5', name: 'Riverbanks Evac Hub', x: 668, y: 244, cap: 500, occ: 300, contact: '(02) 8632-1000' }
+    ],
+    reports: [
+      { id: 1, name: 'San Mateo Bridge', district: 'San Mateo, Rizal', x: 452, y: 120, severity: 'high', depthCm: 118, reportsCount: 18, trend: 'rising', road: 'impassable', minutesAgo: 12 },
+      { id: 2, name: 'Tumana', district: 'Marikina', x: 455, y: 236, severity: 'high', depthCm: 124, reportsCount: 31, trend: 'rising', road: 'impassable', minutesAgo: 8 },
+      { id: 3, name: 'Concepcion Uno', district: 'Marikina', x: 392, y: 206, severity: 'medium', depthCm: 46, reportsCount: 12, trend: 'steady', road: 'risky', minutesAgo: 27 },
+      { id: 4, name: 'Provident Village', district: 'Marikina', x: 506, y: 330, severity: 'high', depthCm: 96, reportsCount: 41, trend: 'rising', road: 'impassable', minutesAgo: 15 },
+      { id: 5, name: 'Riverbanks Center', district: 'Marikina', x: 470, y: 300, severity: 'medium', depthCm: 52, reportsCount: 9, trend: 'steady', road: 'risky', minutesAgo: 33 },
+      { id: 6, name: 'Rosario', district: 'Pasig', x: 545, y: 452, severity: 'medium', depthCm: 38, reportsCount: 14, trend: 'receding', road: 'risky', minutesAgo: 64 },
+      { id: 7, name: 'Santolan', district: 'Pasig', x: 600, y: 404, severity: 'low', depthCm: 16, reportsCount: 6, trend: 'receding', road: 'passable', minutesAgo: 120 },
+      { id: 8, name: 'Cainta Junction', district: 'Cainta, Rizal', x: 660, y: 430, severity: 'low', depthCm: 20, reportsCount: 7, trend: 'steady', road: 'passable', minutesAgo: 48 }
+    ]
+  };
+
+  componentDidMount() {
+    this._measure();
+    window.addEventListener('resize', this._measure);
+    if (window.ResizeObserver && this._rootRef.current) {
+      this._ro = new ResizeObserver(this._measure);
+      this._ro.observe(this._rootRef.current);
+    }
+  }
+  componentWillUnmount() {
+    clearTimeout(this._t);
+    window.removeEventListener('resize', this._measure);
+    if (this._ro) this._ro.disconnect();
+  }
+  _measure = () => {
+    const el = this._rootRef.current;
+    const w = (el && el.offsetWidth) || window.innerWidth || 1200;
+    const isMobile = w < 820;
+    const s = isMobile ? Math.max(0.34, Math.min(1, (w - 20) / 920)) : 1;
+    if (this.state.isMobile !== isMobile || Math.abs(this.state.mapScale - s) > 0.002) this.setState({ isMobile, mapScale: s });
+  };
+
+  sevMeta(s) {
+    return {
+      high: { key: 'high', label: 'High', color: '#EF4444', soft: 'rgba(239,68,68,0.16)', soft2: 'rgba(239,68,68,0.34)' },
+      medium: { key: 'medium', label: 'Medium', color: '#F59E0B', soft: 'rgba(245,158,11,0.16)', soft2: 'rgba(245,158,11,0.34)' },
+      low: { key: 'low', label: 'Low', color: '#16A34A', soft: 'rgba(22,163,74,0.15)', soft2: 'rgba(22,163,74,0.32)' }
+    }[s];
+  }
+  trendMeta(t) {
+    return {
+      rising: { label: 'Rising', sym: '▲', color: '#EF4444' },
+      receding: { label: 'Receding', sym: '▼', color: '#16A34A' },
+      steady: { label: 'Steady', sym: '■', color: '#64748B' }
+    }[t];
+  }
+  roadMeta(r) {
+    return {
+      impassable: { label: 'Impassable', color: '#EF4444' },
+      risky: { label: 'Risky for cars', color: '#F59E0B' },
+      passable: { label: 'Passable', color: '#16A34A' }
+    }[r];
+  }
+  timeAgo(m) {
+    if (m < 1) return 'just now';
+    if (m < 60) return m + ' min ago';
+    const h = Math.floor(m / 60);
+    return h + ' hr' + (h > 1 ? 's' : '') + ' ago';
+  }
+  evacStatus(pct) {
+    if (pct >= 100) return { key: 'full', label: 'At capacity', color: '#EF4444' };
+    if (pct >= 85) return { key: 'filling', label: 'Filling up', color: '#F59E0B' };
+    return { key: 'open', label: 'Open', color: '#16A34A' };
+  }
+  _series(depth, trend, seed) {
+    const n = 7, out = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      let v;
+      if (trend === 'rising') v = depth * (0.42 + 0.58 * t);
+      else if (trend === 'receding') v = depth * (1.6 - 0.6 * t);
+      else v = depth * (0.9 + 0.12 * Math.sin(t * 3 + (seed % 5)));
+      out.push(Math.max(2, Math.round(v)));
+    }
+    out[n - 1] = depth;
+    return out;
+  }
+  _distSeg(p, a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const l2 = dx * dx + dy * dy || 1;
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+  }
+
+  showToast(msg, actionLabel, onAction) {
+    clearTimeout(this._t);
+    this.setState({ toast: { msg, actionLabel: actionLabel || null, onAction: onAction || null } });
+    this._t = setTimeout(() => this.setState({ toast: null }), 4800);
+  }
+
+  startReport() {
+    this.setState({ mode: 'report', selectedId: null, selEvacId: null, pendingPin: { x: this.youX, y: this.youY, atYou: true } });
+    if (this.state.isMobile && this._bodyRef.current) this._bodyRef.current.scrollTop = 0;
+  }
+  cancelReport() { this.setState({ mode: 'idle', pendingPin: null }); }
+  mapClick(e) {
+    if (this.state.mode !== 'report') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const s = this.state.mapScale || 1;
+    this.setState({ pendingPin: { x: (e.clientX - r.left) / s, y: (e.clientY - r.top) / s, atYou: false } });
+  }
+  makeReport(sev) {
+    const p = this.state.pendingPin;
+    if (!p) return;
+    const depth = { high: 108, medium: 46, low: 18 }[sev];
+    const road = { high: 'impassable', medium: 'risky', low: 'passable' }[sev];
+    const trend = { high: 'rising', medium: 'steady', low: 'receding' }[sev];
+    const id = this.state.nextId;
+    const rep = { id, name: 'Your report', district: p.atYou ? 'Your location' : 'Pinned location', x: p.x, y: p.y, severity: sev, depthCm: depth, reportsCount: 1, trend, road, minutesAgo: 0, mine: true };
+    this.setState(s => ({ reports: [rep, ...s.reports], nextId: s.nextId + 1, mode: 'idle', pendingPin: null, tab: 'activity', selectedId: id }));
+    this.showToast('Flood report posted — thank you!', 'Undo', () => this.undoReport(id));
+  }
+  undoReport(id) {
+    this.setState(s => ({ reports: s.reports.filter(r => r.id !== id), selectedId: s.selectedId === id ? null : s.selectedId }));
+    this.showToast('Report removed');
+  }
+  selectReport(id) { this.setState({ selectedId: id, selEvacId: null }); }
+  closeDetail() { this.setState({ selectedId: null }); }
+  selectEvac(id) { this.setState({ selEvacId: id, selectedId: null }); }
+  closeEvac() { this.setState({ selEvacId: null }); }
+  toggleShelters() { this.setState(s => ({ showShelters: !s.showShelters })); }
+  routeTo(id) { this.setState({ routeToId: id, showShelters: true }); }
+  clearRoute() { this.setState({ routeToId: null }); }
+  routeToNearest() {
+    const cs = this.state.centers.map(c => ({ c, full: c.occ / c.cap >= 1, d: Math.hypot(c.x - this.youX, c.y - this.youY) }));
+    const open = cs.filter(o => !o.full);
+    const pick = (open.length ? open : cs).sort((a, b) => a.d - b.d)[0];
+    this.setState({ routeToId: pick.c.id, selEvacId: pick.c.id, showShelters: true });
+    this.showToast('Routing you to ' + pick.c.name);
+  }
+  toggleFilter(k) { this.setState(s => ({ filters: Object.assign({}, s.filters, { [k]: !s.filters[k] }) })); }
+  setTab(t) { this.setState({ tab: t }); }
+  openSOS() { this.setState({ sosOpen: true }); }
+  closeSOS() { this.setState({ sosOpen: false }); }
+  closeAlert() { this.setState({ showAlert: false }); }
+  share() { this.showToast('Live status link copied to clipboard'); this.setState({ sosOpen: false }); }
+
+  renderVals() {
+    const S = this;
+    const SCALE = this.SCALE;
+    const RKM = this.props.reportRadiusKm ?? 3;
+    const MKM = this.props.monitorRadiusKm ?? 10;
+    const px = RKM * SCALE;
+    const { reports, filters, selectedId, mode, pendingPin, tab, toast, showAlert, sosOpen, showShelters, selEvacId, routeToId, centers } = this.state;
+    const isMobile = this.state.isMobile;
+    const s = this.state.mapScale || 1;
+    const W = 920 * s, H = 680 * s;
+    const rank = { high: 3, medium: 2, low: 1 };
+
+    const wd = reports.map(r => {
+      const dpx = Math.hypot(r.x - this.youX, r.y - this.youY);
+      const distKm = dpx / SCALE;
+      return Object.assign({}, r, { distKm, edgeKm: distKm - RKM });
+    });
+
+    const view = wd.map(r => {
+      const sm = this.sevMeta(r.severity);
+      const tm = this.trendMeta(r.trend);
+      const rm = this.roadMeta(r.road);
+      const sel = r.id === selectedId;
+      const depthPct = Math.min(r.depthCm / 150, 1) * 100;
+      return Object.assign({}, r, {
+        sm, tm, rm, sel,
+        time: this.timeAgo(r.minutesAgo),
+        distLabel: r.distKm.toFixed(1) + ' km',
+        swatchStyle: { background: sm.color },
+        depthPillStyle: { background: sm.soft, color: sm.color },
+        tmStyle: { color: tm.color },
+        rmDotStyle: { background: rm.color },
+        barFillStyle: { width: depthPct + '%', background: sm.color },
+        circleStyle: {
+          position: 'absolute', left: (r.x - px) + 'px', top: (r.y - px) + 'px',
+          width: (px * 2) + 'px', height: (px * 2) + 'px', borderRadius: '50%', boxSizing: 'border-box',
+          background: 'radial-gradient(circle, ' + sm.soft2 + ' 0%, ' + sm.soft + ' 55%, rgba(0,0,0,0) 72%)',
+          border: '2px ' + (sel ? 'solid' : 'dashed') + ' ' + sm.color,
+          boxShadow: sel ? '0 0 0 4px ' + sm.soft : 'none',
+          cursor: 'pointer', pointerEvents: 'auto', zIndex: sel ? 4 : 2,
+          animation: r.trend === 'rising' ? 'floodPulse 3s ease-in-out infinite' : 'none'
+        },
+        dotStyle: {
+          position: 'absolute', left: (r.x - 7) + 'px', top: (r.y - 7) + 'px', width: '14px', height: '14px',
+          borderRadius: '50%', background: sm.color, border: '2px solid #fff',
+          boxShadow: '0 1px 5px rgba(15,23,42,.35)', cursor: 'pointer', pointerEvents: 'auto', zIndex: 6
+        },
+        labelStyle: {
+          position: 'absolute', left: (r.x + 12) + 'px', top: (r.y - 9) + 'px',
+          display: 'flex', alignItems: 'center', gap: '5px', padding: '2px 7px',
+          background: 'rgba(255,255,255,.94)', border: '1px solid ' + sm.soft2, borderRadius: '999px',
+          fontSize: '11px', fontWeight: 700, color: '#1f2a37', whiteSpace: 'nowrap',
+          boxShadow: '0 1px 4px rgba(15,23,42,.12)', pointerEvents: 'none', zIndex: 3
+        },
+        itemStyle: {
+          padding: '12px 13px', borderRadius: '14px', cursor: 'pointer', display: 'block',
+          border: sel ? '1.5px solid ' + sm.color : '1px solid #EDF1F4',
+          background: sel ? sm.soft : '#fff', transition: 'all .12s'
+        },
+        onSelect: () => S.selectReport(r.id)
+      });
+    });
+
+    const visible = view.filter(v => filters[v.severity]);
+    const nearby = visible.slice().sort((a, b) => a.distKm - b.distKm);
+    const feed = view.slice().sort((a, b) => a.minutesAgo - b.minutesAgo);
+    const currentList = tab === 'nearby' ? nearby : feed;
+
+    // status
+    let status;
+    const inside = wd.filter(r => r.edgeKm <= 0).sort((a, b) => rank[b.severity] - rank[a.severity]);
+    if (inside.length) {
+      const w = inside[0]; const sm = this.sevMeta(w.severity);
+      status = {
+        cardStyle: { background: '#FEF2F2', border: '1px solid #FCA5A5' },
+        titleStyle: { color: '#B91C1C' },
+        badgeStyle: { background: '#EF4444', color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '.08em', padding: '3px 9px', borderRadius: '7px', whiteSpace: 'nowrap' },
+        badge: 'IN FLOOD ZONE',
+        title: 'You are in a flood-affected area',
+        line: sm.label + ' flooding at ' + w.name + ' — about ' + w.depthCm + ' cm. ' + this.roadMeta(w.road).label + ' for vehicles.',
+        sub: 'Move to higher ground and never wade through fast-moving water.'
+      };
+    } else {
+      const near = wd.filter(r => r.edgeKm <= 2.5).sort((a, b) => a.edgeKm - b.edgeKm);
+      if (near.length) {
+        const ne = near[0]; const sm = this.sevMeta(ne.severity);
+        status = {
+          cardStyle: { background: '#FFFBEB', border: '1px solid #FCD34D' },
+          titleStyle: { color: '#B45309' },
+          badgeStyle: { background: '#F59E0B', color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '.08em', padding: '3px 9px', borderRadius: '7px', whiteSpace: 'nowrap' },
+          badge: 'STAY ALERT',
+          title: 'Flooding is close by',
+          line: 'Nearest flooding is ~' + ne.edgeKm.toFixed(1) + ' km away at ' + ne.name + ' (' + sm.label.toLowerCase() + (ne.trend === 'rising' ? ', rising' : '') + ').',
+          sub: 'Plan an alternate route and keep checking before you travel.'
+        };
+      } else {
+        status = {
+          cardStyle: { background: '#F0FDF4', border: '1px solid #86EFAC' },
+          titleStyle: { color: '#15803D' },
+          badgeStyle: { background: '#16A34A', color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '.08em', padding: '3px 9px', borderRadius: '7px', whiteSpace: 'nowrap' },
+          badge: 'CLEAR',
+          title: 'No flooding near you',
+          line: 'There are no reports within 2.5 km of your location.',
+          sub: 'Conditions change fast in heavy rain — keep this open to stay updated.'
+        };
+      }
+    }
+
+    const filterChips = ['high', 'medium', 'low'].map(k => {
+      const sm = this.sevMeta(k);
+      const count = reports.filter(r => r.severity === k).length;
+      const active = filters[k];
+      return {
+        key: k, label: sm.label, count, active,
+        style: {
+          display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 12px', borderRadius: '999px',
+          border: '1.5px solid ' + (active ? sm.color : '#E2E8F0'),
+          background: active ? sm.soft : 'rgba(255,255,255,.95)',
+          color: active ? '#1f2a37' : '#9AA8B4', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(15,23,42,.08)'
+        },
+        dotStyle: { width: '9px', height: '9px', borderRadius: '50%', background: sm.color, opacity: active ? 1 : 0.4 },
+        onClick: () => S.toggleFilter(k)
+      };
+    });
+
+    // pending pin + picker
+    let pending = null;
+    if (pendingPin) {
+      const x = pendingPin.x, y = pendingPin.y;
+      const pinStyle = {
+        position: 'absolute', left: (x - 11) + 'px', top: (y - 22) + 'px', width: '22px', height: '22px',
+        borderRadius: '50% 50% 50% 0', transform: 'rotate(45deg)', background: '#0EA5E9', border: '3px solid #fff',
+        boxShadow: '0 4px 12px rgba(15,23,42,.4)', zIndex: 22
+      };
+      let popStyle;
+      if (isMobile) {
+        popStyle = { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 46, maxHeight: '82vh', overflowY: 'auto', animation: 'sheetUp .22s ease-out' };
+      } else {
+        let pl = x + 22; if (pl + 248 > 912) pl = x - 270; if (pl < 8) pl = 8;
+        let pt = y + 14; if (pt + 250 > 672) pt = y - 264; if (pt < 8) pt = 8;
+        popStyle = { position: 'absolute', left: pl + 'px', top: pt + 'px', width: '248px', zIndex: 30, animation: 'popIn .14s ease-out' };
+      }
+      pending = { pinStyle, popStyle };
+    }
+
+    // selected detail
+    let sel = null;
+    const sv = view.find(v => v.id === selectedId);
+    if (sv) {
+      let dl = sv.x + 18; if (dl + 300 > 912) dl = sv.x - 318; if (dl < 8) dl = 8;
+      let dt = sv.y - 30; if (dt + 340 > 672) dt = 672 - 340; if (dt < 8) dt = 8;
+      const ticks = [{ l: 'Ankle', cm: 15 }, { l: 'Knee', cm: 50 }, { l: 'Waist', cm: 100 }, { l: 'Chest', cm: 140 }]
+        .map(t => Object.assign({}, t, { style: { left: Math.min(t.cm / 150, 1) * 100 + '%' } }));
+      const adviceMap = {
+        impassable: { txt: 'Do not attempt to cross — water is too deep for vehicles and pedestrians.', bg: '#FEF2F2', col: '#B91C1C' },
+        risky: { txt: 'Cross only if necessary and on foot with caution. Avoid low cars and motorbikes.', bg: '#FFFBEB', col: '#B45309' },
+        passable: { txt: 'Generally passable with care. Watch for hidden debris and slippery surfaces.', bg: '#F0FDF4', col: '#15803D' }
+      }[sv.road];
+      sel = Object.assign({}, sv, {
+        detailStyle: isMobile
+          ? { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 46, maxHeight: '88vh', overflowY: 'auto', animation: 'sheetUp .22s ease-out' }
+          : { position: 'absolute', left: dl + 'px', top: dt + 'px', width: '300px', zIndex: 32, animation: 'popIn .14s ease-out' },
+        headStyle: { padding: '14px 15px 12px', borderBottom: '1px solid #EDF1F4' },
+        badgeStyle: { display: 'inline-block', marginTop: '10px', background: sv.sm.soft, color: sv.sm.color, fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '8px' },
+        ticks,
+        advice: adviceMap.txt,
+        adviceStyle: { marginTop: '11px', padding: '10px 12px', background: adviceMap.bg, color: adviceMap.col, borderRadius: '11px', fontSize: '12px', fontWeight: 600, lineHeight: 1.4 },
+        edgeLabel: sv.edgeKm <= 0 ? 'you are inside this zone' : sv.distKm.toFixed(1) + ' km away'
+      });
+      // 6-hour water-level sparkline + rate / ETA
+      const hist = this._series(sv.depthCm, sv.trend, sv.id);
+      const mx = Math.max.apply(null, hist) * 1.12 || 1;
+      const n = hist.length;
+      const pp = hist.map((v, i) => ({ x: (i / (n - 1)) * 100, y: 34 - (v / mx) * 30 }));
+      const sparkLine = pp.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+      const sparkArea = 'M0 36 ' + pp.map(p => 'L' + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ') + ' L100 36 Z';
+      const rate = (hist[n - 1] - hist[0]) / 6;
+      let note;
+      if (sv.trend === 'rising') {
+        const r = Math.max(1, Math.round(rate));
+        let eta;
+        if (sv.depthCm < 100) { const h = (100 - sv.depthCm) / Math.max(1, rate); eta = ' — could reach waist depth (~100 cm) in about ' + (h < 1 ? '<1' : Math.round(h)) + ' hr'; }
+        else eta = ' — already above waist level';
+        note = '▲ Rising ~' + r + ' cm/hr' + eta + '.';
+      } else if (sv.trend === 'receding') {
+        const r = Math.max(1, Math.round(-rate));
+        let eta = '';
+        if (sv.depthCm > 20) { const h = (sv.depthCm - 20) / Math.max(1, -rate); eta = ' — roads may clear in ~' + (h < 1 ? '<1' : Math.round(h)) + ' hr'; }
+        note = '▼ Receding ~' + r + ' cm/hr' + eta + '.';
+      } else {
+        note = '■ Holding roughly steady over the last few hours.';
+      }
+      Object.assign(sel, {
+        sparkLine, sparkArea, sparkFill: sv.sm.soft, trendNote: note,
+        trendNoteStyle: { marginTop: '9px', fontSize: '12px', fontWeight: 700, color: sv.tm.color, lineHeight: 1.4 }
+      });
+    }
+
+    // spread ETA for the status card
+    status.eta = null;
+    const risingNear = wd.filter(r => r.severity !== 'low' && r.trend === 'rising' && r.edgeKm <= 3).sort((a, b) => a.edgeKm - b.edgeKm)[0];
+    if (risingNear) {
+      if (risingNear.edgeKm <= 0) status.eta = 'Water from ' + risingNear.name + ' is at your area and still rising.';
+      else {
+        const lo = Math.max(1, Math.round(risingNear.edgeKm / 0.98));
+        const hi = Math.max(lo + 1, Math.round(risingNear.edgeKm / 0.49));
+        status.eta = 'At the current rate, flooding from ' + risingNear.name + ' could reach you in ~' + lo + '–' + hi + ' hr (rough estimate).';
+      }
+    }
+
+    // evacuation centers
+    const evac = centers.map(c => {
+      const pct = Math.round(c.occ / c.cap * 100);
+      const st = this.evacStatus(pct);
+      const distKm = Math.hypot(c.x - this.youX, c.y - this.youY) / SCALE;
+      return Object.assign({}, c, {
+        pct, st, distLabel: distKm.toFixed(1) + ' km', walkMin: Math.max(1, Math.round(distKm * 12)),
+        spotsLeft: Math.max(0, c.cap - c.occ),
+        markerStyle: { position: 'absolute', left: (c.x - 13) + 'px', top: (c.y - 13) + 'px', width: '26px', height: '26px', borderRadius: '8px', background: '#0E7490', border: '2px solid #fff', boxShadow: '0 2px 7px rgba(15,23,42,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', pointerEvents: 'auto', zIndex: 7 },
+        statusDotStyle: { position: 'absolute', left: (c.x + 8) + 'px', top: (c.y - 16) + 'px', width: '11px', height: '11px', borderRadius: '50%', background: st.color, border: '2px solid #fff', zIndex: 9, pointerEvents: 'none' },
+        labelStyle: { position: 'absolute', left: (c.x + 17) + 'px', top: (c.y - 8) + 'px', padding: '2px 7px', background: 'rgba(255,255,255,.95)', border: '1px solid #D6E2E6', borderRadius: '999px', fontSize: '10.5px', fontWeight: 700, color: '#0E5063', whiteSpace: 'nowrap', boxShadow: '0 1px 4px rgba(15,23,42,.12)', pointerEvents: 'none', zIndex: 7 },
+        onSelect: () => S.selectEvac(c.id)
+      });
+    });
+
+    // selected evac detail
+    let selEvac = null;
+    const ev = centers.find(c => c.id === selEvacId);
+    if (ev) {
+      const pct = Math.round(ev.occ / ev.cap * 100);
+      const st = this.evacStatus(pct);
+      const distKm = Math.hypot(ev.x - this.youX, ev.y - this.youY) / SCALE;
+      let dl = ev.x + 18; if (dl + 290 > 912) dl = ev.x - 308; if (dl < 8) dl = 8;
+      let dt = ev.y - 20; if (dt + 280 > 672) dt = 672 - 280; if (dt < 8) dt = 8;
+      selEvac = Object.assign({}, ev, {
+        pct, st, distLabel: distKm.toFixed(1) + ' km', walkMin: Math.max(1, Math.round(distKm * 12)),
+        spotsLeft: Math.max(0, ev.cap - ev.occ),
+        barStyle: { width: pct + '%', background: st.color },
+        stBadgeStyle: { display: 'inline-block', marginTop: '10px', background: st.color, color: '#fff', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '8px' },
+        detailStyle: isMobile
+          ? { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 46, maxHeight: '86vh', overflowY: 'auto', animation: 'sheetUp .22s ease-out' }
+          : { position: 'absolute', left: dl + 'px', top: dt + 'px', width: '290px', zIndex: 32, animation: 'popIn .14s ease-out' },
+        onRoute: () => S.routeTo(ev.id)
+      });
+    }
+
+    // safe route
+    let route = null;
+    const rc = centers.find(c => c.id === routeToId);
+    if (rc) {
+      const start = { x: this.youX, y: this.youY }, end = { x: rc.x, y: rc.y };
+      const highC = view.filter(v => v.severity === 'high' && filters.high).map(v => ({ x: v.x, y: v.y, r: px }));
+      let block = null, worst = 0;
+      highC.forEach(h => { const d = this._distSeg(h, start, end); if (d < h.r + 14) { const sc = (h.r + 14) - d; if (sc > worst) { worst = sc; block = h; } } });
+      const pts = [start];
+      if (block) {
+        const mxp = (start.x + end.x) / 2, myp = (start.y + end.y) / 2;
+        let nx = mxp - block.x, ny = myp - block.y; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+        const off = block.r + 36;
+        pts.push({ x: mxp + nx * off, y: myp + ny * off });
+      }
+      pts.push(end);
+      let dist = 0; for (let i = 1; i < pts.length; i++) dist += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      const km = dist / SCALE;
+      route = {
+        path: pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(0) + ' ' + p.y.toFixed(0)).join(' '),
+        km: km.toFixed(1), min: Math.max(1, Math.round(km * 12)), name: rc.name, detoured: pts.length > 2,
+        targetStyle: { position: 'absolute', left: (rc.x - 21) + 'px', top: (rc.y - 21) + 'px', width: '42px', height: '42px', borderRadius: '12px', border: '3px solid #0E7490', boxShadow: '0 0 0 4px rgba(14,116,144,.18)', pointerEvents: 'none', zIndex: 6 }
+      };
+    }
+
+    const seg = on => ({
+      flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: '9px', fontSize: '13px', fontWeight: 700,
+      cursor: 'pointer', color: on ? '#0F172A' : '#94A3B8', background: on ? '#fff' : 'transparent',
+      boxShadow: on ? '0 1px 3px rgba(15,23,42,.12)' : 'none'
+    });
+
+    const mr = MKM * SCALE;
+
+    return {
+      visible, currentList, nearby, feed, status, filterChips, pending, sel,
+      reportMode: mode === 'report', tab, sosOpen, showAlert, toast,
+      reportHint: (pendingPin && pendingPin.atYou) ? 'Reporting at your location — tap the map to move the pin' : 'Tap the map where it\'s flooding',
+      totalCount: reports.length, highCount: reports.filter(r => r.severity === 'high').length,
+      tabNearbyStyle: seg(tab === 'nearby'), tabActivityStyle: seg(tab === 'activity'),
+      listEmpty: currentList.length === 0,
+      regionLabel: this.props.regionLabel ?? 'Marikina · Metro Manila',
+      youAreaLabel: this.props.youAreaLabel ?? 'Marikina Heights',
+      reportRadiusKm: RKM,
+      showDistricts: this.props.showDistrictLabels ?? true,
+      // evac + route
+      evac, selEvac, route, showShelters, noRoute: !route,
+      sheltersChipStyle: {
+        display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 12px', borderRadius: '999px',
+        border: '1.5px solid ' + (showShelters ? '#0E7490' : '#E2E8F0'),
+        background: showShelters ? 'rgba(14,116,144,.12)' : 'rgba(255,255,255,.95)',
+        color: showShelters ? '#0E5063' : '#9AA8B4', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer',
+        boxShadow: '0 2px 8px rgba(15,23,42,.08)'
+      },
+      onToggleShelters: () => S.toggleShelters(), onCloseEvac: () => S.closeEvac(),
+      onRouteNearest: () => S.routeToNearest(), onClearRoute: () => S.clearRoute(),
+      // responsive
+      bodyRef: this._bodyRef,
+      rootRef: this._rootRef,
+      pendingMobile: !!pendingPin && isMobile,
+      selMobile: !!sv && isMobile,
+      selEvacMobile: !!ev && isMobile,
+      showSearch: !isMobile, showShare: !isMobile, showBarReport: !isMobile,
+      showFab: isMobile && mode !== 'report',
+      showLegend: !isMobile, showZoom: !isMobile,
+      showMapFilters: !isMobile, showSidebarFilters: isMobile,
+      topBarStyle: { flex: 'none', height: '62px', display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '16px', padding: isMobile ? '0 14px' : '0 20px', background: '#fff', borderBottom: '1px solid #E6EBF0', zIndex: 40 },
+      bodyStyle: isMobile ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' } : { flex: 1, display: 'flex', overflow: 'hidden' },
+      mapOuterStyle: isMobile
+        ? { flex: 'none', display: 'flex', justifyContent: 'center', padding: '10px 10px 0', background: '#E7ECEF' }
+        : { flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '22px', minWidth: 0, background: '#E7ECEF' },
+      mapWrapStyle: { position: 'relative', width: W + 'px', height: H + 'px', borderRadius: isMobile ? '16px' : '18px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(15,23,42,.14)', background: '#EBEDEF' },
+      geoStyle: { position: 'absolute', top: 0, left: 0, width: '920px', height: '680px', transformOrigin: 'top left', transform: 'scale(' + s + ')', backgroundColor: '#EBEDEF', backgroundImage: 'repeating-linear-gradient(0deg,rgba(150,158,166,.13) 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,rgba(150,158,166,.13) 0 1px,transparent 1px 32px)' },
+      sidebarStyle: isMobile
+        ? { flex: 'none', width: '100%', background: '#fff', display: 'flex', flexDirection: 'column', paddingBottom: '80px' }
+        : { flex: 'none', width: '386px', background: '#fff', borderLeft: '1px solid #E6EBF0', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+      listStyle: isMobile
+        ? { overflowY: 'visible', padding: '0 18px 14px', display: 'flex', flexDirection: 'column', gap: '9px' }
+        : { flex: 1, overflowY: 'auto', padding: '0 18px 12px', display: 'flex', flexDirection: 'column', gap: '9px' },
+      boundaryStyle: {
+        position: 'absolute', left: (this.CX - mr) + 'px', top: (this.CY - mr) + 'px',
+        width: (mr * 2) + 'px', height: (mr * 2) + 'px', borderRadius: '50%',
+        border: '2px dashed rgba(14,165,233,.55)',
+        background: 'radial-gradient(circle, rgba(14,165,233,.05), rgba(14,165,233,0) 70%)',
+        pointerEvents: 'none', zIndex: 1
+      },
+      boundaryLabelStyle: {
+        position: 'absolute', left: this.CX + 'px', top: (this.CY - mr - 4) + 'px', transform: 'translate(-50%,-50%)',
+        padding: '3px 10px', background: '#0EA5E9', color: '#fff', fontSize: '10.5px', fontWeight: 800,
+        borderRadius: '999px', whiteSpace: 'nowrap', zIndex: 11, boxShadow: '0 2px 8px rgba(14,165,233,.4)'
+      },
+      boundaryLabel: MKM + ' km monitoring radius',
+      stop: e => e.stopPropagation(),
+      onReport: () => S.startReport(), onShare: () => S.share(), onSOS: () => S.openSOS(), onCloseSOS: () => S.closeSOS(),
+      onCloseAlert: () => S.closeAlert(), onMapClick: e => S.mapClick(e), onCancelReport: () => S.cancelReport(),
+      onCancelPin: () => S.setState({ pendingPin: null }),
+      onPickHigh: () => S.makeReport('high'), onPickMedium: () => S.makeReport('medium'), onPickLow: () => S.makeReport('low'),
+      onCloseDetail: () => S.closeDetail(), onTabNearby: () => S.setTab('nearby'), onTabActivity: () => S.setTab('activity')
+    };
+  }
+}
+</script>
+</body>
+</html>

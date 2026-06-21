@@ -1,0 +1,118 @@
+// Severity / trend / road metadata and water-level math, ported from the BahaWatch design.
+
+import type { Road, Severity, Trend } from '../types';
+
+export interface SevMeta {
+  label: string;
+  color: string;
+  soft: string;
+  soft2: string;
+  depthLabel: string;
+}
+
+export const SEV_META: Record<Severity, SevMeta> = {
+  high: { label: 'High', color: '#EF4444', soft: 'rgba(239,68,68,0.16)', soft2: 'rgba(239,68,68,0.34)', depthLabel: 'chest-deep+' },
+  medium: { label: 'Medium', color: '#F59E0B', soft: 'rgba(245,158,11,0.16)', soft2: 'rgba(245,158,11,0.34)', depthLabel: 'knee–waist' },
+  low: { label: 'Low', color: '#16A34A', soft: 'rgba(22,163,74,0.15)', soft2: 'rgba(22,163,74,0.32)', depthLabel: 'ankle-deep' },
+};
+
+export const TREND_META: Record<Trend, { label: string; sym: string; color: string }> = {
+  rising: { label: 'Rising', sym: '▲', color: '#EF4444' },
+  receding: { label: 'Receding', sym: '▼', color: '#16A34A' },
+  steady: { label: 'Steady', sym: '■', color: '#64748B' },
+};
+
+export const ROAD_META: Record<Road, { label: string; short: string; glyph: string; color: string; soft: string }> = {
+  impassable: { label: 'Impassable', short: 'Impassable', glyph: '✕', color: '#EF4444', soft: 'rgba(239,68,68,0.12)' },
+  risky: { label: 'Risky for cars', short: 'Risky', glyph: '△', color: '#F59E0B', soft: 'rgba(245,158,11,0.12)' },
+  passable: { label: 'Passable', short: 'Passable', glyph: '✓', color: '#16A34A', soft: 'rgba(22,163,74,0.12)' },
+};
+
+/** Display order for road filters/legend: best → worst. */
+export const ROAD_ORDER: Road[] = ['passable', 'risky', 'impassable'];
+
+export const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
+
+/** Categorical line colors for the per-district water-level chart, assigned by district index. */
+export const DISTRICT_COLORS: string[] = ['#0EA5E9', '#8B5CF6', '#F59E0B', '#16A34A', '#EC4899', '#14B8A6', '#EF4444', '#6366F1'];
+
+/** Depth reference bands (cm) shared by the detail card and the water-level chart axis. */
+export const DEPTH_TICKS: { label: string; cm: number }[] = [
+  { label: 'Ankle', cm: 15 },
+  { label: 'Knee', cm: 50 },
+  { label: 'Waist', cm: 100 },
+  { label: 'Chest', cm: 140 },
+];
+
+export const ADVICE: Record<Road, { txt: string; bg: string; col: string }> = {
+  impassable: { txt: 'Do not attempt to cross — water is too deep for vehicles and pedestrians.', bg: '#FEF2F2', col: '#B91C1C' },
+  risky: { txt: 'Cross only if necessary and on foot with caution. Avoid low cars and motorbikes.', bg: '#FFFBEB', col: '#B45309' },
+  passable: { txt: 'Generally passable with care. Watch for hidden debris and slippery surfaces.', bg: '#F0FDF4', col: '#15803D' },
+};
+
+/** Defaults the report-flood quick-pick uses for each severity. */
+export const SEVERITY_PRESET: Record<Severity, { depthCm: number; road: Road; trend: Trend }> = {
+  high: { depthCm: 108, road: 'impassable', trend: 'rising' },
+  medium: { depthCm: 46, road: 'risky', trend: 'steady' },
+  low: { depthCm: 18, road: 'passable', trend: 'receding' },
+};
+
+/** Depth range (cm) a reporter can dial in for each severity; defaults to SEVERITY_PRESET.depthCm. */
+export const DEPTH_RANGE: Record<Severity, { min: number; max: number; step: number }> = {
+  high: { min: 90, max: 250, step: 5 },
+  medium: { min: 30, max: 90, step: 1 },
+  low: { min: 5, max: 30, step: 1 },
+};
+
+/** Synthesizes a plausible 6-hour water-level series for the detail sparkline. */
+export function waterSeries(depth: number, trend: Trend, seed: number): number[] {
+  const n = 7;
+  const out: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    let v: number;
+    if (trend === 'rising') v = depth * (0.42 + 0.58 * t);
+    else if (trend === 'receding') v = depth * (1.6 - 0.6 * t);
+    else v = depth * (0.9 + 0.12 * Math.sin(t * 3 + (seed % 5)));
+    out.push(Math.max(2, Math.round(v)));
+  }
+  out[n - 1] = depth;
+  return out;
+}
+
+/** SVG path strings (line + filled area) for the sparkline, on a 100×36 viewBox. */
+export function sparkPaths(series: number[]): { line: string; area: string } {
+  const mx = Math.max(...series) * 1.12 || 1;
+  const n = series.length;
+  const pts = series.map((v, i) => ({ x: (i / (n - 1)) * 100, y: 34 - (v / mx) * 30 }));
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+  const area = 'M0 36 ' + pts.map((p) => 'L' + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ') + ' L100 36 Z';
+  return { line, area };
+}
+
+/** Human-readable trend note with a rough rate / ETA, from the design. */
+export function trendNote(depthCm: number, trend: Trend, series: number[]): string {
+  const n = series.length;
+  const rate = (series[n - 1] - series[0]) / 6;
+  if (trend === 'rising') {
+    const r = Math.max(1, Math.round(rate));
+    let eta: string;
+    if (depthCm < 100) {
+      const h = (100 - depthCm) / Math.max(1, rate);
+      eta = ` — could reach waist depth (~100 cm) in about ${h < 1 ? '<1' : Math.round(h)} hr`;
+    } else {
+      eta = ' — already above waist level';
+    }
+    return `▲ Rising ~${r} cm/hr${eta}.`;
+  }
+  if (trend === 'receding') {
+    const r = Math.max(1, Math.round(-rate));
+    let eta = '';
+    if (depthCm > 20) {
+      const h = (depthCm - 20) / Math.max(1, -rate);
+      eta = ` — roads may clear in ~${h < 1 ? '<1' : Math.round(h)} hr`;
+    }
+    return `▼ Receding ~${r} cm/hr${eta}.`;
+  }
+  return '■ Holding roughly steady over the last few hours.';
+}

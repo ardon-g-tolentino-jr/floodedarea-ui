@@ -1,0 +1,626 @@
+import React from 'react';
+import type { AlertLevel, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, Road, Severity } from './types';
+import { useAuth } from './hooks/useAuth';
+import { useIsMobile } from './hooks/useBreakpoint';
+import { useAlerts, useCenters, useHotlines, useReports, useRoadStatus } from './hooks/useDomainData';
+import { useActivityStream } from './hooks/useActivityStream';
+import { mutations } from './api/queries';
+import type { GeoResult } from './api/geocode';
+import type { MapFocus, SearchMark } from './components/map/FloodMap';
+import { SEVERITY_PRESET } from './utils/floodMeta';
+import {
+  computeStatus,
+  enrichReports,
+  type EnrichedReport,
+  REPORT_RADIUS_KM,
+  MONITOR_RADIUS_KM,
+} from './utils/viewModel';
+import TopBar from './components/panels/TopBar';
+import AlertRibbon from './components/panels/AlertRibbon';
+import Sidebar from './components/panels/Sidebar';
+import FloodMap from './components/map/FloodMap';
+import RoadLegend from './components/map/RoadLegend';
+import ReportDetailCard from './components/panels/ReportDetailCard';
+import EvacDetailCard from './components/panels/EvacDetailCard';
+import SeverityPicker from './components/panels/SeverityPicker';
+import SosModal from './components/panels/SosModal';
+import Toast, { type ToastData } from './components/panels/Toast';
+import NotifyModal, { type NotifyPrefs, DEFAULT_NOTIFY_PREFS } from './components/panels/NotifyModal';
+import WaterLevelModal from './components/panels/WaterLevelModal';
+import AdminPanel from './components/panels/AdminPanel';
+import LoginView from './views/LoginView';
+
+const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
+const LIVE_STORAGE_KEY = 'baha_live_v1';
+
+function loadNotifyPrefs(): NotifyPrefs {
+  try {
+    const raw = localStorage.getItem(NOTIFY_STORAGE_KEY);
+    return raw ? { ...DEFAULT_NOTIFY_PREFS, ...(JSON.parse(raw) as NotifyPrefs) } : DEFAULT_NOTIFY_PREFS;
+  } catch {
+    return DEFAULT_NOTIFY_PREFS;
+  }
+}
+
+function loadLivePref(): boolean {
+  try {
+    return localStorage.getItem(LIVE_STORAGE_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+const DEFAULT_LOCATION: LatLng = { lat: 14.66, lng: 121.12 }; // Marikina Heights
+const REGION_LABEL = 'Marikina · Metro Manila';
+
+type PendingPin = LatLng & { atYou: boolean };
+
+const App: React.FC = () => {
+  const { auth, loginWithGoogle, logout } = useAuth();
+  const isMobile = useIsMobile();
+
+  const reports = useReports();
+  const centers = useCenters();
+  const hotlines = useHotlines();
+  const alerts = useAlerts();
+  const roads = useRoadStatus();
+
+  const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
+
+  // Ticking clock so report expiry (30-min TTL) and the safety status update in real time
+  // without waiting on a refetch.
+  const [now, setNow] = React.useState<number>(() => Date.now());
+  React.useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 15000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // UI state
+  const [mode, setMode] = React.useState<'idle' | 'report'>('idle');
+  const [pending, setPending] = React.useState<PendingPin | null>(null);
+  const [selectedReportId, setSelectedReportId] = React.useState<number | null>(null);
+  const [selEvacId, setSelEvacId] = React.useState<number | null>(null);
+  const [tab, setTab] = React.useState<'nearby' | 'activity'>('nearby');
+  const [filters, setFilters] = React.useState<Record<Severity, boolean>>({ high: true, medium: true, low: true });
+  const [roadFilters, setRoadFilters] = React.useState<Record<Road, boolean>>({ passable: true, risky: true, impassable: true });
+  const [reportRadiusKm, setReportRadiusKm] = React.useState<number>(REPORT_RADIUS_KM);
+  const [monitorRadiusKm, setMonitorRadiusKm] = React.useState<number>(MONITOR_RADIUS_KM);
+  const [showShelters, setShowShelters] = React.useState(true);
+  const [showRoads, setShowRoads] = React.useState(true);
+  const [sosOpen, setSosOpen] = React.useState(false);
+  const [mapFocus, setMapFocus] = React.useState<MapFocus | null>(null);
+  const [searchMark, setSearchMark] = React.useState<SearchMark | null>(null);
+  const [notifyPrefs, setNotifyPrefs] = React.useState<NotifyPrefs>(loadNotifyPrefs);
+  const [notifyOpen, setNotifyOpen] = React.useState(false);
+  const [waterChartOpen, setWaterChartOpen] = React.useState(false);
+  const [adminOpen, setAdminOpen] = React.useState(false);
+  const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
+  const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  );
+  const [dismissedAlerts, setDismissedAlerts] = React.useState<Set<number>>(new Set());
+  const [toast, setToast] = React.useState<ToastData | null>(null);
+  const [login_, setLogin] = React.useState<{ open: boolean; reason?: string }>({ open: false });
+  const [busyPick, setBusyPick] = React.useState(false);
+  const [confirming, setConfirming] = React.useState(false);
+  const [removing, setRemoving] = React.useState(false);
+  const [sending, setSending] = React.useState(false);
+
+  const toastTimer = React.useRef<number | undefined>(undefined);
+  const showToast = React.useCallback((msg: string, actionLabel?: string, onAction?: () => void): void => {
+    window.clearTimeout(toastTimer.current);
+    setToast({ msg, actionLabel, onAction });
+    toastTimer.current = window.setTimeout(() => setToast(null), 4800);
+  }, []);
+
+  // Try to use the device location (falls back to the default monitoring area).
+  React.useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {/* keep default */},
+      { enableHighAccuracy: false, timeout: 8000 }
+    );
+  }, []);
+
+  // Persist the alert subscription across sessions.
+  React.useEffect(() => {
+    try { localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(notifyPrefs)); } catch {/* ignore */}
+  }, [notifyPrefs]);
+
+  // Persist the admin live-stream preference.
+  React.useEffect(() => {
+    try { localStorage.setItem(LIVE_STORAGE_KEY, liveStream ? '1' : '0'); } catch {/* ignore */}
+  }, [liveStream]);
+
+  // Only admins can switch the live stream off; everyone else stays always-on.
+  const isAdmin = auth?.role === 'ADMIN';
+  const streamEnabled = !isAdmin || liveStream;
+
+  // Live activity → refresh the affected collection in the background.
+  useActivityStream((event) => {
+    if (event.startsWith('alert')) {
+      void alerts.refetch(true);
+    } else {
+      // Report activity may shift map-matched road status too.
+      void reports.refetch(true);
+      void roads.refetch(true);
+    }
+  }, streamEnabled);
+
+  const reportList = reports.data ?? [];
+  const centerList = centers.data ?? [];
+  const hotlineList = hotlines.data ?? [];
+  const alertList = alerts.data ?? [];
+  const roadList = roads.data ?? [];
+
+  const enriched = React.useMemo(
+    () => enrichReports(reportList, userLoc, auth?.userId ?? null, reportRadiusKm, now),
+    [reportList, userLoc, auth?.userId, reportRadiusKm, now]
+  );
+
+  // Only reports posted within the last 30 min count as "live" — expired ones drop off the
+  // map, feed, status and counts.
+  const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
+
+  const visible = React.useMemo(
+    () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
+    [active, filters, roadFilters]
+  );
+  const nearby = React.useMemo(() => [...visible].sort((a, b) => a.distKm - b.distKm), [visible]);
+  const feed = React.useMemo(
+    () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [active]
+  );
+  const status = React.useMemo(() => computeStatus(active), [active]);
+
+  // ── New-flood-report alert subscription ──
+  // Detect reports that arrive (via the SSE-driven refetch) and alert when they match the
+  // user's criteria. `enriched` already carries distance and `mine`, so matching is local.
+  const seenReportIds = React.useRef<Set<number>>(new Set());
+  const alertsPrimed = React.useRef(false);
+
+  React.useEffect(() => {
+    // First population (initial load): remember existing reports without alerting.
+    if (!alertsPrimed.current) {
+      for (const r of enriched) seenReportIds.current.add(r.id);
+      alertsPrimed.current = true;
+      return;
+    }
+    const fresh = enriched.filter((r) => !seenReportIds.current.has(r.id));
+    if (!fresh.length) return;
+    for (const r of fresh) seenReportIds.current.add(r.id);
+
+    if (!notifyPrefs.enabled) return;
+    const matches = fresh.filter(
+      (r) => !r.mine && r.status === 'active' && r.distKm <= notifyPrefs.radiusKm && notifyPrefs.severities[r.severity]
+    );
+    if (!matches.length) return;
+
+    // System notification(s) when permitted; an in-app toast either way.
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      for (const r of matches.slice(0, 3)) {
+        try {
+          new Notification('New flood reported nearby', {
+            body: `${r.sev.label} flooding ~${r.distKm.toFixed(1)} km away at ${r.name} (${r.depthCm} cm).`,
+          });
+        } catch {/* ignore */}
+      }
+    }
+
+    if (matches.length === 1) {
+      const r = matches[0];
+      showToast(`${r.sev.label} flood reported ~${r.distKm.toFixed(1)} km away`, 'View', () => {
+        setTab('nearby');
+        setSelEvacId(null);
+        setSelectedReportId(r.id);
+        setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+      });
+    } else {
+      showToast(`${matches.length} new flood reports near you`);
+    }
+  }, [enriched, notifyPrefs, showToast]);
+
+  const filterCounts = React.useMemo(() => {
+    const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
+    for (const r of active) c[r.severity]++;
+    return c;
+  }, [active]);
+
+  const roadCounts = React.useMemo(() => {
+    const c: Record<Road, number> = { passable: 0, risky: 0, impassable: 0 };
+    for (const r of active) c[r.road]++;
+    return c;
+  }, [active]);
+
+  // Impassable road segments — drawn on the map and counted in the sidebar summary.
+  const impassableRoads = React.useMemo(
+    () => roadList.filter((s) => s.status === 'impassable'),
+    [roadList]
+  );
+
+  const selectedReport: EnrichedReport | undefined = enriched.find((r) => r.id === selectedReportId);
+  const selEvac = centerList.find((c) => c.id === selEvacId);
+  // Surface the most severe active, non-dismissed alert (red > orange > yellow).
+  const activeAlert = React.useMemo(() => {
+    const rank: Record<AlertLevel, number> = { red: 3, orange: 2, yellow: 1 };
+    return alertList
+      .filter((a) => a.active && !dismissedAlerts.has(a.id))
+      .sort((a, b) => rank[b.level] - rank[a.level])[0];
+  }, [alertList, dismissedAlerts]);
+
+  // Proactively nudge on a newly-active severe (orange/red) rainfall warning. Keyed by id+level
+  // so an escalation (e.g. orange → red) re-fires, but a steady warning doesn't repeat.
+  const notifiedAlertLevels = React.useRef<Map<number, AlertLevel>>(new Map());
+  const severeAlertsPrimed = React.useRef(false);
+
+  React.useEffect(() => {
+    const severe = alertList.filter((a) => a.active && (a.level === 'red' || a.level === 'orange'));
+    if (!severeAlertsPrimed.current) {
+      for (const a of severe) notifiedAlertLevels.current.set(a.id, a.level);
+      severeAlertsPrimed.current = true;
+      return;
+    }
+    const fresh = severe.filter((a) => notifiedAlertLevels.current.get(a.id) !== a.level);
+    if (!fresh.length) return;
+    for (const a of fresh) notifiedAlertLevels.current.set(a.id, a.level);
+
+    const worst = fresh.find((a) => a.level === 'red') ?? fresh[0];
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
+    }
+    showToast(worst.title);
+  }, [alertList, showToast]);
+
+  // ── Actions ──
+  const requireAuth = (reason: string): boolean => {
+    if (auth) return true;
+    setLogin({ open: true, reason });
+    return false;
+  };
+
+  const startReport = (): void => {
+    if (!requireAuth('Sign in to report a flood in your area.')) return;
+    // Anti-spam: one live report per person. While the user's last report is still within its
+    // 30-min window, point them at it instead of letting them post another.
+    const existing = enriched.find((r) => r.mine && !r.expired);
+    if (existing) {
+      const wait = Math.max(1, existing.expiresInMin);
+      showToast(`You already have an active report — you can post again in ${wait} min.`, 'View', () => {
+        setTab('nearby');
+        setSelEvacId(null);
+        setSelectedReportId(existing.id);
+        setMapFocus({ lat: existing.latitude, lng: existing.longitude, key: Date.now() });
+      });
+      return;
+    }
+    setSelectedReportId(null);
+    setSelEvacId(null);
+    setMode('report');
+    setPending({ ...userLoc, atYou: true });
+  };
+
+  const cancelReport = (): void => {
+    setMode('idle');
+    setPending(null);
+  };
+
+  const onMapClick = (latlng: LatLng): void => {
+    if (mode !== 'report') return;
+    setPending({ ...latlng, atYou: false });
+  };
+
+  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean): Promise<void> => {
+    if (!pending) return;
+    const preset = SEVERITY_PRESET[sev];
+    setBusyPick(true);
+    try {
+      const created = await mutations.createReport({
+        name: identify ? (auth?.name?.trim() || 'Your report') : 'Anonymous',
+        district: pending.atYou ? 'Your location' : 'Pinned location',
+        latitude: pending.lat,
+        longitude: pending.lng,
+        severity: sev,
+        depthCm,
+        trend: preset.trend,
+        road: preset.road,
+      });
+      await reports.refetch(true);
+      setMode('idle');
+      setPending(null);
+      setTab('activity');
+      setSelectedReportId(created.id);
+      showToast('Flood report posted — thank you!');
+    } catch {
+      showToast('Could not post your report. Please try again.');
+    } finally {
+      setBusyPick(false);
+    }
+  };
+
+  const confirmReport = async (id: number): Promise<void> => {
+    if (!requireAuth('Sign in to confirm flood reports.')) return;
+    setConfirming(true);
+    try {
+      await mutations.confirmReport(id);
+      await reports.refetch(true);
+      showToast('Thanks — your confirmation was added.');
+    } catch {
+      showToast('Could not confirm right now. Please try again.');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const removeReport = async (id: number): Promise<void> => {
+    if (!requireAuth('Sign in to manage your reports.')) return;
+    setRemoving(true);
+    try {
+      await mutations.deleteReport(id);
+      await reports.refetch(true);
+      if (selectedReportId === id) setSelectedReportId(null);
+      showToast('Your report was removed.');
+    } catch {
+      showToast('Could not remove the report. Please try again.');
+    } finally {
+      setRemoving(false);
+    }
+  };
+
+  const sendRescue = async (): Promise<void> => {
+    if (!requireAuth('Sign in to send a rescue request with your location.')) {
+      setSosOpen(false);
+      return;
+    }
+    setSending(true);
+    try {
+      await mutations.createRescue({ latitude: userLoc.lat, longitude: userLoc.lng });
+      setSosOpen(false);
+      showToast('Rescue request sent with your location. Stay safe.');
+    } catch {
+      showToast('Could not send the rescue request. Please call a hotline.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const share = (): void => {
+    try {
+      void navigator.clipboard?.writeText(window.location.href);
+    } catch {/* ignore */}
+    setSosOpen(false);
+    showToast('Live status link copied to clipboard');
+  };
+
+  // ── Admin data management ──
+  // Each wraps a mutation, refetches the affected collection in the background, and toasts.
+  // Errors propagate so AdminPanel can keep its form open and surface an inline message.
+  const adminAction = async (fn: () => Promise<unknown>, refetch: () => Promise<unknown>, ok: string): Promise<void> => {
+    await fn();
+    await refetch();
+    showToast(ok);
+  };
+
+  const onCreateCenter = (b: NewCenter) => adminAction(() => mutations.createCenter(b), () => centers.refetch(true), 'Shelter added.');
+  const onUpdateCenter = (id: number, b: Partial<NewCenter>) => adminAction(() => mutations.updateCenter(id, b), () => centers.refetch(true), 'Shelter updated.');
+  const onDeleteCenter = (id: number) => adminAction(() => mutations.deleteCenter(id), () => centers.refetch(true), 'Shelter removed.');
+
+  const onCreateHotline = (b: NewHotline) => adminAction(() => mutations.createHotline(b), () => hotlines.refetch(true), 'Hotline added.');
+  const onUpdateHotline = (id: number, b: Partial<NewHotline>) => adminAction(() => mutations.updateHotline(id, b), () => hotlines.refetch(true), 'Hotline updated.');
+  const onDeleteHotline = (id: number) => adminAction(() => mutations.deleteHotline(id), () => hotlines.refetch(true), 'Hotline removed.');
+
+  const onCreateAlert = (b: NewAlert) => adminAction(() => mutations.createAlert(b), () => alerts.refetch(true), 'Alert published.');
+  const onUpdateAlert = (id: number, b: Partial<NewAlert>) => adminAction(() => mutations.updateAlert(id, b), () => alerts.refetch(true), 'Alert updated.');
+  const onDeleteAlert = (id: number) => adminAction(() => mutations.deleteAlert(id), () => alerts.refetch(true), 'Alert removed.');
+
+  const onCreateReport = (b: NewReport) => adminAction(() => mutations.createReport(b), () => reports.refetch(true), 'Report added.');
+  const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
+  const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
+
+  const onSearchSelect = (r: GeoResult): void => {
+    setSearchMark({ lat: r.lat, lng: r.lng, label: r.label });
+    setMapFocus({ lat: r.lat, lng: r.lng, key: Date.now() });
+  };
+
+  const setNotifyEnabled = async (on: boolean): Promise<void> => {
+    // Ask for system-notification permission the first time the user opts in.
+    if (on && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      try {
+        setNotifyPerm(await Notification.requestPermission());
+      } catch {/* ignore */}
+    }
+    setNotifyPrefs((prev) => ({ ...prev, enabled: on }));
+  };
+
+  const toggleFilter = (s: Severity): void => setFilters((f) => ({ ...f, [s]: !f[s] }));
+  const toggleRoad = (r: Road): void => setRoadFilters((f) => ({ ...f, [r]: !f[r] }));
+
+  const highCount = filterCounts.high;
+  const totalCount = active.length;
+
+  const mapAreaStyle: React.CSSProperties = isMobile
+    ? { position: 'relative', height: '52vh', flex: 'none', background: 'var(--bw-map-bg)' }
+    : { flex: 1, position: 'relative', minWidth: 0, background: 'var(--bw-map-bg)' };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', color: 'var(--bw-ink)' }}>
+      <TopBar
+        regionLabel={REGION_LABEL}
+        isMobile={isMobile}
+        auth={auth}
+        onReport={startReport}
+        onShare={share}
+        onSOS={() => setSosOpen(true)}
+        onSignIn={() => setLogin({ open: true })}
+        onSignOut={logout}
+        onSearchSelect={onSearchSelect}
+        onNotify={() => setNotifyOpen(true)}
+        notifyOn={notifyPrefs.enabled}
+        onWaterChart={() => setWaterChartOpen(true)}
+        isAdmin={!!isAdmin}
+        onAdmin={() => setAdminOpen(true)}
+      />
+
+      {activeAlert && (
+        <AlertRibbon alert={activeAlert} onClose={() => setDismissedAlerts((s) => new Set(s).add(activeAlert.id))} />
+      )}
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: isMobile ? 'auto' : 'hidden' }}>
+        <div style={mapAreaStyle}>
+          <FloodMap
+            userLoc={userLoc}
+            reports={visible}
+            centers={centerList}
+            roadSegments={roadList}
+            showRoads={showRoads}
+            showShelters={showShelters}
+            reportRadiusKm={reportRadiusKm}
+            monitorRadiusKm={monitorRadiusKm}
+            selectedReportId={selectedReportId}
+            selEvacId={selEvacId}
+            reportMode={mode === 'report'}
+            pending={pending}
+            focus={mapFocus}
+            searchMark={searchMark}
+            onMapClick={onMapClick}
+            onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
+            onSelectEvac={(id) => { setSelEvacId(id); setSelectedReportId(null); }}
+          />
+
+          {!isMobile && <RoadLegend />}
+
+          {/* Report-mode hint */}
+          {mode === 'report' && (
+            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0EA5E9', boxShadow: '0 0 0 4px rgba(14,165,233,.3)', flex: 'none' }} />
+              <span style={{ lineHeight: 1.3 }}>{pending?.atYou ? 'Reporting at your location — tap the map to move the pin' : 'Tap the map where it’s flooding'}</span>
+              <button onClick={cancelReport} style={{ border: 0, background: 'rgba(255,255,255,.14)', color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>Cancel</button>
+            </div>
+          )}
+
+          {selectedReport && (
+            <ReportDetailCard
+              report={selectedReport}
+              isMobile={isMobile}
+              canConfirm={!!auth && !selectedReport.mine}
+              confirming={confirming}
+              onConfirm={() => void confirmReport(selectedReport.id)}
+              canRemove={selectedReport.mine}
+              removing={removing}
+              onRemove={() => void removeReport(selectedReport.id)}
+              onClose={() => setSelectedReportId(null)}
+            />
+          )}
+
+          {selEvac && (
+            <EvacDetailCard
+              center={selEvac}
+              userLoc={userLoc}
+              isMobile={isMobile}
+              onClose={() => setSelEvacId(null)}
+            />
+          )}
+
+          {mode === 'report' && pending && (
+            <SeverityPicker isMobile={isMobile} busy={busyPick} reporterName={auth?.name ?? ''} onPick={(s, d, id) => void pickSeverity(s, d, id)} onCancel={cancelReport} />
+          )}
+        </div>
+
+        <Sidebar
+          isMobile={isMobile}
+          status={status}
+          list={tab === 'nearby' ? nearby : feed}
+          tab={tab}
+          onTab={setTab}
+          filters={filters}
+          filterCounts={filterCounts}
+          onToggleFilter={toggleFilter}
+          roadFilters={roadFilters}
+          roadCounts={roadCounts}
+          onToggleRoad={toggleRoad}
+          reportRadiusKm={reportRadiusKm}
+          onChangeRadius={setReportRadiusKm}
+          monitorRadiusKm={monitorRadiusKm}
+          onChangeMonitor={setMonitorRadiusKm}
+          notifyOn={notifyPrefs.enabled}
+          notifyRadiusKm={notifyPrefs.radiusKm}
+          onOpenNotify={() => setNotifyOpen(true)}
+          showShelters={showShelters}
+          onToggleShelters={() => setShowShelters((v) => !v)}
+          showRoads={showRoads}
+          onToggleRoads={() => setShowRoads((v) => !v)}
+          impassableRoadCount={impassableRoads.length}
+          highCount={highCount}
+          totalCount={totalCount}
+          selectedReportId={selectedReportId}
+          onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
+          onSOS={() => setSosOpen(true)}
+        />
+      </div>
+
+      {/* Mobile FAB */}
+      {isMobile && mode !== 'report' && (
+        <button
+          onClick={startReport}
+          style={{ position: 'fixed', right: 16, bottom: 20, zIndex: 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
+        >
+          <span style={{ fontSize: 20, fontWeight: 700 }}>+</span> Report flood
+        </button>
+      )}
+
+      {sosOpen && (
+        <SosModal hotlines={hotlineList} sending={sending} onSendRescue={() => void sendRescue()} onClose={() => setSosOpen(false)} />
+      )}
+
+      {notifyOpen && (
+        <NotifyModal
+          prefs={notifyPrefs}
+          permission={notifyPerm}
+          onEnable={(on) => void setNotifyEnabled(on)}
+          onChange={setNotifyPrefs}
+          onClose={() => setNotifyOpen(false)}
+        />
+      )}
+
+      {waterChartOpen && (
+        <WaterLevelModal reports={reportList} isMobile={isMobile} onClose={() => setWaterChartOpen(false)} />
+      )}
+
+      {adminOpen && isAdmin && (
+        <AdminPanel
+          centers={centerList}
+          hotlines={hotlineList}
+          alerts={alertList}
+          reports={reportList}
+          liveStream={liveStream}
+          onToggleLive={setLiveStream}
+          onCreateCenter={onCreateCenter}
+          onUpdateCenter={onUpdateCenter}
+          onDeleteCenter={onDeleteCenter}
+          onCreateHotline={onCreateHotline}
+          onUpdateHotline={onUpdateHotline}
+          onDeleteHotline={onDeleteHotline}
+          onCreateAlert={onCreateAlert}
+          onUpdateAlert={onUpdateAlert}
+          onDeleteAlert={onDeleteAlert}
+          onCreateReport={onCreateReport}
+          onUpdateReport={onUpdateReport}
+          onDeleteReport={onDeleteReport}
+          onClose={() => setAdminOpen(false)}
+        />
+      )}
+
+      {toast && <Toast toast={toast} />}
+
+      {login_.open && (
+        <LoginView
+          reason={login_.reason}
+          onGoogle={loginWithGoogle}
+          onClose={() => setLogin({ open: false })}
+        />
+      )}
+    </div>
+  );
+};
+
+export default App;
