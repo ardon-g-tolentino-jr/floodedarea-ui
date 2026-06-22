@@ -728,7 +728,7 @@ const App: React.FC = () => {
       )}
 
       {waterChartOpen && (
-        <WaterLevelModal reports={reportList} isMobile={isMobile} onClose={() => setWaterChartOpen(false)} />
+        <WaterLevelModal userLoc={userLoc} isMobile={isMobile} onClose={() => setWaterChartOpen(false)} />
       )}
 
       {roadsModalOpen && (
