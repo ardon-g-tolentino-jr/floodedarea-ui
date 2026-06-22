@@ -1,11 +1,14 @@
 import { api, buildQuery } from './client';
 import type {
   EvacuationCenter,
+  Feedback,
+  FeedbackStatus,
   FloodAlert,
   FloodReport,
   Hotline,
   NewAlert,
   NewCenter,
+  NewFeedback,
   NewHotline,
   NewReport,
   NewRescue,
@@ -27,6 +30,10 @@ export const rawApi = {
   alerts: () => api.get<FloodAlert[]>('/alerts'),
   roadStatus: () => api.get<RoadSegment[]>('/road-status'),
   rescues: () => api.get<RescueRequest[]>('/rescue'),
+  /** Accepted feature requests — shown to every registered user. */
+  acceptedFeatures: () => api.get<Feedback[]>('/feedback/accepted'),
+  /** Admin: the full feedback moderation queue. */
+  allFeedback: () => api.get<Feedback[]>('/feedback'),
 };
 
 /** POST/PATCH/DELETE mutations. */
@@ -41,6 +48,11 @@ export const mutations = {
   /** Responder action: advance a rescue request's status (pending → dispatched → resolved). */
   updateRescue: (id: number, body: { status: RescueStatus }) =>
     api.patch<RescueRequest>(`/rescue/${id}`, body),
+
+  // ── Feedback: any logged-in user submits; admin accepts/declines ──
+  createFeedback: (body: NewFeedback) => api.post<Feedback>('/feedback', body),
+  updateFeedbackStatus: (id: number, status: FeedbackStatus) =>
+    api.patch<Feedback>(`/feedback/${id}`, { status }),
 
   // ── Admin: evacuation centers ──
   createCenter: (body: NewCenter) => api.post<EvacuationCenter>('/centers', body),

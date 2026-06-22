@@ -135,3 +135,29 @@ export interface NewAlert {
   level: AlertLevel;
   active: boolean;
 }
+
+export type FeedbackType = 'bug' | 'feature';
+export type FeedbackStatus = 'pending' | 'accepted' | 'declined';
+
+/**
+ * A logged-in user's bug report or feature request. Admins accept feature requests in the console;
+ * accepted features are shown to all registered users. Bugs stay in the admin queue.
+ */
+export interface Feedback {
+  id: number;
+  type: FeedbackType;
+  title: string;
+  details: string | null;
+  status: FeedbackStatus;
+  submittedByUserId: number | null;
+  submitterName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Payload for submitting feedback (the submitter is taken from the JWT). */
+export interface NewFeedback {
+  type: FeedbackType;
+  title: string;
+  details?: string;
+}

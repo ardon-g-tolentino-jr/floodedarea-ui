@@ -1,8 +1,8 @@
 import React from 'react';
-import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
+import type { AlertLevel, FeedbackStatus, FloodAlert, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAlerts, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
+import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { mutations } from './api/queries';
 import { ApiError } from './api/client';
@@ -41,6 +41,7 @@ import RoadConditionsModal from './components/panels/RoadConditionsModal';
 import RescueChartModal from './components/panels/RescueChartModal';
 import SupportModal from './components/panels/SupportModal';
 import FeaturesModal from './components/panels/FeaturesModal';
+import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import AdminPanel from './components/panels/AdminPanel';
 import ResponseConsole from './components/panels/ResponseConsole';
 import LoginView from './views/LoginView';
@@ -89,6 +90,8 @@ const App: React.FC = () => {
   const hotlines = useHotlines();
   const alerts = useAlerts();
   const rescues = useRescues();
+  const acceptedFeatures = useAcceptedFeatures();
+  const allFeedback = useAllFeedback();
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
 
@@ -130,6 +133,8 @@ const App: React.FC = () => {
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [supportOpen, setSupportOpen] = React.useState(false);
   const [featuresOpen, setFeaturesOpen] = React.useState(false);
+  const [feedbackOpen, setFeedbackOpen] = React.useState(false);
+  const [feedbackSending, setFeedbackSending] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [responseOpen, setResponseOpen] = React.useState(false);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
@@ -214,6 +219,10 @@ const App: React.FC = () => {
 
   // Only admins can switch the live stream off; everyone else stays always-on.
   const isAdmin = auth?.role === 'ADMIN';
+
+  // Refresh the feedback lists once a user who can see them is present (handles login after mount).
+  React.useEffect(() => { if (auth) void acceptedFeatures.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => { if (isAdmin) void allFeedback.refetch(true); }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
   const streamEnabled = !isAdmin || liveStream;
 
   // Live activity → refresh the affected collection in the background.
@@ -712,6 +721,30 @@ const App: React.FC = () => {
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
+  // Admin: accept/decline a bug report or feature request; accepted features become public.
+  const updateFeedbackStatus = (id: number, status: FeedbackStatus) =>
+    adminAction(
+      () => mutations.updateFeedbackStatus(id, status),
+      () => Promise.all([allFeedback.refetch(true), acceptedFeatures.refetch(true)]),
+      'Request updated.'
+    );
+
+  // Any signed-in user files a bug report or feature request.
+  const submitFeedback = async (body: NewFeedback): Promise<void> => {
+    if (!requireAuth('Sign in to send feedback.')) return;
+    setFeedbackSending(true);
+    try {
+      await mutations.createFeedback(body);
+      setFeedbackOpen(false);
+      showToast(body.type === 'bug' ? 'Thanks — your bug report was sent.' : 'Thanks — your feature request was sent for review.');
+      if (isAdmin) void allFeedback.refetch(true);
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Could not send feedback. Please try again.');
+    } finally {
+      setFeedbackSending(false);
+    }
+  };
+
   const onSearchSelect = (r: GeoResult): void => {
     setSearchMark({ lat: r.lat, lng: r.lng, label: r.label });
     setMapFocus({ lat: r.lat, lng: r.lng, key: Date.now() });
@@ -798,9 +831,9 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onSupport={() => setSupportOpen(true)}
-        onShowFeatures={() => setFeaturesOpen(true)}
+        onShowFeatures={() => { setFeaturesOpen(true); if (auth) void acceptedFeatures.refetch(true); }}
         isAdmin={!!isAdmin}
-        onAdmin={() => setAdminOpen(true)}
+        onAdmin={() => { setAdminOpen(true); void allFeedback.refetch(true); }}
         onResponse={() => {
           // /rescue reads need auth; prompt sign-in before opening, then warm the data.
           if (!requireAuth('Sign in to open the response console.')) return;
@@ -981,7 +1014,19 @@ const App: React.FC = () => {
         <SupportModal qrSrc={GCASH_QR_SRC} isMobile={isMobile} onClose={() => setSupportOpen(false)} />
       )}
 
-      {featuresOpen && <FeaturesModal isMobile={isMobile} onClose={() => setFeaturesOpen(false)} />}
+      {featuresOpen && (
+        <FeaturesModal
+          isMobile={isMobile}
+          auth={auth}
+          acceptedFeatures={acceptedFeatures.data ?? []}
+          onSuggest={() => { if (requireAuth('Sign in to suggest a feature or report a bug.')) setFeedbackOpen(true); }}
+          onClose={() => setFeaturesOpen(false)}
+        />
+      )}
+
+      {feedbackOpen && (
+        <FeedbackFormModal isMobile={isMobile} sending={feedbackSending} onSubmit={submitFeedback} onClose={() => setFeedbackOpen(false)} />
+      )}
 
       {adminOpen && isAdmin && (
         <AdminPanel
@@ -1003,6 +1048,8 @@ const App: React.FC = () => {
           onCreateReport={onCreateReport}
           onUpdateReport={onUpdateReport}
           onDeleteReport={onDeleteReport}
+          feedback={allFeedback.data ?? []}
+          onUpdateFeedbackStatus={updateFeedbackStatus}
           onClose={() => setAdminOpen(false)}
         />
       )}

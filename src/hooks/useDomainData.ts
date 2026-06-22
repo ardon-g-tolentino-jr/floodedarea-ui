@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { EvacuationCenter, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
+import type { EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -31,4 +31,14 @@ export function useRoadStatus(): FetchResult<RoadSegment[]> {
 
 export function useRescues(): FetchResult<RescueRequest[]> {
   return useFetch(() => rawApi.rescues(), []);
+}
+
+/** Accepted feature requests — the public list shown to registered users. */
+export function useAcceptedFeatures(): FetchResult<Feedback[]> {
+  return useFetch(() => rawApi.acceptedFeatures(), []);
+}
+
+/** Admin: the full feedback moderation queue. */
+export function useAllFeedback(): FetchResult<Feedback[]> {
+  return useFetch(() => rawApi.allFeedback(), []);
 }

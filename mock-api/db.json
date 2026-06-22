@@ -356,5 +356,51 @@
       "status": "pending",
       "createdAt": "2026-06-20T06:35:00Z"
     }
+  ],
+  "feedback": [
+    {
+      "id": 1001,
+      "type": "feature",
+      "title": "Offline mode for my saved area",
+      "details": "Cache the map and my monitored area so I can still check during an outage.",
+      "status": "accepted",
+      "submittedByUserId": 2,
+      "submitterName": "Maria S.",
+      "createdAt": "2026-06-20T03:10:00Z",
+      "updatedAt": "2026-06-21T01:00:00Z"
+    },
+    {
+      "id": 1002,
+      "type": "feature",
+      "title": "Send my live location to a relative",
+      "details": "Share a live pin with family so they know where I am.",
+      "status": "accepted",
+      "submittedByUserId": 3,
+      "submitterName": "Jun P.",
+      "createdAt": "2026-06-19T22:00:00Z",
+      "updatedAt": "2026-06-20T05:00:00Z"
+    },
+    {
+      "id": 1003,
+      "type": "feature",
+      "title": "Color-blind friendly severity colors",
+      "details": null,
+      "status": "pending",
+      "submittedByUserId": 4,
+      "submitterName": "Ana R.",
+      "createdAt": "2026-06-22T08:00:00Z",
+      "updatedAt": "2026-06-22T08:00:00Z"
+    },
+    {
+      "id": 1004,
+      "type": "bug",
+      "title": "Search dropdown covers the map on small phones",
+      "details": "When I tap search, the results hide the map underneath.",
+      "status": "pending",
+      "submittedByUserId": 5,
+      "submitterName": "Carlo M.",
+      "createdAt": "2026-06-22T09:30:00Z",
+      "updatedAt": "2026-06-22T09:30:00Z"
+    }
   ]
 }

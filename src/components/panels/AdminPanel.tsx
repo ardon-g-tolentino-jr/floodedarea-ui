@@ -1,6 +1,8 @@
 import React from 'react';
 import type {
   EvacuationCenter,
+  Feedback,
+  FeedbackStatus,
   FloodAlert,
   FloodReport,
   Hotline,
@@ -13,7 +15,7 @@ import type {
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { MIN_QUERY_LENGTH, searchPlaces, type GeoResult } from '../../api/geocode';
 
-type Tab = 'shelters' | 'hotlines' | 'alerts' | 'reports';
+type Tab = 'shelters' | 'hotlines' | 'alerts' | 'reports' | 'requests';
 
 interface AdminPanelProps {
   centers: EvacuationCenter[];
@@ -34,6 +36,8 @@ interface AdminPanelProps {
   onCreateReport: (b: NewReport) => Promise<void>;
   onUpdateReport: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
   onDeleteReport: (id: number) => Promise<void>;
+  feedback: Feedback[];
+  onUpdateFeedbackStatus: (id: number, status: FeedbackStatus) => Promise<void>;
   onClose: () => void;
 }
 
@@ -87,6 +91,7 @@ const FIELDS: Record<Tab, Field[]> = {
     { key: 'road', label: 'Road', type: 'select', options: roadOptions },
     { key: 'status', label: 'Status', type: 'select', options: statusOptions },
   ],
+  requests: [],
 };
 
 const TAB_LABEL: Record<Tab, string> = {
@@ -94,6 +99,14 @@ const TAB_LABEL: Record<Tab, string> = {
   hotlines: 'Hotlines',
   alerts: 'Alerts',
   reports: 'Reports',
+  requests: 'Requests',
+};
+
+const STATUS_ORDER: Record<FeedbackStatus, number> = { pending: 0, accepted: 1, declined: 2 };
+const STATUS_PILL: Record<FeedbackStatus, { bg: string; fg: string }> = {
+  pending:  { bg: 'var(--bw-bg-subtle)', fg: 'var(--bw-ink-soft)' },
+  accepted: { bg: '#F0FDF4', fg: '#15803D' },
+  declined: { bg: '#FEF2F2', fg: '#B91C1C' },
 };
 
 const PAGE_SIZE = 10;
@@ -274,6 +287,17 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [page, setPage] = React.useState(0);
+  const [actingId, setActingId] = React.useState<number | null>(null);
+  const moderate = async (id: number, status: FeedbackStatus): Promise<void> => {
+    setActingId(id);
+    try { await props.onUpdateFeedbackStatus(id, status); } finally { setActingId(null); }
+  };
+  const sortedFeedback = React.useMemo(
+    () => [...props.feedback].sort(
+      (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ),
+    [props.feedback]
+  );
 
   const switchTab = (t: Tab): void => {
     setTab(t);
@@ -361,6 +385,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
 
   // Per-tab row { id, primary, secondary, rec }
   const rows = React.useMemo(() => {
+    if (tab === 'requests') return [];
     if (tab === 'shelters') return centers.map((c) => ({ id: c.id, primary: c.name, secondary: c.contact, rec: c as unknown as Record<string, unknown> }));
     if (tab === 'hotlines') return [...hotlines].sort((a, b) => a.position - b.position).map((h) => ({ id: h.id, primary: h.name, secondary: h.phoneNumber, rec: h as unknown as Record<string, unknown> }));
     if (tab === 'alerts') return alerts.map((a) => ({ id: a.id, primary: a.title, secondary: `${a.level.toUpperCase()} · ${a.active ? 'active' : 'inactive'}`, rec: a as unknown as Record<string, unknown> }));
@@ -377,7 +402,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   }, [page, safePage]);
   const pagedRows = rows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
-  const tabs: Tab[] = ['shelters', 'hotlines', 'alerts', 'reports'];
+  const tabs: Tab[] = ['shelters', 'hotlines', 'alerts', 'reports', 'requests'];
 
   return (
     <div
@@ -392,7 +417,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         <div style={{ background: 'linear-gradient(135deg,#0EA5E9,#0369A1)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 800 }}>Admin console</div>
-            <div style={{ fontSize: 12, opacity: 0.9 }}>Manage shelters, hotlines, alerts &amp; reports</div>
+            <div style={{ fontSize: 12, opacity: 0.9 }}>Manage shelters, hotlines, alerts, reports &amp; requests</div>
           </div>
           <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
         </div>
@@ -431,7 +456,41 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600, marginBottom: 11 }}>{error}</div>
           )}
 
-          {editing ? (
+          {tab === 'requests' ? (
+            <div>
+              {sortedFeedback.length === 0 && (
+                <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>No feedback yet.</div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {sortedFeedback.map((f) => {
+                  const acting = actingId === f.id;
+                  const isFeature = f.type === 'feature';
+                  const sc = STATUS_PILL[f.status];
+                  return (
+                    <div key={f.id} style={{ padding: '11px 12px', background: '#F7FAFB', borderRadius: 11, border: '1px solid var(--bw-line-soft)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: isFeature ? '#EFF8FF' : '#FEF2F2', color: isFeature ? 'var(--bw-primary)' : '#DC2626' }}>
+                          {isFeature ? '💡 Feature' : '🐞 Bug'}
+                        </span>
+                        <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: sc.bg, color: sc.fg, textTransform: 'capitalize' }}>{f.status}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--bw-faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '45%' }}>{f.submitterName ?? 'Someone'}</span>
+                      </div>
+                      <div style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)' }}>{f.title}</div>
+                      {f.details && <div style={{ fontSize: 12, color: 'var(--bw-muted)', lineHeight: 1.45, marginTop: 2 }}>{f.details}</div>}
+                      <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
+                        {f.status !== 'accepted' && (
+                          <button onClick={() => void moderate(f.id, 'accepted')} disabled={acting} style={{ border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#15803D', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Accept</button>
+                        )}
+                        {f.status !== 'declined' && (
+                          <button onClick={() => void moderate(f.id, 'declined')} disabled={acting} style={{ border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Decline</button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : editing ? (
             <div>
               <div style={{ fontSize: 13.5, fontWeight: 800, marginBottom: 11 }}>
                 {editing.id == null ? `Add ${TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}` : `Edit ${TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}`}

@@ -210,5 +210,33 @@ server.post('/alerts/:id/toggle', (req, res) => {
   res.json(updated);
 });
 
+// ── Feedback (bug reports & feature requests). GET /feedback (all) and PATCH /feedback/:id fall
+// through to json-server; /feedback/accepted and the defaulted POST are custom. Role gating is the
+// UI's job here (the mock accepts anything). ──
+server.get('/feedback/accepted', (_req, res) => {
+  const db = router.db;
+  const items = (db.get('feedback').value() || []).filter((f) => f.type === 'feature' && f.status === 'accepted');
+  res.json(items);
+});
+server.post('/feedback', (req, res) => {
+  const db = router.db;
+  const ids = db.get('feedback').map('id').value();
+  const id = ids.length ? Math.max(...ids) + 1 : 1000;
+  const now = new Date().toISOString();
+  const item = {
+    id,
+    type: req.body.type === 'bug' ? 'bug' : 'feature',
+    title: req.body.title || '',
+    details: req.body.details || null,
+    status: 'pending',
+    submittedByUserId: 1,
+    submitterName: 'Demo User',
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.get('feedback').push(item).write();
+  res.status(201).json(item);
+});
+
 server.use(router);
 server.listen(3001, () => process.stdout.write('[baha mock-api] http://localhost:3001\n'));

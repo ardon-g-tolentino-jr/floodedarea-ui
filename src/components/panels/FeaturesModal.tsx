@@ -1,8 +1,13 @@
 import React from 'react';
 import { BUILD_COMMIT, BUILD_LABEL, BUILD_TIME } from '../../buildInfo';
+import type { AuthState } from '../../hooks/useAuth';
+import type { Feedback } from '../../types';
 
 interface FeaturesModalProps {
   isMobile: boolean;
+  auth: AuthState | null;
+  acceptedFeatures: Feedback[];
+  onSuggest: () => void;
   onClose: () => void;
 }
 
@@ -46,7 +51,7 @@ const GROUPS: { title: string; items: Feature[] }[] = [
   },
 ];
 
-const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, onClose }) => (
+const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, auth, acceptedFeatures, onSuggest, onClose }) => (
   <div
     onClick={onClose}
     style={{
@@ -100,6 +105,42 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, onClose }) => (
             ))}
           </div>
         ))}
+
+        {/* Community requests — accepted feature requests + a way to suggest your own. */}
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--bw-faint)', margin: '17px 0 6px' }}>
+          Community requests
+        </div>
+        {!auth ? (
+          <div style={{ padding: '11px 13px', background: 'var(--bw-bg-subtle)', borderRadius: 11, fontSize: 12.5, lineHeight: 1.5, color: 'var(--bw-muted)' }}>
+            Sign in to see accepted feature requests and suggest your own.
+          </div>
+        ) : (
+          <>
+            {acceptedFeatures.length === 0 ? (
+              <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', lineHeight: 1.5, padding: '2px 0 6px' }}>
+                No accepted requests yet — be the first to suggest one.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {acceptedFeatures.map((f) => (
+                  <div key={f.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '9px 11px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10 }}>
+                    <span style={{ fontSize: 14, flex: 'none', marginTop: 1 }}>✅</span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--bw-ink)' }}>{f.title}</div>
+                      {f.details && <div style={{ fontSize: 12, lineHeight: 1.45, color: 'var(--bw-muted)', marginTop: 1 }}>{f.details}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={onSuggest}
+              style={{ width: '100%', marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+            >
+              💡 Suggest a feature / report a bug
+            </button>
+          </>
+        )}
 
         {/* Responder note — these tools only appear for signed-in responders/admins. */}
         <div style={{ marginTop: 16, padding: '11px 13px', background: 'var(--bw-bg-subtle)', borderRadius: 11, fontSize: 12, lineHeight: 1.5, color: 'var(--bw-muted)' }}>
