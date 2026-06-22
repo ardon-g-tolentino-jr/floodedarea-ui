@@ -9,7 +9,7 @@ const APP_NAME = 'FloodedArea';
 
 /** One-line pitch tail reused by both message variants. */
 const PITCH =
-  `${APP_NAME} — live crowd-sourced flood map for Metro Manila & Rizal: real-time reports, ` +
+  `${APP_NAME} — live crowd-sourced flood map for the Philippines: real-time reports, ` +
   `evac centers, road conditions & SOS rescue.`;
 
 const ALERT_NOTE: Record<AlertLevel, string> = {

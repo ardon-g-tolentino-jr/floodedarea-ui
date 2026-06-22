@@ -110,7 +110,8 @@ const App: React.FC = () => {
   const [roadFilters, setRoadFilters] = React.useState<Record<Road, boolean>>({ passable: true, risky: true, impassable: true });
   const [projectedRiseCm, setProjectedRiseCm] = React.useState<number>(WATER_RISE_DEFAULT);
   const [monitorRadiusKm, setMonitorRadiusKm] = React.useState<number>(MONITOR_RADIUS_KM);
-  const [showShelters, setShowShelters] = React.useState(true);
+  // Shelter markers start hidden — users opt in via the sidebar toggle.
+  const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
   const [sosOpen, setSosOpen] = React.useState(false);
   const [mapFocus, setMapFocus] = React.useState<MapFocus | null>(null);

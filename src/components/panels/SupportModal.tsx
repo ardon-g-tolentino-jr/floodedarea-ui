@@ -43,7 +43,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose })
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>💙</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Salamat — thank you for being here</div>
-            <div style={{ fontSize: 12, opacity: 0.9 }}>FloodedArea · Metro Manila &amp; Rizal</div>
+            <div style={{ fontSize: 12, opacity: 0.9 }}>FloodedArea · Philippines</div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>

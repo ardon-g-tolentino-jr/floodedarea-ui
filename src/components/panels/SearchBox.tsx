@@ -4,11 +4,13 @@ import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocod
 interface SearchBoxProps {
   isMobile: boolean;
   onSelect: (r: GeoResult) => void;
+  /** Notifies the parent when the mobile field expands, so the TopBar can free the row for it. */
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 const DEBOUNCE_MS = 350;
 
-const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect }) => {
+const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect, onExpandedChange }) => {
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -16,6 +18,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect }) => {
   const [activeIndex, setActiveIndex] = React.useState(-1);
   // Mobile: the input is collapsed behind a search icon until tapped.
   const [expanded, setExpanded] = React.useState(false);
+
+  // While the mobile field is open it takes over the whole bar — tell the TopBar to hide its
+  // action cluster so the input and the results list have room to be legible.
+  React.useEffect(() => {
+    onExpandedChange?.(isMobile && expanded);
+  }, [isMobile, expanded, onExpandedChange]);
 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -50,7 +58,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect }) => {
     const onDocClick = (e: MouseEvent): void => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
         setOpen(false);
-        if (isMobile && !query.trim()) setExpanded(false);
+        // Always collapse on mobile so the action cluster (SOS, alerts, menu) comes back.
+        if (isMobile) setExpanded(false);
       }
     };
     document.addEventListener('mousedown', onDocClick);
@@ -117,7 +126,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect }) => {
             onMouseEnter={() => setActiveIndex(i)}
             style={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: 9,
               width: '100%',
               textAlign: 'left',
@@ -131,8 +140,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect }) => {
               lineHeight: 1.35,
             }}
           >
-            <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none' }}>⚲</span>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
+            <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none', marginTop: 1 }}>⚲</span>
+            <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{r.label}</span>
           </button>
         ))
       )}

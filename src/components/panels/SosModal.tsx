@@ -31,7 +31,7 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
         <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, flex: 'none' }}>!</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>Emergency help</div>
-          <div style={{ fontSize: 12, opacity: 0.9 }}>Philippines · Metro Manila &amp; Rizal</div>
+          <div style={{ fontSize: 12, opacity: 0.9 }}>Philippines</div>
         </div>
         <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
       </div>

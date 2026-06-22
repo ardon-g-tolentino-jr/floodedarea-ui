@@ -1,6 +1,6 @@
 # floodedarea-ui
 
-FloodedArea — a flood-watch web app for Metro Manila & Rizal. Crowd-sourced flood
+FloodedArea — a flood-watch web app for the Philippines. Crowd-sourced flood
 reports on an interactive map, evacuation centers, a live activity feed, rainfall
 alerts, safe-route hints, and an SOS rescue request. React 18 + Vite + TypeScript
 on Leaflet/OpenStreetMap. Mirrors the structure of `appointment-web`.

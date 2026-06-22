@@ -73,6 +73,8 @@ const TopBar: React.FC<TopBarProps> = ({
 
   // On mobile the secondary actions collapse into this overflow menu so the bar fits any viewport.
   const [menuOpen, setMenuOpen] = React.useState(false);
+  // When the mobile location search expands, it takes over the row and the action cluster hides.
+  const [searchExpanded, setSearchExpanded] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (!menuOpen) return;
@@ -211,8 +213,10 @@ const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Location search */}
-      <SearchBox isMobile={isMobile} onSelect={onSearchSelect} />
+      <SearchBox isMobile={isMobile} onSelect={onSearchSelect} onExpandedChange={setSearchExpanded} />
 
+      {/* The action cluster yields the whole row to the search field while it's expanded on mobile. */}
+      {!(isMobile && searchExpanded) && (
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 9, marginLeft: 'auto' }}>
         {isMobile ? (
           <>
@@ -283,6 +287,7 @@ const TopBar: React.FC<TopBarProps> = ({
           </>
         )}
       </div>
+      )}
     </div>
   );
 };
