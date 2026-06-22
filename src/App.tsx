@@ -321,6 +321,19 @@ const App: React.FC = () => {
     return false;
   };
 
+  // The rescue chart reads /rescue, which needs a valid session. `requireAuth` only checks that a
+  // local session exists, so an expired/invalid JWT lets the chart open but the read then 401/403s.
+  // Recover like the write paths: drop the dead session, close the chart and re-prompt — otherwise
+  // reopening just loops on the same error.
+  React.useEffect(() => {
+    if (!rescueChartOpen) return;
+    if (rescues.error instanceof ApiError && (rescues.error.status === 401 || rescues.error.status === 403)) {
+      setRescueChartOpen(false);
+      handleAuthError(rescues.error, 'Your session expired. Please sign in again to view rescue requests by district.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rescueChartOpen, rescues.error]);
+
   // Reverse-geocode a pin location to the street it sits on, guarding against stale responses
   // when the pin moves quickly. Feeds the editable road field in the report dialog.
   const runReverseGeocode = React.useCallback((loc: LatLng): void => {
