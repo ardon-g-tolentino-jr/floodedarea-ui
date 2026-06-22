@@ -286,9 +286,26 @@ const App: React.FC = () => {
   // so an escalation (e.g. orange → red) re-fires, but a steady warning doesn't repeat.
   const notifiedAlertLevels = React.useRef<Map<number, AlertLevel>>(new Map());
   const severeAlertsPrimed = React.useRef(false);
+  const modaledAlertLevels = React.useRef<Map<number, AlertLevel>>(new Map());
 
   React.useEffect(() => {
     const severe = alertList.filter((a) => a.active && (a.level === 'red' || a.level === 'orange'));
+
+    // Hard interrupt: pop a centered modal + alarm for the worst active severe alert we haven't
+    // shown this session — including one already active on first load. Keyed by id+level so it
+    // re-fires on escalation (orange → red) but not on every refetch. The play() rejection
+    // (autoplay block before the user's first interaction) is swallowed.
+    const worstActive = severe.find((a) => a.level === 'red') ?? severe[0];
+    if (worstActive && modaledAlertLevels.current.get(worstActive.id) !== worstActive.level) {
+      modaledAlertLevels.current.set(worstActive.id, worstActive.level);
+      setAlertModal(worstActive);
+      if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
+      alertSound.current.currentTime = 0;
+      void alertSound.current.play().catch(() => {/* autoplay blocked */});
+    }
+
+    // OS notification + toast: only for a newly-active/escalated severe alert. Primed on first
+    // load so we don't re-nag about already-known warnings on every page reload.
     if (!severeAlertsPrimed.current) {
       for (const a of severe) notifiedAlertLevels.current.set(a.id, a.level);
       severeAlertsPrimed.current = true;
@@ -303,13 +320,6 @@ const App: React.FC = () => {
       try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
     }
     showToast(worst.title);
-
-    // Hard interrupt for severe alerts: pop a centered modal and sound the alarm. The play()
-    // rejection (browser autoplay block before the user's first interaction) is swallowed.
-    setAlertModal(worst);
-    if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
-    alertSound.current.currentTime = 0;
-    void alertSound.current.play().catch(() => {/* autoplay blocked */});
   }, [alertList, showToast]);
 
   // ── Actions ──
