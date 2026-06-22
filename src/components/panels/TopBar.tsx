@@ -18,6 +18,7 @@ interface TopBarProps {
   notifyOn: boolean;
   onWaterChart: () => void;
   onRescueChart: () => void;
+  onSupport: () => void;
   isAdmin: boolean;
   onAdmin: () => void;
 }
@@ -36,6 +37,7 @@ const TopBar: React.FC<TopBarProps> = ({
   notifyOn,
   onWaterChart,
   onRescueChart,
+  onSupport,
   isAdmin,
   onAdmin,
 }) => {
@@ -203,6 +205,27 @@ const TopBar: React.FC<TopBarProps> = ({
           {notifyOn && (
             <span style={{ position: 'absolute', top: 7, right: 8, width: 8, height: 8, borderRadius: '50%', background: 'var(--bw-primary)', border: '2px solid #fff' }} />
           )}
+        </button>
+
+        <button
+          onClick={onSupport}
+          title="About FloodedArea & support"
+          aria-label="About FloodedArea & support"
+          style={{
+            width: 40,
+            height: 40,
+            flex: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #DCE3E9',
+            background: '#fff',
+            borderRadius: 11,
+            fontSize: 16,
+            cursor: 'pointer',
+          }}
+        >
+          💙
         </button>
 
         <button
