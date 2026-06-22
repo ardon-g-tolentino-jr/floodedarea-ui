@@ -67,10 +67,12 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
   }));
 }
 
-/** The road a flood pin sits on, plus its district, resolved from coordinates. */
+/** The road a flood pin sits on, plus its district, city, and barangay, resolved from coordinates. */
 export interface ReverseResult {
   road: string | null;
   district: string | null;
+  city: string | null;
+  barangay: string | null;
   label: string | null;
 }
 
@@ -79,9 +81,11 @@ interface NominatimAddress {
   pedestrian?: string;
   footway?: string;
   residential?: string;
+  quarter?: string;
   neighbourhood?: string;
   suburb?: string;
   village?: string;
+  hamlet?: string;
   town?: string;
   city_district?: string;
   city?: string;
@@ -102,7 +106,7 @@ interface NominatimReverseRow {
  * the caller falls back to a generic label.
  */
 export async function reverseGeocode(lat: number, lng: number, signal?: AbortSignal): Promise<ReverseResult> {
-  const empty: ReverseResult = { road: null, district: null, label: null };
+  const empty: ReverseResult = { road: null, district: null, city: null, barangay: null, label: null };
 
   const params = new URLSearchParams({
     format: 'jsonv2',
@@ -131,6 +135,10 @@ export async function reverseGeocode(lat: number, lng: number, signal?: AbortSig
   const road = a.road ?? a.pedestrian ?? a.footway ?? a.residential ?? a.neighbourhood ?? null;
   const area = a.suburb ?? a.village ?? a.town ?? a.city_district ?? a.city ?? a.municipality ?? null;
   const district = [area, a.state].filter(Boolean).join(', ') || null;
+  // PH city/municipality and barangay (the smallest admin unit). Nominatim maps a barangay to
+  // one of quarter/neighbourhood/suburb/village/hamlet depending on the place.
+  const city = a.city ?? a.town ?? a.municipality ?? a.city_district ?? null;
+  const barangay = a.quarter ?? a.neighbourhood ?? a.suburb ?? a.village ?? a.hamlet ?? null;
 
-  return { road, district, label: row.display_name ?? null };
+  return { road, district, city, barangay, label: row.display_name ?? null };
 }

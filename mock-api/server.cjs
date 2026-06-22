@@ -129,6 +129,8 @@ server.post('/rescue', (req, res) => {
       latitude: req.body.latitude,
       longitude: req.body.longitude,
       district: req.body.district || recent.district,
+      city: req.body.city || null,
+      barangay: req.body.barangay || null,
       note: req.body.note || null,
       lastRequestedAt: now.toISOString(),
     }).write();
@@ -143,6 +145,8 @@ server.post('/rescue', (req, res) => {
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     district: req.body.district || 'Unknown area',
+    city: req.body.city || null,
+    barangay: req.body.barangay || null,
     note: req.body.note || null,
     status: 'pending',
     createdAt: now.toISOString(),
