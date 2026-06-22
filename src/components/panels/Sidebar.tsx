@@ -3,6 +3,7 @@ import type { Road, Severity } from '../../types';
 import {
   type EnrichedReport,
   type SafetyStatus,
+  affectedRiseRatio,
   WATER_RISE_MAX,
   WATER_RISE_MIN,
   WATER_RISE_STEP,
@@ -30,6 +31,7 @@ interface SidebarProps {
   onOpenRoads: () => void;
   projectedRiseCm: number;
   onChangeRise: (cm: number) => void;
+  representativeDepthCm: number;
   monitorRadiusKm: number;
   onChangeMonitor: (km: number) => void;
   notifyOn: boolean;
@@ -88,7 +90,7 @@ const CollapsibleSection: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -221,6 +223,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <span>Now (+0)</span>
           <span>+{WATER_RISE_MAX} cm</span>
         </div>
+        {projectedRiseCm > 0 && representativeDepthCm > 0 && (() => {
+          const { diameter, area } = affectedRiseRatio(representativeDepthCm, projectedRiseCm);
+          return (
+            <div style={{ marginTop: 9, padding: '8px 10px', background: 'var(--bw-bg-subtle)', borderRadius: 9, fontSize: 11.5, fontWeight: 600, color: 'var(--bw-ink-soft)', lineHeight: 1.4 }}>
+              At <strong>+{projectedRiseCm} cm</strong>, a typical flooded zone spreads{' '}
+              <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{diameter.toFixed(1)}× wider</strong>{' '}
+              (<strong style={{ color: 'var(--bw-primary-deep)' }}>≈{area.toFixed(1)}× the area</strong>).
+            </div>
+          );
+        })()}
       </CollapsibleSection>
 
       {/* MONITORING-AREA RADIUS */}

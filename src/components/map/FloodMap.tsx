@@ -150,10 +150,10 @@ const FloodMap: React.FC<FloodMapProps> = ({
           );
         })}
 
-      {/* Flood reports. Affected area is drawn as rings: a solid ring at the radius implied by the
-          CURRENT depth (filled with the severity-category color at 20% opacity), and — when
-          projecting a water rise — a wider dashed ring at the radius the flood would reach at
-          depth + projectedRiseCm. */}
+      {/* Flood reports. Affected area uses the planar inundation model (radius ≈ depth ÷ ground
+          slope): a solid ring at the radius implied by the CURRENT depth (filled with the
+          severity-category color at 20% opacity), and — when projecting a water rise — a wider
+          dashed ring at the radius the flood would reach at depth + projectedRiseCm. */}
       {reports.map((r) => {
         const sel = r.id === selectedReportId;
         const projectedKm = projectedRiseCm > 0 ? affectedRadiusKm(r.depthCm + projectedRiseCm) : null;

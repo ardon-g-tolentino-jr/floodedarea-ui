@@ -6,16 +6,29 @@ import { kmBetween } from './geo';
 import { ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 
-// Affected-area model: a report's affected radius grows with its water depth (deeper water
-// spreads further). Linear (~3 m of spread per cm of depth), clamped to a sane band.
-export const AFFECTED_M_PER_CM = 3;
-export const AFFECTED_MIN_M = 60; // floor so shallow reports still show a ring
-export const AFFECTED_MAX_M = 2000; // ceiling so a very deep report doesn't swamp the map
+// Affected-area model — planar ("bathtub") inundation: floodwater of depth h spreads horizontally
+// until the ground rises to meet it, so the inundation radius ≈ h / S, where S is the local ground
+// slope. Metro Manila's Marikina–Pasig floodplain is very flat (~0.3%), used here as a representative
+// default. (This also happens to match the old "~3 m per cm" heuristic, which implied a 1/300 slope.)
+export const FLOODPLAIN_SLOPE = 0.003; // 0.3% ground slope (vertical/horizontal), dimensionless
+export const AFFECTED_MIN_M = 60; // display floor so shallow reports still show a ring
+export const AFFECTED_MAX_M = 2000; // display ceiling so a very deep report doesn't swamp the map
 
-/** Affected-area radius (km) for a given water depth — proportional to depth, clamped. */
-export function affectedRadiusKm(depthCm: number): number {
-  const m = Math.min(AFFECTED_MAX_M, Math.max(AFFECTED_MIN_M, depthCm * AFFECTED_M_PER_CM));
-  return m / 1000;
+/** Real-world inundation radius (km) for a water depth, via radius = depth / slope (clamped). */
+export function affectedRadiusKm(depthCm: number, slope: number = FLOODPLAIN_SLOPE): number {
+  const radiusM = (depthCm / 100) / slope; // depth (m) ÷ slope → horizontal reach (m)
+  return Math.min(AFFECTED_MAX_M, Math.max(AFFECTED_MIN_M, radiusM)) / 1000;
+}
+
+/**
+ * Ratio by which a water-level rise widens the affected zone. Diameter grows ∝ depth; flooded area
+ * grows ∝ depth². Computed from the (clamped) drawn radii so the figures match the map exactly.
+ */
+export function affectedRiseRatio(depthCm: number, riseCm: number): { diameter: number; area: number } {
+  const r0 = affectedRadiusKm(depthCm);
+  const r1 = affectedRadiusKm(depthCm + Math.max(0, riseCm));
+  const diameter = r0 > 0 ? r1 / r0 : 1;
+  return { diameter, area: diameter * diameter };
 }
 
 // Predictive "what if water keeps rising" control: how many cm of extra depth to project. At 0

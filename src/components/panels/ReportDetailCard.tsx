@@ -1,5 +1,5 @@
 import React from 'react';
-import type { EnrichedReport } from '../../utils/viewModel';
+import { affectedRiseRatio, type EnrichedReport } from '../../utils/viewModel';
 import { ADVICE, ROAD_META, TREND_META, sparkPaths, trendNote, waterSeries } from '../../utils/floodMeta';
 
 interface ReportDetailCardProps {
@@ -12,6 +12,7 @@ interface ReportDetailCardProps {
   removing: boolean;
   onRemove: () => void;
   onShowLocation: () => void;
+  projectedRiseCm: number;
   onClose: () => void;
 }
 
@@ -22,8 +23,9 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, onClose }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, projectedRiseCm, onClose }) => {
   const [confirmRemove, setConfirmRemove] = React.useState(false);
+  const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
   const sev = report.sev;
   const tm = TREND_META[report.trend];
   const rm = ROAD_META[report.road];
@@ -71,6 +73,14 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             </div>
           ))}
         </div>
+
+        {rise && (
+          <div style={{ marginBottom: 10, padding: '9px 11px', background: 'var(--bw-bg-subtle)', borderRadius: 11, fontSize: 11.5, fontWeight: 700, color: 'var(--bw-ink-soft)', lineHeight: 1.4 }}>
+            📈 If water rises <strong>+{projectedRiseCm} cm</strong>, this zone spreads{' '}
+            <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{rise.diameter.toFixed(1)}× wider</strong> ·{' '}
+            <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{rise.area.toFixed(1)}× area</strong>
+          </div>
+        )}
 
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', margin: '2px 0 6px' }}>WATER LEVEL · LAST 6 HOURS</div>
         <div style={{ background: '#F7FAFB', borderRadius: 11, padding: '10px 10px 6px', marginBottom: 10 }}>

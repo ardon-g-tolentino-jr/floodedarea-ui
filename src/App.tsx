@@ -177,6 +177,12 @@ const App: React.FC = () => {
   // map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
 
+  // Representative (median) depth of active reports — drives the sidebar water-rise ratio readout.
+  const representativeDepthCm = React.useMemo(() => {
+    const ds = active.map((r) => r.depthCm).sort((a, b) => a - b);
+    return ds.length ? ds[Math.floor(ds.length / 2)] : 0;
+  }, [active]);
+
   const visible = React.useMemo(
     () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
     [active, filters, roadFilters]
@@ -592,6 +598,7 @@ const App: React.FC = () => {
               removing={removing}
               onRemove={() => void removeReport(selectedReport.id)}
               onShowLocation={() => setMapFocus({ lat: selectedReport.latitude, lng: selectedReport.longitude, key: Date.now() })}
+              projectedRiseCm={projectedRiseCm}
               onClose={() => setSelectedReportId(null)}
             />
           )}
@@ -633,6 +640,7 @@ const App: React.FC = () => {
           onOpenRoads={() => setRoadsModalOpen(true)}
           projectedRiseCm={projectedRiseCm}
           onChangeRise={setProjectedRiseCm}
+          representativeDepthCm={representativeDepthCm}
           monitorRadiusKm={monitorRadiusKm}
           onChangeMonitor={setMonitorRadiusKm}
           notifyOn={notifyPrefs.enabled}
