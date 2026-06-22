@@ -695,9 +695,12 @@ const App: React.FC = () => {
   const highCount = filterCounts.high;
   const totalCount = active.length;
 
+  // `isolation: isolate` gives the map area its own stacking context so Leaflet's internal
+  // z-indexes (panes 200–700, controls up to 1000) stay contained instead of leaking into the
+  // root context — otherwise they paint over the TopBar's overflow menu / search-results dropdowns.
   const mapAreaStyle: React.CSSProperties = isMobile
-    ? { position: 'relative', height: '52vh', flex: 'none', background: 'var(--bw-map-bg)' }
-    : { flex: 1, position: 'relative', minWidth: 0, background: 'var(--bw-map-bg)' };
+    ? { position: 'relative', isolation: 'isolate', height: '52vh', flex: 'none', background: 'var(--bw-map-bg)' }
+    : { flex: 1, position: 'relative', isolation: 'isolate', minWidth: 0, background: 'var(--bw-map-bg)' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', color: 'var(--bw-ink)' }}>
