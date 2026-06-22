@@ -488,6 +488,8 @@ const App: React.FC = () => {
         latitude: userLoc.lat,
         longitude: userLoc.lng,
         district,
+        city: geo?.city?.trim() || undefined,
+        barangay: geo?.barangay?.trim() || undefined,
       });
       await rescues.refetch(true);
       setSosOpen(false);

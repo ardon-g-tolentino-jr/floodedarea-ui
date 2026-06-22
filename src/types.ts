@@ -95,6 +95,8 @@ export interface RescueRequest {
   latitude: number;
   longitude: number;
   district: string;
+  city: string | null;
+  barangay: string | null;
   note: string | null;
   status: RescueStatus;
   createdAt: string;
@@ -106,6 +108,8 @@ export interface NewRescue {
   latitude: number;
   longitude: number;
   district: string;
+  city?: string;
+  barangay?: string;
   note?: string;
 }
 
