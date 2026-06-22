@@ -22,6 +22,7 @@ interface TopBarProps {
   isAdmin: boolean;
   onAdmin: () => void;
   onResponse: () => void;
+  onShowFeatures: () => void;
 }
 
 /** Shared style for the square 40×40 icon buttons in the action row. */
@@ -68,6 +69,7 @@ const TopBar: React.FC<TopBarProps> = ({
   isAdmin,
   onAdmin,
   onResponse,
+  onShowFeatures,
 }) => {
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
 
@@ -195,19 +197,27 @@ const TopBar: React.FC<TopBarProps> = ({
           <div style={{ lineHeight: 1.2 }}>
             <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-.02em' }}>FloodedArea</div>
             <div style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{regionLabel}</div>
-            <div
-              title={`Build ${BUILD_COMMIT} · ${new Date(BUILD_TIME).toLocaleString()}`}
+            <button
+              onClick={onShowFeatures}
+              title={`See all features · build ${BUILD_COMMIT} · ${new Date(BUILD_TIME).toLocaleString()}`}
               style={{
+                border: 0,
+                background: 'transparent',
+                padding: 0,
                 fontSize: 9.5,
                 fontWeight: 700,
                 fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                 color: 'var(--bw-faint)',
                 whiteSpace: 'nowrap',
                 marginTop: 1,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                textDecorationStyle: 'dotted',
+                textUnderlineOffset: 2,
               }}
             >
               {BUILD_LABEL}
-            </div>
+            </button>
           </div>
         )}
       </div>
@@ -239,6 +249,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="📈" label="Water levels" onClick={runAndClose(onWaterChart)} />
                   <MenuItem icon="🛟" label="Rescue requests" onClick={runAndClose(onRescueChart)} />
                   <MenuItem icon="💙" label="About &amp; support" onClick={runAndClose(onSupport)} />
+                  <MenuItem icon="✨" label="What’s in this app" onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
                   {isAdmin && <MenuItem icon="🚑" label="Response console" onClick={runAndClose(onResponse)} />}
                   {isAdmin && <MenuItem icon="⚙" label="Admin console" onClick={runAndClose(onAdmin)} />}

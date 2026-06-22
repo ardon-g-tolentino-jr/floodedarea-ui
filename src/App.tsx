@@ -36,6 +36,7 @@ import WaterLevelModal from './components/panels/WaterLevelModal';
 import RoadConditionsModal from './components/panels/RoadConditionsModal';
 import RescueChartModal from './components/panels/RescueChartModal';
 import SupportModal from './components/panels/SupportModal';
+import FeaturesModal from './components/panels/FeaturesModal';
 import AdminPanel from './components/panels/AdminPanel';
 import ResponseConsole from './components/panels/ResponseConsole';
 import LoginView from './views/LoginView';
@@ -123,6 +124,7 @@ const App: React.FC = () => {
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [supportOpen, setSupportOpen] = React.useState(false);
+  const [featuresOpen, setFeaturesOpen] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [responseOpen, setResponseOpen] = React.useState(false);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
@@ -754,6 +756,7 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onSupport={() => setSupportOpen(true)}
+        onShowFeatures={() => setFeaturesOpen(true)}
         isAdmin={!!isAdmin}
         onAdmin={() => setAdminOpen(true)}
         onResponse={() => {
@@ -928,6 +931,8 @@ const App: React.FC = () => {
       {supportOpen && (
         <SupportModal qrSrc={GCASH_QR_SRC} isMobile={isMobile} onClose={() => setSupportOpen(false)} />
       )}
+
+      {featuresOpen && <FeaturesModal isMobile={isMobile} onClose={() => setFeaturesOpen(false)} />}
 
       {adminOpen && isAdmin && (
         <AdminPanel
