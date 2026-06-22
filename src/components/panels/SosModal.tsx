@@ -37,6 +37,15 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
       </div>
 
       <div style={{ padding: '16px 20px' }}>
+        {/* Usage disclaimer — the rescue queue is only monitored once an LGU activates it. */}
+        <div style={{ display: 'flex', gap: 9, padding: '11px 13px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, marginBottom: 14 }}>
+          <span style={{ fontSize: 15, flex: 'none', lineHeight: 1.3 }}>⚠️</span>
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: '#7C2D12' }}>
+            <strong style={{ color: '#9A3412' }}>Use only when activated.</strong> Send a rescue request only when your local
+            government (LGU / DRRMO) has announced this feature is active for your area. Otherwise, call a hotline below or
+            911 — requests sent at other times may not be monitored.
+          </p>
+        </div>
         <button
           onClick={onSendRescue}
           disabled={sending}
