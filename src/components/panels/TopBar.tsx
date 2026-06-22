@@ -190,7 +190,16 @@ const TopBar: React.FC<TopBarProps> = ({
             flex: 'none',
           }}
         >
-          <div style={{ width: 13, height: 13, background: '#fff', borderRadius: '50% 50% 50% 0', transform: 'rotate(45deg)' }} />
+          {/* Rain + flood mark — mirrors public/favicon.svg */}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <g stroke="#fff" strokeWidth="1.8" strokeLinecap="round">
+              <line x1="8" y1="4" x2="6.6" y2="7.8" />
+              <line x1="12" y1="3.2" x2="10.6" y2="7" />
+              <line x1="16" y1="4" x2="14.6" y2="7.8" />
+            </g>
+            <path d="M0 13 q 3.5 -3 7 0 t 7 0 t 7 0 t 7 0 V24 H0 Z" fill="#fff" fillOpacity="0.5" />
+            <path d="M0 16 q 3.5 -3 7 0 t 7 0 t 7 0 t 7 0 V24 H0 Z" fill="#fff" />
+          </svg>
         </div>
         {/* The wordmark + sublines are hidden on mobile to free up room for the action row. */}
         {!isMobile && (

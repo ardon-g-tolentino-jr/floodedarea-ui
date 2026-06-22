@@ -31,6 +31,9 @@ export interface ShareInputs {
 
 export interface ShareText {
   title: string;
+  /** Message body WITHOUT the URL — for share intents that take the link as a separate field (X, Telegram). */
+  body: string;
+  /** Full message: body + the URL on its own line — for clipboard, native share, WhatsApp, email. */
   text: string;
 }
 
@@ -48,11 +51,11 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
     const trend = myReport.trend === 'rising' || myReport.trend === 'receding'
       ? `, ${TREND_META[myReport.trend].label.toLowerCase()}`
       : '';
-    const text =
+    const body =
       `⚠️ I just reported ${myReport.sev.label.toUpperCase()} flooding on ${where} — ` +
       `~${myReport.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
-      `Track live flood conditions on ${PITCH}\n${url}`;
-    return { title: `Flood update — ${APP_NAME}`, text };
+      `Track live flood conditions on ${PITCH}`;
+    return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}` };
   }
 
   // Visitor / no active report: an enticing pitch sweetened with live stats.
@@ -65,6 +68,33 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
   } else if (alertLevel) {
     stats = ` Right now ${ALERT_NOTE[alertLevel]} 👀`;
   }
-  const text = `🌊 ${PITCH}${stats}\n${url}`;
-  return { title: `${APP_NAME} — live flood map`, text };
+  const body = `🌊 ${PITCH}${stats}`;
+  return { title: `${APP_NAME} — live flood map`, body, text: `${body}\n${url}` };
+}
+
+/** A single social-network share target. `href` opens that network's web (or app) composer. */
+export interface ShareLink {
+  key: 'facebook' | 'x' | 'whatsapp' | 'telegram' | 'email';
+  label: string;
+  /** Brand color used for the button. */
+  color: string;
+  href: string;
+}
+
+/** Builds the per-network share URLs. Pure — the component renders these as plain links.
+ *  `body` (no URL) is used where the network takes the link as its own param; `text` (with URL)
+ *  where everything goes in one free-text field. */
+export function buildShareLinks({ url, body, text }: { url: string; body: string; text: string }): ShareLink[] {
+  const u = encodeURIComponent(url);
+  const b = encodeURIComponent(body);
+  const full = encodeURIComponent(text);
+  const subject = encodeURIComponent(`${APP_NAME} — live flood map for the Philippines`);
+  return [
+    // Facebook's sharer only accepts the URL; it builds its own preview from the page's OG tags.
+    { key: 'facebook', label: 'Facebook', color: '#1877F2', href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
+    { key: 'x', label: 'X', color: '#000000', href: `https://twitter.com/intent/tweet?text=${b}&url=${u}` },
+    { key: 'whatsapp', label: 'WhatsApp', color: '#25D366', href: `https://wa.me/?text=${full}` },
+    { key: 'telegram', label: 'Telegram', color: '#229ED9', href: `https://t.me/share/url?url=${u}&text=${b}` },
+    { key: 'email', label: 'Email', color: '#64748B', href: `mailto:?subject=${subject}&body=${full}` },
+  ];
 }

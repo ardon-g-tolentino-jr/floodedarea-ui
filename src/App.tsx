@@ -10,7 +10,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
-import { buildShareText } from './utils/share';
+import { buildShareText, buildShareLinks } from './utils/share';
 import {
   buildPossibleClosures,
   buildRoadDirectory,
@@ -40,6 +40,7 @@ import WaterLevelModal from './components/panels/WaterLevelModal';
 import RoadConditionsModal from './components/panels/RoadConditionsModal';
 import RescueChartModal from './components/panels/RescueChartModal';
 import SupportModal from './components/panels/SupportModal';
+import ShareModal from './components/panels/ShareModal';
 import FeaturesModal from './components/panels/FeaturesModal';
 import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import AdminPanel from './components/panels/AdminPanel';
@@ -132,6 +133,7 @@ const App: React.FC = () => {
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [supportOpen, setSupportOpen] = React.useState(false);
+  const [shareOpen, setShareOpen] = React.useState(false);
   const [featuresOpen, setFeaturesOpen] = React.useState(false);
   const [feedbackOpen, setFeedbackOpen] = React.useState(false);
   const [feedbackSending, setFeedbackSending] = React.useState(false);
@@ -672,28 +674,41 @@ const App: React.FC = () => {
     }
   };
 
-  const share = async (): Promise<void> => {
-    // A signed-in user's own still-live report turns Share into a situation snapshot;
-    // otherwise it's an enticing pitch with live stats. (Same "mine && !expired" pick as startReport.)
+  // The Share dialog's contents. A signed-in user's own still-live report turns Share into a
+  // situation snapshot; otherwise it's an enticing pitch with live stats. (Same "mine && !expired"
+  // pick as startReport.) Recomputed only when the live data or page URL changes.
+  const shareData = React.useMemo(() => {
     const myReport = enriched.find((r) => r.mine && !r.expired) ?? null;
-    const { title, text } = buildShareText({
+    const url = window.location.href;
+    const st = buildShareText({
       myReport,
       activeCount: active.length,
       alertLevel: activeAlert?.level ?? null,
-      url: window.location.href,
+      url,
     });
-    setSosOpen(false);
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text, url: window.location.href });
-        return; // share sheet handled it — no toast needed
-      } catch (err) {
-        // User dismissed the sheet → done; any other failure falls through to the clipboard copy.
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      }
+    return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text }) };
+  }, [enriched, active.length, activeAlert]);
+
+  const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+  // The Share modal's "Share via your apps…" button (mobile native sheet — covers Messenger/Viber/etc).
+  const nativeShare = async (): Promise<void> => {
+    try {
+      await navigator.share?.({ title: shareData.title, text: shareData.text, url: shareData.url });
+    } catch (err) {
+      // User dismissed the sheet → done; swallow other failures (the in-modal buttons remain).
+      if (err instanceof DOMException && err.name === 'AbortError') return;
     }
-    try { await navigator.clipboard?.writeText(text); } catch {/* ignore */}
-    showToast('Share message copied — paste it anywhere');
+  };
+
+  // Clipboard copy for the modal's "Copy link" / "Copy message" actions.
+  const copyShare = async (textToCopy: string, successMsg: string): Promise<void> => {
+    try {
+      await navigator.clipboard?.writeText(textToCopy);
+      showToast(successMsg);
+    } catch {
+      showToast('Could not copy — please copy it manually');
+    }
   };
 
   // ── Admin data management ──
@@ -816,7 +831,7 @@ const App: React.FC = () => {
         isMobile={isMobile}
         auth={auth}
         onReport={startReport}
-        onShare={() => void share()}
+        onShare={() => setShareOpen(true)}
         onSOS={() => setSosOpen(true)}
         onSignIn={() => setLogin({ open: true })}
         onSignOut={logout}
@@ -1010,6 +1025,19 @@ const App: React.FC = () => {
         />
       )}
 
+      {shareOpen && (
+        <ShareModal
+          text={shareData.text}
+          url={shareData.url}
+          links={shareData.links}
+          activeCount={active.length}
+          isMobile={isMobile}
+          canNativeShare={canNativeShare}
+          onNativeShare={() => void nativeShare()}
+          onCopy={(t, msg) => void copyShare(t, msg)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
       {supportOpen && (
         <SupportModal qrSrc={GCASH_QR_SRC} isMobile={isMobile} onClose={() => setSupportOpen(false)} />
       )}
