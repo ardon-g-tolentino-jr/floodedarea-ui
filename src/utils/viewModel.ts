@@ -201,6 +201,22 @@ export function rescueCountsByDistrict(rescues: RescueRequest[]): RescueDistrict
     .sort((a, b) => b.count - a.count || a.district.localeCompare(b.district));
 }
 
+/** Local-timezone calendar day of an ISO timestamp as `YYYY-MM-DD` (so "today" matches the user's clock). */
+export function localDateKey(iso: string | Date): string {
+  const d = iso instanceof Date ? iso : new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** Rescue requests created on the given local day (`YYYY-MM-DD`), newest first. */
+export function rescuesOnLocalDate(rescues: RescueRequest[], ymd: string): RescueRequest[] {
+  return rescues
+    .filter((r) => localDateKey(r.createdAt) === ymd)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
 
 export function computeStatus(enriched: EnrichedReport[]): SafetyStatus {
