@@ -3,7 +3,7 @@
 
 import type { FloodReport, LatLng, RescueRequest, Road, Severity } from '../types';
 import { kmBetween } from './geo';
-import { ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
+import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 
 // Affected-area model — planar ("bathtub") inundation: floodwater of depth h spreads horizontally
@@ -215,6 +215,126 @@ export function rescuesOnLocalDate(rescues: RescueRequest[], ymd: string): Rescu
   return rescues
     .filter((r) => localDateKey(r.createdAt) === ymd)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+// ── Response-team view model: rescue triage, district hotspots and surge trend ──────────────
+
+export interface EnrichedRescue extends RescueRequest {
+  waitMin: number;        // minutes since the request was first created
+  sinceUpdateMin: number; // minutes since the last (re-)request
+  reRequested: boolean;   // the sender pinged again after the first request — still waiting
+  place: string;          // "barangay · city · district"
+  urgency: number;        // higher = triage sooner (within a status)
+}
+
+/**
+ * Enrich rescue requests for the response console: time waiting, a place label and an urgency
+ * score. Requests in a district with severe or rising active flooding are boosted, as are ones
+ * the sender re-pinged. `reports` should be the currently-active reports.
+ */
+export function enrichRescues(
+  rescues: RescueRequest[],
+  reports: FloodReport[],
+  now: number = Date.now()
+): EnrichedRescue[] {
+  const hotDistricts = new Set<string>();
+  for (const r of reports) {
+    if (r.severity === 'high' || r.trend === 'rising') hotDistricts.add(r.district.trim().toLowerCase());
+  }
+  return rescues.map((r) => {
+    const created = new Date(r.createdAt).getTime();
+    const last = new Date(r.lastRequestedAt ?? r.createdAt).getTime();
+    const waitMin = Number.isNaN(created) ? 0 : Math.max(0, Math.floor((now - created) / 60000));
+    const sinceUpdateMin = Number.isNaN(last) ? waitMin : Math.max(0, Math.floor((now - last) / 60000));
+    const reRequested = !Number.isNaN(created) && !Number.isNaN(last) && last - created > 60000;
+    const place = [r.barangay, r.city, r.district].map((s) => s?.trim()).filter(Boolean).join(' · ') || 'Unknown area';
+    const hot = hotDistricts.has((r.district ?? '').trim().toLowerCase());
+    const urgency = waitMin + (reRequested ? 120 : 0) + (hot ? 60 : 0);
+    return { ...r, waitMin, sinceUpdateMin, reRequested, place, urgency };
+  });
+}
+
+/** Triage order for the queue: open work first (pending → dispatched → resolved), then urgency. */
+export function rescueQueue(enriched: EnrichedRescue[]): EnrichedRescue[] {
+  return [...enriched].sort(
+    (a, b) => RESCUE_STATUS_RANK[b.status] - RESCUE_STATUS_RANK[a.status] || b.urgency - a.urgency
+  );
+}
+
+export interface DistrictHotspot {
+  district: string;
+  rescueCount: number;   // open (unresolved) rescue requests
+  highCount: number;     // high-severity active reports
+  risingCount: number;   // rising active reports
+  reportCount: number;
+  worstSeverity: Severity | null;
+  score: number;         // combined response load — higher = prioritize
+}
+
+/**
+ * Rank districts by combined response load: open rescue requests weigh heaviest (people waiting),
+ * then severe and rising flooding. `reports` should be the currently-active reports.
+ */
+export function districtHotspots(reports: FloodReport[], rescues: RescueRequest[]): DistrictHotspot[] {
+  const map = new Map<string, DistrictHotspot>();
+  const bucket = (district: string | null | undefined): DistrictHotspot => {
+    const key = district?.trim() || 'Unknown area';
+    let h = map.get(key);
+    if (!h) {
+      h = { district: key, rescueCount: 0, highCount: 0, risingCount: 0, reportCount: 0, worstSeverity: null, score: 0 };
+      map.set(key, h);
+    }
+    return h;
+  };
+  for (const r of reports) {
+    const h = bucket(r.district);
+    h.reportCount++;
+    if (r.severity === 'high') h.highCount++;
+    if (r.trend === 'rising') h.risingCount++;
+    if (!h.worstSeverity || SEV_RANK[r.severity] > SEV_RANK[h.worstSeverity]) h.worstSeverity = r.severity;
+  }
+  for (const r of rescues) {
+    if (r.status === 'resolved') continue;
+    bucket(r.district).rescueCount++;
+  }
+  const list = [...map.values()];
+  for (const h of list) h.score = h.rescueCount * 5 + h.highCount * 3 + h.risingCount * 2 + h.reportCount;
+  return list
+    .filter((h) => h.score > 0)
+    .sort((a, b) => b.score - a.score || a.district.localeCompare(b.district));
+}
+
+export interface SurgeBucket {
+  label: string;   // hour label, e.g. "3 PM"
+  start: number;   // epoch ms at the top of the hour
+  rescues: number;
+  reports: number;
+}
+
+/** Rescues & reports bucketed by hour over the trailing `hours` window — surfaces a surge. */
+export function hourlySurge(
+  reports: FloodReport[],
+  rescues: RescueRequest[],
+  hours: number = 12,
+  now: number = Date.now()
+): SurgeBucket[] {
+  const top = new Date(now);
+  top.setMinutes(0, 0, 0);
+  const buckets: SurgeBucket[] = [];
+  for (let i = hours - 1; i >= 0; i--) {
+    const start = top.getTime() - i * 3600000;
+    buckets.push({ label: new Date(start).toLocaleTimeString([], { hour: 'numeric' }), start, rescues: 0, reports: 0 });
+  }
+  const base = buckets[0].start;
+  const idxOf = (iso: string): number => {
+    const t = new Date(iso).getTime();
+    if (Number.isNaN(t)) return -1;
+    const i = Math.floor((t - base) / 3600000);
+    return i >= 0 && i < buckets.length ? i : -1;
+  };
+  for (const r of reports) { const i = idxOf(r.createdAt); if (i >= 0) buckets[i].reports++; }
+  for (const r of rescues) { const i = idxOf(r.createdAt); if (i >= 0) buckets[i].rescues++; }
+  return buckets;
 }
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };

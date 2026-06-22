@@ -13,3 +13,12 @@ export function timeAgo(iso: string): string {
   const h = Math.floor(m / 60);
   return `${h} hr${h > 1 ? 's' : ''} ago`;
 }
+
+/** Compact elapsed duration from whole minutes: "just now" / "45m" / "2h 5m". */
+export function formatDuration(min: number): string {
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m ? `${h}h ${m}m` : `${h}h`;
+}

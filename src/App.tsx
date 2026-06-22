@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, Road, Severity } from './types';
+import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, RescueStatus, Road, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStatus } from './hooks/useDomainData';
@@ -36,6 +36,7 @@ import RoadConditionsModal from './components/panels/RoadConditionsModal';
 import RescueChartModal from './components/panels/RescueChartModal';
 import SupportModal from './components/panels/SupportModal';
 import AdminPanel from './components/panels/AdminPanel';
+import ResponseConsole from './components/panels/ResponseConsole';
 import LoginView from './views/LoginView';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
@@ -120,6 +121,8 @@ const App: React.FC = () => {
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [supportOpen, setSupportOpen] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
+  const [responseOpen, setResponseOpen] = React.useState(false);
+  const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
@@ -415,13 +418,14 @@ const App: React.FC = () => {
   // means we're signed in but lack permission, and signing in again as the same user won't help —
   // so we leave the modal up to show its "no permission" message instead of logging out.
   React.useEffect(() => {
-    if (!rescueChartOpen) return;
+    if (!rescueChartOpen && !responseOpen) return;
     if (rescues.error instanceof ApiError && rescues.error.status === 401) {
       setRescueChartOpen(false);
-      handleAuthError(rescues.error, 'Your session expired. Please sign in again to view rescue requests by district.');
+      setResponseOpen(false);
+      handleAuthError(rescues.error, 'Your session expired. Please sign in again to view rescue requests.');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rescueChartOpen, rescues.error]);
+  }, [rescueChartOpen, responseOpen, rescues.error]);
 
   // Reverse-geocode a pin location to the street it sits on, guarding against stale responses
   // when the pin moves quickly. Feeds the editable road field in the report dialog.
@@ -596,6 +600,22 @@ const App: React.FC = () => {
     }
   };
 
+  // Responder action: advance a rescue request's status (dispatch / resolve / reopen). ADMIN-only
+  // surface; mirrors adminAction but tracks the in-flight row so its buttons can show progress.
+  const onUpdateRescueStatus = async (id: number, status: RescueStatus): Promise<void> => {
+    setRescueBusyId(id);
+    try {
+      await mutations.updateRescue(id, { status });
+      await rescues.refetch(true);
+      showToast(status === 'dispatched' ? 'Marked as dispatched.' : status === 'resolved' ? 'Marked as resolved.' : 'Request reopened.');
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to update rescue requests.')) return;
+      showToast('Could not update the request. Please try again.');
+    } finally {
+      setRescueBusyId(null);
+    }
+  };
+
   const share = async (): Promise<void> => {
     // A signed-in user's own still-live report turns Share into a situation snapshot;
     // otherwise it's an enticing pitch with live stats. (Same "mine && !expired" pick as startReport.)
@@ -703,6 +723,12 @@ const App: React.FC = () => {
         onSupport={() => setSupportOpen(true)}
         isAdmin={!!isAdmin}
         onAdmin={() => setAdminOpen(true)}
+        onResponse={() => {
+          // /rescue reads need auth; prompt sign-in before opening, then warm the data.
+          if (!requireAuth('Sign in to open the response console.')) return;
+          setResponseOpen(true);
+          void rescues.refetch(true);
+        }}
       />
 
       {activeAlert && (
@@ -888,6 +914,24 @@ const App: React.FC = () => {
           onUpdateReport={onUpdateReport}
           onDeleteReport={onDeleteReport}
           onClose={() => setAdminOpen(false)}
+        />
+      )}
+
+      {responseOpen && isAdmin && (
+        <ResponseConsole
+          rescues={rescueList}
+          reports={active}
+          centers={centerList}
+          roadSegments={roadList}
+          alerts={alertList}
+          userLoc={userLoc}
+          now={now}
+          isMobile={isMobile}
+          loading={rescues.loading && rescueList.length === 0}
+          error={rescues.error}
+          busyId={rescueBusyId}
+          onUpdateRescueStatus={(id, s) => void onUpdateRescueStatus(id, s)}
+          onClose={() => setResponseOpen(false)}
         />
       )}
 

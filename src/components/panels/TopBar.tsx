@@ -21,6 +21,7 @@ interface TopBarProps {
   onSupport: () => void;
   isAdmin: boolean;
   onAdmin: () => void;
+  onResponse: () => void;
 }
 
 /** Shared style for the square 40×40 icon buttons in the action row. */
@@ -66,6 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onSupport,
   isAdmin,
   onAdmin,
+  onResponse,
 }) => {
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
 
@@ -114,6 +116,18 @@ const TopBar: React.FC<TopBarProps> = ({
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #BAE2FB', background: '#EFF8FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: 'var(--bw-primary)', cursor: 'pointer' }}
     >
       ⚙ {!isMobile && 'Admin'}
+    </button>
+  ) : null;
+
+  // Response console — ADMIN-only triage/dispatch dashboard. Rose-tinted to read as ops/emergency,
+  // distinct from the blue Admin button.
+  const responseBtn = isAdmin ? (
+    <button
+      onClick={onResponse}
+      title="Response console — triage & dispatch"
+      style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #FBCFE8', background: '#FDF2F8', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#BE185D', cursor: 'pointer' }}
+    >
+      🚑 {!isMobile && 'Response'}
     </button>
   ) : null;
 
@@ -226,6 +240,7 @@ const TopBar: React.FC<TopBarProps> = ({
             </div>
             {notifyBtn}
             {sosBtn}
+            {responseBtn}
             {adminBtn}
             {authCluster}
           </>
@@ -261,6 +276,7 @@ const TopBar: React.FC<TopBarProps> = ({
               <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> Report flood
             </button>
 
+            {responseBtn}
             {adminBtn}
             {authCluster}
           </>

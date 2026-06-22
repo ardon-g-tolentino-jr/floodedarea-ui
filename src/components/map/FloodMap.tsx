@@ -2,8 +2,9 @@ import React from 'react';
 import L from 'leaflet';
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { EvacuationCenter, LatLng, RoadSegment } from '../../types';
-import { ROAD_META } from '../../utils/floodMeta';
-import { affectedRadiusKm, type EnrichedReport } from '../../utils/viewModel';
+import { RESCUE_STATUS_META, ROAD_META } from '../../utils/floodMeta';
+import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue } from '../../utils/viewModel';
+import { formatDuration } from '../../utils/format';
 
 export interface MapFocus extends LatLng {
   /** Bumped on every search so re-selecting the same place still re-flies the map. */
@@ -33,6 +34,10 @@ interface FloodMapProps {
   onMapClick: (latlng: LatLng) => void;
   onSelectReport: (id: number) => void;
   onSelectEvac: (id: number) => void;
+  /** Optional rescue-request layer (response console): status-colored pins. */
+  rescues?: EnrichedRescue[];
+  selectedRescueId?: number | null;
+  onSelectRescue?: (id: number) => void;
 }
 
 const shelterIconHtml = (color: string): string =>
@@ -106,6 +111,9 @@ const FloodMap: React.FC<FloodMapProps> = ({
   onMapClick,
   onSelectReport,
   onSelectEvac,
+  rescues,
+  selectedRescueId,
+  onSelectRescue,
 }) => {
   return (
     <MapContainer
@@ -123,12 +131,14 @@ const FloodMap: React.FC<FloodMapProps> = ({
       <ClickCatcher onMapClick={onMapClick} />
       <FlyTo focus={focus} />
 
-      {/* Monitoring boundary */}
-      <Circle
-        center={[userLoc.lat, userLoc.lng]}
-        radius={monitorRadiusKm * 1000}
-        pathOptions={{ color: '#0EA5E9', weight: 2, dashArray: '6 8', fillColor: '#0EA5E9', fillOpacity: 0.04 }}
-      />
+      {/* Monitoring boundary (citizen view only — the response console passes 0 to hide it) */}
+      {monitorRadiusKm > 0 && (
+        <Circle
+          center={[userLoc.lat, userLoc.lng]}
+          radius={monitorRadiusKm * 1000}
+          pathOptions={{ color: '#0EA5E9', weight: 2, dashArray: '6 8', fillColor: '#0EA5E9', fillOpacity: 0.04 }}
+        />
+      )}
 
       {/* Flooded road segments (map-matched by baha-api). White casing for legibility, colored
           by passability — matches RoadLegend. */}
@@ -211,6 +221,34 @@ const FloodMap: React.FC<FloodMapProps> = ({
               pathOptions={{ color: '#0E7490', weight: 3, fill: false }}
             />
           ))}
+
+      {/* Rescue requests (response console). Status-colored pins; selected gets an outer ring. */}
+      {rescues?.map((r) => {
+        const meta = RESCUE_STATUS_META[r.status] ?? RESCUE_STATUS_META.pending;
+        const sel = r.id === selectedRescueId;
+        return (
+          <React.Fragment key={`rescue-${r.id}`}>
+            {sel && (
+              <CircleMarker
+                center={[r.latitude, r.longitude]}
+                radius={16}
+                pathOptions={{ color: meta.color, weight: 2, fill: false }}
+              />
+            )}
+            <CircleMarker
+              center={[r.latitude, r.longitude]}
+              radius={sel ? 10 : 8}
+              pathOptions={{ color: '#fff', weight: 2.5, fillColor: meta.color, fillOpacity: 1 }}
+              eventHandlers={{ click: () => onSelectRescue?.(r.id) }}
+            >
+              <Tooltip direction="top" offset={[0, -4]} opacity={1}>
+                <span style={{ fontWeight: 700 }}>{meta.label}</span> · {r.place}
+                {r.waitMin > 0 ? ` · waiting ${formatDuration(r.waitMin)}` : ''}
+              </Tooltip>
+            </CircleMarker>
+          </React.Fragment>
+        );
+      })}
 
       {/* Searched location */}
       {searchMark && (

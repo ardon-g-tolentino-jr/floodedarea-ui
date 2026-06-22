@@ -169,6 +169,20 @@ server.post('/rescue', (req, res) => {
   res.status(201).json(rescue);
 });
 
+// Responder action: advance a request's status (pending → dispatched → resolved). baha-api does
+// this server-side; the broadcast lets the response console refresh live.
+const RESCUE_STATUSES = ['pending', 'dispatched', 'resolved'];
+server.patch('/rescue/:id', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const rescue = db.get('rescues').find({ id }).value();
+  if (!rescue) return res.status(404).json({ message: 'Rescue request not found' });
+  const next = RESCUE_STATUSES.includes(req.body.status) ? req.body.status : rescue.status;
+  const updated = db.get('rescues').find({ id }).assign({ status: next }).write();
+  broadcast('rescue-updated', { id });
+  res.json(updated);
+});
+
 server.get('/sse/activity', (_req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',

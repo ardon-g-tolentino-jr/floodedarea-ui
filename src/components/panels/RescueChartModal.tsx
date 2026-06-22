@@ -1,7 +1,7 @@
 import React from 'react';
-import type { RescueRequest, RescueStatus } from '../../types';
+import type { RescueRequest } from '../../types';
 import { ApiError } from '../../api/client';
-import { DISTRICT_COLORS } from '../../utils/floodMeta';
+import { DISTRICT_COLORS, RESCUE_STATUS_META } from '../../utils/floodMeta';
 import { localDateKey, rescueCountsByDistrict, rescuesOnLocalDate } from '../../utils/viewModel';
 
 interface RescueChartModalProps {
@@ -11,13 +11,6 @@ interface RescueChartModalProps {
   isMobile: boolean;
   onClose: () => void;
 }
-
-// Small status pill palette, consistent with the app's hues (amber/blue/green).
-const STATUS_STYLE: Record<RescueStatus, { bg: string; fg: string; label: string }> = {
-  pending: { bg: '#FEF3C7', fg: '#B45309', label: 'Pending' },
-  dispatched: { bg: '#DBEAFE', fg: '#1D4ED8', label: 'Dispatched' },
-  resolved: { bg: '#DCFCE7', fg: '#15803D', label: 'Resolved' },
-};
 
 /** A readable label for a `YYYY-MM-DD` key, e.g. "Today · Mon, Jun 22". */
 function dateLabel(ymd: string, today: string): string {
@@ -95,7 +88,7 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {dayRescues.map((r) => {
-            const st = STATUS_STYLE[r.status] ?? STATUS_STYLE.pending;
+            const st = RESCUE_STATUS_META[r.status] ?? RESCUE_STATUS_META.pending;
             const time = new Date(r.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
             const place = [r.barangay, r.city, r.district].map((s) => s?.trim()).filter(Boolean).join(' · ') || 'Unknown area';
             return (

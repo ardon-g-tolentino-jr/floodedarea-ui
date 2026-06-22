@@ -1,6 +1,6 @@
 // Severity / trend / road metadata and water-level math, ported from the BahaWatch design.
 
-import type { Road, Severity, Trend } from '../types';
+import type { RescueStatus, Road, Severity, Trend } from '../types';
 
 export interface SevMeta {
   label: string;
@@ -32,6 +32,20 @@ export const ROAD_META: Record<Road, { label: string; short: string; glyph: stri
 export const ROAD_ORDER: Road[] = ['passable', 'risky', 'impassable'];
 
 export const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
+
+/**
+ * Rescue-request status palette — single source for the status pill (bg/fg) and the map pin
+ * (color), in the app's amber→blue→green hues. Used by the response console, the map's rescue
+ * layer and the rescue chart.
+ */
+export const RESCUE_STATUS_META: Record<RescueStatus, { label: string; color: string; bg: string; fg: string }> = {
+  pending: { label: 'Pending', color: '#F59E0B', bg: '#FEF3C7', fg: '#B45309' },
+  dispatched: { label: 'Dispatched', color: '#3B82F6', bg: '#DBEAFE', fg: '#1D4ED8' },
+  resolved: { label: 'Resolved', color: '#16A34A', bg: '#DCFCE7', fg: '#15803D' },
+};
+
+/** Triage rank for rescue statuses (open work floats to the top): pending → dispatched → resolved. */
+export const RESCUE_STATUS_RANK: Record<RescueStatus, number> = { pending: 3, dispatched: 2, resolved: 1 };
 
 /** Passability rank, worst → best. Used to pick a road's overall condition from its reports. */
 export const ROAD_RANK: Record<Road, number> = { impassable: 3, risky: 2, passable: 1 };

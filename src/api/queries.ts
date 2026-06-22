@@ -11,6 +11,7 @@ import type {
   NewRescue,
   ReportStatus,
   RescueRequest,
+  RescueStatus,
   RoadSegment,
   Severity,
 } from '../types';
@@ -37,6 +38,9 @@ export const mutations = {
     api.patch<FloodReport>(`/reports/${id}`, body),
   deleteReport: (id: number) => api.delete<void>(`/reports/${id}`),
   createRescue: (body: NewRescue) => api.post<RescueRequest>('/rescue', body),
+  /** Responder action: advance a rescue request's status (pending → dispatched → resolved). */
+  updateRescue: (id: number, body: { status: RescueStatus }) =>
+    api.patch<RescueRequest>(`/rescue/${id}`, body),
 
   // ── Admin: evacuation centers ──
   createCenter: (body: NewCenter) => api.post<EvacuationCenter>('/centers', body),
