@@ -322,12 +322,14 @@ const App: React.FC = () => {
   };
 
   // The rescue chart reads /rescue, which needs a valid session. `requireAuth` only checks that a
-  // local session exists, so an expired/invalid JWT lets the chart open but the read then 401/403s.
+  // local session exists, so an expired/invalid JWT lets the chart open but the read then 401s.
   // Recover like the write paths: drop the dead session, close the chart and re-prompt — otherwise
-  // reopening just loops on the same error.
+  // reopening just loops on the same error. Only a 401 (no/invalid session) triggers this; a 403
+  // means we're signed in but lack permission, and signing in again as the same user won't help —
+  // so we leave the modal up to show its "no permission" message instead of logging out.
   React.useEffect(() => {
     if (!rescueChartOpen) return;
-    if (rescues.error instanceof ApiError && (rescues.error.status === 401 || rescues.error.status === 403)) {
+    if (rescues.error instanceof ApiError && rescues.error.status === 401) {
       setRescueChartOpen(false);
       handleAuthError(rescues.error, 'Your session expired. Please sign in again to view rescue requests by district.');
     }

@@ -17,16 +17,23 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
   const rows = React.useMemo(() => rescueCountsByDistrict(rescues), [rescues]);
   const total = rescues.length;
   const max = rows.reduce((m, r) => Math.max(m, r.count), 0) || 1;
-  // Rescue data is auth-protected; a 401/403 means the session is missing/expired, not a backend outage.
-  const authError = error instanceof ApiError && (error.status === 401 || error.status === 403);
+  // Rescue data is auth-protected. 401 = missing/expired session; 403 = signed in without
+  // permission; anything else is treated as a backend outage.
+  const status = error instanceof ApiError ? error.status : undefined;
+  const headline =
+    status === 401 ? 'Sign in to view rescue requests.'
+    : status === 403 ? 'You don’t have access to rescue requests.'
+    : 'Couldn’t load rescue requests.';
+  const subtext =
+    status === 401 ? 'Your session may have expired — sign in again, then reopen.'
+    : status === 403 ? 'This view isn’t available for your account.'
+    : 'Check the backend is running, then reopen.';
 
   const body =
     error && rows.length === 0 ? (
       <div style={{ textAlign: 'center', padding: '40px 10px', color: '#B91C1C', fontSize: 13, lineHeight: 1.5 }}>
-        {authError ? 'Sign in to view rescue requests.' : 'Couldn’t load rescue requests.'}
-        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>
-          {authError ? 'Your session may have expired — sign in again, then reopen.' : 'Check the backend is running, then reopen.'}
-        </div>
+        {headline}
+        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>{subtext}</div>
       </div>
     ) : loading && rows.length === 0 ? (
       <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
