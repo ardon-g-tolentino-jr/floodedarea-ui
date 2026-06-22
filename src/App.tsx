@@ -476,12 +476,16 @@ const App: React.FC = () => {
     }
     setSending(true);
     try {
-      // Attribute the request to the nearest reported district so it can be tallied per district.
+      // Attribute the request to a district so it can be tallied per district. Prefer the actual
+      // sender location reverse-geocoded to a district (works even with no nearby reports); fall
+      // back to the nearest reported district, then a generic label.
+      const geo = await reverseGeocode(userLoc.lat, userLoc.lng).catch(() => null);
       const nearest = [...enriched].sort((a, b) => a.distKm - b.distKm)[0];
+      const district = geo?.district?.trim() || nearest?.district?.trim() || 'Unknown area';
       await mutations.createRescue({
         latitude: userLoc.lat,
         longitude: userLoc.lng,
-        district: nearest?.district ?? 'Unknown area',
+        district,
       });
       await rescues.refetch(true);
       setSosOpen(false);
