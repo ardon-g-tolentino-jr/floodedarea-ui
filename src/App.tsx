@@ -62,6 +62,13 @@ const REGION_LABEL = 'Philippines';
 
 type PendingPin = LatLng & { atYou: boolean };
 
+/** A flood-alert dialog: the alert to show plus an optional primary action (e.g. jump to the
+ *  report on the map). Used for both rainfall alerts and new-nearby-report notifications. */
+type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => void } };
+
+/** Map a report severity onto an alert level for the dialog's color/label. */
+const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
+
 const App: React.FC = () => {
   const { auth, loginWithGoogle, logout } = useAuth();
   const isMobile = useIsMobile();
@@ -113,8 +120,13 @@ const App: React.FC = () => {
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
   );
   const [dismissedAlerts, setDismissedAlerts] = React.useState<Set<number>>(new Set());
-  const [alertModal, setAlertModal] = React.useState<FloodAlert | null>(null);
+  const [alertModal, setAlertModal] = React.useState<AlertDialog | null>(null);
   const alertSound = React.useRef<HTMLAudioElement | null>(null);
+  const playAlertSound = React.useCallback(() => {
+    if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
+    alertSound.current.currentTime = 0;
+    void alertSound.current.play().catch(() => {/* autoplay blocked until first interaction */});
+  }, []);
   const [toast, setToast] = React.useState<ToastData | null>(null);
   const [login_, setLogin] = React.useState<{ open: boolean; reason?: string }>({ open: false });
   const [busyPick, setBusyPick] = React.useState(false);
@@ -233,18 +245,48 @@ const App: React.FC = () => {
       }
     }
 
+    // Surface the alert as a dialog box (with sound), not just a toast.
+    const now = new Date().toISOString();
     if (matches.length === 1) {
       const r = matches[0];
-      showToast(`${r.sev.label} flood reported ~${r.distKm.toFixed(1)} km away`, 'View', () => {
-        setTab('nearby');
-        setSelEvacId(null);
-        setSelectedReportId(r.id);
-        setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+      setAlertModal({
+        alert: {
+          id: -r.id, // synthetic id (negative) so it never collides with rainfall alerts
+          title: 'New flood reported nearby',
+          body: `${r.sev.label} flooding reported ~${r.distKm.toFixed(1)} km away at ${r.name} — about ${r.depthCm} cm deep.`,
+          region: r.name ?? null,
+          level: SEV_TO_LEVEL[r.severity],
+          active: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        action: {
+          label: 'View on map',
+          run: () => {
+            setTab('nearby');
+            setSelEvacId(null);
+            setSelectedReportId(r.id);
+            setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+          },
+        },
       });
     } else {
-      showToast(`${matches.length} new flood reports near you`);
+      const worst = matches.find((r) => r.severity === 'high') ?? matches.find((r) => r.severity === 'medium') ?? matches[0];
+      setAlertModal({
+        alert: {
+          id: -worst.id,
+          title: `${matches.length} new flood reports near you`,
+          body: `${matches.length} new floods reported within ${notifyPrefs.radiusKm} km. The nearest is ${worst.sev.label.toLowerCase()} at ${worst.name}.`,
+          region: null,
+          level: SEV_TO_LEVEL[worst.severity],
+          active: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
     }
-  }, [enriched, notifyPrefs, showToast]);
+    playAlertSound();
+  }, [enriched, notifyPrefs, playAlertSound]);
 
   const filterCounts = React.useMemo(() => {
     const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
@@ -298,10 +340,8 @@ const App: React.FC = () => {
     const worstActive = severe.find((a) => a.level === 'red') ?? severe[0];
     if (worstActive && modaledAlertLevels.current.get(worstActive.id) !== worstActive.level) {
       modaledAlertLevels.current.set(worstActive.id, worstActive.level);
-      setAlertModal(worstActive);
-      if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
-      alertSound.current.currentTime = 0;
-      void alertSound.current.play().catch(() => {/* autoplay blocked */});
+      setAlertModal({ alert: worstActive });
+      playAlertSound();
     }
 
     // OS notification + toast: only for a newly-active/escalated severe alert. Primed on first
@@ -320,7 +360,7 @@ const App: React.FC = () => {
       try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
     }
     showToast(worst.title);
-  }, [alertList, showToast]);
+  }, [alertList, showToast, playAlertSound]);
 
   // ── Actions ──
   const requireAuth = (reason: string): boolean => {
@@ -635,7 +675,7 @@ const App: React.FC = () => {
         <AlertRibbon alert={activeAlert} onClose={() => setDismissedAlerts((s) => new Set(s).add(activeAlert.id))} />
       )}
 
-      {alertModal && <AlertModal alert={alertModal} onClose={() => setAlertModal(null)} />}
+      {alertModal && <AlertModal alert={alertModal.alert} action={alertModal.action} onClose={() => setAlertModal(null)} />}
 
       <div style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: isMobile ? 'auto' : 'hidden' }}>
         <div style={mapAreaStyle}>

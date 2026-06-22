@@ -10,12 +10,14 @@ const LEVEL_LABEL: Record<FloodAlert['level'], string> = {
 
 interface AlertModalProps {
   alert: FloodAlert;
+  /** Optional primary action (e.g. "View on map"). Runs, then closes the dialog. */
+  action?: { label: string; run: () => void };
   onClose: () => void;
 }
 
 /** Centered, attention-demanding modal for a severe (orange/red) flood alert. Auto-popped from
  *  App when a newly-active severe alert arrives; the top ribbon persists behind it. */
-const AlertModal: React.FC<AlertModalProps> = ({ alert, onClose }) => {
+const AlertModal: React.FC<AlertModalProps> = ({ alert, action, onClose }) => {
   const s = LEVEL_STYLE[alert.level] ?? LEVEL_STYLE.orange;
   return (
     <div
@@ -41,12 +43,22 @@ const AlertModal: React.FC<AlertModalProps> = ({ alert, onClose }) => {
             </div>
           ) : null}
 
-          <button
-            onClick={onClose}
-            style={{ marginTop: alert.body ? 18 : 0, width: '100%', padding: '13px 0', border: 0, borderRadius: 12, background: s.chip, color: '#fff', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}
-          >
-            Got it
-          </button>
+          <div style={{ display: 'flex', gap: 10, marginTop: alert.body ? 18 : 0 }}>
+            {action ? (
+              <button
+                onClick={onClose}
+                style={{ flex: 'none', padding: '13px 18px', border: '1px solid var(--bw-line)', borderRadius: 12, background: '#fff', color: 'var(--bw-ink)', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Dismiss
+              </button>
+            ) : null}
+            <button
+              onClick={() => { action?.run(); onClose(); }}
+              style={{ flex: 1, padding: '13px 0', border: 0, borderRadius: 12, background: s.chip, color: '#fff', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}
+            >
+              {action ? action.label : 'Got it'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
