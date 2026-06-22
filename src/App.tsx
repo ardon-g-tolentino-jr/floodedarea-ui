@@ -1,8 +1,8 @@
 import React from 'react';
-import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, RescueStatus, Road, Severity } from './types';
+import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStatus } from './hooks/useDomainData';
+import { useAlerts, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { mutations } from './api/queries';
 import { ApiError } from './api/client';
@@ -12,6 +12,7 @@ import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
 import { buildShareText } from './utils/share';
 import {
+  buildRoadDirectory,
   computeStatus,
   enrichReports,
   type EnrichedReport,
@@ -19,6 +20,7 @@ import {
   WATER_RISE_DEFAULT,
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
+import { loadRoads, roadsLoaded } from './utils/roadSnap';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
 import AlertModal from './components/panels/AlertModal';
@@ -84,7 +86,6 @@ const App: React.FC = () => {
   const centers = useCenters();
   const hotlines = useHotlines();
   const alerts = useAlerts();
-  const roads = useRoadStatus();
   const rescues = useRescues();
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
@@ -114,6 +115,8 @@ const App: React.FC = () => {
   // Shelter markers start hidden — users opt in via the sidebar toggle.
   const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
+  // Flips once the bundled road network finishes loading, so the road overlay re-derives with it.
+  const [roadsReady, setRoadsReady] = React.useState(false);
   const [sosOpen, setSosOpen] = React.useState(false);
   const [mapFocus, setMapFocus] = React.useState<MapFocus | null>(null);
   const [locating, setLocating] = React.useState(false);
@@ -185,6 +188,18 @@ const App: React.FC = () => {
     );
   }, []);
 
+  // Lazily fetch the bundled road network the first time the Roads overlay is shown, then snap
+  // reports to real roads (see utils/roadSnap). Failure degrades the overlay to report pins only.
+  React.useEffect(() => {
+    if (!showRoads || roadsLoaded()) return;
+    let cancelled = false;
+    void fetch(`${import.meta.env.BASE_URL}roads.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((asset) => { if (!cancelled && asset) { loadRoads(asset); setRoadsReady(true); } })
+      .catch(() => {/* overlay shows pins only */});
+    return () => { cancelled = true; };
+  }, [showRoads]);
+
   // Persist the alert subscription across sessions.
   React.useEffect(() => {
     try { localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(notifyPrefs)); } catch {/* ignore */}
@@ -206,9 +221,8 @@ const App: React.FC = () => {
     } else if (event.startsWith('rescue')) {
       void rescues.refetch(true);
     } else {
-      // Report activity may shift map-matched road status too.
+      // Report activity re-derives the road overlay (it's computed from the reports).
       void reports.refetch(true);
-      void roads.refetch(true);
     }
   }, streamEnabled);
 
@@ -216,7 +230,6 @@ const App: React.FC = () => {
   const centerList = centers.data ?? [];
   const hotlineList = hotlines.data ?? [];
   const alertList = alerts.data ?? [];
-  const roadList = roads.data ?? [];
   const rescueList = rescues.data ?? [];
 
   const enriched = React.useMemo(
@@ -227,6 +240,22 @@ const App: React.FC = () => {
   // Only reports posted within the last 30 min count as "live" — expired ones drop off the
   // map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
+
+  // Snap active reports to real roads (bundled OSM data) → one directory of affected roads with real
+  // geometry, shared by the map overlay, the sidebar count, and the Road-conditions modal.
+  // `roadsReady` re-runs this once the dataset finishes loading.
+  const roadDirectory = React.useMemo(() => {
+    void roadsReady;
+    return buildRoadDirectory(active);
+  }, [active, roadsReady]);
+
+  // Map overlay: only roads we have real geometry for draw a line (un-snapped ones still pin/list).
+  const roadList: RoadSegment[] = React.useMemo(
+    () => roadDirectory.flatMap((d) => d.roads)
+      .filter((r) => r.path && r.path.length >= 2)
+      .map((r) => ({ id: r.roadId ?? r.reportId, name: r.name, status: r.road, path: r.path!, reportsCount: r.reportCount, updatedAt: '' })),
+    [roadDirectory]
+  );
 
   // Representative (median) depth of active reports — drives the sidebar water-rise ratio readout.
   const representativeDepthCm = React.useMemo(() => {
@@ -342,10 +371,10 @@ const App: React.FC = () => {
     [roadList, roadFilters]
   );
 
-  // Impassable road segments — counted in the sidebar summary (always the true count).
+  // Impassable roads — counted in the sidebar summary; from the full directory (snapped or not).
   const impassableRoads = React.useMemo(
-    () => roadList.filter((s) => s.status === 'impassable'),
-    [roadList]
+    () => roadDirectory.flatMap((d) => d.roads).filter((r) => r.road === 'impassable'),
+    [roadDirectory]
   );
 
   const selectedReport: EnrichedReport | undefined = enriched.find((r) => r.id === selectedReportId);
@@ -911,7 +940,7 @@ const App: React.FC = () => {
 
       {roadsModalOpen && (
         <RoadConditionsModal
-          reports={active}
+          directory={roadDirectory}
           isMobile={isMobile}
           onSelectRoad={openRoadOnMap}
           onClose={() => setRoadsModalOpen(false)}

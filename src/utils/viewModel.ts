@@ -5,6 +5,7 @@ import type { FloodReport, LatLng, RescueRequest, Road, Severity } from '../type
 import { kmBetween } from './geo';
 import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
+import { snapToRoad } from './roadSnap';
 
 // Affected-area model — planar ("bathtub") inundation: floodwater of depth h spreads horizontally
 // until the ground rises to meet it, so the inundation radius ≈ h / S, where S is the local ground
@@ -114,6 +115,8 @@ export interface RoadEntry {
   longitude: number;
   reportId: number;      // representative report — clicking opens its detail card
   time: string;          // relative time of the most recent contributing report
+  roadId?: number;       // OSM road id when the report snapped to a real road
+  path?: LatLng[];       // real road geometry (the affected stretch) when snapped
 }
 
 export interface DistrictRoads {
@@ -123,14 +126,21 @@ export interface DistrictRoads {
 
 /**
  * Roll up reports into a per-district directory of roads with their current condition.
- * Reports sharing a district + name (case-insensitively) collapse into one road; its condition
- * takes the worst passability/severity reported, and the representative report is the worst one
- * (ties broken by most recent). Roads sort worst-condition-first; districts sort alphabetically.
+ * Each report is snapped to the real road it sits on (bundled OSM data via `snapToRoad`); reports
+ * on the same road collapse into one entry with that road's canonical name + real geometry. Reports
+ * that don't snap (no road within range, or the dataset hasn't loaded) fall back to grouping by
+ * district + name. Condition is inferred from the deepest report's water depth; the representative
+ * is the worst report (ties broken by most recent). Roads sort worst-first; districts alphabetically.
  */
 export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
+  const snaps = new Map<number, ReturnType<typeof snapToRoad>>();
   const groups = new Map<string, FloodReport[]>();
   for (const r of reports) {
-    const key = `${r.district.trim().toLowerCase()}|${r.name.trim().toLowerCase()}`;
+    const snap = snapToRoad(r.latitude, r.longitude);
+    snaps.set(r.id, snap);
+    const key = snap
+      ? `road:${snap.roadId}`
+      : `${r.district.trim().toLowerCase()}|${r.name.trim().toLowerCase()}`;
     const bucket = groups.get(key);
     if (bucket) bucket.push(r);
     else groups.set(key, [r]);
@@ -151,9 +161,12 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
     );
     // Corroborated when ≥2 reports mention this road, or confirmations push the tally to ≥2.
     const totalReports = rs.reduce((n, r) => n + Math.max(1, r.reportsCount), 0);
+    // Prefer the snapped road's canonical name + real geometry — the representative's snap, else any
+    // snapped report in the group; falls back to the report's own label when nothing snapped.
+    const repSnap = snaps.get(rep.id) ?? rs.map((r) => snaps.get(r.id)).find(Boolean) ?? null;
     entries.push({
       key,
-      name: rep.name,
+      name: repSnap?.name ?? rep.name,
       district: rep.district,
       road: roadFromDepth(rep.depthCm),
       severity: rep.severity,
@@ -164,6 +177,8 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       longitude: rep.longitude,
       reportId: rep.id,
       time: timeAgo(newest.createdAt),
+      roadId: repSnap?.roadId,
+      path: repSnap?.path,
     });
   }
 

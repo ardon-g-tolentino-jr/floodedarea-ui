@@ -1,19 +1,17 @@
 import React from 'react';
-import type { FloodReport } from '../../types';
 import { ROAD_META } from '../../utils/floodMeta';
-import { buildRoadDirectory, type RoadEntry } from '../../utils/viewModel';
+import type { DistrictRoads, RoadEntry } from '../../utils/viewModel';
 
 interface RoadConditionsModalProps {
-  reports: FloodReport[];
+  directory: DistrictRoads[];
   isMobile: boolean;
   onSelectRoad: (entry: RoadEntry) => void;
   onClose: () => void;
 }
 
 /** Browsable, searchable directory of roads and their current condition, grouped by district. */
-const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ reports, isMobile, onSelectRoad, onClose }) => {
+const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, isMobile, onSelectRoad, onClose }) => {
   const [query, setQuery] = React.useState('');
-  const directory = React.useMemo(() => buildRoadDirectory(reports), [reports]);
 
   // Local substring filter over road name + district (this is local data — no geocoding needed).
   const q = query.trim().toLowerCase();
