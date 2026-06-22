@@ -132,7 +132,10 @@ export async function reverseGeocode(lat: number, lng: number, signal?: AbortSig
   if (row.error || !row.address) return empty;
   const a = row.address;
 
-  const road = a.road ?? a.pedestrian ?? a.footway ?? a.residential ?? a.neighbourhood ?? null;
+  // Only genuine public streets. We deliberately do NOT fall back to `residential` (a named
+  // private subdivision, e.g. "Brescia Homes") or `neighbourhood`, since those can identify
+  // someone's home when used as a report's public label. Area context comes from barangay/district.
+  const road = a.road ?? a.pedestrian ?? a.footway ?? null;
   const area = a.suburb ?? a.village ?? a.town ?? a.city_district ?? a.city ?? a.municipality ?? null;
   const district = [area, a.state].filter(Boolean).join(', ') || null;
   // PH city/municipality and barangay (the smallest admin unit). Nominatim maps a barangay to

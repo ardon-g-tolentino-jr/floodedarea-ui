@@ -98,7 +98,7 @@ const App: React.FC = () => {
   const [mode, setMode] = React.useState<'idle' | 'report'>('idle');
   const [pending, setPending] = React.useState<PendingPin | null>(null);
   // Road auto-detected from the pending pin via reverse geocoding (which street it's on).
-  const [detectedRoad, setDetectedRoad] = React.useState<{ road: string | null; district: string | null }>({ road: null, district: null });
+  const [detectedRoad, setDetectedRoad] = React.useState<{ road: string | null; district: string | null; barangay: string | null }>({ road: null, district: null, barangay: null });
   const [detectingRoad, setDetectingRoad] = React.useState(false);
   const geocodeReqId = React.useRef(0);
   const [selectedReportId, setSelectedReportId] = React.useState<number | null>(null);
@@ -428,10 +428,10 @@ const App: React.FC = () => {
   const runReverseGeocode = React.useCallback((loc: LatLng): void => {
     const myId = ++geocodeReqId.current;
     setDetectingRoad(true);
-    setDetectedRoad({ road: null, district: null });
+    setDetectedRoad({ road: null, district: null, barangay: null });
     void reverseGeocode(loc.lat, loc.lng).then((r) => {
       if (myId !== geocodeReqId.current) return;
-      setDetectedRoad({ road: r.road, district: r.district });
+      setDetectedRoad({ road: r.road, district: r.district, barangay: r.barangay });
       setDetectingRoad(false);
     });
   }, []);
@@ -483,7 +483,7 @@ const App: React.FC = () => {
   const cancelReport = (): void => {
     setMode('idle');
     setPending(null);
-    setDetectedRoad({ road: null, district: null });
+    setDetectedRoad({ road: null, district: null, barangay: null });
     setDetectingRoad(false);
   };
 
@@ -498,10 +498,17 @@ const App: React.FC = () => {
     const preset = SEVERITY_PRESET[sev];
     setBusyPick(true);
     try {
-      // The road name identifies WHICH street is flooded (reverse-geocoded from the pin, then
-      // editable by the reporter). Fall back to the detected road, then a generic label.
+      // The label identifies WHICH street is flooded (reverse-geocoded from the pin, then editable
+      // by the reporter). When there's no public street, fall back to a generic AREA (barangay →
+      // district) rather than anything that could pinpoint a home — the detected road is already
+      // streets-only (see geocode.ts). Only if no area at all is known, and the reporter chose to
+      // be named (`identify`), do we use their name; otherwise a plain generic label.
+      const genericArea = detectedRoad.barangay?.trim() || detectedRoad.district?.trim();
       const roadName =
-        road || detectedRoad.road || (identify ? (auth?.name?.trim() ? `${auth.name.trim()}’s spot` : 'Near dropped pin') : 'Near dropped pin');
+        road.trim() ||
+        detectedRoad.road?.trim() ||
+        genericArea ||
+        (identify && auth?.name?.trim() ? `${auth.name.trim()}’s spot` : 'Flooded area');
       const created = await mutations.createReport({
         name: roadName,
         district: detectedRoad.district ?? 'Unknown area',
@@ -515,7 +522,7 @@ const App: React.FC = () => {
       await reports.refetch(true);
       setMode('idle');
       setPending(null);
-      setDetectedRoad({ road: null, district: null });
+      setDetectedRoad({ road: null, district: null, barangay: null });
       setTab('activity');
       setSelectedReportId(created.id);
       showToast('Flood report posted — thank you!');
