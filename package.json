@@ -1,7 +1,7 @@
 {
   "name": "baha-ui",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.9.0",
   "type": "module",
   "description": "BahaWatch — a flood-watch web app for Metro Manila & Rizal (reports, shelters, alerts, SOS).",
   "scripts": {

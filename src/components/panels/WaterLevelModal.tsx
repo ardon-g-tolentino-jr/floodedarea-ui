@@ -38,18 +38,24 @@ function hourLabel(h: number): string {
 const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, onClose }) => {
   const today = React.useMemo(() => localDateKey(new Date()), []);
   const [selectedDate, setSelectedDate] = React.useState(today);
-  const [selectedDistrict, setSelectedDistrict] = React.useState('');
+  // Free-text search across a report's name (street/barangay) and district. Empty = all areas.
+  const [query, setQuery] = React.useState('');
+  const queryTouched = React.useRef(false);
 
   const history = useReportHistory(selectedDate);
   const dayReports = history.data ?? [];
 
-  // Districts that have reports this day, sorted.
-  const districts = React.useMemo(
-    () => [...new Set(dayReports.map((r) => r.district))].sort((a, b) => a.localeCompare(b)),
-    [dayReports]
-  );
+  // Autocomplete suggestions: every street/area name and district that has reports this day.
+  const suggestions = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const r of dayReports) {
+      if (r.name) set.add(r.name);
+      if (r.district) set.add(r.district);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [dayReports]);
 
-  // Default to the district of the report nearest to the user.
+  // The district of the report nearest the user — used to seed the search on first load.
   const nearestDistrict = React.useMemo(() => {
     let best: { d: string; km: number } | null = null;
     for (const r of dayReports) {
@@ -59,21 +65,17 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
     return best?.d ?? null;
   }, [dayReports, userLoc]);
 
+  // Seed the search with the nearest district once reports load, until the user edits it.
   React.useEffect(() => {
-    if (districts.length === 0) {
-      if (selectedDistrict) setSelectedDistrict('');
-      return;
-    }
-    if (!districts.includes(selectedDistrict)) {
-      setSelectedDistrict(nearestDistrict && districts.includes(nearestDistrict) ? nearestDistrict : districts[0]);
-    }
-  }, [districts, nearestDistrict]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!queryTouched.current && !query && nearestDistrict) setQuery(nearestDistrict);
+  }, [nearestDistrict, query]);
 
+  const q = query.trim().toLowerCase();
   const { bars, depthMax } = React.useMemo(
-    () => buildDailyWaterBars(dayReports, selectedDistrict, selectedDate),
-    [dayReports, selectedDistrict, selectedDate]
+    () => buildDailyWaterBars(dayReports, selectedDate, (r) => q === '' || `${r.name} ${r.district}`.toLowerCase().includes(q)),
+    [dayReports, selectedDate, q]
   );
-  const hasData = selectedDistrict !== '' && bars.some((b) => b.depthCm > 0);
+  const hasData = bars.some((b) => b.depthCm > 0);
 
   const y = (cm: number): number => M.top + (1 - Math.min(cm, depthMax) / depthMax) * PLOT_H;
   const slotW = PLOT_W / 24;
@@ -92,7 +94,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
       </div>
     ) : !hasData ? (
       <div style={{ textAlign: 'center', padding: '46px 10px', color: '#9AA8B4', fontSize: 13 }}>
-        No water-level reports for {selectedDistrict || 'this area'} on {dateLabel(selectedDate, today)}.
+        No water-level reports for “{query.trim() || 'any area'}” on {dateLabel(selectedDate, today)}.
       </div>
     ) : (
       <svg viewBox={`0 0 ${VB_W} ${VB_H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
@@ -160,7 +162,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>Water level over time</div>
           <div style={{ fontSize: 12, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
-            {selectedDistrict || 'No reports'} · {dateLabel(selectedDate, today)}
+            {query.trim() || 'All areas'} · {dateLabel(selectedDate, today)}
           </div>
         </div>
         <button
@@ -172,19 +174,34 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
         </button>
       </div>
 
-      {/* Controls: district + date */}
+      {/* Controls: search (street / district) + date */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 18px', borderBottom: '1px solid var(--bw-line-soft)', flexWrap: 'wrap' }}>
-        <select
-          value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
-          disabled={districts.length === 0}
-          style={{ flex: '1 1 180px', fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 10px', background: '#fff' }}
-        >
-          {districts.length === 0 && <option value="">No reports this day</option>}
-          {districts.map((d) => (
-            <option key={d} value={d}>{d}</option>
-          ))}
-        </select>
+        <div style={{ flex: '1 1 200px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <span style={{ position: 'absolute', left: 10, fontSize: 13, color: '#9AA8B4', pointerEvents: 'none' }}>⌕</span>
+          <input
+            list="bw-water-areas"
+            value={query}
+            onChange={(e) => { queryTouched.current = true; setQuery(e.target.value); }}
+            disabled={dayReports.length === 0}
+            placeholder={dayReports.length === 0 ? 'No reports this day' : 'Search a street or district…'}
+            aria-label="Search water levels by street or district"
+            style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 28px', background: '#fff' }}
+          />
+          {query && (
+            <button
+              onClick={() => { queryTouched.current = true; setQuery(''); }}
+              aria-label="Clear search"
+              style={{ position: 'absolute', right: 6, border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 16, cursor: 'pointer', padding: 2, lineHeight: 1 }}
+            >
+              ×
+            </button>
+          )}
+          <datalist id="bw-water-areas">
+            {suggestions.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+        </div>
         <input
           type="date"
           value={selectedDate}

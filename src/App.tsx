@@ -499,16 +499,16 @@ const App: React.FC = () => {
     setBusyPick(true);
     try {
       // The label identifies WHICH street is flooded (reverse-geocoded from the pin, then editable
-      // by the reporter). When there's no public street, fall back to a generic AREA (barangay →
-      // district) rather than anything that could pinpoint a home — the detected road is already
-      // streets-only (see geocode.ts). Only if no area at all is known, and the reporter chose to
-      // be named (`identify`), do we use their name; otherwise a plain generic label.
-      const genericArea = detectedRoad.barangay?.trim() || detectedRoad.district?.trim();
-      const roadName =
-        road.trim() ||
-        detectedRoad.road?.trim() ||
-        genericArea ||
-        (identify && auth?.name?.trim() ? `${auth.name.trim()}’s spot` : 'Flooded area');
+      // by the reporter). Lead with the public street and append the barangay for context
+      // ("Lilac St, Batasan Hills"). With no public street, fall back to the barangay, then
+      // district — never a private subdivision, which is excluded in geocode.ts. Only if no area
+      // is known and the reporter chose to be named do we use their name. `district` is kept clean
+      // (no barangay) below since it's the water-level chart's grouping key.
+      const street = road.trim() || detectedRoad.road?.trim() || '';
+      const area = detectedRoad.barangay?.trim() || '';
+      const roadName = street
+        ? (area && area !== street ? `${street}, ${area}` : street)
+        : area || detectedRoad.district?.trim() || (identify && auth?.name?.trim() ? `${auth.name.trim()}’s spot` : 'Flooded area');
       const created = await mutations.createReport({
         name: roadName,
         district: detectedRoad.district ?? 'Unknown area',

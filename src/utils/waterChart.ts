@@ -120,15 +120,15 @@ export interface DailyWaterBars {
 }
 
 /**
- * Bucket a district's reports for one local day (`ymd`, YYYY-MM-DD) into 24 hourly bars.
- * Each bar's height is the peak depth reported that hour; its color follows that report's severity.
- * Pure — no side effects.
+ * Bucket reports for one local day (`ymd`, YYYY-MM-DD) into 24 hourly bars, keeping only those
+ * the `keep` predicate accepts (e.g. matching a searched street or district). Each bar's height is
+ * the peak depth reported that hour; its color follows that report's severity. Pure — no side effects.
  */
-export function buildDailyWaterBars(reports: FloodReport[], district: string, ymd: string): DailyWaterBars {
+export function buildDailyWaterBars(reports: FloodReport[], ymd: string, keep: (r: FloodReport) => boolean): DailyWaterBars {
   const bars: HourBucket[] = Array.from({ length: 24 }, (_, hour) => ({ hour, depthCm: 0, severity: null }));
 
   for (const r of reports) {
-    if (r.district !== district) continue;
+    if (!keep(r)) continue;
     if (localDateKey(r.createdAt) !== ymd) continue;
     const hour = new Date(r.createdAt).getHours();
     if (r.depthCm > bars[hour].depthCm) {
