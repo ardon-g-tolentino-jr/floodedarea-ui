@@ -150,9 +150,10 @@ const FloodMap: React.FC<FloodMapProps> = ({
           );
         })}
 
-      {/* Flood reports. Affected area is drawn as outline-only rings (no fill): a solid ring at
-          the radius implied by the CURRENT depth, and — when projecting a water rise — a wider
-          dashed ring at the radius the flood would reach at depth + projectedRiseCm. */}
+      {/* Flood reports. Affected area is drawn as rings: a solid ring at the radius implied by the
+          CURRENT depth (filled with the severity-category color at 20% opacity), and — when
+          projecting a water rise — a wider dashed ring at the radius the flood would reach at
+          depth + projectedRiseCm. */}
       {reports.map((r) => {
         const sel = r.id === selectedReportId;
         const projectedKm = projectedRiseCm > 0 ? affectedRadiusKm(r.depthCm + projectedRiseCm) : null;
@@ -167,11 +168,11 @@ const FloodMap: React.FC<FloodMapProps> = ({
                 eventHandlers={{ click: () => onSelectReport(r.id) }}
               />
             )}
-            {/* Current affected area (solid outline, no color fill) */}
+            {/* Current affected area: filled with the severity-category color at 20% opacity, matching outline. */}
             <Circle
               center={[r.latitude, r.longitude]}
               radius={r.affectedKm * 1000}
-              pathOptions={{ color: '#475569', weight: sel ? 2.5 : 1.5, fill: false }}
+              pathOptions={{ color: r.sev.color, weight: sel ? 2.5 : 1.5, fill: true, fillColor: r.sev.color, fillOpacity: 0.2 }}
               eventHandlers={{ click: () => onSelectReport(r.id) }}
             />
             {/* Center marker: ring encodes flood SEVERITY; inner dot encodes ROAD passability. */}
