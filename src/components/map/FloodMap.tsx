@@ -164,7 +164,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
               <Circle
                 center={[r.latitude, r.longitude]}
                 radius={projectedKm * 1000}
-                pathOptions={{ color: '#64748B', weight: 1.5, dashArray: '2 6', fill: false }}
+                pathOptions={{ color: '#9333EA', weight: 2.25, dashArray: '2 6', fill: false }}
                 eventHandlers={{ click: () => onSelectReport(r.id) }}
               />
             )}

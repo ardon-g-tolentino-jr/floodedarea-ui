@@ -60,7 +60,9 @@ const fmtRadius = (km: number): string =>
   km < 1 ? `${Math.round(km * 1000)} m` : `${Number.isInteger(km) ? km : km.toFixed(1)} km`;
 
 type SectionKey = 'filters' | 'roads' | 'affected' | 'monitor';
-const SECTIONS_STORAGE_KEY = 'baha_sidebar_sections_v1';
+// v2: reset persisted state so Filters / Roads / Affected area open by default again, discarding
+// any previously-saved collapsed state from v1.
+const SECTIONS_STORAGE_KEY = 'baha_sidebar_sections_v2';
 const DEFAULT_OPEN: Record<SectionKey, boolean> = { filters: true, roads: true, affected: true, monitor: true };
 
 /** A sidebar control group with a clickable header that collapses its body. */

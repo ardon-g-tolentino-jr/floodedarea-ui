@@ -3,32 +3,48 @@ import React from 'react';
 interface SupportModalProps {
   /** Path to the bundled GCash donation QR (passed from App as `${BASE_URL}gcash-qr.png`). */
   qrSrc: string;
+  isMobile: boolean;
   onClose: () => void;
 }
 
 /** A warm welcome / thank-you dialog: explains what FloodedArea is for, asks people to report
  *  only the truth (lives depend on it), and offers an optional GCash donation to keep the app
- *  running. Auto-popped once per device on first visit; re-openable from the TopBar heart. */
-const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, onClose }) => (
+ *  running. Opened on demand from the TopBar heart. Renders as a bottom sheet on mobile and a
+ *  centered card on desktop, matching the app's other adaptive dialogs. */
+const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose }) => (
   <div
     onClick={onClose}
-    style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', backdropFilter: 'blur(3px)', zIndex: 1300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}
+    style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(15,23,42,.55)',
+      backdropFilter: 'blur(3px)',
+      zIndex: 1300,
+      display: 'flex',
+      alignItems: isMobile ? 'flex-end' : 'center',
+      justifyContent: 'center',
+      padding: isMobile ? 0 : 18,
+    }}
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}
+      style={
+        isMobile
+          ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+          : { width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+      }
     >
       {/* Header */}
       <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>💙</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>Salamat — thank you for being here</div>
+          <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Salamat — thank you for being here</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>FloodedArea · Metro Manila &amp; Rizal</div>
         </div>
         <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
-      <div style={{ padding: '18px 22px 22px' }}>
+      <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
         {/* What this is for */}
         <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: 'var(--bw-ink-soft)' }}>
           FloodedArea is a free, community-powered flood watch. Neighbors report flooding in real
@@ -58,15 +74,15 @@ const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, onClose }) => (
           </p>
 
           {/* GCash QR card */}
-          <div style={{ marginTop: 14, padding: 16, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 14, textAlign: 'center' }}>
+          <div style={{ marginTop: 14, padding: 'clamp(12px, 4vw, 16px)', background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 14, textAlign: 'center' }}>
             <img
               src={qrSrc}
               alt="GCash InstaPay donation QR code for AR**N T."
-              style={{ width: 200, maxWidth: '100%', height: 'auto', borderRadius: 12, display: 'block', margin: '0 auto', boxShadow: '0 6px 18px rgba(15,23,42,.12)' }}
+              style={{ width: 'min(200px, 62vw)', height: 'auto', borderRadius: 12, display: 'block', margin: '0 auto', boxShadow: '0 6px 18px rgba(15,23,42,.12)' }}
             />
             <div style={{ marginTop: 12, fontSize: 14, fontWeight: 800, color: 'var(--bw-ink)' }}>AR**N T.</div>
             <div style={{ marginTop: 2, fontSize: 11.5, color: 'var(--bw-muted)' }}>GCash · InstaPay · Mobile +63 998 843 ••••</div>
-            <div style={{ marginTop: 8, fontSize: 11, color: 'var(--bw-faint)' }}>
+            <div style={{ marginTop: 8, fontSize: 11, color: 'var(--bw-faint)', lineHeight: 1.45 }}>
               Scan with GCash or any InstaPay-enabled app. Transfer fees may apply.
             </div>
           </div>

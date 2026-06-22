@@ -40,19 +40,9 @@ import LoginView from './views/LoginView';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
-const SUPPORT_SEEN_KEY = 'baha_support_seen_v1';
 
 /** Bundled GCash donation QR — lives in public/, served under the app's base path. */
 const GCASH_QR_SRC = `${import.meta.env.BASE_URL}gcash-qr.png`;
-
-/** Show the welcome/support dialog once per device (after first visit it's re-openable from the TopBar). */
-function loadSupportSeen(): boolean {
-  try {
-    return localStorage.getItem(SUPPORT_SEEN_KEY) === '1';
-  } catch {
-    return true;
-  }
-}
 
 function loadNotifyPrefs(): NotifyPrefs {
   try {
@@ -128,7 +118,7 @@ const App: React.FC = () => {
   const [waterChartOpen, setWaterChartOpen] = React.useState(false);
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
-  const [supportOpen, setSupportOpen] = React.useState<boolean>(() => !loadSupportSeen());
+  const [supportOpen, setSupportOpen] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -663,12 +653,6 @@ const App: React.FC = () => {
     setNotifyPrefs((prev) => ({ ...prev, enabled: on }));
   };
 
-  // Closing the welcome/support dialog remembers it so it doesn't re-pop on every visit.
-  const closeSupport = (): void => {
-    try { localStorage.setItem(SUPPORT_SEEN_KEY, '1'); } catch {/* ignore */}
-    setSupportOpen(false);
-  };
-
   const toggleFilter = (s: Severity): void => setFilters((f) => ({ ...f, [s]: !f[s] }));
   const toggleRoad = (r: Road): void => setRoadFilters((f) => ({ ...f, [r]: !f[r] }));
 
@@ -873,7 +857,7 @@ const App: React.FC = () => {
       )}
 
       {supportOpen && (
-        <SupportModal qrSrc={GCASH_QR_SRC} onClose={closeSupport} />
+        <SupportModal qrSrc={GCASH_QR_SRC} isMobile={isMobile} onClose={() => setSupportOpen(false)} />
       )}
 
       {adminOpen && isAdmin && (

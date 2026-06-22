@@ -12,10 +12,10 @@ interface WaterLevelModalProps {
   onClose: () => void;
 }
 
-// SVG plot geometry (viewBox units). Margins leave room for axis labels.
+// SVG plot geometry (viewBox units). Margins leave room for tick + axis-title labels.
 const VB_W = 560;
-const VB_H = 300;
-const M = { top: 14, right: 16, bottom: 28, left: 40 };
+const VB_H = 322;
+const M = { top: 14, right: 16, bottom: 50, left: 54 };
 const PLOT_W = VB_W - M.left - M.right;
 const PLOT_H = VB_H - M.top - M.bottom;
 
@@ -129,13 +129,28 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
                 </rect>
               )}
               {b.hour % 3 === 0 && (
-                <text x={cx} y={VB_H - 8} textAnchor="middle" fontSize={9} fontWeight={700} fill="#A4B0BB">
+                <text x={cx} y={M.top + PLOT_H + 14} textAnchor="middle" fontSize={9} fontWeight={700} fill="#A4B0BB">
                   {hourLabel(b.hour)}
                 </text>
               )}
             </g>
           );
         })}
+        {/* Axis titles */}
+        <text x={M.left + PLOT_W / 2} y={M.top + PLOT_H + 34} textAnchor="middle" fontSize={10.5} fontWeight={800} fill="#64748B">
+          Time of day
+        </text>
+        <text
+          x={14}
+          y={M.top + PLOT_H / 2}
+          textAnchor="middle"
+          fontSize={10.5}
+          fontWeight={800}
+          fill="#64748B"
+          transform={`rotate(-90 14 ${M.top + PLOT_H / 2})`}
+        >
+          Water depth (cm)
+        </text>
       </svg>
     );
 
