@@ -235,13 +235,14 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="📈" label="Water levels" onClick={runAndClose(onWaterChart)} />
                   <MenuItem icon="🛟" label="Rescue requests" onClick={runAndClose(onRescueChart)} />
                   <MenuItem icon="💙" label="About &amp; support" onClick={runAndClose(onSupport)} />
+                  {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
+                  {isAdmin && <MenuItem icon="🚑" label="Response console" onClick={runAndClose(onResponse)} />}
+                  {isAdmin && <MenuItem icon="⚙" label="Admin console" onClick={runAndClose(onAdmin)} />}
                 </div>
               )}
             </div>
             {notifyBtn}
             {sosBtn}
-            {responseBtn}
-            {adminBtn}
             {authCluster}
           </>
         ) : (
