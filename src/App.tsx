@@ -127,6 +127,27 @@ const App: React.FC = () => {
     alertSound.current.currentTime = 0;
     void alertSound.current.play().catch(() => {/* autoplay blocked until first interaction */});
   }, []);
+
+  // Mobile browsers (Android Chrome / iOS Safari) block programmatic audio until it's been played
+  // once inside a user gesture. Prime the element silently on the first tap/click anywhere, so a
+  // later SSE-driven playAlertSound() is allowed to sound. Runs once, then unbinds.
+  React.useEffect(() => {
+    const unlock = (): void => {
+      if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
+      const a = alertSound.current;
+      const vol = a.volume;
+      a.volume = 0;
+      a.play().then(() => { a.pause(); a.currentTime = 0; a.volume = vol; }).catch(() => { a.volume = vol; });
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchend', unlock);
+    };
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchend', unlock, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchend', unlock);
+    };
+  }, []);
   const [toast, setToast] = React.useState<ToastData | null>(null);
   const [login_, setLogin] = React.useState<{ open: boolean; reason?: string }>({ open: false });
   const [busyPick, setBusyPick] = React.useState(false);
