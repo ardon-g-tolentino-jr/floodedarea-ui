@@ -563,7 +563,12 @@ const App: React.FC = () => {
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}
         onWaterChart={() => setWaterChartOpen(true)}
-        onRescueChart={() => { setRescueChartOpen(true); void rescues.refetch(true); }}
+        onRescueChart={() => {
+          // The backend requires auth to read /rescue, so prompt sign-in before opening the chart.
+          if (!requireAuth('Sign in to view rescue requests by district.')) return;
+          setRescueChartOpen(true);
+          void rescues.refetch(true);
+        }}
         isAdmin={!!isAdmin}
         onAdmin={() => setAdminOpen(true)}
       />

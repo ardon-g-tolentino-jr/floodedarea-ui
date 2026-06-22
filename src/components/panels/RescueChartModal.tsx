@@ -1,5 +1,6 @@
 import React from 'react';
 import type { RescueRequest } from '../../types';
+import { ApiError } from '../../api/client';
 import { DISTRICT_COLORS } from '../../utils/floodMeta';
 import { rescueCountsByDistrict } from '../../utils/viewModel';
 
@@ -16,12 +17,16 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
   const rows = React.useMemo(() => rescueCountsByDistrict(rescues), [rescues]);
   const total = rescues.length;
   const max = rows.reduce((m, r) => Math.max(m, r.count), 0) || 1;
+  // Rescue data is auth-protected; a 401/403 means the session is missing/expired, not a backend outage.
+  const authError = error instanceof ApiError && (error.status === 401 || error.status === 403);
 
   const body =
     error && rows.length === 0 ? (
       <div style={{ textAlign: 'center', padding: '40px 10px', color: '#B91C1C', fontSize: 13, lineHeight: 1.5 }}>
-        Couldn’t load rescue requests.
-        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>Check the backend is running, then reopen.</div>
+        {authError ? 'Sign in to view rescue requests.' : 'Couldn’t load rescue requests.'}
+        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>
+          {authError ? 'Your session may have expired — sign in again, then reopen.' : 'Check the backend is running, then reopen.'}
+        </div>
       </div>
     ) : loading && rows.length === 0 ? (
       <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
