@@ -5,6 +5,7 @@ import { useIsMobile } from './hooks/useBreakpoint';
 import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStatus } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { mutations } from './api/queries';
+import { ApiError } from './api/client';
 import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
@@ -307,6 +308,19 @@ const App: React.FC = () => {
     return false;
   };
 
+  // A stale session (cached profile but a missing/expired JWT) makes the API reject authed writes
+  // with 401/403. Treat that as a sign-in failure: drop the dead session and re-prompt sign-in.
+  // Returns true if it handled an auth error, so callers can skip their generic error toast.
+  const handleAuthError = (err: unknown, reason: string): boolean => {
+    if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+      logout();
+      setSosOpen(false);
+      setLogin({ open: true, reason });
+      return true;
+    }
+    return false;
+  };
+
   // Reverse-geocode a pin location to the street it sits on, guarding against stale responses
   // when the pin moves quickly. Feeds the editable road field in the report dialog.
   const runReverseGeocode = React.useCallback((loc: LatLng): void => {
@@ -403,7 +417,8 @@ const App: React.FC = () => {
       setTab('activity');
       setSelectedReportId(created.id);
       showToast('Flood report posted — thank you!');
-    } catch {
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to post a report.')) return;
       showToast('Could not post your report. Please try again.');
     } finally {
       setBusyPick(false);
@@ -417,7 +432,8 @@ const App: React.FC = () => {
       await mutations.confirmReport(id);
       await reports.refetch(true);
       showToast('Thanks — your confirmation was added.');
-    } catch {
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to confirm reports.')) return;
       showToast('Could not confirm right now. Please try again.');
     } finally {
       setConfirming(false);
@@ -432,7 +448,8 @@ const App: React.FC = () => {
       await reports.refetch(true);
       if (selectedReportId === id) setSelectedReportId(null);
       showToast('Your report was removed.');
-    } catch {
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to manage your reports.')) return;
       showToast('Could not remove the report. Please try again.');
     } finally {
       setRemoving(false);
@@ -456,7 +473,8 @@ const App: React.FC = () => {
       await rescues.refetch(true);
       setSosOpen(false);
       showToast('Rescue request sent with your location. Stay safe.');
-    } catch {
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to send a rescue request.')) return;
       showToast('Could not send the rescue request. Please call a hotline.');
     } finally {
       setSending(false);
