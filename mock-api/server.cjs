@@ -72,6 +72,18 @@ server.post('/reports/:id/confirm', (req, res) => {
   res.json(db.get('reports').find({ id }).value());
 });
 
+// ── Report history — reports created in [from, to) regardless of status (powers the water-level
+// chart's date browsing). Must be declared before the json-server router so it wins over /reports. ──
+server.get('/reports/history', (req, res) => {
+  const from = Date.parse(req.query.from);
+  const to = Date.parse(req.query.to);
+  const reports = (router.db.get('reports').value() || []).filter((r) => {
+    const t = Date.parse(r.createdAt);
+    return (Number.isNaN(from) || t >= from) && (Number.isNaN(to) || t < to);
+  });
+  res.json(reports);
+});
+
 // ── Road status (stub) — synthesize a ~150 m segment through each non-passable report so the
 // flooded-road overlay and route-avoidance can be exercised offline. No real map-matching. ──
 server.get('/road-status', (_req, res) => {

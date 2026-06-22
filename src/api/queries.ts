@@ -19,6 +19,8 @@ import type {
 export const rawApi = {
   reports: (severity?: Severity) =>
     api.get<FloodReport[]>(`/reports${buildQuery({ severity })}`),
+  reportHistory: (from: string, to: string) =>
+    api.get<FloodReport[]>(`/reports/history${buildQuery({ from, to })}`),
   centers: () => api.get<EvacuationCenter[]>('/centers'),
   hotlines: () => api.get<Hotline[]>('/hotlines'),
   alerts: () => api.get<FloodAlert[]>('/alerts'),

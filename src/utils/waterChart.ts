@@ -6,8 +6,9 @@
 // (the same 6-hour synthesis the detail sparkline uses); with several we connect the real points.
 // Keep this layer side-effect-free.
 
-import type { FloodReport, Trend } from '../types';
+import type { FloodReport, Severity, Trend } from '../types';
 import { waterSeries } from './floodMeta';
+import { localDateKey } from './viewModel';
 
 export interface TimedDepth {
   t: number; // epoch ms
@@ -103,4 +104,39 @@ export function buildWaterChart(
   }
 
   return { series, tMin, tMax, depthMax: depthMax * 1.12 };
+}
+
+// ── Daily bar chart: water level (cm) by hour-of-day for one district ───────────────────────
+
+export interface HourBucket {
+  hour: number; // 0–23 (local)
+  depthCm: number; // peak depth observed that hour (0 if no reports)
+  severity: Severity | null; // severity of the peak report (drives bar color)
+}
+
+export interface DailyWaterBars {
+  bars: HourBucket[]; // always length 24
+  depthMax: number; // Y scale (cm), padded
+}
+
+/**
+ * Bucket a district's reports for one local day (`ymd`, YYYY-MM-DD) into 24 hourly bars.
+ * Each bar's height is the peak depth reported that hour; its color follows that report's severity.
+ * Pure — no side effects.
+ */
+export function buildDailyWaterBars(reports: FloodReport[], district: string, ymd: string): DailyWaterBars {
+  const bars: HourBucket[] = Array.from({ length: 24 }, (_, hour) => ({ hour, depthCm: 0, severity: null }));
+
+  for (const r of reports) {
+    if (r.district !== district) continue;
+    if (localDateKey(r.createdAt) !== ymd) continue;
+    const hour = new Date(r.createdAt).getHours();
+    if (r.depthCm > bars[hour].depthCm) {
+      bars[hour] = { hour, depthCm: r.depthCm, severity: r.severity };
+    }
+  }
+
+  let depthMax = MIN_DEPTH_AXIS;
+  for (const b of bars) depthMax = Math.max(depthMax, b.depthCm);
+  return { bars, depthMax: depthMax * 1.12 };
 }
