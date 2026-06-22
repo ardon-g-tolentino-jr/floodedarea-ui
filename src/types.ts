@@ -98,6 +98,7 @@ export interface RescueRequest {
   note: string | null;
   status: RescueStatus;
   createdAt: string;
+  lastRequestedAt?: string;
 }
 
 /** Payload for sending a rescue request (the sender is taken from the JWT). */

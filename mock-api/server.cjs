@@ -114,6 +114,28 @@ server.get('/rescue', (_req, res) => {
 
 server.post('/rescue', (req, res) => {
   const db = router.db;
+  const now = new Date();
+  const hourAgo = now.getTime() - 60 * 60 * 1000;
+
+  // Dedup mirror of baha-api: refresh the most recent open request from within the last hour
+  // instead of creating a duplicate. The mock has no per-user auth, so this matches across all
+  // senders (approximation) rather than per user.
+  const recent = (db.get('rescues').value() || [])
+    .filter((r) => r.status === 'pending' || r.status === 'dispatched')
+    .filter((r) => new Date(r.lastRequestedAt || r.createdAt).getTime() > hourAgo)
+    .sort((a, b) => new Date(b.lastRequestedAt || b.createdAt) - new Date(a.lastRequestedAt || a.createdAt))[0];
+  if (recent) {
+    const updated = db.get('rescues').find({ id: recent.id }).assign({
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      district: req.body.district || recent.district,
+      note: req.body.note || null,
+      lastRequestedAt: now.toISOString(),
+    }).write();
+    broadcast('rescue-updated', { id: recent.id });
+    return res.status(200).json(updated);
+  }
+
   const ids = db.get('rescues').map('id').value();
   const id = ids.length ? Math.max(...ids) + 1 : 1;
   const rescue = {
@@ -123,7 +145,8 @@ server.post('/rescue', (req, res) => {
     district: req.body.district || 'Unknown area',
     note: req.body.note || null,
     status: 'pending',
-    createdAt: new Date().toISOString(),
+    createdAt: now.toISOString(),
+    lastRequestedAt: now.toISOString(),
   };
   db.get('rescues').push(rescue).write();
   broadcast('rescue-created', { id });
