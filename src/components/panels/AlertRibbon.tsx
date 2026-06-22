@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FloodAlert } from '../../types';
 
-const LEVEL_STYLE: Record<FloodAlert['level'], { bg: string; border: string; chip: string; text: string; close: string }> = {
+export const LEVEL_STYLE: Record<FloodAlert['level'], { bg: string; border: string; chip: string; text: string; close: string }> = {
   yellow: { bg: '#FEFCE8', border: '#FDE68A', chip: '#EAB308', text: '#854D0E', close: '#A16207' },
   orange: { bg: '#FFF4E0', border: '#F6E2BC', chip: '#F59E0B', text: '#92600B', close: '#B07D1C' },
   red: { bg: '#FEF2F2', border: '#FECACA', chip: '#EF4444', text: '#991B1B', close: '#B91C1C' },

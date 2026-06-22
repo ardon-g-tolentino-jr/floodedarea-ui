@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AlertLevel, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, Road, Severity } from './types';
+import type { AlertLevel, FloodAlert, LatLng, NewAlert, NewCenter, NewHotline, NewReport, ReportStatus, Road, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useAlerts, useCenters, useHotlines, useReports, useRescues, useRoadStatus } from './hooks/useDomainData';
@@ -21,6 +21,7 @@ import {
 } from './utils/viewModel';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
+import AlertModal from './components/panels/AlertModal';
 import Sidebar from './components/panels/Sidebar';
 import FloodMap from './components/map/FloodMap';
 import RoadLegend from './components/map/RoadLegend';
@@ -112,6 +113,8 @@ const App: React.FC = () => {
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
   );
   const [dismissedAlerts, setDismissedAlerts] = React.useState<Set<number>>(new Set());
+  const [alertModal, setAlertModal] = React.useState<FloodAlert | null>(null);
+  const alertSound = React.useRef<HTMLAudioElement | null>(null);
   const [toast, setToast] = React.useState<ToastData | null>(null);
   const [login_, setLogin] = React.useState<{ open: boolean; reason?: string }>({ open: false });
   const [busyPick, setBusyPick] = React.useState(false);
@@ -300,6 +303,13 @@ const App: React.FC = () => {
       try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
     }
     showToast(worst.title);
+
+    // Hard interrupt for severe alerts: pop a centered modal and sound the alarm. The play()
+    // rejection (browser autoplay block before the user's first interaction) is swallowed.
+    setAlertModal(worst);
+    if (!alertSound.current) alertSound.current = new Audio(`${import.meta.env.BASE_URL}alert.wav`);
+    alertSound.current.currentTime = 0;
+    void alertSound.current.play().catch(() => {/* autoplay blocked */});
   }, [alertList, showToast]);
 
   // ── Actions ──
@@ -614,6 +624,8 @@ const App: React.FC = () => {
       {activeAlert && (
         <AlertRibbon alert={activeAlert} onClose={() => setDismissedAlerts((s) => new Set(s).add(activeAlert.id))} />
       )}
+
+      {alertModal && <AlertModal alert={alertModal} onClose={() => setAlertModal(null)} />}
 
       <div style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: isMobile ? 'auto' : 'hidden' }}>
         <div style={mapAreaStyle}>
