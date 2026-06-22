@@ -263,8 +263,8 @@ const App: React.FC = () => {
   // (dashed) layer, separate from the directly-reported roads above. Filtered by the same ROADS chips.
   const possibleClosures: PossibleClosure[] = React.useMemo(() => {
     void roadsReady;
-    return showRoads ? buildPossibleClosures(active) : [];
-  }, [active, showRoads, roadsReady]);
+    return buildPossibleClosures(active);
+  }, [active, roadsReady]);
   const visiblePossibleClosures = React.useMemo(
     () => possibleClosures.filter((c) => roadFilters[c.status]),
     [possibleClosures, roadFilters]
@@ -955,8 +955,14 @@ const App: React.FC = () => {
       {roadsModalOpen && (
         <RoadConditionsModal
           directory={roadDirectory}
+          closures={possibleClosures}
           isMobile={isMobile}
           onSelectRoad={openRoadOnMap}
+          onSelectClosure={(c) => {
+            setRoadsModalOpen(false);
+            const mid = c.path[Math.floor(c.path.length / 2)] ?? c.path[0];
+            if (mid) setMapFocus({ lat: mid.lat, lng: mid.lng, key: Date.now() });
+          }}
           onClose={() => setRoadsModalOpen(false)}
         />
       )}
