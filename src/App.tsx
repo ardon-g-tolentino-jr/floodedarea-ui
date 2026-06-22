@@ -25,6 +25,7 @@ import AlertModal from './components/panels/AlertModal';
 import Sidebar from './components/panels/Sidebar';
 import FloodMap from './components/map/FloodMap';
 import RoadLegend from './components/map/RoadLegend';
+import LocateButton from './components/map/LocateButton';
 import ReportDetailCard from './components/panels/ReportDetailCard';
 import EvacDetailCard from './components/panels/EvacDetailCard';
 import SeverityPicker from './components/panels/SeverityPicker';
@@ -113,6 +114,7 @@ const App: React.FC = () => {
   const [showRoads, setShowRoads] = React.useState(true);
   const [sosOpen, setSosOpen] = React.useState(false);
   const [mapFocus, setMapFocus] = React.useState<MapFocus | null>(null);
+  const [locating, setLocating] = React.useState(false);
   const [searchMark, setSearchMark] = React.useState<SearchMark | null>(null);
   const [notifyPrefs, setNotifyPrefs] = React.useState<NotifyPrefs>(loadNotifyPrefs);
   const [notifyOpen, setNotifyOpen] = React.useState(false);
@@ -692,6 +694,33 @@ const App: React.FC = () => {
     setMapFocus({ lat: entry.latitude, lng: entry.longitude, key: Date.now() });
   };
 
+  // Floating locate control: grab a fresh high-accuracy GPS fix, then recenter the map on it.
+  // The pulsing "You" marker already renders at userLoc, so flying there pinpoints the user.
+  const locateMe = React.useCallback((): void => {
+    if (!navigator.geolocation) {
+      showToast('Location isn’t available on this device.');
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setUserLoc(loc);
+        setMapFocus({ ...loc, key: Date.now() });
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        showToast(
+          err.code === err.PERMISSION_DENIED
+            ? 'Location permission denied — enable it in your browser settings.'
+            : 'Couldn’t get your location. Please try again.'
+        );
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }, [showToast]);
+
   const highCount = filterCounts.high;
   const totalCount = active.length;
 
@@ -763,6 +792,9 @@ const App: React.FC = () => {
           />
 
           {!isMobile && <RoadLegend />}
+
+          {/* Floating "show my location" control — recenters the map on a fresh GPS fix. */}
+          <LocateButton onClick={locateMe} locating={locating} />
 
           {/* Report-mode hint */}
           {mode === 'report' && (
