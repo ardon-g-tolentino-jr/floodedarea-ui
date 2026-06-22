@@ -10,6 +10,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
+import { buildShareText } from './utils/share';
 import {
   computeStatus,
   enrichReports,
@@ -502,12 +503,28 @@ const App: React.FC = () => {
     }
   };
 
-  const share = (): void => {
-    try {
-      void navigator.clipboard?.writeText(window.location.href);
-    } catch {/* ignore */}
+  const share = async (): Promise<void> => {
+    // A signed-in user's own still-live report turns Share into a situation snapshot;
+    // otherwise it's an enticing pitch with live stats. (Same "mine && !expired" pick as startReport.)
+    const myReport = enriched.find((r) => r.mine && !r.expired) ?? null;
+    const { title, text } = buildShareText({
+      myReport,
+      activeCount: active.length,
+      alertLevel: activeAlert?.level ?? null,
+      url: window.location.href,
+    });
     setSosOpen(false);
-    showToast('Live status link copied to clipboard');
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url: window.location.href });
+        return; // share sheet handled it — no toast needed
+      } catch (err) {
+        // User dismissed the sheet → done; any other failure falls through to the clipboard copy.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+    try { await navigator.clipboard?.writeText(text); } catch {/* ignore */}
+    showToast('Share message copied — paste it anywhere');
   };
 
   // ── Admin data management ──
@@ -576,7 +593,7 @@ const App: React.FC = () => {
         isMobile={isMobile}
         auth={auth}
         onReport={startReport}
-        onShare={share}
+        onShare={() => void share()}
         onSOS={() => setSosOpen(true)}
         onSignIn={() => setLogin({ open: true })}
         onSignOut={logout}

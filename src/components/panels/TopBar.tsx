@@ -95,7 +95,28 @@ const TopBar: React.FC<TopBarProps> = ({
       <SearchBox isMobile={isMobile} onSelect={onSearchSelect} />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginLeft: 'auto' }}>
-        {!isMobile && (
+        {isMobile ? (
+          <button
+            onClick={onShare}
+            title="Share"
+            aria-label="Share"
+            style={{
+              width: 40,
+              height: 40,
+              flex: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #DCE3E9',
+              background: '#fff',
+              borderRadius: 11,
+              fontSize: 16,
+              cursor: 'pointer',
+            }}
+          >
+            ⤴
+          </button>
+        ) : (
           <button
             onClick={onShare}
             style={{
