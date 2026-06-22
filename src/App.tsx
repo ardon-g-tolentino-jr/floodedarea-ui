@@ -12,10 +12,12 @@ import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
 import { buildShareText } from './utils/share';
 import {
+  buildPossibleClosures,
   buildRoadDirectory,
   computeStatus,
   enrichReports,
   type EnrichedReport,
+  type PossibleClosure,
   type RoadEntry,
   WATER_RISE_DEFAULT,
   MONITOR_RADIUS_KM,
@@ -255,6 +257,17 @@ const App: React.FC = () => {
       .filter((r) => r.path && r.path.length >= 2)
       .map((r) => ({ id: r.roadId ?? r.reportId, name: r.name, status: r.road, path: r.path!, reportsCount: r.reportCount, updatedAt: '' })),
     [roadDirectory]
+  );
+
+  // Inferred closures: roads inside each report's flooded ring, graded by estimated depth — a distinct
+  // (dashed) layer, separate from the directly-reported roads above. Filtered by the same ROADS chips.
+  const possibleClosures: PossibleClosure[] = React.useMemo(() => {
+    void roadsReady;
+    return showRoads ? buildPossibleClosures(active) : [];
+  }, [active, showRoads, roadsReady]);
+  const visiblePossibleClosures = React.useMemo(
+    () => possibleClosures.filter((c) => roadFilters[c.status]),
+    [possibleClosures, roadFilters]
   );
 
   // Representative (median) depth of active reports — drives the sidebar water-rise ratio readout.
@@ -809,6 +822,7 @@ const App: React.FC = () => {
             reports={visible}
             centers={centerList}
             roadSegments={visibleRoadSegments}
+            possibleClosures={visiblePossibleClosures}
             showRoads={showRoads}
             showShelters={showShelters}
             projectedRiseCm={projectedRiseCm}

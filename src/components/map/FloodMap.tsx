@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { EvacuationCenter, LatLng, RoadSegment } from '../../types';
 import { RESCUE_STATUS_META, ROAD_META } from '../../utils/floodMeta';
-import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue } from '../../utils/viewModel';
+import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
 import { formatDuration } from '../../utils/format';
 
 export interface MapFocus extends LatLng {
@@ -20,6 +20,8 @@ interface FloodMapProps {
   reports: EnrichedReport[];
   centers: EvacuationCenter[];
   roadSegments: RoadSegment[];
+  /** Inferred possible-closure roads (area-based). Optional — consumers that don't infer omit it. */
+  possibleClosures?: PossibleClosure[];
   showRoads: boolean;
   showShelters: boolean;
   /** Projected extra water rise (cm) for the predictive outer ring; 0 = current state only. */
@@ -98,6 +100,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
   reports,
   centers,
   roadSegments,
+  possibleClosures = [],
   showRoads,
   showShelters,
   projectedRiseCm,
@@ -140,7 +143,23 @@ const FloodMap: React.FC<FloodMapProps> = ({
         />
       )}
 
-      {/* Flooded road segments (map-matched by baha-api). White casing for legibility, colored
+      {/* Inferred possible closures — roads inside each report's flooded ring, graded by estimated
+          depth. Dashed + translucent so they read as inferred, distinct from the reported roads below. */}
+      {showRoads &&
+        possibleClosures.map((c) => {
+          const rm = ROAD_META[c.status];
+          const positions = c.path.map((p) => [p.lat, p.lng] as [number, number]);
+          if (positions.length < 2) return null;
+          return (
+            <Polyline key={`closure-${c.roadId}`} positions={positions} pathOptions={{ color: rm.color, weight: 3, opacity: 0.55, dashArray: '4 7' }}>
+              <Tooltip direction="top" sticky opacity={1}>
+                <span style={{ fontWeight: 700 }}>{c.name}</span> · possible closure · {rm.label} · ~{Math.round(c.estDepthCm)} cm
+              </Tooltip>
+            </Polyline>
+          );
+        })}
+
+      {/* Reported road segments (the road each report sits on). White casing for legibility, colored
           by passability — matches RoadLegend. */}
       {showRoads &&
         roadSegments.map((seg) => {

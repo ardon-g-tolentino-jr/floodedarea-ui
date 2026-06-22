@@ -3,9 +3,9 @@
 
 import type { FloodReport, LatLng, RescueRequest, Road, Severity } from '../types';
 import { kmBetween } from './geo';
-import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
+import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
-import { snapToRoad } from './roadSnap';
+import { roadsWithinRadius, snapToRoad } from './roadSnap';
 
 // Affected-area model — planar ("bathtub") inundation: floodwater of depth h spreads horizontally
 // until the ground rises to meet it, so the inundation radius ≈ h / S, where S is the local ground
@@ -197,6 +197,46 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       ),
     }))
     .sort((a, b) => a.district.localeCompare(b.district));
+}
+
+export interface PossibleClosure {
+  roadId: number;
+  name: string;
+  status: Road;        // inferred passability (impassable | risky)
+  estDepthCm: number;  // estimated water depth where the flood reaches this road
+  path: LatLng[];      // road geometry clipped to the flooded ring
+}
+
+/**
+ * Infer roads possibly closed inside each report's flooded area. Inverts the inundation model: modeled
+ * depth drops by `slope` per metre out from the report, so a road's closest distance implies its likely
+ * passability. Each report reaches out to where modeled depth hits the risky threshold; every road in
+ * range is graded via roadFromDepth and the worst (deepest) estimate wins across overlapping floods.
+ * A report's own directly-snapped road is dropped — that's the high-confidence "reported" overlay,
+ * not an inference.
+ */
+export function buildPossibleClosures(reports: FloodReport[]): PossibleClosure[] {
+  const reported = new Set<number>();
+  for (const r of reports) {
+    const snap = snapToRoad(r.latitude, r.longitude);
+    if (snap) reported.add(snap.roadId);
+  }
+  const worst = new Map<number, PossibleClosure>();
+  for (const r of reports) {
+    const rMaxM = (r.depthCm - ROAD_RISKY_CM) / (FLOODPLAIN_SLOPE * 100); // reach out to risky-depth
+    if (rMaxM <= 0) continue;
+    for (const nr of roadsWithinRadius(r.latitude, r.longitude, rMaxM / 1000)) {
+      if (reported.has(nr.roadId)) continue;
+      const estDepthCm = r.depthCm - nr.nearestM * FLOODPLAIN_SLOPE * 100;
+      const status = roadFromDepth(estDepthCm);
+      if (status === 'passable') continue;
+      const prev = worst.get(nr.roadId);
+      if (!prev || estDepthCm > prev.estDepthCm) {
+        worst.set(nr.roadId, { roadId: nr.roadId, name: nr.name, status, estDepthCm, path: nr.path });
+      }
+    }
+  }
+  return [...worst.values()];
 }
 
 export interface RescueDistrictCount {

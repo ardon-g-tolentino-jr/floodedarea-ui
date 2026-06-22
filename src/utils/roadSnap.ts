@@ -128,3 +128,81 @@ export function snapToRoad(lat: number, lng: number): SnappedRoad | null {
   path.push(pointAt(road, hi));
   return { roadId: best.roadId, name: road.name, highway: road.highway, path };
 }
+
+export interface NearbyRoad {
+  roadId: number;
+  name: string;
+  highway: string;
+  nearestM: number; // the road's closest approach to the query point (metres)
+  path: LatLng[];   // the road's geometry clipped to the circle
+}
+
+const lerp = (a: LatLng, b: LatLng, t: number): LatLng => ({ lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.lng - a.lng) * t });
+
+/**
+ * Every road whose geometry comes within `radiusKm` of (lat,lng), each with its closest approach and
+ * geometry clipped to the circle. Powers area-based closure inference (a flood's affected ring covers
+ * many roads, not just the one the pin sits on). Reuses the same grid index + projection as snapToRoad.
+ */
+export function roadsWithinRadius(lat: number, lng: number, radiusKm: number): NearbyRoad[] {
+  if (!roads || !grid || radiusKm <= 0) return [];
+  const center: LatLng = { lat, lng };
+  const radiusM = radiusKm * 1000;
+  const dLat = radiusM / M_PER_DEG_LAT, dLng = radiusM / mPerDegLng(lat);
+  const latLo = Math.floor((lat - dLat) / CELL_DEG), latHi = Math.floor((lat + dLat) / CELL_DEG);
+  const lngLo = Math.floor((lng - dLng) / CELL_DEG), lngHi = Math.floor((lng + dLng) / CELL_DEG);
+
+  const nearest = new Map<number, number>();
+  const seen = new Set<Seg>();
+  for (let cy = latLo; cy <= latHi; cy++) {
+    for (let cx = lngLo; cx <= lngHi; cx++) {
+      const bucket = grid.get(`${cy}:${cx}`);
+      if (!bucket) continue;
+      for (const seg of bucket) {
+        if (seen.has(seg)) continue;
+        seen.add(seg);
+        const road = roads.get(seg.roadId);
+        if (!road) continue;
+        const { dist } = project(center, road.pts[seg.k], road.pts[seg.k + 1], lat);
+        const cur = nearest.get(seg.roadId);
+        if (cur === undefined || dist < cur) nearest.set(seg.roadId, dist);
+      }
+    }
+  }
+
+  const out: NearbyRoad[] = [];
+  for (const [roadId, nearestM] of nearest) {
+    if (nearestM > radiusM) continue;
+    const road = roads.get(roadId)!;
+    out.push({ roadId, name: road.name, highway: road.highway, nearestM, path: clipToCircle(road, center, radiusM, lat) });
+  }
+  return out;
+}
+
+/** The contiguous stretch of a road within `radiusM` of `center`, through the road's closest point. */
+function clipToCircle(road: Road, center: LatLng, radiusM: number, lat0: number): LatLng[] {
+  const { pts } = road;
+  let bestK = 0, bestT = 0, bestD = Infinity;
+  for (let k = 0; k < pts.length - 1; k++) {
+    const { dist, t } = project(center, pts[k], pts[k + 1], lat0);
+    if (dist < bestD) { bestD = dist; bestK = k; bestT = t; }
+  }
+  const np = lerp(pts[bestK], pts[bestK + 1], bestT);
+  const within = (p: LatLng): boolean => meters(center, p, lat0) <= radiusM;
+  const cross = (inside: LatLng, outside: LatLng): LatLng => {
+    const dIn = meters(center, inside, lat0), dOut = meters(center, outside, lat0);
+    const t = dOut === dIn ? 0 : Math.max(0, Math.min(1, (radiusM - dIn) / (dOut - dIn)));
+    return lerp(inside, outside, t);
+  };
+  const fwd: LatLng[] = [];
+  let prev = np;
+  for (let i = bestK + 1; i < pts.length; i++) {
+    if (within(pts[i])) { fwd.push(pts[i]); prev = pts[i]; } else { fwd.push(cross(prev, pts[i])); break; }
+  }
+  const bwd: LatLng[] = [];
+  prev = np;
+  for (let i = bestK; i >= 0; i--) {
+    if (within(pts[i])) { bwd.push(pts[i]); prev = pts[i]; } else { bwd.push(cross(prev, pts[i])); break; }
+  }
+  return [...bwd.reverse(), np, ...fwd];
+}
