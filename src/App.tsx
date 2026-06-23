@@ -968,7 +968,6 @@ const App: React.FC = () => {
           totalCount={totalCount}
           selectedReportId={selectedReportId}
           onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
-          onSOS={() => setSosOpen(true)}
         />
       </div>
 

@@ -46,7 +46,6 @@ interface SidebarProps {
   totalCount: number;
   selectedReportId: number | null;
   onSelectReport: (id: number) => void;
-  onSOS: () => void;
 }
 
 const TONE: Record<SafetyStatus['tone'], { bg: string; border: string; title: string; badge: string }> = {
@@ -92,7 +91,7 @@ const CollapsibleSection: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, onSOS } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport } = props;
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -244,6 +243,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         onToggle={() => toggleSection('monitor')}
         right={<span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--bw-primary-deep)' }}>{fmtRadius(monitorRadiusKm)}</span>}
       >
+        <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.45, marginBottom: 10 }}>
+          The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.
+        </div>
         <input
           type="range"
           min={MONITOR_RADIUS_MIN}
@@ -262,6 +264,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
       {/* ALERTS */}
       <div style={{ flex: 'none', padding: '0 18px 14px' }}>
+        <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.45, marginBottom: 8 }}>
+          Get a heads-up the moment a new flood is reported near you — even while this tab is in the background.
+        </div>
         <button
           onClick={onOpenNotify}
           style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 11, padding: '11px 13px', borderRadius: 12, border: `1.5px solid ${notifyOn ? '#BAE2FB' : 'var(--bw-line)'}`, background: notifyOn ? '#EFF8FF' : '#fff', cursor: 'pointer', textAlign: 'left' }}
@@ -342,15 +347,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         {list.length === 0 && (
           <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>No reports match the active filters.</div>
         )}
-      </div>
-
-      {/* FOOTER */}
-      <div style={{ flex: 'none', padding: '13px 18px', borderTop: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 11, background: '#FBFCFD' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, fontWeight: 800 }}>In danger right now?</div>
-          <div style={{ fontSize: 11, color: 'var(--bw-muted)' }}>Emergency hotlines &amp; rescue request</div>
-        </div>
-        <button onClick={onSOS} style={{ border: 0, background: 'var(--bw-danger)', color: '#fff', padding: '9px 16px', borderRadius: 11, fontSize: 13, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,.28)' }}>Get help</button>
       </div>
     </div>
   );
