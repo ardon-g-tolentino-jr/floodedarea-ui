@@ -47,7 +47,20 @@ export const MONITOR_RADIUS_STEP = 1; // 1 km
 // A report is considered "live" for this long after its last activity. Past it the report drops
 // off the map/feed and the reporter is free to post again. A confirmation or re-report bumps the
 // report's `updatedAt`, which resets this window — fresh sightings keep a flood on the map.
-export const REPORT_TTL_MIN = 30;
+//
+// The window scales with severity because deeper floods physically persist longer: in Metro
+// Manila's pluvial flooding, ankle-deep water on streets with working drainage clears within
+// ~15–30 min of the rain easing, knee-to-waist water lingers roughly half an hour to a couple of
+// hours, and chest-deep+ water in low-lying catch basins (Marikina/Pasig floodplain) stays for
+// hours. So a shallow sighting goes stale fast while a severe one stays trustworthy longer.
+export const REPORT_TTL_MIN: Record<Severity, number> = {
+  low: 20, // ankle-deep — drains quickly once rain lets up
+  medium: 45, // knee–waist — persists tens of minutes to a couple of hours
+  high: 90, // chest-deep+ — low-lying water lingers for hours
+};
+
+/** Default/fallback freshness window (medium), for callers without a specific severity. */
+export const REPORT_TTL_DEFAULT_MIN = REPORT_TTL_MIN.medium;
 
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
@@ -85,7 +98,8 @@ export function enrichReports(
     const lastActivity = new Date(r.updatedAt ?? r.createdAt).getTime();
     const anchor = Number.isNaN(lastActivity) ? new Date(r.createdAt).getTime() : lastActivity;
     const ageMin = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((now - anchor) / 60000));
-    const expiresInMin = Math.max(0, REPORT_TTL_MIN - ageMin);
+    const ttlMin = REPORT_TTL_MIN[r.severity] ?? REPORT_TTL_DEFAULT_MIN;
+    const expiresInMin = Math.max(0, ttlMin - ageMin);
     return {
       ...r,
       sev: SEV_META[r.severity],

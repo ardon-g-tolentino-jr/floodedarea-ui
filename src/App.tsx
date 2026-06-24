@@ -96,7 +96,7 @@ const App: React.FC = () => {
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
 
-  // Ticking clock so report expiry (30-min TTL) and the safety status update in real time
+  // Ticking clock so report expiry (severity-scaled TTL) and the safety status update in real time
   // without waiting on a refetch.
   const [now, setNow] = React.useState<number>(() => Date.now());
   React.useEffect(() => {
@@ -250,8 +250,8 @@ const App: React.FC = () => {
     [reportList, userLoc, auth?.userId, now]
   );
 
-  // Only reports posted within the last 30 min count as "live" — expired ones drop off the
-  // map, feed, status and counts.
+  // Only reports still within their severity-scaled freshness window count as "live" — expired
+  // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
 
   // Snap active reports to real roads (bundled OSM data) → one directory of affected roads with real
