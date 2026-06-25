@@ -1519,7 +1519,7 @@
       "label": "MsgKey",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L228",
+      "source_location": "L238",
       "id": "src_i18n_msgkey",
       "community": 8,
       "norm_label": "msgkey"
@@ -1528,7 +1528,7 @@
       "label": "translate()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L230",
+      "source_location": "L240",
       "id": "src_i18n_translate",
       "community": 8,
       "norm_label": "translate()"
@@ -1537,7 +1537,7 @@
       "label": "tFormat()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L237",
+      "source_location": "L247",
       "id": "src_i18n_tformat",
       "community": 8,
       "norm_label": "tformat()"
@@ -1546,7 +1546,7 @@
       "label": "sevLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L245",
+      "source_location": "L255",
       "id": "src_i18n_sevlabel",
       "community": 8,
       "norm_label": "sevlabel()"
@@ -1555,7 +1555,7 @@
       "label": "roadLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L248",
+      "source_location": "L258",
       "id": "src_i18n_roadlabel",
       "community": 8,
       "norm_label": "roadlabel()"
@@ -1564,7 +1564,7 @@
       "label": "roadShort()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L251",
+      "source_location": "L261",
       "id": "src_i18n_roadshort",
       "community": 8,
       "norm_label": "roadshort()"
@@ -1573,7 +1573,7 @@
       "label": "trendLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L254",
+      "source_location": "L264",
       "id": "src_i18n_trendlabel",
       "community": 8,
       "norm_label": "trendlabel()"
@@ -1582,7 +1582,7 @@
       "label": "useI18n()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L259",
+      "source_location": "L269",
       "id": "src_i18n_usei18n",
       "community": 8,
       "norm_label": "usei18n()"
@@ -3573,25 +3573,25 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sosmodal_tsx",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodal.tsx"
     },
     {
       "label": "SosModalProps",
       "file_type": "code",
       "source_file": "src/components/panels/SosModal.tsx",
-      "source_location": "L4",
+      "source_location": "L5",
       "id": "panels_sosmodal_sosmodalprops",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodalprops"
     },
     {
       "label": "SosModal()",
       "file_type": "code",
       "source_file": "src/components/panels/SosModal.tsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "id": "panels_sosmodal_sosmodal",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodal()"
     },
     {
@@ -7772,9 +7772,9 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_notifymodal_tsx",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -7794,9 +7794,9 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sharemodal_tsx",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -7808,6 +7808,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_sidebar_tsx",
       "target": "src_i18n_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SosModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_sosmodal_tsx",
+      "target": "src_i18n_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7956,9 +7967,9 @@
       "source_file": "src/i18n.ts",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_i18n_ts",
-      "target": "src_i18n_tformat",
-      "confidence_score": 1.0
+      "target": "src_i18n_tformat"
     },
     {
       "relation": "contains",
@@ -8041,9 +8052,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -8063,9 +8074,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_lang",
-      "confidence_score": 1.0
+      "target": "src_i18n_lang"
     },
     {
       "relation": "imports",
@@ -8085,9 +8096,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_getlang",
-      "confidence_score": 1.0
+      "target": "src_i18n_getlang"
     },
     {
       "relation": "imports",
@@ -8096,9 +8107,9 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_notifymodal_tsx",
-      "target": "src_i18n_msgkey",
-      "confidence_score": 1.0
+      "target": "src_i18n_msgkey"
     },
     {
       "relation": "calls",
@@ -8140,9 +8151,9 @@
       "source_file": "src/i18n.ts",
       "source_location": "L238",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_i18n_tformat",
-      "target": "src_i18n_translate",
-      "confidence_score": 1.0
+      "target": "src_i18n_translate"
     },
     {
       "relation": "calls",
@@ -8162,9 +8173,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_translate",
-      "confidence_score": 1.0
+      "target": "src_i18n_translate"
     },
     {
       "relation": "calls",
@@ -8195,9 +8206,9 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sharemodal_tsx",
-      "target": "src_i18n_tformat",
-      "confidence_score": 1.0
+      "target": "src_i18n_tformat"
     },
     {
       "relation": "imports",
@@ -8206,9 +8217,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_tformat",
-      "confidence_score": 1.0
+      "target": "src_i18n_tformat"
     },
     {
       "relation": "calls",
@@ -8228,9 +8239,9 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_notifymodal_tsx",
-      "target": "src_i18n_sevlabel",
-      "confidence_score": 1.0
+      "target": "src_i18n_sevlabel"
     },
     {
       "relation": "imports",
@@ -8250,9 +8261,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_i18n_sevlabel",
-      "confidence_score": 1.0
+      "target": "src_i18n_sevlabel"
     },
     {
       "relation": "calls",
@@ -8402,6 +8413,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "src/components/panels/SosModal.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "panels_sosmodal_sosmodal",
+      "target": "src_i18n_usei18n"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "src/components/panels/TopBar.tsx",
       "source_location": "L75",
       "weight": 1.0,
@@ -8415,9 +8437,9 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_notifymodal_tsx",
-      "target": "src_i18n_usei18n",
-      "confidence_score": 1.0
+      "target": "src_i18n_usei18n"
     },
     {
       "relation": "imports",
@@ -8437,9 +8459,9 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sharemodal_tsx",
-      "target": "src_i18n_usei18n",
-      "confidence_score": 1.0
+      "target": "src_i18n_usei18n"
     },
     {
       "relation": "imports",
@@ -8451,6 +8473,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_sidebar_tsx",
       "target": "src_i18n_usei18n"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SosModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_sosmodal_tsx",
+      "target": "src_i18n_usei18n",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -15753,5 +15786,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8311a3f5cbb05eacfb1b75e7ca14ea75f38c2075"
+  "built_at_commit": "3c3dfe66b0f85c1fc334bfab674efe44a5f0d2a2"
 }

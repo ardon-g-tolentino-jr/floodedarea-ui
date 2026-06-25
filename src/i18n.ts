@@ -114,7 +114,7 @@ const MESSAGES = {
   'sidebar.noReports': { en: 'No reports match the active filters.', fil: 'Walang ulat na tumutugma sa mga filter.' },
 
   // ── Sidebar descriptions / affected-area readout ──
-  'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang singsing ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na singsing kung gaano kalayo maaaring kumalat ang baha.' },
+  'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang bilog ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na bilog kung gaano kalayo maaaring kumalat ang baha.' },
   'sidebar.monitorDesc': { en: 'The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.', fil: 'Ang putol-putol na asul na bilog sa mapa sa paligid mo. I-drag para itakda kung gaano kalayo babantayan ang baha.' },
   'sidebar.alertsDesc': { en: 'Get a heads-up the moment a new flood is reported near you — even while this tab is in the background.', fil: 'Makatanggap ng abiso sa sandaling may bagong baha na maiulat malapit sa iyo — kahit nasa background ang tab na ito.' },
   'sidebar.affectedAt': { en: 'At', fil: 'Sa' },
@@ -167,6 +167,16 @@ const MESSAGES = {
   'share.linkCopied': { en: 'Link copied to clipboard', fil: 'Nakopya ang link sa clipboard' },
   'share.messageCopied': { en: 'Message copied — paste it anywhere', fil: 'Nakopya ang mensahe — i-paste kahit saan' },
   'share.thanks': { en: 'Salamat for spreading the word — stay safe out there. 💙', fil: 'Salamat sa pagpapakalat — mag-ingat lagi. 💙' },
+
+  // ── SOS / rescue modal ──
+  'sos.title': { en: 'Emergency help', fil: 'Tulong sa emergency' },
+  'sos.disclaimerBold': { en: 'Use only when activated.', fil: 'Gamitin lamang kapag aktibo.' },
+  'sos.disclaimer': { en: 'Send a rescue request only when your local government (LGU / DRRMO) has announced this feature is active for your area. Otherwise, call a hotline below or 911 — requests sent at other times may not be monitored.', fil: 'Magpadala lamang ng rescue request kapag inanunsyo ng inyong lokal na pamahalaan (LGU / DRRMO) na aktibo ang feature na ito para sa inyong lugar. Kung hindi, tumawag sa hotline sa ibaba o sa 911 — maaaring hindi mabantayan ang mga request na ipinadala sa ibang oras.' },
+  'sos.ack': { en: 'My LGU / DRRMO has announced this feature is active for my area.', fil: 'Inanunsyo ng aking LGU / DRRMO na aktibo ang feature na ito para sa aking lugar.' },
+  'sos.send': { en: 'Send rescue request with my location', fil: 'Magpadala ng rescue request kasama ang aking lokasyon' },
+  'sos.sending': { en: 'Sending your location…', fil: 'Ipinapadala ang iyong lokasyon…' },
+  'sos.callHotline': { en: 'CALL A HOTLINE', fil: 'TUMAWAG SA HOTLINE' },
+  'sos.danger911': { en: 'If you are in immediate danger, move to the highest safe floor and call 911.', fil: 'Kung nasa agarang panganib ka, pumunta sa pinakamataas na ligtas na palapag at tumawag sa 911.' },
 
   // ── Report list item ──
   'report.yours': { en: 'YOURS', fil: 'IYO' },

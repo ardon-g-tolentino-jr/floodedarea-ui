@@ -1,16 +1,16 @@
 # Graph Report - baha-ui  (2026-06-25)
 
 ## Corpus Check
-- 61 files · ~154,173 words
+- 61 files · ~154,477 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 518 nodes · 1049 edges · 23 communities (20 shown, 3 thin omitted)
+- 518 nodes · 1052 edges · 23 communities (20 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8311a3f5`
+- Built from commit: `3c3dfe66`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -40,9 +40,9 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `LatLng` - 20 edges
-2. `Severity` - 19 edges
-3. `compilerOptions` - 18 edges
-4. `useI18n()` - 17 edges
+2. `useI18n()` - 19 edges
+3. `Severity` - 19 edges
+4. `compilerOptions` - 18 edges
 5. `App()` - 14 edges
 6. `EnrichedReport` - 13 edges
 7. `FloodAlert` - 12 edges
@@ -51,6 +51,8 @@
 10. `EvacuationCenter` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `SosModalProps` --references--> `Hotline`  [EXTRACTED]
+  src/components/panels/SosModal.tsx → src/types.ts
 - `App()` --calls--> `useAuth()`  [EXTRACTED]
   src/App.tsx → src/hooks/useAuth.ts
 - `App()` --calls--> `useI18n()`  [EXTRACTED]
@@ -59,8 +61,6 @@
   src/components/panels/NotifyModal.tsx → src/i18n.ts
 - `PublicDashboardModal()` --calls--> `useI18n()`  [EXTRACTED]
   src/components/panels/PublicDashboardModal.tsx → src/i18n.ts
-- `TopBar()` --calls--> `useI18n()`  [EXTRACTED]
-  src/components/panels/TopBar.tsx → src/i18n.ts
 
 ## Communities (23 total, 3 thin omitted)
 
@@ -73,8 +73,8 @@ Cohesion: 0.07
 Nodes (40): boot(), collectProps(), compileAttr(), compileTemplate(), createComponentFactory(), createExternalModules(), createHelmetManager(), createPseudoSheet() (+32 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.07
-Nodes (36): AdminPanelProps, Field, FIELDS, FieldType, FormValues, inputStyle, levelOptions, roadOptions (+28 more)
+Cohesion: 0.08
+Nodes (35): AdminPanelProps, Field, FIELDS, FieldType, FormValues, inputStyle, levelOptions, roadOptions (+27 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.08
@@ -97,8 +97,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowImportingTsExtensions, exactOptionalPropertyTypes, isolatedModules, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.07
-Nodes (36): DEFAULT_NOTIFY_PREFS, fmtKm(), NotifyModal(), NotifyModalProps, NotifyPrefs, PermissionNote(), SEV_ORDER, ConditionPill() (+28 more)
+Cohesion: 0.06
+Nodes (38): DEFAULT_NOTIFY_PREFS, fmtKm(), NotifyModal(), NotifyModalProps, NotifyPrefs, PermissionNote(), SEV_ORDER, ConditionPill() (+30 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.18
@@ -148,17 +148,17 @@ Nodes (13): code:bash (curl -sI https://floodedarea.com/manifest.webmanifest   #
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `useI18n()` connect `Community 8` to `Community 21`, `Community 3`, `Community 5`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Why does `LatLng` connect `Community 20` to `Community 2`, `Community 5`, `Community 6`, `Community 13`, `Community 21`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Why does `Severity` connect `Community 21` to `Community 8`, `Community 2`, `Community 5`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `useI18n()` connect `Community 8` to `Community 21`, `Community 3`, `Community 5`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `target`, `lib`, `module` to the rest of the system?**
   _160 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.06918238993710692 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.07372549019607844 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07890070921985816 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.07957957957957958 - nodes in this community are weakly interconnected._
