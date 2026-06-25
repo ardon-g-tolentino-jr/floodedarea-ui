@@ -238,5 +238,18 @@ server.post('/feedback', (req, res) => {
   res.status(201).json(item);
 });
 
+// ── Visit counter — mirrors baha-api's public stats endpoints. POST increments the all-time
+// tally and returns the new total; GET reads it without incrementing. Persisted in db.json. ──
+function readVisits() {
+  const v = router.db.get('stats.visits').value();
+  return typeof v === 'number' ? v : 0;
+}
+server.get('/stats/visits', (_req, res) => res.json({ total: readVisits() }));
+server.post('/stats/visit', (_req, res) => {
+  const total = readVisits() + 1;
+  router.db.set('stats.visits', total).write();
+  res.status(201).json({ total });
+});
+
 server.use(router);
 server.listen(3001, () => process.stdout.write('[baha mock-api] http://localhost:3001\n'));

@@ -17,6 +17,7 @@ import type {
   RescueStatus,
   RoadSegment,
   Severity,
+  VisitStats,
 } from '../types';
 
 /** Typed GET functions. baha-api returns domain-shaped JSON, so these are direct. */
@@ -34,10 +35,14 @@ export const rawApi = {
   acceptedFeatures: () => api.get<Feedback[]>('/feedback/accepted'),
   /** Admin: the full feedback moderation queue. */
   allFeedback: () => api.get<Feedback[]>('/feedback'),
+  /** Public all-time visit tally (read-only — does not increment). */
+  visitCount: () => api.get<VisitStats>('/stats/visits'),
 };
 
 /** POST/PATCH/DELETE mutations. */
 export const mutations = {
+  /** Record one site visit and return the new all-time total. Public (no auth). */
+  recordVisit: () => api.post<VisitStats>('/stats/visit', {}),
   createReport: (body: NewReport) => api.post<FloodReport>('/reports', body),
   confirmReport: (id: number) => api.post<FloodReport>(`/reports/${id}/confirm`, {}),
   resolveReport: (id: number) => api.patch<FloodReport>(`/reports/${id}`, { status: 'resolved' }),

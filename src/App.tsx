@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
+import { useVisitCounter } from './hooks/useVisitCounter';
 import { mutations } from './api/queries';
 import { ApiError } from './api/client';
 import type { GeoResult } from './api/geocode';
@@ -86,6 +87,7 @@ const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orang
 const App: React.FC = () => {
   const { auth, loginWithGoogle, logout } = useAuth();
   const isMobile = useIsMobile();
+  const visitCount = useVisitCounter();
 
   const reports = useReports();
   const centers = useCenters();
@@ -831,6 +833,7 @@ const App: React.FC = () => {
       <TopBar
         regionLabel={REGION_LABEL}
         isMobile={isMobile}
+        visitCount={visitCount}
         auth={auth}
         onReport={startReport}
         onShare={() => setShareOpen(true)}

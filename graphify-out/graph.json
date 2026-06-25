@@ -1210,6 +1210,24 @@
       "norm_label": "feedback"
     },
     {
+      "label": "stats",
+      "file_type": "code",
+      "source_file": "mock-api/db.json",
+      "source_location": "L406",
+      "id": "mock_api_db_stats",
+      "community": 14,
+      "norm_label": "stats"
+    },
+    {
+      "label": "visits",
+      "file_type": "code",
+      "source_file": "mock-api/db.json",
+      "source_location": "L407",
+      "id": "mock_api_db_stats_visits",
+      "community": 14,
+      "norm_label": "visits"
+    },
+    {
       "label": "build-roads.mjs",
       "file_type": "code",
       "source_file": "scripts/build-roads.mjs",
@@ -1321,7 +1339,7 @@
       "label": "loadNotifyPrefs()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L57",
+      "source_location": "L58",
       "id": "src_app_loadnotifyprefs",
       "community": 5,
       "norm_label": "loadnotifyprefs()"
@@ -1330,7 +1348,7 @@
       "label": "loadLivePref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L66",
+      "source_location": "L67",
       "id": "src_app_loadlivepref",
       "community": 5,
       "norm_label": "loadlivepref()"
@@ -1339,7 +1357,7 @@
       "label": "DEFAULT_LOCATION",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L74",
+      "source_location": "L75",
       "id": "src_app_default_location",
       "community": 5,
       "norm_label": "default_location"
@@ -1348,7 +1366,7 @@
       "label": "PendingPin",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L77",
+      "source_location": "L78",
       "id": "src_app_pendingpin",
       "community": 5,
       "norm_label": "pendingpin"
@@ -1357,7 +1375,7 @@
       "label": "AlertDialog",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L81",
+      "source_location": "L82",
       "id": "src_app_alertdialog",
       "community": 5,
       "norm_label": "alertdialog"
@@ -1366,7 +1384,7 @@
       "label": "SEV_TO_LEVEL",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L84",
+      "source_location": "L85",
       "id": "src_app_sev_to_level",
       "community": 5,
       "norm_label": "sev_to_level"
@@ -1375,7 +1393,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L86",
+      "source_location": "L87",
       "id": "src_app_app",
       "community": 5,
       "norm_label": "app()"
@@ -1624,6 +1642,15 @@
       "norm_label": "newfeedback"
     },
     {
+      "label": "VisitStats",
+      "file_type": "code",
+      "source_file": "src/types.ts",
+      "source_location": "L166",
+      "id": "src_types_visitstats",
+      "community": 2,
+      "norm_label": "visitstats"
+    },
+    {
       "label": "vite-env.d.ts",
       "file_type": "code",
       "source_file": "src/vite-env.d.ts",
@@ -1773,7 +1800,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L87",
       "id": "utils_share_buildsharelinks",
-      "community": 5,
+      "community": 0,
       "norm_label": "buildsharelinks()"
     },
     {
@@ -1791,7 +1818,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L19",
       "id": "utils_viewmodel_affectedradiuskm",
-      "community": 13,
+      "community": 21,
       "norm_label": "affectedradiuskm()"
     },
     {
@@ -1800,7 +1827,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L28",
       "id": "utils_viewmodel_affectedriseratio",
-      "community": 0,
+      "community": 21,
       "norm_label": "affectedriseratio()"
     },
     {
@@ -1818,7 +1845,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L65",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 0,
+      "community": 21,
       "norm_label": "enrichedreport"
     },
     {
@@ -1827,7 +1854,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L77",
       "id": "utils_viewmodel_safetystatus",
-      "community": 0,
+      "community": 21,
       "norm_label": "safetystatus"
     },
     {
@@ -2088,7 +2115,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L1",
       "id": "src_utils_floodmeta_ts",
-      "community": 0,
+      "community": 21,
       "norm_label": "floodmeta.ts"
     },
     {
@@ -2097,7 +2124,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 0,
+      "community": 21,
       "norm_label": "sevmeta"
     },
     {
@@ -2106,7 +2133,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L13",
       "id": "utils_floodmeta_sev_meta",
-      "community": 13,
+      "community": 21,
       "norm_label": "sev_meta"
     },
     {
@@ -2124,7 +2151,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L25",
       "id": "utils_floodmeta_road_meta",
-      "community": 0,
+      "community": 21,
       "norm_label": "road_meta"
     },
     {
@@ -2133,7 +2160,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L32",
       "id": "utils_floodmeta_road_order",
-      "community": 0,
+      "community": 21,
       "norm_label": "road_order"
     },
     {
@@ -2142,7 +2169,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L34",
       "id": "utils_floodmeta_sev_rank",
-      "community": 0,
+      "community": 21,
       "norm_label": "sev_rank"
     },
     {
@@ -2160,7 +2187,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L48",
       "id": "utils_floodmeta_rescue_status_rank",
-      "community": 0,
+      "community": 21,
       "norm_label": "rescue_status_rank"
     },
     {
@@ -2205,7 +2232,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L78",
       "id": "utils_floodmeta_advice",
-      "community": 0,
+      "community": 21,
       "norm_label": "advice"
     },
     {
@@ -2232,7 +2259,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L99",
       "id": "utils_floodmeta_waterseries",
-      "community": 0,
+      "community": 21,
       "norm_label": "waterseries()"
     },
     {
@@ -2241,7 +2268,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L115",
       "id": "utils_floodmeta_sparkpaths",
-      "community": 0,
+      "community": 21,
       "norm_label": "sparkpaths()"
     },
     {
@@ -2250,7 +2277,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L125",
       "id": "utils_floodmeta_trendnote",
-      "community": 0,
+      "community": 21,
       "norm_label": "trendnote()"
     },
     {
@@ -2599,7 +2626,7 @@
       "label": "ICON_BTN",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L30",
+      "source_location": "L32",
       "id": "panels_topbar_icon_btn",
       "community": 3,
       "norm_label": "icon_btn"
@@ -2608,16 +2635,25 @@
       "label": "MenuItem()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L45",
+      "source_location": "L47",
       "id": "panels_topbar_menuitem",
       "community": 3,
       "norm_label": "menuitem()"
     },
     {
+      "label": "formatVisits()",
+      "file_type": "code",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L58",
+      "id": "panels_topbar_formatvisits",
+      "community": 3,
+      "norm_label": "formatvisits()"
+    },
+    {
       "label": "TopBar()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L55",
+      "source_location": "L65",
       "id": "panels_topbar_topbar",
       "community": 3,
       "norm_label": "topbar()"
@@ -3222,7 +3258,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sidebar_tsx",
-      "community": 0,
+      "community": 21,
       "norm_label": "sidebar.tsx"
     },
     {
@@ -3231,7 +3267,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L17",
       "id": "panels_sidebar_tab",
-      "community": 0,
+      "community": 21,
       "norm_label": "tab"
     },
     {
@@ -3240,7 +3276,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L19",
       "id": "panels_sidebar_sidebarprops",
-      "community": 0,
+      "community": 21,
       "norm_label": "sidebarprops"
     },
     {
@@ -3249,7 +3285,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L51",
       "id": "panels_sidebar_tone",
-      "community": 0,
+      "community": 21,
       "norm_label": "tone"
     },
     {
@@ -3258,7 +3294,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L58",
       "id": "panels_sidebar_fmtradius",
-      "community": 0,
+      "community": 21,
       "norm_label": "fmtradius()"
     },
     {
@@ -3267,7 +3303,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L61",
       "id": "panels_sidebar_sectionkey",
-      "community": 0,
+      "community": 21,
       "norm_label": "sectionkey"
     },
     {
@@ -3276,7 +3312,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L65",
       "id": "panels_sidebar_default_open",
-      "community": 0,
+      "community": 21,
       "norm_label": "default_open"
     },
     {
@@ -3285,7 +3321,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L68",
       "id": "panels_sidebar_collapsiblesection",
-      "community": 0,
+      "community": 21,
       "norm_label": "collapsiblesection()"
     },
     {
@@ -3294,7 +3330,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L93",
       "id": "panels_sidebar_sidebar",
-      "community": 0,
+      "community": 21,
       "norm_label": "sidebar()"
     },
     {
@@ -3339,7 +3375,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L9",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 21,
+      "community": 6,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -3483,7 +3519,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L1",
       "id": "src_components_panels_reportdetailcard_tsx",
-      "community": 0,
+      "community": 21,
       "norm_label": "reportdetailcard.tsx"
     },
     {
@@ -3492,7 +3528,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L5",
       "id": "panels_reportdetailcard_reportdetailcardprops",
-      "community": 0,
+      "community": 21,
       "norm_label": "reportdetailcardprops"
     },
     {
@@ -3501,7 +3537,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L19",
       "id": "panels_reportdetailcard_depth_ticks",
-      "community": 0,
+      "community": 21,
       "norm_label": "depth_ticks"
     },
     {
@@ -3510,7 +3546,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L26",
       "id": "panels_reportdetailcard_reportdetailcard",
-      "community": 0,
+      "community": 21,
       "norm_label": "reportdetailcard()"
     },
     {
@@ -3519,7 +3555,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L169",
       "id": "panels_reportdetailcard_cell",
-      "community": 0,
+      "community": 21,
       "norm_label": "cell()"
     },
     {
@@ -3555,7 +3591,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L1",
       "id": "src_components_map_roadlegend_tsx",
-      "community": 0,
+      "community": 21,
       "norm_label": "roadlegend.tsx"
     },
     {
@@ -3564,7 +3600,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L5",
       "id": "map_roadlegend_roadlegend",
-      "community": 0,
+      "community": 21,
       "norm_label": "roadlegend()"
     },
     {
@@ -3600,7 +3636,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L18",
       "id": "map_floodmap_floodmapprops",
-      "community": 2,
+      "community": 13,
       "norm_label": "floodmapprops"
     },
     {
@@ -3674,6 +3710,24 @@
       "id": "map_floodmap_floodmap",
       "community": 13,
       "norm_label": "floodmap()"
+    },
+    {
+      "label": "useVisitCounter.ts",
+      "file_type": "code",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L1",
+      "id": "src_hooks_usevisitcounter_ts",
+      "community": 5,
+      "norm_label": "usevisitcounter.ts"
+    },
+    {
+      "label": "useVisitCounter()",
+      "file_type": "code",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L14",
+      "id": "hooks_usevisitcounter_usevisitcounter",
+      "community": 5,
+      "norm_label": "usevisitcounter()"
     },
     {
       "label": "useAuth.ts",
@@ -3762,7 +3816,7 @@
       "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L10",
       "id": "hooks_usedomaindata_usereporthistory",
-      "community": 5,
+      "community": 21,
       "norm_label": "usereporthistory()"
     },
     {
@@ -3913,7 +3967,7 @@
       "label": "rawApi",
       "file_type": "code",
       "source_file": "src/api/queries.ts",
-      "source_location": "L23",
+      "source_location": "L24",
       "id": "api_queries_rawapi",
       "community": 5,
       "norm_label": "rawapi"
@@ -3922,7 +3976,7 @@
       "label": "mutations",
       "file_type": "code",
       "source_file": "src/api/queries.ts",
-      "source_location": "L40",
+      "source_location": "L43",
       "id": "api_queries_mutations",
       "community": 5,
       "norm_label": "mutations"
@@ -6220,6 +6274,26 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "mock-api/db.json",
+      "source_location": "L406",
+      "weight": 1.0,
+      "source": "mock_api_db_json",
+      "target": "mock_api_db_stats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "mock-api/db.json",
+      "source_location": "L407",
+      "weight": 1.0,
+      "source": "mock_api_db_stats",
+      "target": "mock_api_db_stats_visits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/build-roads.mjs",
       "source_location": "L18",
       "weight": 1.0,
@@ -6481,6 +6555,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "hooks_usedomaindata_useroadstatus"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "hooks_usevisitcounter_usevisitcounter",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6767,9 +6852,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_components_panels_publicdashboardmodal_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_publicdashboardmodal_tsx"
     },
     {
       "relation": "imports_from",
@@ -6946,6 +7031,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "src_hooks_usedomaindata_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_hooks_usevisitcounter_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7432,6 +7528,17 @@
       "target": "hooks_usedomaindata_useroadstatus"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "src_app_app",
+      "target": "hooks_usevisitcounter_usevisitcounter"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/main.tsx",
@@ -7569,9 +7676,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_types_ts",
-      "confidence_score": 1.0
+      "target": "src_types_ts"
     },
     {
       "relation": "imports_from",
@@ -7903,6 +8010,16 @@
       "target": "src_types_userrole"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types.ts",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "src_types_ts",
+      "target": "src_types_visitstats",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -8118,9 +8235,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L499",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_viewmodel_recentreportrow",
-      "target": "src_types_severity",
-      "confidence_score": 1.0
+      "target": "src_types_severity"
     },
     {
       "relation": "references",
@@ -8162,9 +8279,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "src_types_trend",
-      "confidence_score": 1.0
+      "target": "src_types_trend"
     },
     {
       "relation": "imports",
@@ -8184,9 +8301,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L500",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_viewmodel_recentreportrow",
-      "target": "src_types_trend",
-      "confidence_score": 1.0
+      "target": "src_types_trend"
     },
     {
       "relation": "references",
@@ -8250,9 +8367,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L427",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_viewmodel_nearbyclosure",
-      "target": "src_types_road",
-      "confidence_score": 1.0
+      "target": "src_types_road"
     },
     {
       "relation": "references",
@@ -8448,9 +8565,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "target": "src_types_floodreport",
-      "confidence_score": 1.0
+      "target": "src_types_floodreport"
     },
     {
       "relation": "references",
@@ -8492,9 +8609,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_types_floodreport",
-      "confidence_score": 1.0
+      "target": "src_types_floodreport"
     },
     {
       "relation": "imports",
@@ -8855,9 +8972,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "target": "src_types_latlng",
-      "confidence_score": 1.0
+      "target": "src_types_latlng"
     },
     {
       "relation": "references",
@@ -8910,9 +9027,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_types_latlng",
-      "confidence_score": 1.0
+      "target": "src_types_latlng"
     },
     {
       "relation": "imports",
@@ -9454,6 +9571,17 @@
       "target": "src_types_newfeedback"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/api/queries.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_api_queries_ts",
+      "target": "src_types_visitstats",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -9809,9 +9937,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_utils_viewmodel_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_viewmodel_ts"
     },
     {
       "relation": "imports_from",
@@ -10079,9 +10207,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L442",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_closuresnearlocation",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_closuresnearlocation"
     },
     {
       "relation": "contains",
@@ -10189,9 +10317,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L416",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_localityparts",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_localityparts"
     },
     {
       "relation": "contains",
@@ -10199,9 +10327,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L424",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_nearbyclosure",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_nearbyclosure"
     },
     {
       "relation": "contains",
@@ -10229,9 +10357,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L493",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_recentreportrow",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_recentreportrow"
     },
     {
       "relation": "contains",
@@ -10239,9 +10367,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L513",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_recentreportrows",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_recentreportrows"
     },
     {
       "relation": "contains",
@@ -10528,9 +10656,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "target": "utils_viewmodel_districtroads",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_districtroads"
     },
     {
       "relation": "references",
@@ -10550,9 +10678,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_viewmodel_districtroads",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_districtroads"
     },
     {
       "relation": "imports",
@@ -10638,9 +10766,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "target": "utils_viewmodel_possibleclosure",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_possibleclosure"
     },
     {
       "relation": "references",
@@ -10671,9 +10799,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_viewmodel_possibleclosure",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_possibleclosure"
     },
     {
       "relation": "imports",
@@ -10847,9 +10975,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_viewmodel_nearbyclosure",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_nearbyclosure"
     },
     {
       "relation": "imports",
@@ -10858,9 +10986,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_viewmodel_closuresnearlocation",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_closuresnearlocation"
     },
     {
       "relation": "calls",
@@ -10880,9 +11008,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_viewmodel_recentreportrows",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_recentreportrows"
     },
     {
       "relation": "imports_from",
@@ -11020,9 +11148,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_utils_floodmeta_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_floodmeta_ts"
     },
     {
       "relation": "imports_from",
@@ -11310,9 +11438,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_floodmeta_sev_meta",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_sev_meta"
     },
     {
       "relation": "imports",
@@ -11376,9 +11504,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_floodmeta_trend_meta",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_trend_meta"
     },
     {
       "relation": "imports",
@@ -11442,9 +11570,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "utils_floodmeta_road_meta",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_road_meta"
     },
     {
       "relation": "imports",
@@ -12186,9 +12314,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "api_geocode_georesult",
-      "confidence_score": 1.0
+      "target": "api_geocode_georesult"
     },
     {
       "relation": "imports",
@@ -12197,9 +12325,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "api_geocode_searchplaces",
-      "confidence_score": 1.0
+      "target": "api_geocode_searchplaces"
     },
     {
       "relation": "contains",
@@ -12207,9 +12335,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "panels_publicdashboardmodal_conditionpill",
-      "confidence_score": 1.0
+      "target": "panels_publicdashboardmodal_conditionpill"
     },
     {
       "relation": "contains",
@@ -12217,9 +12345,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "panels_publicdashboardmodal_page_size_options",
-      "confidence_score": 1.0
+      "target": "panels_publicdashboardmodal_page_size_options"
     },
     {
       "relation": "contains",
@@ -12227,9 +12355,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "panels_publicdashboardmodal_publicdashboardmodal",
-      "confidence_score": 1.0
+      "target": "panels_publicdashboardmodal_publicdashboardmodal"
     },
     {
       "relation": "contains",
@@ -12237,9 +12365,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "confidence_score": 1.0
+      "target": "panels_publicdashboardmodal_publicdashboardmodalprops"
     },
     {
       "relation": "contains",
@@ -12247,9 +12375,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "panels_publicdashboardmodal_radius_options",
-      "confidence_score": 1.0
+      "target": "panels_publicdashboardmodal_radius_options"
     },
     {
       "relation": "imports_from",
@@ -12258,9 +12386,9 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
-      "target": "src_api_geocode_ts",
-      "confidence_score": 1.0
+      "target": "src_api_geocode_ts"
     },
     {
       "relation": "imports",
@@ -12283,6 +12411,16 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_topbar_tsx",
       "target": "hooks_useauth_authstate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "src_components_panels_topbar_tsx",
+      "target": "panels_topbar_formatvisits",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -12400,6 +12538,17 @@
       "confidence_score": 1.0,
       "source": "panels_topbar_topbarprops",
       "target": "hooks_useauth_authstate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "panels_topbar_topbar",
+      "target": "panels_topbar_formatvisits",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -13716,6 +13865,49 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_hooks_usevisitcounter_ts",
+      "target": "api_queries_mutations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_hooks_usevisitcounter_ts",
+      "target": "api_queries_rawapi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_hooks_usevisitcounter_ts",
+      "target": "hooks_usevisitcounter_usevisitcounter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useVisitCounter.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_hooks_usevisitcounter_ts",
+      "target": "src_api_queries_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L2",
       "weight": 1.0,
@@ -14646,5 +14838,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "26e8ac475ff5e332da9911598efd093cf730eeab"
+  "built_at_commit": "b8cfc8f7e1f9282da4d630847e230b9dd3d6149f"
 }

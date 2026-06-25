@@ -161,3 +161,8 @@ export interface NewFeedback {
   title: string;
   details?: string;
 }
+
+/** Site visit tally — `total` is the all-time count returned by the public stats endpoint. */
+export interface VisitStats {
+  total: number;
+}
