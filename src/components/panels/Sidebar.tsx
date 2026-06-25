@@ -211,8 +211,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         }
       >
         <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.4, marginBottom: 9 }}>
-          Each report’s ring grows with its water depth. Drag to project how much higher the water
-          rises — the dashed rings show how far flooding could spread.
+          {t('sidebar.affectedDesc')}
         </div>
         <input
           type="range"
@@ -232,9 +231,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           const { diameter, area } = affectedRiseRatio(representativeDepthCm, projectedRiseCm);
           return (
             <div style={{ marginTop: 9, padding: '8px 10px', background: 'var(--bw-bg-subtle)', borderRadius: 9, fontSize: 11.5, fontWeight: 600, color: 'var(--bw-ink-soft)', lineHeight: 1.4 }}>
-              At <strong>+{projectedRiseCm} cm</strong>, a typical flooded zone spreads{' '}
-              <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{diameter.toFixed(1)}× wider</strong>{' '}
-              (<strong style={{ color: 'var(--bw-primary-deep)' }}>≈{area.toFixed(1)}× the area</strong>).
+              {t('sidebar.affectedAt')} <strong>+{projectedRiseCm} cm</strong>, {t('sidebar.affectedSpread')}{' '}
+              <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{diameter.toFixed(1)}× {t('sidebar.affectedWider')}</strong>{' '}
+              (<strong style={{ color: 'var(--bw-primary-deep)' }}>≈{area.toFixed(1)}× {t('sidebar.theArea')}</strong>).
             </div>
           );
         })()}
@@ -248,7 +247,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         right={<span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--bw-primary-deep)' }}>{fmtRadius(monitorRadiusKm)}</span>}
       >
         <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.45, marginBottom: 10 }}>
-          The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.
+          {t('sidebar.monitorDesc')}
         </div>
         <input
           type="range"
@@ -269,7 +268,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       {/* ALERTS */}
       <div style={{ flex: 'none', padding: '0 18px 14px' }}>
         <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.45, marginBottom: 8 }}>
-          Get a heads-up the moment a new flood is reported near you — even while this tab is in the background.
+          {t('sidebar.alertsDesc')}
         </div>
         <button
           onClick={onOpenNotify}

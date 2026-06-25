@@ -6,6 +6,7 @@ import { kmBetween } from './geo';
 import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 import { roadsWithinRadius, snapToRoad } from './roadSnap';
+import { translate, tFormat, sevLabel, getLang, type Lang } from '../i18n';
 
 // Affected-area model — planar ("bathtub") inundation: floodwater of depth h spreads horizontally
 // until the ground rises to meet it, so the inundation radius ≈ h / S, where S is the local ground
@@ -540,7 +541,7 @@ export function recentReportRows(reports: FloodReport[], hours = 12, now: number
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
 
-export function computeStatus(enriched: EnrichedReport[]): SafetyStatus {
+export function computeStatus(enriched: EnrichedReport[], lang: Lang = getLang()): SafetyStatus {
   const inside = enriched
     .filter((r) => r.edgeKm <= 0)
     .sort((a, b) => RANK[b.severity] - RANK[a.severity]);
@@ -550,10 +551,10 @@ export function computeStatus(enriched: EnrichedReport[]): SafetyStatus {
     const w = inside[0];
     status = {
       tone: 'danger',
-      badge: 'IN FLOOD ZONE',
-      title: 'You are in a flood-affected area',
-      line: `${w.sev.label} flooding at ${w.name} — about ${w.depthCm} cm.`,
-      sub: 'Move to higher ground and never wade through fast-moving water.',
+      badge: translate(lang, 'status.inFloodZone'),
+      title: translate(lang, 'status.inFloodZoneTitle'),
+      line: tFormat(lang, 'status.inFloodZoneLine', { sev: sevLabel(lang, w.severity), name: w.name, depth: w.depthCm }),
+      sub: translate(lang, 'status.inFloodZoneSub'),
       eta: null,
     };
   } else {
@@ -562,19 +563,24 @@ export function computeStatus(enriched: EnrichedReport[]): SafetyStatus {
       const ne = near[0];
       status = {
         tone: 'warn',
-        badge: 'STAY ALERT',
-        title: 'Flooding is close by',
-        line: `Nearest flooding is ~${ne.edgeKm.toFixed(1)} km away at ${ne.name} (${ne.sev.label.toLowerCase()}${ne.trend === 'rising' ? ', rising' : ''}).`,
-        sub: 'Plan an alternate route and keep checking before you travel.',
+        badge: translate(lang, 'status.stayAlert'),
+        title: translate(lang, 'status.stayAlertTitle'),
+        line: tFormat(lang, 'status.stayAlertLine', {
+          km: ne.edgeKm.toFixed(1),
+          name: ne.name,
+          sev: sevLabel(lang, ne.severity).toLowerCase(),
+          rising: ne.trend === 'rising' ? translate(lang, 'status.rising') : '',
+        }),
+        sub: translate(lang, 'status.stayAlertSub'),
         eta: null,
       };
     } else {
       status = {
         tone: 'ok',
-        badge: 'CLEAR',
-        title: 'No flooding near you',
-        line: 'There are no reports within 2.5 km of your location.',
-        sub: 'Conditions change fast in heavy rain — keep this open to stay updated.',
+        badge: translate(lang, 'status.clear'),
+        title: translate(lang, 'status.clearTitle'),
+        line: translate(lang, 'status.clearLine'),
+        sub: translate(lang, 'status.clearSub'),
         eta: null,
       };
     }
@@ -586,11 +592,11 @@ export function computeStatus(enriched: EnrichedReport[]): SafetyStatus {
     .sort((a, b) => a.edgeKm - b.edgeKm)[0];
   if (risingNear) {
     if (risingNear.edgeKm <= 0) {
-      status.eta = `Water from ${risingNear.name} is at your area and still rising.`;
+      status.eta = tFormat(lang, 'status.etaAtArea', { name: risingNear.name });
     } else {
       const lo = Math.max(1, Math.round(risingNear.edgeKm / 0.98));
       const hi = Math.max(lo + 1, Math.round(risingNear.edgeKm / 0.49));
-      status.eta = `At the current rate, flooding from ${risingNear.name} could reach you in ~${lo}–${hi} hr (rough estimate).`;
+      status.eta = tFormat(lang, 'status.etaReach', { name: risingNear.name, lo, hi });
     }
   }
   return status;

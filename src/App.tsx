@@ -88,7 +88,7 @@ const App: React.FC = () => {
   const { auth, loginWithGoogle, logout } = useAuth();
   const isMobile = useIsMobile();
   const visitCount = useVisitCounter();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const reports = useReports();
   const centers = useCenters();
@@ -301,7 +301,7 @@ const App: React.FC = () => {
     () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     [active]
   );
-  const status = React.useMemo(() => computeStatus(active), [active]);
+  const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
 
   // ── New-flood-report alert subscription ──
   // Detect reports that arrive (via the SSE-driven refetch) and alert when they match the

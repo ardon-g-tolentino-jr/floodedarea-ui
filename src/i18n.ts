@@ -72,7 +72,7 @@ const MESSAGES = {
 
   // ── TopBar ──
   'topbar.region': { en: 'Philippines', fil: 'Pilipinas' },
-  'topbar.share': { en: 'Share', fil: 'Ibahagi' },
+  'topbar.share': { en: 'Share', fil: 'Share' },
   'topbar.report': { en: 'Report flood', fil: 'Mag-ulat ng baha' },
   'topbar.signIn': { en: 'Sign in', fil: 'Mag-sign in' },
   'topbar.signOut': { en: 'Sign out', fil: 'Mag-sign out' },
@@ -113,6 +113,61 @@ const MESSAGES = {
   'sidebar.totalVisits': { en: 'total visits', fil: 'kabuuang bisita' },
   'sidebar.noReports': { en: 'No reports match the active filters.', fil: 'Walang ulat na tumutugma sa mga filter.' },
 
+  // ── Sidebar descriptions / affected-area readout ──
+  'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang singsing ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na singsing kung gaano kalayo maaaring kumalat ang baha.' },
+  'sidebar.monitorDesc': { en: 'The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.', fil: 'Ang putol-putol na asul na bilog sa mapa sa paligid mo. I-drag para itakda kung gaano kalayo babantayan ang baha.' },
+  'sidebar.alertsDesc': { en: 'Get a heads-up the moment a new flood is reported near you — even while this tab is in the background.', fil: 'Makatanggap ng abiso sa sandaling may bagong baha na maiulat malapit sa iyo — kahit nasa background ang tab na ito.' },
+  'sidebar.affectedAt': { en: 'At', fil: 'Sa' },
+  'sidebar.affectedSpread': { en: 'a typical flooded zone spreads', fil: 'kumakalat ang karaniwang binahang lugar nang' },
+  'sidebar.affectedWider': { en: 'wider', fil: 'na mas malawak' },
+  'sidebar.theArea': { en: 'the area', fil: 'ng lugar' },
+
+  // ── Safety status banner ──
+  'status.inFloodZone': { en: 'IN FLOOD ZONE', fil: 'NASA LUGAR NG BAHA' },
+  'status.inFloodZoneTitle': { en: 'You are in a flood-affected area', fil: 'Nasa apektadong lugar ka ng baha' },
+  'status.inFloodZoneLine': { en: '{sev} flooding at {name} — about {depth} cm.', fil: '{sev} na baha sa {name} — humigit-kumulang {depth} cm.' },
+  'status.inFloodZoneSub': { en: 'Move to higher ground and never wade through fast-moving water.', fil: 'Lumipat sa mas mataas na lugar at huwag kailanman tatawid sa mabilis na agos ng tubig.' },
+  'status.stayAlert': { en: 'STAY ALERT', fil: 'MAG-INGAT' },
+  'status.stayAlertTitle': { en: 'Flooding is close by', fil: 'Malapit na ang baha' },
+  'status.stayAlertLine': { en: 'Nearest flooding is ~{km} km away at {name} ({sev}{rising}).', fil: 'Ang pinakamalapit na baha ay ~{km} km ang layo sa {name} ({sev}{rising}).' },
+  'status.stayAlertSub': { en: 'Plan an alternate route and keep checking before you travel.', fil: 'Magplano ng ibang ruta at patuloy na magsuri bago maglakbay.' },
+  'status.rising': { en: ', rising', fil: ', tumataas' },
+  'status.clear': { en: 'CLEAR', fil: 'LIGTAS' },
+  'status.clearTitle': { en: 'No flooding near you', fil: 'Walang baha malapit sa iyo' },
+  'status.clearLine': { en: 'There are no reports within 2.5 km of your location.', fil: 'Walang ulat sa loob ng 2.5 km mula sa iyong lokasyon.' },
+  'status.clearSub': { en: 'Conditions change fast in heavy rain — keep this open to stay updated.', fil: 'Mabilis magbago ang kalagayan sa malakas na ulan — panatilihing bukas ito para sa mga update.' },
+  'status.etaAtArea': { en: 'Water from {name} is at your area and still rising.', fil: 'Ang tubig mula sa {name} ay nasa lugar mo na at patuloy pang tumataas.' },
+  'status.etaReach': { en: 'At the current rate, flooding from {name} could reach you in ~{lo}–{hi} hr (rough estimate).', fil: 'Sa kasalukuyang bilis, maaaring umabot sa iyo ang baha mula sa {name} sa loob ng ~{lo}–{hi} oras (tantya lamang).' },
+
+  // ── Notify modal ──
+  'notify.subtitle': { en: 'Get notified when a new flood is reported near you', fil: 'Mapaalalahanan kapag may bagong baha na naiulat malapit sa iyo' },
+  'notify.master': { en: 'Notify me about new reports', fil: 'Abisuhan ako tungkol sa mga bagong ulat' },
+  'notify.criteria': { en: 'From other people, matching the criteria below', fil: 'Mula sa ibang tao, na tumutugma sa pamantayan sa ibaba' },
+  'notify.withinDistance': { en: 'WITHIN DISTANCE', fil: 'SA LOOB NG LAYO' },
+  'notify.forLevels': { en: 'FOR THESE LEVELS', fil: 'PARA SA MGA ANTAS NA ITO' },
+  'notify.permGranted': { en: 'Browser notifications are on — you’ll be alerted even when this tab is in the background.', fil: 'Naka-on ang mga abiso ng browser — aabisuhan ka kahit nasa background ang tab na ito.' },
+  'notify.permDenied': { en: 'Browser notifications are blocked in your browser settings. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Naka-block ang mga abiso ng browser sa iyong settings. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
+  'notify.permUnsupported': { en: 'This browser can’t show system notifications. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Hindi maipapakita ng browser na ito ang mga system notification. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
+  'notify.permDefault': { en: 'Turn the toggle on to allow notifications and get alerts even when this tab is in the background.', fil: 'I-on ang toggle para payagan ang mga abiso at makatanggap kahit nasa background ang tab na ito.' },
+
+  // ── Share modal ──
+  'share.title': { en: 'Help your neighbors stay safe', fil: 'Tulungan ang iyong mga kapitbahay na manatiling ligtas' },
+  'share.subtitle': { en: 'Share FloodedArea · Philippines', fil: 'Share FloodedArea · Pilipinas' },
+  'share.intro': { en: 'FloodedArea works best when the whole neighborhood is watching. Every person you invite adds another set of eyes on the water — and another voice that can warn others in time.', fil: 'Pinakamabisa ang FloodedArea kapag nagbabantay ang buong kapitbahayan. Bawat taong iniimbita mo ay nagdaragdag ng isa pang tagamasid sa tubig — at isa pang boses na makakapagbabala sa iba nang maaga.' },
+  'share.clearerMap': { en: 'More people, a clearer map', fil: 'Mas maraming tao, mas malinaw na mapa' },
+  'share.liveReportsOne': { en: '{n} live report is already helping people decide where it’s safe right now. ', fil: '{n} live na ulat ang tumutulong na sa mga tao na magpasya kung saan ligtas ngayon. ' },
+  'share.liveReportsMany': { en: '{n} live reports are already helping people decide where it’s safe right now. ', fil: '{n} live na ulat ang tumutulong na sa mga tao na magpasya kung saan ligtas ngayon. ' },
+  'share.impact': { en: 'More neighbors means more reports, faster — your share could be the heads-up that keeps a family out of dangerous water.', fil: 'Mas maraming kapitbahay, mas maraming ulat nang mabilis — maaaring ang share mo ang babalang magliligtas sa isang pamilya mula sa mapanganib na tubig.' },
+  'share.viaApps': { en: 'Share via your apps…', fil: 'I-share sa iyong mga app…' },
+  'share.orDirectly': { en: 'Or share directly', fil: 'O direktang i-share' },
+  'share.directly': { en: 'Share directly', fil: 'Direktang i-share' },
+  'share.shareOn': { en: 'Share on', fil: 'I-share sa' },
+  'share.copyLink': { en: 'Copy link', fil: 'Kopyahin ang link' },
+  'share.copyMessage': { en: 'Copy message', fil: 'Kopyahin ang mensahe' },
+  'share.linkCopied': { en: 'Link copied to clipboard', fil: 'Nakopya ang link sa clipboard' },
+  'share.messageCopied': { en: 'Message copied — paste it anywhere', fil: 'Nakopya ang mensahe — i-paste kahit saan' },
+  'share.thanks': { en: 'Salamat for spreading the word — stay safe out there. 💙', fil: 'Salamat sa pagpapakalat — mag-ingat lagi. 💙' },
+
   // ── Report list item ──
   'report.yours': { en: 'YOURS', fil: 'IYO' },
   'report.kmAway': { en: 'km away', fil: 'km ang layo' },
@@ -139,7 +194,7 @@ const MESSAGES = {
 
   // ── Flood dashboard ──
   'dash.title': { en: 'Flood dashboard', fil: 'Dashboard ng baha' },
-  'dash.subtitle': { en: 'Live road closures & reports · Metro Manila & Rizal', fil: 'Live na saradong kalsada at ulat · Metro Manila at Rizal' },
+  'dash.subtitle': { en: 'Live road closures & reports · Philippines', fil: 'Live na saradong kalsada at ulat · Pilipinas' },
   'dash.closuresNear': { en: 'Road closures near a location', fil: 'Mga saradong kalsada malapit sa lugar' },
   'dash.searchPlaceholder': { en: 'Search a barangay, street or landmark…', fil: 'Maghanap ng barangay, kalye o landmark…' },
   'dash.searching': { en: 'Searching…', fil: 'Naghahanap…' },
@@ -176,6 +231,13 @@ export function translate(lang: Lang, key: MsgKey): string {
   const entry = MESSAGES[key];
   if (!entry) return key;
   return lang === 'fil' ? entry.fil : entry.en;
+}
+
+/** Translate a key and substitute {placeholder} tokens from `params`. */
+export function tFormat(lang: Lang, key: MsgKey, params: Record<string, string | number>): string {
+  let s = translate(lang, key);
+  for (const [k, v] of Object.entries(params)) s = s.replace(`{${k}}`, String(v));
+  return s;
 }
 
 // Typed helpers for the domain enums — translate a severity/road/trend value to its label in one

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ShareLink } from '../../utils/share';
+import { useI18n, tFormat } from '../../i18n';
 
 interface ShareModalProps {
   /** Full message including the URL — for clipboard / native share. */
@@ -59,6 +60,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onCopy,
   onClose,
 }) => {
+  const { lang, t } = useI18n();
   return (
     <div
       onClick={onClose}
@@ -86,8 +88,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
         <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>📣</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Help your neighbors stay safe</div>
-            <div style={{ fontSize: 12, opacity: 0.9 }}>Share FloodedArea · Philippines</div>
+            <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>{t('share.title')}</div>
+            <div style={{ fontSize: 12, opacity: 0.9 }}>{t('share.subtitle')}</div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
@@ -95,21 +97,19 @@ const ShareModal: React.FC<ShareModalProps> = ({
         <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
           {/* Why sharing matters */}
           <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: 'var(--bw-ink-soft)' }}>
-            FloodedArea works best when the whole neighborhood is watching. Every person you invite
-            adds another set of eyes on the water — and another voice that can warn others in time.
+            {t('share.intro')}
           </p>
 
           <div style={{ marginTop: 14, padding: '13px 14px', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <span style={{ fontSize: 15 }}>🌊</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>More people, a clearer map</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>{t('share.clearerMap')}</span>
             </div>
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: '#047857' }}>
               {activeCount > 0
-                ? `${activeCount} live report${activeCount === 1 ? ' is' : 's are'} already helping people decide where it's safe right now. `
+                ? tFormat(lang, activeCount === 1 ? 'share.liveReportsOne' : 'share.liveReportsMany', { n: activeCount })
                 : ''}
-              More neighbors means more reports, faster — your share could be the heads-up that keeps
-              a family out of dangerous water.
+              {t('share.impact')}
             </p>
           </div>
 
@@ -119,13 +119,13 @@ const ShareModal: React.FC<ShareModalProps> = ({
               onClick={onNativeShare}
               style={{ width: '100%', marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
             >
-              <Glyph d={SHARE_GLYPH} size={19} /> Share via your apps…
+              <Glyph d={SHARE_GLYPH} size={19} /> {t('share.viaApps')}
             </button>
           )}
 
           {/* One-tap social targets */}
           <div style={{ marginTop: 18, fontSize: 11.5, fontWeight: 800, letterSpacing: '.04em', textTransform: 'uppercase', color: 'var(--bw-faint)' }}>
-            {canNativeShare ? 'Or share directly' : 'Share directly'}
+            {canNativeShare ? t('share.orDirectly') : t('share.directly')}
           </div>
           <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: 10 }}>
             {links.map((l) => (
@@ -134,7 +134,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={`Share on ${l.label}`}
+                title={`${t('share.shareOn')} ${l.label}`}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, textDecoration: 'none' }}
               >
                 <span style={{ width: 52, height: 52, borderRadius: 16, background: l.color, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,23,42,.18)' }}>
@@ -148,17 +148,17 @@ const ShareModal: React.FC<ShareModalProps> = ({
           {/* Copy actions */}
           <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
             <button
-              onClick={() => onCopy(url, 'Link copied to clipboard')}
+              onClick={() => onCopy(url, t('share.linkCopied'))}
               style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="var(--bw-muted)" aria-hidden="true"><path d={LINK_GLYPH} /></svg>
-              Copy link
+              {t('share.copyLink')}
             </button>
             <button
-              onClick={() => onCopy(text, 'Message copied — paste it anywhere')}
+              onClick={() => onCopy(text, t('share.messageCopied'))}
               style={{ flex: 1, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
             >
-              Copy message
+              {t('share.copyMessage')}
             </button>
           </div>
 
@@ -168,7 +168,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
           </div>
 
           <div style={{ marginTop: 14, textAlign: 'center', fontSize: 11, color: 'var(--bw-faint)' }}>
-            Salamat for spreading the word — stay safe out there. 💙
+            {t('share.thanks')}
           </div>
         </div>
       </div>
