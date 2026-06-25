@@ -1,7 +1,7 @@
 // Derived view model for the flood map + sidebar, ported from the design's renderVals().
 // Pure functions over the live API data + the user's location.
 
-import type { FloodReport, LatLng, RescueRequest, Road, Severity } from '../types';
+import type { FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
 import { kmBetween } from './geo';
 import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
@@ -404,6 +404,138 @@ export function hourlySurge(
   for (const r of reports) { const i = idxOf(r.createdAt); if (i >= 0) buckets[i].reports++; }
   for (const r of rescues) { const i = idxOf(r.createdAt); if (i >= 0) buckets[i].rescues++; }
   return buckets;
+}
+
+// ── Public dashboard view model: closures near a searched place + a recent-reports table ──────
+
+/**
+ * Split a stored report `district` label into its locality ("city/area") and the wider
+ * district/region. Reports record district as "Area, Region" (e.g. "Batasan Hills, Metro Manila")
+ * — geocode.ts joins the locality and state. Falls back gracefully for blank/single-part labels.
+ */
+export function localityParts(district: string | null | undefined): { city: string; district: string } {
+  const parts = (district ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  if (parts.length === 0) return { city: 'Unknown area', district: '—' };
+  if (parts.length === 1) return { city: parts[0], district: parts[0] };
+  return { city: parts[0], district: parts.slice(1).join(', ') };
+}
+
+/** A road that may be closed within a searched location's impact radius. */
+export interface NearbyClosure {
+  key: string;
+  name: string;
+  status: Road;        // risky | impassable (passable roads aren't "closures")
+  depthCm: number;     // observed depth (reported) or estimated depth (inferred)
+  reportCount: number; // contributing reports — 0 for inferred closures
+  inferred: boolean;   // true = derived from a nearby flooded area, not directly reported
+  distanceKm: number;  // distance from the searched location
+  latitude: number;
+  longitude: number;
+}
+
+/**
+ * Every road that may be closed within `radiusKm` of `center`, worst-condition first. Combines two
+ * sources: directly-reported impassable/risky roads (from the road directory) and inferred possible
+ * closures (roads inside a nearby flood's modeled reach). An inferred closure is dropped when the
+ * same road is already directly reported, so it isn't listed twice. Pure over the precomputed inputs.
+ */
+export function closuresNearLocation(
+  directory: DistrictRoads[],
+  closures: PossibleClosure[],
+  center: LatLng,
+  radiusKm: number
+): NearbyClosure[] {
+  const out: NearbyClosure[] = [];
+  const reportedRoadIds = new Set<number>();
+  for (const d of directory) {
+    for (const r of d.roads) {
+      if (r.roadId != null) reportedRoadIds.add(r.roadId);
+      if (r.road === 'passable') continue; // only risky/impassable count as a closure
+      const distanceKm = kmBetween(center, { lat: r.latitude, lng: r.longitude });
+      if (distanceKm > radiusKm) continue;
+      out.push({
+        key: `reported:${r.key}`,
+        name: r.name,
+        status: r.road,
+        depthCm: r.depthCm,
+        reportCount: r.reportCount,
+        inferred: false,
+        distanceKm,
+        latitude: r.latitude,
+        longitude: r.longitude,
+      });
+    }
+  }
+  for (const c of closures) {
+    if (reportedRoadIds.has(c.roadId)) continue; // already shown as a reported road
+    const mid = c.path[Math.floor(c.path.length / 2)] ?? c.path[0];
+    if (!mid) continue;
+    const distanceKm = kmBetween(center, mid);
+    if (distanceKm > radiusKm) continue;
+    out.push({
+      key: `inferred:${c.roadId}`,
+      name: c.name,
+      status: c.status,
+      depthCm: Math.round(c.estDepthCm),
+      reportCount: 0,
+      inferred: true,
+      distanceKm,
+      latitude: mid.lat,
+      longitude: mid.lng,
+    });
+  }
+  return out.sort(
+    (a, b) => ROAD_RANK[b.status] - ROAD_RANK[a.status] || a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
+  );
+}
+
+/** One row of the recent-reports table: a user flood report with its locality split out. */
+export interface RecentReportRow {
+  id: number;
+  name: string;
+  city: string;
+  district: string;
+  depthCm: number;
+  severity: Severity;
+  trend: Trend;
+  reportsCount: number;
+  createdAt: string;
+  time: string; // relative ("12 min ago")
+  latitude: number;
+  longitude: number;
+}
+
+/**
+ * Active user reports from the trailing `hours` window (default 12 h), deepest water first
+ * (ties broken newest-first). Resolved reports are excluded. Drives the dashboard table — note it
+ * uses the raw reports, not the short TTL-filtered "active" set, so the full 12-hour history shows.
+ */
+export function recentReportRows(reports: FloodReport[], hours = 12, now: number = Date.now()): RecentReportRow[] {
+  const cutoff = now - hours * 3600000;
+  return reports
+    .filter((r) => {
+      if (r.status === 'resolved') return false;
+      const t = new Date(r.createdAt).getTime();
+      return !Number.isNaN(t) && t >= cutoff;
+    })
+    .map((r) => {
+      const { city, district } = localityParts(r.district);
+      return {
+        id: r.id,
+        name: r.name,
+        city,
+        district,
+        depthCm: r.depthCm,
+        severity: r.severity,
+        trend: r.trend,
+        reportsCount: r.reportsCount,
+        createdAt: r.createdAt,
+        time: timeAgo(r.createdAt),
+        latitude: r.latitude,
+        longitude: r.longitude,
+      };
+    })
+    .sort((a, b) => b.depthCm - a.depthCm || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };

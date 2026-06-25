@@ -16,6 +16,7 @@ interface TopBarProps {
   onSearchSelect: (r: GeoResult) => void;
   onNotify: () => void;
   notifyOn: boolean;
+  onDashboard: () => void;
   onWaterChart: () => void;
   onRescueChart: () => void;
   onSupport: () => void;
@@ -63,6 +64,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onSearchSelect,
   onNotify,
   notifyOn,
+  onDashboard,
   onWaterChart,
   onRescueChart,
   onSupport,
@@ -254,6 +256,7 @@ const TopBar: React.FC<TopBarProps> = ({
                 <div
                   style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 1400, minWidth: 212, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 12, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', padding: 6 }}
                 >
+                  <MenuItem icon="📊" label="Flood dashboard" onClick={runAndClose(onDashboard)} />
                   <MenuItem icon="⤴" label="Share" onClick={runAndClose(onShare)} />
                   <MenuItem icon="📈" label="Water levels" onClick={runAndClose(onWaterChart)} />
                   <MenuItem icon="🛟" label="Rescue requests" onClick={runAndClose(onRescueChart)} />
@@ -276,6 +279,10 @@ const TopBar: React.FC<TopBarProps> = ({
               style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 7, height: 40, padding: '0 15px', border: '1px solid #DCE3E9', background: '#fff', borderRadius: 11, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink-soft)', cursor: 'pointer' }}
             >
               <span style={{ fontSize: 14 }}>⤴</span> Share
+            </button>
+
+            <button onClick={onDashboard} title="Flood dashboard" aria-label="Flood dashboard" style={ICON_BTN}>
+              📊
             </button>
 
             <button onClick={onWaterChart} title="Water levels over time" aria-label="Water levels over time" style={ICON_BTN}>

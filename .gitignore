@@ -5,3 +5,8 @@ node_modules
 *.local
 .DS_Store
 *.tsbuildinfo
+
+# Android / TWA signing — irreplaceable; never commit. See PLAYSTORE_PACKAGE.md.
+*.jks
+*.keystore
+key.properties

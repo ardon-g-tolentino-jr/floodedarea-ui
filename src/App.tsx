@@ -38,6 +38,7 @@ import Toast, { type ToastData } from './components/panels/Toast';
 import NotifyModal, { type NotifyPrefs, DEFAULT_NOTIFY_PREFS } from './components/panels/NotifyModal';
 import WaterLevelModal from './components/panels/WaterLevelModal';
 import RoadConditionsModal from './components/panels/RoadConditionsModal';
+import PublicDashboardModal from './components/panels/PublicDashboardModal';
 import RescueChartModal from './components/panels/RescueChartModal';
 import SupportModal from './components/panels/SupportModal';
 import ShareModal from './components/panels/ShareModal';
@@ -131,6 +132,7 @@ const App: React.FC = () => {
   const [notifyOpen, setNotifyOpen] = React.useState(false);
   const [waterChartOpen, setWaterChartOpen] = React.useState(false);
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
+  const [dashboardOpen, setDashboardOpen] = React.useState(false);
   const [rescueChartOpen, setRescueChartOpen] = React.useState(false);
   const [supportOpen, setSupportOpen] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
@@ -838,6 +840,7 @@ const App: React.FC = () => {
         onSearchSelect={onSearchSelect}
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}
+        onDashboard={() => setDashboardOpen(true)}
         onWaterChart={() => setWaterChartOpen(true)}
         onRescueChart={() => {
           // The backend requires auth to read /rescue, so prompt sign-in before opening the chart.
@@ -1011,6 +1014,18 @@ const App: React.FC = () => {
             if (mid) setMapFocus({ lat: mid.lat, lng: mid.lng, key: Date.now() });
           }}
           onClose={() => setRoadsModalOpen(false)}
+        />
+      )}
+
+      {dashboardOpen && (
+        <PublicDashboardModal
+          reports={reportList}
+          directory={roadDirectory}
+          closures={possibleClosures}
+          isMobile={isMobile}
+          now={now}
+          onShowOnMap={(loc) => setMapFocus({ lat: loc.lat, lng: loc.lng, key: Date.now() })}
+          onClose={() => setDashboardOpen(false)}
         />
       )}
 
