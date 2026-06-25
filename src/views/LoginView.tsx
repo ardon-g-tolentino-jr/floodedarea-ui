@@ -1,6 +1,7 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { ApiError } from '../api/client';
+import { useI18n, type Lang } from '../i18n';
 
 const GOOGLE_ENABLED = Boolean((import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim());
 
@@ -11,6 +12,7 @@ interface LoginViewProps {
 }
 
 const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
+  const { lang, t, setLang } = useI18n();
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
@@ -43,12 +45,32 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 17, fontWeight: 800 }}>FloodedArea</div>
-            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>Sign in to report &amp; get help</div>
+            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('login.subtitle')}</div>
           </div>
           <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
         </div>
 
         <div style={{ padding: 24 }}>
+          {/* Language picker — choose once; remembered for next time. Default is English. */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 7 }}>
+              {t('lang.label').toUpperCase()}
+            </div>
+            <div role="group" aria-label={t('lang.label')} style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--bw-bg-subtle)', borderRadius: 12 }}>
+              {(['en', 'fil'] as Lang[]).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  aria-pressed={lang === l}
+                  style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, border: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: lang === l ? '#0F172A' : '#94A3B8', background: lang === l ? '#fff' : 'transparent', boxShadow: lang === l ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
+                >
+                  {t(l === 'en' ? 'lang.en' : 'lang.fil')}
+                </button>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--bw-muted)', marginTop: 6, lineHeight: 1.4 }}>{t('lang.hint')}</div>
+          </div>
+
           {reason && (
             <div style={{ marginBottom: 16, padding: '10px 13px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, fontSize: 12.5, color: '#1D4ED8', lineHeight: 1.5 }}>
               {reason}
@@ -56,11 +78,11 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
           )}
 
           <p style={{ margin: '0 0 18px', fontSize: 13, color: 'var(--bw-muted)', lineHeight: 1.55 }}>
-            Sign in with your Google account. A FloodedArea account is created automatically on first use.
+            {t('login.intro')}
           </p>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '14px 0', fontSize: 13, color: 'var(--bw-muted)' }}>Verifying…</div>
+            <div style={{ textAlign: 'center', padding: '14px 0', fontSize: 13, color: 'var(--bw-muted)' }}>{t('login.verifying')}</div>
           ) : GOOGLE_ENABLED ? (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <GoogleLogin
@@ -75,7 +97,7 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
             </div>
           ) : (
             <div style={{ padding: '11px 14px', background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 8, fontSize: 12.5, color: 'var(--bw-muted)', lineHeight: 1.5 }}>
-              Google SSO isn’t configured. Set <code>VITE_GOOGLE_CLIENT_ID</code> to enable sign-in.
+              {t('login.notConfigured')}
             </div>
           )}
 

@@ -5,7 +5,7 @@ export function minutesSince(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - then) / 60000));
 }
 
-/** "just now" / "12 min ago" / "3 hrs ago" — matches the BahaWatch design. */
+/** "just now" / "12 min ago" / "3 hrs ago" — matches the FloodedArea design. */
 export function timeAgo(iso: string): string {
   const m = minutesSince(iso);
   if (m < 1) return 'just now';

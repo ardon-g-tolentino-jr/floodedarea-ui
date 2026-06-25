@@ -5,6 +5,7 @@ import { useIsMobile } from './hooks/useBreakpoint';
 import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
+import { useI18n } from './i18n';
 import { mutations } from './api/queries';
 import { ApiError } from './api/client';
 import type { GeoResult } from './api/geocode';
@@ -73,7 +74,6 @@ function loadLivePref(): boolean {
 }
 
 const DEFAULT_LOCATION: LatLng = { lat: 14.66, lng: 121.12 }; // Marikina Heights
-const REGION_LABEL = 'Philippines';
 
 type PendingPin = LatLng & { atYou: boolean };
 
@@ -88,6 +88,7 @@ const App: React.FC = () => {
   const { auth, loginWithGoogle, logout } = useAuth();
   const isMobile = useIsMobile();
   const visitCount = useVisitCounter();
+  const { t } = useI18n();
 
   const reports = useReports();
   const centers = useCenters();
@@ -831,7 +832,6 @@ const App: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', color: 'var(--bw-ink)' }}>
       <TopBar
-        regionLabel={REGION_LABEL}
         isMobile={isMobile}
         auth={auth}
         onReport={startReport}
@@ -983,7 +983,7 @@ const App: React.FC = () => {
           onClick={startReport}
           style={{ position: 'fixed', right: 16, bottom: 20, zIndex: 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
         >
-          <span style={{ fontSize: 20, fontWeight: 700 }}>+</span> Report flood
+          <span style={{ fontSize: 20, fontWeight: 700 }}>+</span> {t('topbar.report')}
         </button>
       )}
 

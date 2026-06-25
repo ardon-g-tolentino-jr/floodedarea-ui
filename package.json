@@ -1,9 +1,9 @@
 {
   "name": "baha-ui",
   "private": true,
-  "version": "1.24.1",
+  "version": "1.25.0",
   "type": "module",
-  "description": "BahaWatch — a flood-watch web app for the Philippines (reports, shelters, alerts, SOS).",
+  "description": "FloodedArea — a flood-watch web app for the Philippines (reports, shelters, alerts, SOS).",
   "scripts": {
     "dev": "vite",
     "dev:vite": "vite",

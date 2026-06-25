@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**BahaWatch** (`baha-ui`) — a flood-watch single-page web app for Metro Manila & Rizal:
+**FloodedArea** (`baha-ui`) — a flood-watch single-page web app for Metro Manila & Rizal:
 crowd-sourced flood reports on a Leaflet map, evacuation centers, a live activity feed,
 rainfall alerts, and an SOS rescue request. React 18 + Vite + TypeScript.
 The UI structure deliberately mirrors a sibling project, `appointment-web`.

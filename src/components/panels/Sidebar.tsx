@@ -12,6 +12,7 @@ import {
   MONITOR_RADIUS_STEP,
 } from '../../utils/viewModel';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
+import { useI18n, sevLabel, roadLabel, roadShort, trendLabel } from '../../i18n';
 import ShelterIcon from './ShelterIcon';
 
 type Tab = 'nearby' | 'activity';
@@ -94,6 +95,7 @@ const CollapsibleSection: React.FC<{
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount } = props;
+  const { lang, t } = useI18n();
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -119,11 +121,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     <div style={sidebarStyle}>
       {/* STATUS */}
       <div style={{ flex: 'none', padding: '18px 18px 14px' }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.13em', color: 'var(--bw-faint)', marginBottom: 9 }}>YOUR SAFETY STATUS</div>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.13em', color: 'var(--bw-faint)', marginBottom: 9 }}>{t('sidebar.safetyStatus')}</div>
         <div style={{ background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 16, padding: '15px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 9 }}>
             <span style={{ background: tone.badge, color: '#fff', fontSize: 10, fontWeight: 800, letterSpacing: '.08em', padding: '3px 9px', borderRadius: 7, whiteSpace: 'nowrap' }}>{status.badge}</span>
-            <span style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginLeft: 'auto' }}>Updated live</span>
+            <span style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginLeft: 'auto' }}>{t('sidebar.updatedLive')}</span>
           </div>
           <div style={{ color: tone.title, fontSize: 18, fontWeight: 800, letterSpacing: '-.01em', lineHeight: 1.2 }}>{status.title}</div>
           <div style={{ fontSize: 13, color: '#475563', marginTop: 6, lineHeight: 1.45 }}>{status.line}</div>
@@ -137,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       </div>
 
       {/* FILTERS */}
-      <CollapsibleSection title="FILTERS" open={openSections.filters} onToggle={() => toggleSection('filters')}>
+      <CollapsibleSection title={t('sidebar.filters')} open={openSections.filters} onToggle={() => toggleSection('filters')}>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {(['high', 'medium', 'low'] as Severity[]).map((k) => {
           const sm = SEV_META[k];
@@ -149,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 999, border: `1.5px solid ${active ? sm.color : '#E2E8F0'}`, background: active ? sm.soft : '#fff', color: active ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
             >
               <span style={{ width: 9, height: 9, borderRadius: '50%', background: sm.color, opacity: active ? 1 : 0.4 }} />
-              {sm.label}<span style={{ opacity: 0.6, fontWeight: 700 }}>{filterCounts[k]}</span>
+              {sevLabel(lang, k)}<span style={{ opacity: 0.6, fontWeight: 700 }}>{filterCounts[k]}</span>
             </button>
           );
         })}
@@ -158,20 +160,20 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 999, border: `1.5px solid ${showShelters ? 'var(--bw-shelter)' : '#E2E8F0'}`, background: showShelters ? 'rgba(14,116,144,.12)' : '#fff', color: showShelters ? '#0E5063' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
         >
           <span style={{ width: 13, height: 13, borderRadius: 4, background: 'var(--bw-shelter)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}><ShelterIcon size={9} /></span>
-          Shelters
+          {t('sidebar.shelters')}
         </button>
         <button
           onClick={onToggleRoads}
           style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 999, border: `1.5px solid ${showRoads ? ROAD_META.impassable.color : '#E2E8F0'}`, background: showRoads ? ROAD_META.impassable.soft : '#fff', color: showRoads ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
         >
           <span style={{ width: 14, height: 4, borderRadius: 2, background: ROAD_META.impassable.color, opacity: showRoads ? 1 : 0.4, flex: 'none' }} />
-          Flooded roads
+          {t('sidebar.floodedRoads')}
         </button>
       </div>
       </CollapsibleSection>
 
       {/* ROAD FILTERS */}
-      <CollapsibleSection title="ROADS" open={openSections.roads} onToggle={() => toggleSection('roads')}>
+      <CollapsibleSection title={t('sidebar.roads')} open={openSections.roads} onToggle={() => toggleSection('roads')}>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         {ROAD_ORDER.map((k) => {
           const rm = ROAD_META[k];
@@ -183,7 +185,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 11px', borderRadius: 999, border: `1.5px solid ${active ? rm.color : '#E2E8F0'}`, background: active ? rm.soft : '#fff', color: active ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
             >
               <span style={{ color: active ? rm.color : '#B6C0CA', fontWeight: 800 }}>{rm.glyph}</span>
-              {rm.short}
+              {roadShort(lang, k)}
               <span style={{ opacity: 0.6, fontWeight: 700 }}>{roadCounts[k]}</span>
             </button>
           );
@@ -193,18 +195,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         onClick={onOpenRoads}
         style={{ width: '100%', marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 12px', borderRadius: 11, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-primary-deep)', fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}
       >
-        <span style={{ fontSize: 13 }}>⌕</span> Search roads by condition
+        <span style={{ fontSize: 13 }}>⌕</span> {t('sidebar.searchRoads')}
       </button>
       </CollapsibleSection>
 
       {/* AFFECTED AREA — predictive water-rise projection */}
       <CollapsibleSection
-        title="AFFECTED AREA"
+        title={t('sidebar.affectedArea')}
         open={openSections.affected}
         onToggle={() => toggleSection('affected')}
         right={
           <span style={{ fontSize: 12.5, fontWeight: 800, color: projectedRiseCm > 0 ? 'var(--bw-primary-deep)' : 'var(--bw-muted)' }}>
-            {projectedRiseCm > 0 ? `+${projectedRiseCm} cm` : 'Now'}
+            {projectedRiseCm > 0 ? `+${projectedRiseCm} cm` : t('sidebar.now')}
           </span>
         }
       >
@@ -240,7 +242,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
       {/* MONITORING-AREA RADIUS */}
       <CollapsibleSection
-        title="MONITORING AREA"
+        title={t('sidebar.monitoringArea')}
         open={openSections.monitor}
         onToggle={() => toggleSection('monitor')}
         right={<span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--bw-primary-deep)' }}>{fmtRadius(monitorRadiusKm)}</span>}
@@ -275,13 +277,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         >
           <span style={{ fontSize: 16, flex: 'none' }}>🔔</span>
           <span style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ display: 'block', fontSize: 13, fontWeight: 800, color: 'var(--bw-ink)' }}>Flood alerts</span>
+            <span style={{ display: 'block', fontSize: 13, fontWeight: 800, color: 'var(--bw-ink)' }}>{t('sidebar.floodAlerts')}</span>
             <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', marginTop: 1 }}>
-              {notifyOn ? `On · new floods within ${fmtRadius(notifyRadiusKm)}` : 'Off · get notified about new floods nearby'}
+              {notifyOn ? `${t('sidebar.alertsOn')} ${fmtRadius(notifyRadiusKm)}` : t('sidebar.alertsOff')}
             </span>
           </span>
           <span style={{ fontSize: 11.5, fontWeight: 800, color: notifyOn ? 'var(--bw-primary-deep)' : 'var(--bw-muted)', flex: 'none' }}>
-            {notifyOn ? 'Edit' : 'Set up'}
+            {notifyOn ? t('sidebar.edit') : t('sidebar.setUp')}
           </span>
         </button>
       </div>
@@ -289,27 +291,27 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       {/* SUMMARY + TABS */}
       <div style={{ flex: 'none', padding: '0 18px 12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: 'var(--bw-muted)', fontWeight: 600, marginBottom: 11 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} /><b style={{ color: 'var(--bw-ink)' }}>{highCount}</b> high</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} /><b style={{ color: 'var(--bw-ink)' }}>{highCount}</b> {t('sidebar.high')}</span>
           <span style={{ color: '#D5DDE3' }}>·</span>
-          <span><b style={{ color: 'var(--bw-ink)' }}>{totalCount}</b> active reports nearby</span>
+          <span><b style={{ color: 'var(--bw-ink)' }}>{totalCount}</b> {t('sidebar.activeReports')}</span>
           {impassableRoadCount > 0 && (
             <>
               <span style={{ color: '#D5DDE3' }}>·</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ width: 14, height: 4, borderRadius: 2, background: ROAD_META.impassable.color }} />
-                <b style={{ color: 'var(--bw-ink)' }}>{impassableRoadCount}</b> {impassableRoadCount === 1 ? 'road' : 'roads'} impassable
+                <b style={{ color: 'var(--bw-ink)' }}>{impassableRoadCount}</b> {impassableRoadCount === 1 ? t('sidebar.road') : t('sidebar.roadsPlural')} {t('sidebar.roadImpassable')}
               </span>
             </>
           )}
         </div>
         <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--bw-bg-subtle)', borderRadius: 12 }}>
-          {(['nearby', 'activity'] as Tab[]).map((t) => (
+          {(['nearby', 'activity'] as Tab[]).map((t2) => (
             <div
-              key={t}
-              onClick={() => onTab(t)}
-              style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: tab === t ? '#0F172A' : '#94A3B8', background: tab === t ? '#fff' : 'transparent', boxShadow: tab === t ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
+              key={t2}
+              onClick={() => onTab(t2)}
+              style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: tab === t2 ? '#0F172A' : '#94A3B8', background: tab === t2 ? '#fff' : 'transparent', boxShadow: tab === t2 ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
             >
-              {t === 'nearby' ? 'Nearby' : 'Live activity'}
+              {t2 === 'nearby' ? t('sidebar.nearby') : t('sidebar.liveActivity')}
             </div>
           ))}
         </div>
@@ -332,22 +334,22 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', flex: 'none', background: r.sev.color }} />
                 <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-.01em' }}>{r.name}</span>
-                {r.mine && <span style={{ fontSize: 9.5, fontWeight: 800, color: '#0EA5E9', background: '#E3F4FC', padding: '2px 6px', borderRadius: 6 }}>YOURS</span>}
+                {r.mine && <span style={{ fontSize: 9.5, fontWeight: 800, color: '#0EA5E9', background: '#E3F4FC', padding: '2px 6px', borderRadius: 6 }}>{t('report.yours')}</span>}
                 <span style={{ fontSize: 11, color: '#9AA8B4', fontWeight: 600, marginLeft: 'auto' }}>{r.time}</span>
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, margin: '4px 0 9px 18px' }}>{r.district} · {r.distKm.toFixed(1)} km away</div>
+              <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, margin: '4px 0 9px 18px' }}>{r.district} · {r.distKm.toFixed(1)} {t('report.kmAway')}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginLeft: 18 }}>
                 <span style={{ background: r.sev.soft, color: r.sev.color, fontSize: 11, fontWeight: 800, padding: '3px 9px', borderRadius: 999 }}>{r.depthCm} cm</span>
-                <span style={{ color: tm.color, fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}><span>{tm.sym}</span>{tm.label}</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: '#5A6875' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: rm.color }} />{rm.label}</span>
-                <span style={{ fontSize: 11, color: '#9AA8B4', fontWeight: 600 }}>{r.reportsCount}× confirmed</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {r.expiresInMin}m left</span>
+                <span style={{ color: tm.color, fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}><span>{tm.sym}</span>{trendLabel(lang, r.trend)}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: '#5A6875' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: rm.color }} />{roadLabel(lang, r.road)}</span>
+                <span style={{ fontSize: 11, color: '#9AA8B4', fontWeight: 600 }}>{r.reportsCount}× {t('report.confirmed')}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {r.expiresInMin}m {t('report.left')}</span>
               </div>
             </div>
           );
         })}
         {list.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>No reports match the active filters.</div>
+          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>{t('sidebar.noReports')}</div>
         )}
       </div>
 
@@ -358,7 +360,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           title={`${visitCount.toLocaleString()} total visits`}
           style={{ flex: 'none', borderTop: '1px solid var(--bw-line-soft)', padding: '10px 18px', textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)', letterSpacing: '.01em' }}
         >
-          <span aria-hidden="true">👁</span> {visitCount.toLocaleString()} total visits
+          <span aria-hidden="true">👁</span> {visitCount.toLocaleString()} {t('sidebar.totalVisits')}
         </div>
       )}
     </div>

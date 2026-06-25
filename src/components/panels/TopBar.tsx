@@ -2,10 +2,10 @@ import React from 'react';
 import type { AuthState } from '../../hooks/useAuth';
 import type { GeoResult } from '../../api/geocode';
 import { BUILD_COMMIT, BUILD_LABEL, BUILD_TIME } from '../../buildInfo';
+import { useI18n } from '../../i18n';
 import SearchBox from './SearchBox';
 
 interface TopBarProps {
-  regionLabel: string;
   isMobile: boolean;
   auth: AuthState | null;
   onReport: () => void;
@@ -53,7 +53,6 @@ const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void }> =
 );
 
 const TopBar: React.FC<TopBarProps> = ({
-  regionLabel,
   isMobile,
   auth,
   onReport,
@@ -73,6 +72,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onResponse,
   onShowFeatures,
 }) => {
+  const { t } = useI18n();
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
 
   // On mobile the secondary actions collapse into this overflow menu so the bar fits any viewport.
@@ -121,7 +121,7 @@ const TopBar: React.FC<TopBarProps> = ({
       title="Admin console"
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #BAE2FB', background: '#EFF8FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: 'var(--bw-primary)', cursor: 'pointer' }}
     >
-      ⚙ {!isMobile && 'Admin'}
+      ⚙ {!isMobile && t('topbar.admin')}
     </button>
   ) : null;
 
@@ -133,7 +133,7 @@ const TopBar: React.FC<TopBarProps> = ({
       title="Response console — triage & dispatch"
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #FBCFE8', background: '#FDF2F8', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#BE185D', cursor: 'pointer' }}
     >
-      🚑 {!isMobile && 'Response'}
+      🚑 {!isMobile && t('topbar.response')}
     </button>
   ) : null;
 
@@ -150,7 +150,7 @@ const TopBar: React.FC<TopBarProps> = ({
           onClick={onSignOut}
           style={{ border: '1px solid #DCE3E9', background: '#fff', borderRadius: 9, padding: '7px 11px', fontSize: 12.5, fontWeight: 700, color: 'var(--bw-ink-soft)', cursor: 'pointer' }}
         >
-          Sign out
+          {t('topbar.signOut')}
         </button>
       )}
     </div>
@@ -159,7 +159,7 @@ const TopBar: React.FC<TopBarProps> = ({
       onClick={onSignIn}
       style={{ flex: 'none', height: 40, padding: '0 15px', border: '1px solid #DCE3E9', background: '#fff', borderRadius: 11, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink-soft)', cursor: 'pointer' }}
     >
-      Sign in
+      {t('topbar.signIn')}
     </button>
   );
 
@@ -207,7 +207,7 @@ const TopBar: React.FC<TopBarProps> = ({
         {!isMobile && (
           <div style={{ lineHeight: 1.2 }}>
             <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-.02em' }}>FloodedArea</div>
-            <div style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{regionLabel}</div>
+            <div style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('topbar.region')}</div>
             <button
               onClick={onShowFeatures}
               title={`See all features · build ${BUILD_COMMIT} · ${new Date(BUILD_TIME).toLocaleString()}`}
@@ -245,8 +245,8 @@ const TopBar: React.FC<TopBarProps> = ({
             <div ref={menuRef} style={{ position: 'relative', flex: 'none' }}>
               <button
                 onClick={() => setMenuOpen((o) => !o)}
-                title="More"
-                aria-label="More options"
+                title={t('topbar.more')}
+                aria-label={t('topbar.more')}
                 aria-expanded={menuOpen}
                 style={{ ...ICON_BTN, background: menuOpen ? 'var(--bw-bg-subtle)' : '#fff' }}
               >
@@ -256,15 +256,15 @@ const TopBar: React.FC<TopBarProps> = ({
                 <div
                   style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 1400, minWidth: 212, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 12, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', padding: 6 }}
                 >
-                  <MenuItem icon="📊" label="Flood dashboard" onClick={runAndClose(onDashboard)} />
-                  <MenuItem icon="⤴" label="Share" onClick={runAndClose(onShare)} />
-                  <MenuItem icon="📈" label="Water levels" onClick={runAndClose(onWaterChart)} />
-                  <MenuItem icon="🛟" label="Rescue requests" onClick={runAndClose(onRescueChart)} />
-                  <MenuItem icon="💙" label="About &amp; support" onClick={runAndClose(onSupport)} />
-                  <MenuItem icon="✨" label="What’s in this app" onClick={runAndClose(onShowFeatures)} />
+                  <MenuItem icon="📊" label={t('topbar.dashboard')} onClick={runAndClose(onDashboard)} />
+                  <MenuItem icon="⤴" label={t('topbar.share')} onClick={runAndClose(onShare)} />
+                  <MenuItem icon="📈" label={t('topbar.waterLevels')} onClick={runAndClose(onWaterChart)} />
+                  <MenuItem icon="🛟" label={t('topbar.rescue')} onClick={runAndClose(onRescueChart)} />
+                  <MenuItem icon="💙" label={t('topbar.support')} onClick={runAndClose(onSupport)} />
+                  <MenuItem icon="✨" label={t('topbar.features')} onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
-                  {isAdmin && <MenuItem icon="🚑" label="Response console" onClick={runAndClose(onResponse)} />}
-                  {isAdmin && <MenuItem icon="⚙" label="Admin console" onClick={runAndClose(onAdmin)} />}
+                  {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
+                  {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}
                 </div>
               )}
             </div>
@@ -278,7 +278,7 @@ const TopBar: React.FC<TopBarProps> = ({
               onClick={onShare}
               style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 7, height: 40, padding: '0 15px', border: '1px solid #DCE3E9', background: '#fff', borderRadius: 11, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink-soft)', cursor: 'pointer' }}
             >
-              <span style={{ fontSize: 14 }}>⤴</span> Share
+              <span style={{ fontSize: 14 }}>⤴</span> {t('topbar.share')}
             </button>
 
             <button onClick={onDashboard} title="Flood dashboard" aria-label="Flood dashboard" style={ICON_BTN}>
@@ -305,7 +305,7 @@ const TopBar: React.FC<TopBarProps> = ({
               onClick={onReport}
               style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 8, height: 40, padding: '0 17px', border: 0, background: 'var(--bw-primary)', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#fff', cursor: 'pointer', boxShadow: '0 4px 12px rgba(14,165,233,.32)' }}
             >
-              <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> Report flood
+              <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> {t('topbar.report')}
             </button>
 
             {responseBtn}

@@ -1,4 +1,4 @@
-// Severity / trend / road metadata and water-level math, ported from the BahaWatch design.
+// Severity / trend / road metadata and water-level math, ported from the FloodedArea design.
 
 import type { RescueStatus, Road, Severity, Trend } from '../types';
 

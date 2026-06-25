@@ -4,6 +4,7 @@ import type { DistrictRoads, PossibleClosure, NearbyClosure } from '../../utils/
 import { closuresNearLocation, recentReportRows } from '../../utils/viewModel';
 import { ROAD_META, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocode';
+import { useI18n, roadShort, trendLabel } from '../../i18n';
 
 interface PublicDashboardModalProps {
   /** Raw reports — the table windows these to the last 12 h itself (not the short-TTL active set). */
@@ -27,6 +28,7 @@ const REPORT_WINDOW_HOURS = 12;
 
 /** A condition pill (Impassable / Risky) shared by the closure list. */
 const ConditionPill: React.FC<{ status: NearbyClosure['status'] }> = ({ status }) => {
+  const { lang } = useI18n();
   const rm = ROAD_META[status];
   return (
     <span
@@ -44,7 +46,7 @@ const ConditionPill: React.FC<{ status: NearbyClosure['status'] }> = ({ status }
       }}
     >
       <span>{rm.glyph}</span>
-      {rm.short}
+      {roadShort(lang, status)}
     </span>
   );
 };
@@ -63,6 +65,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
   onShowOnMap,
   onClose,
 }) => {
+  const { lang, t } = useI18n();
   // ── Location search (impact-radius closures) ──
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
@@ -137,7 +140,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
 
   const searchSection = (
     <div>
-      <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8 }}>Road closures near a location</div>
+      <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8 }}>{t('dash.closuresNear')}</div>
       <div style={{ position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 13px', height: 42, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 11 }}>
           <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
@@ -146,7 +149,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => { if (results.length) setOpen(true); }}
-            placeholder="Search a barangay, street or landmark…"
+            placeholder={t('dash.searchPlaceholder')}
             style={{ border: 0, background: 'transparent', outline: 'none', fontSize: 13.5, width: '100%', color: 'var(--bw-ink)' }}
           />
           {query && (
@@ -163,7 +166,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
         {open && (searching || results.length > 0) && (
           <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 30, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 11, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
             {searching && results.length === 0 ? (
-              <div style={{ padding: '12px 14px', fontSize: 12.5, color: 'var(--bw-muted)' }}>Searching…</div>
+              <div style={{ padding: '12px 14px', fontSize: 12.5, color: 'var(--bw-muted)' }}>{t('dash.searching')}</div>
             ) : (
               results.map((r, i) => (
                 <button
@@ -183,7 +186,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
 
       {/* Impact-radius control */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 11, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)' }}>Impact radius</span>
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)' }}>{t('dash.impactRadius')}</span>
         {RADIUS_OPTIONS.map((km) => (
           <button
             key={km}
@@ -208,16 +211,16 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
       <div style={{ marginTop: 12 }}>
         {!place ? (
           <div style={{ padding: '22px 12px', textAlign: 'center', color: 'var(--bw-muted)', fontSize: 12.5, border: '1px dashed var(--bw-line)', borderRadius: 12 }}>
-            Search a location to see possible road closures within its impact radius.
+            {t('dash.searchPrompt')}
           </div>
         ) : nearbyClosures.length === 0 ? (
           <div style={{ padding: '22px 12px', textAlign: 'center', color: 'var(--bw-muted)', fontSize: 12.5, border: '1px dashed var(--bw-line)', borderRadius: 12 }}>
-            No road closures reported within {radiusKm} km of this location.
+            {t('dash.noClosures')} {radiusKm} km {t('dash.ofThisLocation')}
           </div>
         ) : (
           <>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 700, marginBottom: 8 }}>
-              {nearbyClosures.length} possible {nearbyClosures.length === 1 ? 'closure' : 'closures'} within {radiusKm} km
+              {nearbyClosures.length} {t('dash.possible')} {nearbyClosures.length === 1 ? t('dash.closure') : t('dash.closures')} {t('dash.within')} {radiusKm} km
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
               {nearbyClosures.map((c) => {
@@ -231,8 +234,8 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ display: 'block', fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
                       <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
-                        {c.distanceKm.toFixed(1)} km away · ~{c.depthCm} cm{c.inferred ? ' est.' : c.reportCount ? ` · ${c.reportCount === 1 ? '1 report' : `${c.reportCount} reports`}` : ''}
-                        {c.inferred && <span style={{ color: '#B45309', fontWeight: 700 }}> · inferred</span>}
+                        {c.distanceKm.toFixed(1)} km {t('dash.away')} · ~{c.depthCm} cm{c.inferred ? ` ${t('dash.est')}` : c.reportCount ? ` · ${c.reportCount} ${c.reportCount === 1 ? t('dash.report') : t('dash.reports')}` : ''}
+                        {c.inferred && <span style={{ color: '#B45309', fontWeight: 700 }}> · {t('dash.inferred')}</span>}
                       </span>
                     </span>
                     <ConditionPill status={c.status} />
@@ -249,13 +252,13 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
   const tableSection = (
     <div>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
-        <div style={{ fontSize: 13, fontWeight: 800 }}>Reports in the last 12 hours</div>
-        <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>Ordered by deepest water</div>
+        <div style={{ fontSize: 13, fontWeight: 800 }}>{t('dash.reports12h')}</div>
+        <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('dash.orderedByDepth')}</div>
       </div>
 
       {rows.length === 0 ? (
         <div style={{ padding: '26px 12px', textAlign: 'center', color: 'var(--bw-muted)', fontSize: 12.5, border: '1px dashed var(--bw-line)', borderRadius: 12 }}>
-          No flood reports in the last 12 hours.
+          {t('dash.noRecent')}
         </div>
       ) : (
         <>
@@ -265,11 +268,11 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                 <thead>
                   <tr>
                     <th style={{ ...th, width: 34, textAlign: 'right' }}>#</th>
-                    <th style={th}>City / Area</th>
-                    <th style={th}>District</th>
-                    <th style={th}>Report</th>
-                    <th style={{ ...th, textAlign: 'right' }}>Water level</th>
-                    <th style={{ ...th, textAlign: 'right' }}>Reported</th>
+                    <th style={th}>{t('dash.colCity')}</th>
+                    <th style={th}>{t('dash.colDistrict')}</th>
+                    <th style={th}>{t('dash.colReport')}</th>
+                    <th style={{ ...th, textAlign: 'right' }}>{t('dash.colWaterLevel')}</th>
+                    <th style={{ ...th, textAlign: 'right' }}>{t('dash.colReported')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -288,13 +291,13 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                         <td style={{ ...td, maxWidth: 220 }}>
                           <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</span>
                           {r.reportsCount > 1 && (
-                            <span style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{r.reportsCount} reports</span>
+                            <span style={{ fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>{r.reportsCount} {t('dash.reports')}</span>
                           )}
                         </td>
                         <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
                             <span style={{ fontWeight: 800, color: sev.color }}>{r.depthCm} cm</span>
-                            <span title={tm.label} style={{ color: tm.color, fontSize: 11 }}>{tm.sym}</span>
+                            <span title={trendLabel(lang, r.trend)} style={{ color: tm.color, fontSize: 11 }}>{tm.sym}</span>
                           </span>
                         </td>
                         <td style={{ ...td, textAlign: 'right', color: 'var(--bw-muted)', whiteSpace: 'nowrap' }}>{r.time}</td>
@@ -309,10 +312,10 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
           {/* Pagination */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--bw-muted)', fontWeight: 600 }}>
-              <span>Showing {rangeStart}–{rangeEnd} of {rows.length}</span>
+              <span>{t('dash.showing')} {rangeStart}–{rangeEnd} {t('dash.of')} {rows.length}</span>
               <span style={{ color: 'var(--bw-line)' }}>·</span>
               <label style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                Rows
+                {t('dash.rows')}
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
@@ -328,15 +331,15 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                 disabled={page === 0}
                 style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: '#fff', fontSize: 12.5, fontWeight: 700, color: page === 0 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page === 0 ? 'default' : 'pointer' }}
               >
-                Prev
+                {t('common.prev')}
               </button>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--bw-muted)', minWidth: 64, textAlign: 'center' }}>Page {page + 1} / {pageCount}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--bw-muted)', minWidth: 64, textAlign: 'center' }}>{t('dash.page')} {page + 1} / {pageCount}</span>
               <button
                 onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                 disabled={page >= pageCount - 1}
                 style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: '#fff', fontSize: 12.5, fontWeight: 700, color: page >= pageCount - 1 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           </div>
@@ -349,8 +352,8 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
     <div style={{ background: '#fff', borderRadius: isMobile ? '18px 18px 0 0' : 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)', display: 'flex', flexDirection: 'column', maxHeight: isMobile ? '92vh' : '88vh' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '16px 18px 12px', borderBottom: '1px solid var(--bw-line-soft)', flex: 'none' }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>Flood dashboard</div>
-          <div style={{ fontSize: 12, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>Live road closures &amp; reports · Metro Manila &amp; Rizal</div>
+          <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>{t('dash.title')}</div>
+          <div style={{ fontSize: 12, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>{t('dash.subtitle')}</div>
         </div>
         <button
           onClick={onClose}

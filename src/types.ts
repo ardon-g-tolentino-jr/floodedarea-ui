@@ -1,4 +1,4 @@
-// Single source of truth for BahaWatch domain types. Field names mirror the JSON
+// Single source of truth for FloodedArea domain types. Field names mirror the JSON
 // the baha-api returns (camelCase).
 
 export type Severity = 'high' | 'medium' | 'low';

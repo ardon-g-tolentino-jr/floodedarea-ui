@@ -1,5 +1,5 @@
 :root {
-  /* BahaWatch design tokens (from the BahaWatch.dc design) */
+  /* FloodedArea design tokens (from the original BahaWatch.dc design comp) */
   --bw-primary: #0ea5e9;
   --bw-primary-deep: #0369a1;
   --bw-shelter: #0e7490;
@@ -63,7 +63,7 @@ button {
   background: transparent;
 }
 
-/* ── Animations (lifted from the BahaWatch design) ── */
+/* ── Animations (lifted from the FloodedArea design) ── */
 @keyframes floodPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
