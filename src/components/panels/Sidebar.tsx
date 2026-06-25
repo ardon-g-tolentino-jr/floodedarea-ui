@@ -46,6 +46,8 @@ interface SidebarProps {
   totalCount: number;
   selectedReportId: number | null;
   onSelectReport: (id: number) => void;
+  /** Public all-time visit count; `null` while loading or if the stats endpoint is unavailable. */
+  visitCount: number | null;
 }
 
 const TONE: Record<SafetyStatus['tone'], { bg: string; border: string; title: string; badge: string }> = {
@@ -91,7 +93,7 @@ const CollapsibleSection: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount } = props;
   const tone = TONE[status.tone];
 
   const [openSections, setOpenSections] = React.useState<Record<SectionKey, boolean>>(() => {
@@ -348,6 +350,17 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>No reports match the active filters.</div>
         )}
       </div>
+
+      {/* FOOTER — public visit counter. Pinned to the sidebar bottom on desktop (the list above
+          takes the remaining height); flows after the list on mobile. Hidden until the count loads. */}
+      {visitCount != null && (
+        <div
+          title={`${visitCount.toLocaleString()} total visits`}
+          style={{ flex: 'none', borderTop: '1px solid var(--bw-line-soft)', padding: '10px 18px', textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)', letterSpacing: '.01em' }}
+        >
+          <span aria-hidden="true">👁</span> {visitCount.toLocaleString()} total visits
+        </div>
+      )}
     </div>
   );
 };

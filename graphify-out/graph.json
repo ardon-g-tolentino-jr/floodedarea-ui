@@ -2626,7 +2626,7 @@
       "label": "ICON_BTN",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L32",
+      "source_location": "L30",
       "id": "panels_topbar_icon_btn",
       "community": 3,
       "norm_label": "icon_btn"
@@ -2635,25 +2635,16 @@
       "label": "MenuItem()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L47",
+      "source_location": "L45",
       "id": "panels_topbar_menuitem",
       "community": 3,
       "norm_label": "menuitem()"
     },
     {
-      "label": "formatVisits()",
-      "file_type": "code",
-      "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L58",
-      "id": "panels_topbar_formatvisits",
-      "community": 3,
-      "norm_label": "formatvisits()"
-    },
-    {
       "label": "TopBar()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L65",
+      "source_location": "L55",
       "id": "panels_topbar_topbar",
       "community": 3,
       "norm_label": "topbar()"
@@ -3283,7 +3274,7 @@
       "label": "TONE",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L51",
+      "source_location": "L53",
       "id": "panels_sidebar_tone",
       "community": 21,
       "norm_label": "tone"
@@ -3292,7 +3283,7 @@
       "label": "fmtRadius()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L58",
+      "source_location": "L60",
       "id": "panels_sidebar_fmtradius",
       "community": 21,
       "norm_label": "fmtradius()"
@@ -3301,7 +3292,7 @@
       "label": "SectionKey",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L61",
+      "source_location": "L63",
       "id": "panels_sidebar_sectionkey",
       "community": 21,
       "norm_label": "sectionkey"
@@ -3310,7 +3301,7 @@
       "label": "DEFAULT_OPEN",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L65",
+      "source_location": "L67",
       "id": "panels_sidebar_default_open",
       "community": 21,
       "norm_label": "default_open"
@@ -3319,7 +3310,7 @@
       "label": "CollapsibleSection()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L68",
+      "source_location": "L70",
       "id": "panels_sidebar_collapsiblesection",
       "community": 21,
       "norm_label": "collapsiblesection()"
@@ -3328,7 +3319,7 @@
       "label": "Sidebar()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L93",
+      "source_location": "L95",
       "id": "panels_sidebar_sidebar",
       "community": 21,
       "norm_label": "sidebar()"
@@ -4484,6 +4475,15 @@
       "id": "src_buildinfo_build_time",
       "community": 3,
       "norm_label": "build_time"
+    },
+    {
+      "label": "formatVisits()",
+      "file_type": "code",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L58",
+      "community": 3,
+      "norm_label": "formatvisits()",
+      "id": "panels_topbar_formatvisits"
     },
     {
       "label": "STATUS_STYLE",
@@ -6277,9 +6277,9 @@
       "source_file": "mock-api/db.json",
       "source_location": "L406",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "mock_api_db_json",
-      "target": "mock_api_db_stats",
-      "confidence_score": 1.0
+      "target": "mock_api_db_stats"
     },
     {
       "relation": "contains",
@@ -6287,9 +6287,9 @@
       "source_file": "mock-api/db.json",
       "source_location": "L407",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "mock_api_db_stats",
-      "target": "mock_api_db_stats_visits",
-      "confidence_score": 1.0
+      "target": "mock_api_db_stats_visits"
     },
     {
       "relation": "contains",
@@ -6563,9 +6563,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "hooks_usevisitcounter_usevisitcounter",
-      "confidence_score": 1.0
+      "target": "hooks_usevisitcounter_usevisitcounter"
     },
     {
       "relation": "imports",
@@ -7039,9 +7039,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_hooks_usevisitcounter_ts",
-      "confidence_score": 1.0
+      "target": "src_hooks_usevisitcounter_ts"
     },
     {
       "relation": "imports",
@@ -8015,9 +8015,9 @@
       "source_file": "src/types.ts",
       "source_location": "L166",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_ts",
-      "target": "src_types_visitstats",
-      "confidence_score": 1.0
+      "target": "src_types_visitstats"
     },
     {
       "relation": "imports_from",
@@ -9577,9 +9577,9 @@
       "source_file": "src/api/queries.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_queries_ts",
-      "target": "src_types_visitstats",
-      "confidence_score": 1.0
+      "target": "src_types_visitstats"
     },
     {
       "relation": "imports_from",
@@ -12418,9 +12418,9 @@
       "source_file": "src/components/panels/TopBar.tsx",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_topbar_tsx",
-      "target": "panels_topbar_formatvisits",
-      "confidence_score": 1.0
+      "target": "panels_topbar_formatvisits"
     },
     {
       "relation": "contains",
@@ -12546,9 +12546,9 @@
       "source_file": "src/components/panels/TopBar.tsx",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_topbar_topbar",
-      "target": "panels_topbar_formatvisits",
-      "confidence_score": 1.0
+      "target": "panels_topbar_formatvisits"
     },
     {
       "relation": "contains",
@@ -13868,9 +13868,9 @@
       "source_file": "src/hooks/useVisitCounter.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_hooks_usevisitcounter_ts",
-      "target": "api_queries_mutations",
-      "confidence_score": 1.0
+      "target": "api_queries_mutations"
     },
     {
       "relation": "imports",
@@ -13879,9 +13879,9 @@
       "source_file": "src/hooks/useVisitCounter.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_hooks_usevisitcounter_ts",
-      "target": "api_queries_rawapi",
-      "confidence_score": 1.0
+      "target": "api_queries_rawapi"
     },
     {
       "relation": "contains",
@@ -13889,9 +13889,9 @@
       "source_file": "src/hooks/useVisitCounter.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_hooks_usevisitcounter_ts",
-      "target": "hooks_usevisitcounter_usevisitcounter",
-      "confidence_score": 1.0
+      "target": "hooks_usevisitcounter_usevisitcounter"
     },
     {
       "relation": "imports_from",
@@ -13900,9 +13900,9 @@
       "source_file": "src/hooks/useVisitCounter.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_hooks_usevisitcounter_ts",
-      "target": "src_api_queries_ts",
-      "confidence_score": 1.0
+      "target": "src_api_queries_ts"
     },
     {
       "relation": "imports",
@@ -14838,5 +14838,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b8cfc8f7e1f9282da4d630847e230b9dd3d6149f"
+  "built_at_commit": "d267459d39881fe868869f2be54db227bf774987"
 }

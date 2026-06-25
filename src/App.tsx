@@ -833,7 +833,6 @@ const App: React.FC = () => {
       <TopBar
         regionLabel={REGION_LABEL}
         isMobile={isMobile}
-        visitCount={visitCount}
         auth={auth}
         onReport={startReport}
         onShare={() => setShareOpen(true)}
@@ -974,6 +973,7 @@ const App: React.FC = () => {
           totalCount={totalCount}
           selectedReportId={selectedReportId}
           onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
+          visitCount={visitCount}
         />
       </div>
 

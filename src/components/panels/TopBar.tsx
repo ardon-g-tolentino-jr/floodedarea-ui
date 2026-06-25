@@ -7,8 +7,6 @@ import SearchBox from './SearchBox';
 interface TopBarProps {
   regionLabel: string;
   isMobile: boolean;
-  /** Public all-time visit count; `null` while loading or if the stats endpoint is unavailable. */
-  visitCount: number | null;
   auth: AuthState | null;
   onReport: () => void;
   onShare: () => void;
@@ -54,18 +52,9 @@ const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void }> =
   </button>
 );
 
-/** Compact visit count: "1.2k" / "3.4M" on tight screens, grouped digits otherwise. */
-function formatVisits(n: number, compact: boolean): string {
-  if (!compact) return n.toLocaleString();
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
-  return String(n);
-}
-
 const TopBar: React.FC<TopBarProps> = ({
   regionLabel,
   isMobile,
-  visitCount,
   auth,
   onReport,
   onShare,
@@ -85,34 +74,6 @@ const TopBar: React.FC<TopBarProps> = ({
   onShowFeatures,
 }) => {
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
-
-  // Subtle "people have been here" chip. Hidden until the count loads (visitCount === null).
-  const visitChip =
-    visitCount == null ? null : (
-      <span
-        title={`${visitCount.toLocaleString()} total visits`}
-        aria-label={`${visitCount.toLocaleString()} total visits`}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          flex: 'none',
-          padding: isMobile ? '3px 7px' : '2px 8px',
-          borderRadius: 999,
-          background: 'var(--bw-bg-subtle)',
-          border: '1px solid var(--bw-line)',
-          color: 'var(--bw-muted)',
-          fontSize: isMobile ? 10.5 : 11,
-          fontWeight: 700,
-          lineHeight: 1.3,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <span aria-hidden="true">👁</span>
-        {formatVisits(visitCount, isMobile)}
-        {!isMobile && ' visits'}
-      </span>
-    );
 
   // On mobile the secondary actions collapse into this overflow menu so the bar fits any viewport.
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -268,11 +229,8 @@ const TopBar: React.FC<TopBarProps> = ({
             >
               {BUILD_LABEL}
             </button>
-            {visitChip && <div style={{ marginTop: 4 }}>{visitChip}</div>}
           </div>
         )}
-        {/* Mobile: the wordmark is hidden, so the visit chip sits next to the logo mark. */}
-        {isMobile && visitChip}
       </div>
 
       {/* Location search */}
