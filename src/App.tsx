@@ -205,19 +205,30 @@ const App: React.FC = () => {
   }, []);
 
   // Try to use the device location (falls back to the default monitoring area).
+  const didAutoCenter = React.useRef(false);
   React.useEffect(() => {
     // Let the fix converge in the background and keep the best reading; the map's "You" marker
     // and accuracy ring follow each improvement. On failure we keep the default monitoring area.
+    //
+    // Center the map on the user the first time a fix lands so their location shows automatically
+    // (same effect as the locate button) — but only once, and never yank them away from a place
+    // they already searched/selected while the fix was still converging (`prev ?? …`).
+    const autoCenter = (lat: number, lng: number): void => {
+      if (didAutoCenter.current) return;
+      didAutoCenter.current = true;
+      setMapFocus((prev) => prev ?? { lat, lng, key: Date.now() });
+    };
     void locateWithAccuracy({
       desiredAccuracyM: 60,
       totalTimeoutMs: 10000,
       onProgress: (fix) => {
         setUserLoc({ lat: fix.lat, lng: fix.lng });
         setUserAccuracyM(fix.accuracyM);
+        autoCenter(fix.lat, fix.lng);
       },
     }).then(
-      (fix) => { setUserLoc({ lat: fix.lat, lng: fix.lng }); setUserAccuracyM(fix.accuracyM); },
-      () => {/* keep default */}
+      (fix) => { setUserLoc({ lat: fix.lat, lng: fix.lng }); setUserAccuracyM(fix.accuracyM); autoCenter(fix.lat, fix.lng); },
+      () => {/* keep default; the locate button is still available */}
     );
   }, []);
 
