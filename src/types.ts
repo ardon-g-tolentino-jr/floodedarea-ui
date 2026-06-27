@@ -7,7 +7,9 @@ export type Road = 'impassable' | 'risky' | 'passable';
 export type ReportStatus = 'active' | 'resolved';
 export type AlertLevel = 'yellow' | 'orange' | 'red';
 export type RescueStatus = 'pending' | 'dispatched' | 'resolved';
-export type UserRole = 'CITIZEN' | 'ADMIN';
+export type UserRole = 'CITIZEN' | 'ADMIN' | 'GUEST';
+/** How much we trust the report's author: a full account vs. a no-login guest/device session. */
+export type ReporterTrust = 'verified' | 'guest';
 
 export interface FloodReport {
   id: number;
@@ -22,6 +24,8 @@ export interface FloodReport {
   reportsCount: number;
   status: ReportStatus;
   reporterUserId: number | null;
+  /** Backend-provided author trust. Absent (older payloads) is treated as 'verified'. */
+  reporterTrust?: ReporterTrust;
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +88,8 @@ export interface NewReport {
   depthCm: number;
   trend: Trend;
   road: Road;
+  /** Anti-abuse CAPTCHA proof, sent only for guest submissions when Turnstile is configured. */
+  captchaToken?: string;
 }
 
 /**

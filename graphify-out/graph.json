@@ -1339,7 +1339,7 @@
       "label": "loadNotifyPrefs()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L59",
+      "source_location": "L63",
       "id": "src_app_loadnotifyprefs",
       "community": 5,
       "norm_label": "loadnotifyprefs()"
@@ -1348,7 +1348,7 @@
       "label": "loadLivePref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L68",
+      "source_location": "L72",
       "id": "src_app_loadlivepref",
       "community": 5,
       "norm_label": "loadlivepref()"
@@ -1357,7 +1357,7 @@
       "label": "DEFAULT_LOCATION",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L76",
+      "source_location": "L80",
       "id": "src_app_default_location",
       "community": 5,
       "norm_label": "default_location"
@@ -1366,7 +1366,7 @@
       "label": "PendingPin",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L78",
+      "source_location": "L82",
       "id": "src_app_pendingpin",
       "community": 5,
       "norm_label": "pendingpin"
@@ -1375,7 +1375,7 @@
       "label": "AlertDialog",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L82",
+      "source_location": "L86",
       "id": "src_app_alertdialog",
       "community": 5,
       "norm_label": "alertdialog"
@@ -1384,7 +1384,7 @@
       "label": "SEV_TO_LEVEL",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L85",
+      "source_location": "L89",
       "id": "src_app_sev_to_level",
       "community": 5,
       "norm_label": "sev_to_level"
@@ -1393,7 +1393,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L87",
+      "source_location": "L91",
       "id": "src_app_app",
       "community": 5,
       "norm_label": "app()"
@@ -1519,7 +1519,7 @@
       "label": "MsgKey",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L238",
+      "source_location": "L290",
       "id": "src_i18n_msgkey",
       "community": 8,
       "norm_label": "msgkey"
@@ -1528,7 +1528,7 @@
       "label": "translate()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L240",
+      "source_location": "L292",
       "id": "src_i18n_translate",
       "community": 8,
       "norm_label": "translate()"
@@ -1537,7 +1537,7 @@
       "label": "tFormat()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L247",
+      "source_location": "L299",
       "id": "src_i18n_tformat",
       "community": 8,
       "norm_label": "tformat()"
@@ -1546,7 +1546,7 @@
       "label": "sevLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L255",
+      "source_location": "L307",
       "id": "src_i18n_sevlabel",
       "community": 8,
       "norm_label": "sevlabel()"
@@ -1555,7 +1555,7 @@
       "label": "roadLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L258",
+      "source_location": "L310",
       "id": "src_i18n_roadlabel",
       "community": 8,
       "norm_label": "roadlabel()"
@@ -1564,7 +1564,7 @@
       "label": "roadShort()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L261",
+      "source_location": "L313",
       "id": "src_i18n_roadshort",
       "community": 8,
       "norm_label": "roadshort()"
@@ -1573,7 +1573,7 @@
       "label": "trendLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L264",
+      "source_location": "L316",
       "id": "src_i18n_trendlabel",
       "community": 8,
       "norm_label": "trendlabel()"
@@ -1582,7 +1582,7 @@
       "label": "useI18n()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L269",
+      "source_location": "L321",
       "id": "src_i18n_usei18n",
       "community": 8,
       "norm_label": "usei18n()"
@@ -1620,7 +1620,7 @@
       "source_file": "src/types.ts",
       "source_location": "L6",
       "id": "src_types_road",
-      "community": 21,
+      "community": 8,
       "norm_label": "road"
     },
     {
@@ -1647,7 +1647,7 @@
       "source_file": "src/types.ts",
       "source_location": "L9",
       "id": "src_types_rescuestatus",
-      "community": 13,
+      "community": 2,
       "norm_label": "rescuestatus"
     },
     {
@@ -1660,19 +1660,28 @@
       "norm_label": "userrole"
     },
     {
-      "label": "FloodReport",
+      "label": "ReporterTrust",
       "file_type": "code",
       "source_file": "src/types.ts",
       "source_location": "L12",
+      "id": "src_types_reportertrust",
+      "community": 2,
+      "norm_label": "reportertrust"
+    },
+    {
+      "label": "FloodReport",
+      "file_type": "code",
+      "source_file": "src/types.ts",
+      "source_location": "L14",
       "id": "src_types_floodreport",
-      "community": 21,
+      "community": 8,
       "norm_label": "floodreport"
     },
     {
       "label": "EvacuationCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L29",
+      "source_location": "L33",
       "id": "src_types_evacuationcenter",
       "community": 2,
       "norm_label": "evacuationcenter"
@@ -1681,7 +1690,7 @@
       "label": "Hotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L39",
+      "source_location": "L43",
       "id": "src_types_hotline",
       "community": 2,
       "norm_label": "hotline"
@@ -1690,7 +1699,7 @@
       "label": "FloodAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L47",
+      "source_location": "L51",
       "id": "src_types_floodalert",
       "community": 2,
       "norm_label": "floodalert"
@@ -1699,25 +1708,25 @@
       "label": "LatLng",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L58",
+      "source_location": "L62",
       "id": "src_types_latlng",
-      "community": 20,
+      "community": 6,
       "norm_label": "latlng"
     },
     {
       "label": "RoadSegment",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L68",
+      "source_location": "L72",
       "id": "src_types_roadsegment",
-      "community": 13,
+      "community": 2,
       "norm_label": "roadsegment"
     },
     {
       "label": "NewReport",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L78",
+      "source_location": "L82",
       "id": "src_types_newreport",
       "community": 2,
       "norm_label": "newreport"
@@ -1726,16 +1735,16 @@
       "label": "RescueRequest",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L93",
+      "source_location": "L99",
       "id": "src_types_rescuerequest",
-      "community": 13,
+      "community": 2,
       "norm_label": "rescuerequest"
     },
     {
       "label": "NewRescue",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L107",
+      "source_location": "L113",
       "id": "src_types_newrescue",
       "community": 2,
       "norm_label": "newrescue"
@@ -1744,7 +1753,7 @@
       "label": "NewCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L117",
+      "source_location": "L123",
       "id": "src_types_newcenter",
       "community": 2,
       "norm_label": "newcenter"
@@ -1753,7 +1762,7 @@
       "label": "NewHotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L124",
+      "source_location": "L130",
       "id": "src_types_newhotline",
       "community": 2,
       "norm_label": "newhotline"
@@ -1762,7 +1771,7 @@
       "label": "NewAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L131",
+      "source_location": "L137",
       "id": "src_types_newalert",
       "community": 2,
       "norm_label": "newalert"
@@ -1771,7 +1780,7 @@
       "label": "FeedbackType",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L139",
+      "source_location": "L145",
       "id": "src_types_feedbacktype",
       "community": 2,
       "norm_label": "feedbacktype"
@@ -1780,7 +1789,7 @@
       "label": "FeedbackStatus",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L140",
+      "source_location": "L146",
       "id": "src_types_feedbackstatus",
       "community": 2,
       "norm_label": "feedbackstatus"
@@ -1789,7 +1798,7 @@
       "label": "Feedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L146",
+      "source_location": "L152",
       "id": "src_types_feedback",
       "community": 2,
       "norm_label": "feedback"
@@ -1798,7 +1807,7 @@
       "label": "NewFeedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L159",
+      "source_location": "L165",
       "id": "src_types_newfeedback",
       "community": 2,
       "norm_label": "newfeedback"
@@ -1807,7 +1816,7 @@
       "label": "VisitStats",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L166",
+      "source_location": "L172",
       "id": "src_types_visitstats",
       "community": 2,
       "norm_label": "visitstats"
@@ -1820,6 +1829,42 @@
       "id": "src_vite_env_d_ts",
       "community": 18,
       "norm_label": "vite-env.d.ts"
+    },
+    {
+      "label": "geolocate.ts",
+      "file_type": "code",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L1",
+      "id": "src_utils_geolocate_ts",
+      "community": 5,
+      "norm_label": "geolocate.ts"
+    },
+    {
+      "label": "Fix",
+      "file_type": "code",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L7",
+      "id": "utils_geolocate_fix",
+      "community": 5,
+      "norm_label": "fix"
+    },
+    {
+      "label": "LocateOptions",
+      "file_type": "code",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L14",
+      "id": "utils_geolocate_locateoptions",
+      "community": 5,
+      "norm_label": "locateoptions"
+    },
+    {
+      "label": "locateWithAccuracy()",
+      "file_type": "code",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L28",
+      "id": "utils_geolocate_locatewithaccuracy",
+      "community": 5,
+      "norm_label": "locatewithaccuracy()"
     },
     {
       "label": "waterChart.ts",
@@ -1863,7 +1908,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L42",
       "id": "utils_waterchart_buildwaterchart",
-      "community": 21,
+      "community": 20,
       "norm_label": "buildwaterchart()"
     },
     {
@@ -1890,7 +1935,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L127",
       "id": "utils_waterchart_builddailywaterbars",
-      "community": 20,
+      "community": 21,
       "norm_label": "builddailywaterbars()"
     },
     {
@@ -1966,12 +2011,57 @@
       "norm_label": "buildsharelinks()"
     },
     {
+      "label": "locationHelp.ts",
+      "file_type": "code",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L1",
+      "id": "src_utils_locationhelp_ts",
+      "community": 8,
+      "norm_label": "locationhelp.ts"
+    },
+    {
+      "label": "HelpBucket",
+      "file_type": "code",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L8",
+      "id": "utils_locationhelp_helpbucket",
+      "community": 8,
+      "norm_label": "helpbucket"
+    },
+    {
+      "label": "detectHelpBucket()",
+      "file_type": "code",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L11",
+      "id": "utils_locationhelp_detecthelpbucket",
+      "community": 8,
+      "norm_label": "detecthelpbucket()"
+    },
+    {
+      "label": "STEPS",
+      "file_type": "code",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L28",
+      "id": "utils_locationhelp_steps",
+      "community": 8,
+      "norm_label": "steps"
+    },
+    {
+      "label": "locationHelpSteps()",
+      "file_type": "code",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L38",
+      "id": "utils_locationhelp_locationhelpsteps",
+      "community": 8,
+      "norm_label": "locationhelpsteps()"
+    },
+    {
       "label": "viewModel.ts",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L1",
       "id": "src_utils_viewmodel_ts",
-      "community": 21,
+      "community": 13,
       "norm_label": "viewmodel.ts"
     },
     {
@@ -1980,7 +2070,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L20",
       "id": "utils_viewmodel_affectedradiuskm",
-      "community": 13,
+      "community": 23,
       "norm_label": "affectedradiuskm()"
     },
     {
@@ -1989,7 +2079,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L29",
       "id": "utils_viewmodel_affectedriseratio",
-      "community": 21,
+      "community": 20,
       "norm_label": "affectedriseratio()"
     },
     {
@@ -1998,7 +2088,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L57",
       "id": "utils_viewmodel_report_ttl_min",
-      "community": 21,
+      "community": 13,
       "norm_label": "report_ttl_min"
     },
     {
@@ -2007,68 +2097,68 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L66",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 21,
+      "community": 0,
       "norm_label": "enrichedreport"
     },
     {
       "label": "SafetyStatus",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L78",
+      "source_location": "L80",
       "id": "utils_viewmodel_safetystatus",
-      "community": 21,
+      "community": 8,
       "norm_label": "safetystatus"
     },
     {
       "label": "enrichReports()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L87",
+      "source_location": "L89",
       "id": "utils_viewmodel_enrichreports",
-      "community": 21,
+      "community": 13,
       "norm_label": "enrichreports()"
     },
     {
       "label": "RoadEntry",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L120",
+      "source_location": "L123",
       "id": "utils_viewmodel_roadentry",
-      "community": 21,
+      "community": 8,
       "norm_label": "roadentry"
     },
     {
       "label": "DistrictRoads",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L137",
+      "source_location": "L140",
       "id": "utils_viewmodel_districtroads",
-      "community": 21,
+      "community": 8,
       "norm_label": "districtroads"
     },
     {
       "label": "buildRoadDirectory()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L150",
+      "source_location": "L153",
       "id": "utils_viewmodel_buildroaddirectory",
-      "community": 6,
+      "community": 13,
       "norm_label": "buildroaddirectory()"
     },
     {
       "label": "PossibleClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L217",
+      "source_location": "L224",
       "id": "utils_viewmodel_possibleclosure",
-      "community": 21,
+      "community": 8,
       "norm_label": "possibleclosure"
     },
     {
       "label": "buildPossibleClosures()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L233",
+      "source_location": "L240",
       "id": "utils_viewmodel_buildpossibleclosures",
       "community": 6,
       "norm_label": "buildpossibleclosures()"
@@ -2077,52 +2167,52 @@
       "label": "RescueDistrictCount",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L257",
+      "source_location": "L264",
       "id": "utils_viewmodel_rescuedistrictcount",
-      "community": 21,
+      "community": 13,
       "norm_label": "rescuedistrictcount"
     },
     {
       "label": "rescueCountsByDistrict()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L263",
+      "source_location": "L270",
       "id": "utils_viewmodel_rescuecountsbydistrict",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescuecountsbydistrict()"
     },
     {
       "label": "localDateKey()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L275",
+      "source_location": "L282",
       "id": "utils_viewmodel_localdatekey",
-      "community": 20,
+      "community": 21,
       "norm_label": "localdatekey()"
     },
     {
       "label": "rescuesOnLocalDate()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L284",
+      "source_location": "L291",
       "id": "utils_viewmodel_rescuesonlocaldate",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescuesonlocaldate()"
     },
     {
       "label": "EnrichedRescue",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L292",
+      "source_location": "L299",
       "id": "utils_viewmodel_enrichedrescue",
-      "community": 13,
+      "community": 23,
       "norm_label": "enrichedrescue"
     },
     {
       "label": "enrichRescues()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L305",
+      "source_location": "L312",
       "id": "utils_viewmodel_enrichrescues",
       "community": 13,
       "norm_label": "enrichrescues()"
@@ -2131,7 +2221,7 @@
       "label": "rescueQueue()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L328",
+      "source_location": "L335",
       "id": "utils_viewmodel_rescuequeue",
       "community": 13,
       "norm_label": "rescuequeue()"
@@ -2140,7 +2230,7 @@
       "label": "DistrictHotspot",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L334",
+      "source_location": "L341",
       "id": "utils_viewmodel_districthotspot",
       "community": 21,
       "norm_label": "districthotspot"
@@ -2149,7 +2239,7 @@
       "label": "districtHotspots()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L348",
+      "source_location": "L355",
       "id": "utils_viewmodel_districthotspots",
       "community": 13,
       "norm_label": "districthotspots()"
@@ -2158,16 +2248,16 @@
       "label": "SurgeBucket",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L377",
+      "source_location": "L384",
       "id": "utils_viewmodel_surgebucket",
-      "community": 21,
+      "community": 13,
       "norm_label": "surgebucket"
     },
     {
       "label": "hourlySurge()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L385",
+      "source_location": "L392",
       "id": "utils_viewmodel_hourlysurge",
       "community": 13,
       "norm_label": "hourlysurge()"
@@ -2176,34 +2266,34 @@
       "label": "localityParts()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L417",
+      "source_location": "L424",
       "id": "utils_viewmodel_localityparts",
-      "community": 21,
+      "community": 13,
       "norm_label": "localityparts()"
     },
     {
       "label": "NearbyClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L425",
+      "source_location": "L432",
       "id": "utils_viewmodel_nearbyclosure",
-      "community": 21,
+      "community": 8,
       "norm_label": "nearbyclosure"
     },
     {
       "label": "closuresNearLocation()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L443",
+      "source_location": "L450",
       "id": "utils_viewmodel_closuresnearlocation",
-      "community": 20,
+      "community": 6,
       "norm_label": "closuresnearlocation()"
     },
     {
       "label": "RecentReportRow",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L494",
+      "source_location": "L501",
       "id": "utils_viewmodel_recentreportrow",
       "community": 21,
       "norm_label": "recentreportrow"
@@ -2212,25 +2302,25 @@
       "label": "recentReportRows()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L514",
+      "source_location": "L521",
       "id": "utils_viewmodel_recentreportrows",
-      "community": 21,
+      "community": 13,
       "norm_label": "recentreportrows()"
     },
     {
       "label": "RANK",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L542",
+      "source_location": "L549",
       "id": "utils_viewmodel_rank",
-      "community": 21,
+      "community": 13,
       "norm_label": "rank"
     },
     {
       "label": "computeStatus()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L544",
+      "source_location": "L551",
       "id": "utils_viewmodel_computestatus",
       "community": 8,
       "norm_label": "computestatus()"
@@ -2277,7 +2367,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L1",
       "id": "src_utils_floodmeta_ts",
-      "community": 21,
+      "community": 20,
       "norm_label": "floodmeta.ts"
     },
     {
@@ -2286,7 +2376,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 21,
+      "community": 0,
       "norm_label": "sevmeta"
     },
     {
@@ -2313,7 +2403,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L25",
       "id": "utils_floodmeta_road_meta",
-      "community": 21,
+      "community": 20,
       "norm_label": "road_meta"
     },
     {
@@ -2322,7 +2412,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L32",
       "id": "utils_floodmeta_road_order",
-      "community": 21,
+      "community": 20,
       "norm_label": "road_order"
     },
     {
@@ -2331,7 +2421,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L34",
       "id": "utils_floodmeta_sev_rank",
-      "community": 21,
+      "community": 20,
       "norm_label": "sev_rank"
     },
     {
@@ -2340,7 +2430,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L41",
       "id": "utils_floodmeta_rescue_status_meta",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescue_status_meta"
     },
     {
@@ -2349,7 +2439,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L48",
       "id": "utils_floodmeta_rescue_status_rank",
-      "community": 21,
+      "community": 20,
       "norm_label": "rescue_status_rank"
     },
     {
@@ -2358,7 +2448,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L51",
       "id": "utils_floodmeta_road_rank",
-      "community": 21,
+      "community": 20,
       "norm_label": "road_rank"
     },
     {
@@ -2367,7 +2457,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L61",
       "id": "utils_floodmeta_roadfromdepth",
-      "community": 6,
+      "community": 13,
       "norm_label": "roadfromdepth()"
     },
     {
@@ -2376,7 +2466,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L68",
       "id": "utils_floodmeta_district_colors",
-      "community": 13,
+      "community": 24,
       "norm_label": "district_colors"
     },
     {
@@ -2385,7 +2475,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L71",
       "id": "utils_floodmeta_depth_ticks",
-      "community": 20,
+      "community": 21,
       "norm_label": "depth_ticks"
     },
     {
@@ -2394,7 +2484,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L78",
       "id": "utils_floodmeta_advice",
-      "community": 21,
+      "community": 20,
       "norm_label": "advice"
     },
     {
@@ -2421,7 +2511,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L99",
       "id": "utils_floodmeta_waterseries",
-      "community": 21,
+      "community": 20,
       "norm_label": "waterseries()"
     },
     {
@@ -2430,7 +2520,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L115",
       "id": "utils_floodmeta_sparkpaths",
-      "community": 21,
+      "community": 20,
       "norm_label": "sparkpaths()"
     },
     {
@@ -2439,8 +2529,71 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L125",
       "id": "utils_floodmeta_trendnote",
-      "community": 21,
+      "community": 20,
       "norm_label": "trendnote()"
+    },
+    {
+      "label": "turnstile.ts",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L1",
+      "id": "src_utils_turnstile_ts",
+      "community": 5,
+      "norm_label": "turnstile.ts"
+    },
+    {
+      "label": "SITE_KEY",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L7",
+      "id": "utils_turnstile_site_key",
+      "community": 5,
+      "norm_label": "site_key"
+    },
+    {
+      "label": "captchaEnabled()",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L10",
+      "id": "utils_turnstile_captchaenabled",
+      "community": 5,
+      "norm_label": "captchaenabled()"
+    },
+    {
+      "label": "TurnstileApi",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L14",
+      "id": "utils_turnstile_turnstileapi",
+      "community": 5,
+      "norm_label": "turnstileapi"
+    },
+    {
+      "label": "Window",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L20",
+      "id": "utils_turnstile_window",
+      "community": 5,
+      "norm_label": "window"
+    },
+    {
+      "label": "loadScript()",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L26",
+      "id": "utils_turnstile_loadscript",
+      "community": 5,
+      "norm_label": "loadscript()"
+    },
+    {
+      "label": "getCaptchaToken()",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L45",
+      "id": "utils_turnstile_getcaptchatoken",
+      "community": 5,
+      "norm_label": "getcaptchatoken()"
     },
     {
       "label": "roadSnap.ts",
@@ -2475,7 +2628,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L11",
       "id": "utils_roadsnap_snappedroad",
-      "community": 20,
+      "community": 6,
       "norm_label": "snappedroad"
     },
     {
@@ -2502,7 +2655,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L27",
       "id": "utils_roadsnap_road",
-      "community": 20,
+      "community": 6,
       "norm_label": "road"
     },
     {
@@ -2574,7 +2727,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L132",
       "id": "utils_roadsnap_nearbyroad",
-      "community": 20,
+      "community": 6,
       "norm_label": "nearbyroad"
     },
     {
@@ -2610,7 +2763,7 @@
       "source_file": "src/utils/geo.ts",
       "source_location": "L1",
       "id": "src_utils_geo_ts",
-      "community": 20,
+      "community": 6,
       "norm_label": "geo.ts"
     },
     {
@@ -2619,7 +2772,7 @@
       "source_file": "src/utils/geo.ts",
       "source_location": "L5",
       "id": "utils_geo_torad",
-      "community": 20,
+      "community": 6,
       "norm_label": "torad()"
     },
     {
@@ -2628,7 +2781,7 @@
       "source_file": "src/utils/geo.ts",
       "source_location": "L10",
       "id": "utils_geo_kmbetween",
-      "community": 20,
+      "community": 6,
       "norm_label": "kmbetween()"
     },
     {
@@ -2637,7 +2790,7 @@
       "source_file": "src/utils/geo.ts",
       "source_location": "L22",
       "id": "utils_geo_walkminutes",
-      "community": 20,
+      "community": 6,
       "norm_label": "walkminutes()"
     },
     {
@@ -2713,12 +2866,39 @@
       "norm_label": "feedbackformmodal()"
     },
     {
+      "label": "LocationHelpModal.tsx",
+      "file_type": "code",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L1",
+      "id": "src_components_panels_locationhelpmodal_tsx",
+      "community": 8,
+      "norm_label": "locationhelpmodal.tsx"
+    },
+    {
+      "label": "LocationHelpModalProps",
+      "file_type": "code",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L5",
+      "id": "panels_locationhelpmodal_locationhelpmodalprops",
+      "community": 8,
+      "norm_label": "locationhelpmodalprops"
+    },
+    {
+      "label": "LocationHelpModal()",
+      "file_type": "code",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L16",
+      "id": "panels_locationhelpmodal_locationhelpmodal",
+      "community": 8,
+      "norm_label": "locationhelpmodal()"
+    },
+    {
       "label": "PublicDashboardModal.tsx",
       "file_type": "code",
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_publicdashboardmodal_tsx",
-      "community": 21,
+      "community": 8,
       "norm_label": "publicdashboardmodal.tsx"
     },
     {
@@ -2727,7 +2907,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L9",
       "id": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "community": 21,
+      "community": 8,
       "norm_label": "publicdashboardmodalprops"
     },
     {
@@ -2736,7 +2916,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L24",
       "id": "panels_publicdashboardmodal_radius_options",
-      "community": 21,
+      "community": 8,
       "norm_label": "radius_options"
     },
     {
@@ -2745,7 +2925,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L26",
       "id": "panels_publicdashboardmodal_page_size_options",
-      "community": 21,
+      "community": 8,
       "norm_label": "page_size_options"
     },
     {
@@ -2788,7 +2968,7 @@
       "label": "ICON_BTN",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L30",
+      "source_location": "L32",
       "id": "panels_topbar_icon_btn",
       "community": 3,
       "norm_label": "icon_btn"
@@ -2797,7 +2977,7 @@
       "label": "MenuItem()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L45",
+      "source_location": "L47",
       "id": "panels_topbar_menuitem",
       "community": 3,
       "norm_label": "menuitem()"
@@ -2806,7 +2986,7 @@
       "label": "TopBar()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L55",
+      "source_location": "L57",
       "id": "panels_topbar_topbar",
       "community": 3,
       "norm_label": "topbar()"
@@ -2817,7 +2997,7 @@
       "source_file": "src/components/panels/EvacDetailCard.tsx",
       "source_location": "L1",
       "id": "src_components_panels_evacdetailcard_tsx",
-      "community": 20,
+      "community": 6,
       "norm_label": "evacdetailcard.tsx"
     },
     {
@@ -2826,7 +3006,7 @@
       "source_file": "src/components/panels/EvacDetailCard.tsx",
       "source_location": "L6",
       "id": "panels_evacdetailcard_evacdetailcardprops",
-      "community": 20,
+      "community": 6,
       "norm_label": "evacdetailcardprops"
     },
     {
@@ -2835,7 +3015,7 @@
       "source_file": "src/components/panels/EvacDetailCard.tsx",
       "source_location": "L13",
       "id": "panels_evacdetailcard_evacdetailcard",
-      "community": 20,
+      "community": 6,
       "norm_label": "evacdetailcard()"
     },
     {
@@ -2844,7 +3024,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_notifymodal_tsx",
-      "community": 8,
+      "community": 21,
       "norm_label": "notifymodal.tsx"
     },
     {
@@ -2853,7 +3033,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L8",
       "id": "panels_notifymodal_notifyprefs",
-      "community": 8,
+      "community": 21,
       "norm_label": "notifyprefs"
     },
     {
@@ -2862,7 +3042,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L14",
       "id": "panels_notifymodal_default_notify_prefs",
-      "community": 8,
+      "community": 21,
       "norm_label": "default_notify_prefs"
     },
     {
@@ -2871,7 +3051,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L20",
       "id": "panels_notifymodal_fmtkm",
-      "community": 8,
+      "community": 21,
       "norm_label": "fmtkm()"
     },
     {
@@ -2880,7 +3060,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L23",
       "id": "panels_notifymodal_notifymodalprops",
-      "community": 8,
+      "community": 21,
       "norm_label": "notifymodalprops"
     },
     {
@@ -2889,7 +3069,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L31",
       "id": "panels_notifymodal_sev_order",
-      "community": 8,
+      "community": 21,
       "norm_label": "sev_order"
     },
     {
@@ -2898,7 +3078,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L33",
       "id": "panels_notifymodal_notifymodal",
-      "community": 8,
+      "community": 21,
       "norm_label": "notifymodal()"
     },
     {
@@ -2961,7 +3141,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_roadconditionsmodal_tsx",
-      "community": 21,
+      "community": 8,
       "norm_label": "roadconditionsmodal.tsx"
     },
     {
@@ -2970,7 +3150,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L5",
       "id": "panels_roadconditionsmodal_roadconditionsmodalprops",
-      "community": 21,
+      "community": 8,
       "norm_label": "roadconditionsmodalprops"
     },
     {
@@ -2979,7 +3159,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L17",
       "id": "panels_roadconditionsmodal_roadconditionsmodal",
-      "community": 21,
+      "community": 8,
       "norm_label": "roadconditionsmodal()"
     },
     {
@@ -2988,7 +3168,7 @@
       "source_file": "src/components/panels/ShelterIcon.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sheltericon_tsx",
-      "community": 20,
+      "community": 6,
       "norm_label": "sheltericon.tsx"
     },
     {
@@ -2997,7 +3177,7 @@
       "source_file": "src/components/panels/ShelterIcon.tsx",
       "source_location": "L4",
       "id": "panels_sheltericon_sheltericon",
-      "community": 20,
+      "community": 6,
       "norm_label": "sheltericon()"
     },
     {
@@ -3019,13 +3199,22 @@
       "norm_label": "searchboxprops"
     },
     {
-      "label": "SearchBox()",
+      "label": "SearchBoxHandle",
       "file_type": "code",
       "source_file": "src/components/panels/SearchBox.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
+      "id": "panels_searchbox_searchboxhandle",
+      "community": 3,
+      "norm_label": "searchboxhandle"
+    },
+    {
+      "label": "SearchBox",
+      "file_type": "code",
+      "source_file": "src/components/panels/SearchBox.tsx",
+      "source_location": "L18",
       "id": "panels_searchbox_searchbox",
       "community": 3,
-      "norm_label": "searchbox()"
+      "norm_label": "searchbox"
     },
     {
       "label": "AlertModal.tsx",
@@ -3078,7 +3267,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L17",
       "id": "panels_responseconsole_responseconsoleprops",
-      "community": 13,
+      "community": 2,
       "norm_label": "responseconsoleprops"
     },
     {
@@ -3157,7 +3346,7 @@
       "label": "Tab",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "panels_adminpanel_tab",
       "community": 2,
       "norm_label": "tab"
@@ -3166,7 +3355,7 @@
       "label": "AdminPanelProps",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "panels_adminpanel_adminpanelprops",
       "community": 2,
       "norm_label": "adminpanelprops"
@@ -3175,7 +3364,7 @@
       "label": "FieldType",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "panels_adminpanel_fieldtype",
       "community": 2,
       "norm_label": "fieldtype"
@@ -3184,7 +3373,7 @@
       "label": "Field",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "panels_adminpanel_field",
       "community": 2,
       "norm_label": "field"
@@ -3193,7 +3382,7 @@
       "label": "sevOptions",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "id": "panels_adminpanel_sevoptions",
       "community": 2,
       "norm_label": "sevoptions"
@@ -3202,7 +3391,7 @@
       "label": "trendOptions",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "id": "panels_adminpanel_trendoptions",
       "community": 2,
       "norm_label": "trendoptions"
@@ -3211,7 +3400,7 @@
       "label": "roadOptions",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "id": "panels_adminpanel_roadoptions",
       "community": 2,
       "norm_label": "roadoptions"
@@ -3220,7 +3409,7 @@
       "label": "levelOptions",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L55",
+      "source_location": "L56",
       "id": "panels_adminpanel_leveloptions",
       "community": 2,
       "norm_label": "leveloptions"
@@ -3229,7 +3418,7 @@
       "label": "statusOptions",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L60",
+      "source_location": "L61",
       "id": "panels_adminpanel_statusoptions",
       "community": 2,
       "norm_label": "statusoptions"
@@ -3238,7 +3427,7 @@
       "label": "FIELDS",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "panels_adminpanel_fields",
       "community": 2,
       "norm_label": "fields"
@@ -3247,7 +3436,7 @@
       "label": "TAB_LABEL",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L97",
+      "source_location": "L98",
       "id": "panels_adminpanel_tab_label",
       "community": 2,
       "norm_label": "tab_label"
@@ -3256,7 +3445,7 @@
       "label": "STATUS_ORDER",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L105",
+      "source_location": "L106",
       "id": "panels_adminpanel_status_order",
       "community": 2,
       "norm_label": "status_order"
@@ -3265,7 +3454,7 @@
       "label": "STATUS_PILL",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L106",
+      "source_location": "L107",
       "id": "panels_adminpanel_status_pill",
       "community": 2,
       "norm_label": "status_pill"
@@ -3274,7 +3463,7 @@
       "label": "FormValues",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L114",
+      "source_location": "L115",
       "id": "panels_adminpanel_formvalues",
       "community": 2,
       "norm_label": "formvalues"
@@ -3283,7 +3472,7 @@
       "label": "blankForm()",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L117",
+      "source_location": "L118",
       "id": "panels_adminpanel_blankform",
       "community": 2,
       "norm_label": "blankform()"
@@ -3292,7 +3481,7 @@
       "label": "fillForm()",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L128",
+      "source_location": "L129",
       "id": "panels_adminpanel_fillform",
       "community": 2,
       "norm_label": "fillform()"
@@ -3301,7 +3490,7 @@
       "label": "inputStyle",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L144",
+      "source_location": "L145",
       "id": "panels_adminpanel_inputstyle",
       "community": 2,
       "norm_label": "inputstyle"
@@ -3310,7 +3499,7 @@
       "label": "PlaceField()",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L159",
+      "source_location": "L160",
       "id": "panels_adminpanel_placefield",
       "community": 2,
       "norm_label": "placefield()"
@@ -3319,7 +3508,7 @@
       "label": "AdminPanel()",
       "file_type": "code",
       "source_file": "src/components/panels/AdminPanel.tsx",
-      "source_location": "L283",
+      "source_location": "L284",
       "id": "panels_adminpanel_adminpanel",
       "community": 2,
       "norm_label": "adminpanel()"
@@ -3330,7 +3519,7 @@
       "source_file": "src/components/panels/RescueChartModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_rescuechartmodal_tsx",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescuechartmodal.tsx"
     },
     {
@@ -3339,7 +3528,7 @@
       "source_file": "src/components/panels/RescueChartModal.tsx",
       "source_location": "L7",
       "id": "panels_rescuechartmodal_rescuechartmodalprops",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescuechartmodalprops"
     },
     {
@@ -3348,7 +3537,7 @@
       "source_file": "src/components/panels/RescueChartModal.tsx",
       "source_location": "L16",
       "id": "panels_rescuechartmodal_datelabel",
-      "community": 13,
+      "community": 24,
       "norm_label": "datelabel()"
     },
     {
@@ -3357,7 +3546,7 @@
       "source_file": "src/components/panels/RescueChartModal.tsx",
       "source_location": "L24",
       "id": "panels_rescuechartmodal_rescuechartmodal",
-      "community": 13,
+      "community": 24,
       "norm_label": "rescuechartmodal()"
     },
     {
@@ -3429,7 +3618,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L20",
       "id": "panels_sidebar_sidebarprops",
-      "community": 21,
+      "community": 8,
       "norm_label": "sidebarprops"
     },
     {
@@ -3519,7 +3708,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_waterlevelmodal_tsx",
-      "community": 20,
+      "community": 21,
       "norm_label": "waterlevelmodal.tsx"
     },
     {
@@ -3528,7 +3717,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L9",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 20,
+      "community": 6,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -3537,7 +3726,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L18",
       "id": "panels_waterlevelmodal_m",
-      "community": 20,
+      "community": 21,
       "norm_label": "m"
     },
     {
@@ -3546,7 +3735,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L25",
       "id": "panels_waterlevelmodal_datelabel",
-      "community": 20,
+      "community": 21,
       "norm_label": "datelabel()"
     },
     {
@@ -3555,7 +3744,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L32",
       "id": "panels_waterlevelmodal_hourlabel",
-      "community": 20,
+      "community": 21,
       "norm_label": "hourlabel()"
     },
     {
@@ -3564,7 +3753,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L38",
       "id": "panels_waterlevelmodal_waterlevelmodal",
-      "community": 20,
+      "community": 21,
       "norm_label": "waterlevelmodal()"
     },
     {
@@ -3672,7 +3861,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L1",
       "id": "src_components_panels_reportdetailcard_tsx",
-      "community": 21,
+      "community": 20,
       "norm_label": "reportdetailcard.tsx"
     },
     {
@@ -3681,7 +3870,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L5",
       "id": "panels_reportdetailcard_reportdetailcardprops",
-      "community": 21,
+      "community": 0,
       "norm_label": "reportdetailcardprops"
     },
     {
@@ -3690,7 +3879,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L19",
       "id": "panels_reportdetailcard_depth_ticks",
-      "community": 21,
+      "community": 20,
       "norm_label": "depth_ticks"
     },
     {
@@ -3699,16 +3888,16 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L26",
       "id": "panels_reportdetailcard_reportdetailcard",
-      "community": 21,
+      "community": 20,
       "norm_label": "reportdetailcard()"
     },
     {
       "label": "Cell()",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L169",
+      "source_location": "L177",
       "id": "panels_reportdetailcard_cell",
-      "community": 21,
+      "community": 20,
       "norm_label": "cell()"
     },
     {
@@ -3744,7 +3933,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L1",
       "id": "src_components_map_roadlegend_tsx",
-      "community": 21,
+      "community": 20,
       "norm_label": "roadlegend.tsx"
     },
     {
@@ -3753,7 +3942,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L5",
       "id": "map_roadlegend_roadlegend",
-      "community": 21,
+      "community": 20,
       "norm_label": "roadlegend()"
     },
     {
@@ -3762,7 +3951,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L1",
       "id": "src_components_map_floodmap_tsx",
-      "community": 13,
+      "community": 23,
       "norm_label": "floodmap.tsx"
     },
     {
@@ -3771,7 +3960,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L9",
       "id": "map_floodmap_mapfocus",
-      "community": 13,
+      "community": 23,
       "norm_label": "mapfocus"
     },
     {
@@ -3780,7 +3969,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L14",
       "id": "map_floodmap_searchmark",
-      "community": 13,
+      "community": 23,
       "norm_label": "searchmark"
     },
     {
@@ -3789,79 +3978,79 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L18",
       "id": "map_floodmap_floodmapprops",
-      "community": 13,
+      "community": 23,
       "norm_label": "floodmapprops"
     },
     {
       "label": "shelterIconHtml()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L45",
+      "source_location": "L47",
       "id": "map_floodmap_sheltericonhtml",
-      "community": 13,
+      "community": 23,
       "norm_label": "sheltericonhtml()"
     },
     {
       "label": "shelterIcon()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L50",
+      "source_location": "L52",
       "id": "map_floodmap_sheltericon",
-      "community": 13,
+      "community": 23,
       "norm_label": "sheltericon()"
     },
     {
       "label": "youIcon()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L54",
+      "source_location": "L56",
       "id": "map_floodmap_youicon",
-      "community": 13,
+      "community": 23,
       "norm_label": "youicon()"
     },
     {
       "label": "pendingIcon()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L64",
+      "source_location": "L66",
       "id": "map_floodmap_pendingicon",
-      "community": 13,
+      "community": 23,
       "norm_label": "pendingicon()"
     },
     {
       "label": "searchIcon()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L69",
+      "source_location": "L71",
       "id": "map_floodmap_searchicon",
-      "community": 13,
+      "community": 23,
       "norm_label": "searchicon()"
     },
     {
       "label": "FlyTo()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L79",
+      "source_location": "L81",
       "id": "map_floodmap_flyto",
-      "community": 13,
+      "community": 23,
       "norm_label": "flyto()"
     },
     {
       "label": "ClickCatcher()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L89",
+      "source_location": "L91",
       "id": "map_floodmap_clickcatcher",
-      "community": 13,
+      "community": 23,
       "norm_label": "clickcatcher()"
     },
     {
       "label": "FloodMap()",
       "file_type": "code",
       "source_file": "src/components/map/FloodMap.tsx",
-      "source_location": "L98",
+      "source_location": "L100",
       "id": "map_floodmap_floodmap",
-      "community": 13,
+      "community": 23,
       "norm_label": "floodmap()"
     },
     {
@@ -3892,10 +4081,19 @@
       "norm_label": "useauth.ts"
     },
     {
+      "label": "getDeviceId()",
+      "file_type": "code",
+      "source_file": "src/hooks/useAuth.ts",
+      "source_location": "L11",
+      "id": "hooks_useauth_getdeviceid",
+      "community": 3,
+      "norm_label": "getdeviceid()"
+    },
+    {
       "label": "AuthState",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L7",
+      "source_location": "L25",
       "id": "hooks_useauth_authstate",
       "community": 3,
       "norm_label": "authstate"
@@ -3904,7 +4102,7 @@
       "label": "AuthResponse",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L15",
+      "source_location": "L33",
       "id": "hooks_useauth_authresponse",
       "community": 3,
       "norm_label": "authresponse"
@@ -3913,7 +4111,7 @@
       "label": "loadSession()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L25",
+      "source_location": "L43",
       "id": "hooks_useauth_loadsession",
       "community": 3,
       "norm_label": "loadsession()"
@@ -3922,7 +4120,7 @@
       "label": "decodeGoogleJwt()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L35",
+      "source_location": "L53",
       "id": "hooks_useauth_decodegooglejwt",
       "community": 3,
       "norm_label": "decodegooglejwt()"
@@ -3931,7 +4129,7 @@
       "label": "UseAuthResult",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L45",
+      "source_location": "L63",
       "id": "hooks_useauth_useauthresult",
       "community": 3,
       "norm_label": "useauthresult"
@@ -3940,9 +4138,9 @@
       "label": "useAuth()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L51",
+      "source_location": "L72",
       "id": "hooks_useauth_useauth",
-      "community": 3,
+      "community": 5,
       "norm_label": "useauth()"
     },
     {
@@ -3969,7 +4167,7 @@
       "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L10",
       "id": "hooks_usedomaindata_usereporthistory",
-      "community": 20,
+      "community": 5,
       "norm_label": "usereporthistory()"
     },
     {
@@ -4221,7 +4419,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L8",
       "id": "api_client_apierror",
-      "community": 13,
+      "community": 24,
       "norm_label": "apierror"
     },
     {
@@ -4230,7 +4428,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L9",
       "id": "api_client_apierror_constructor",
-      "community": 13,
+      "community": 24,
       "norm_label": ".constructor()"
     },
     {
@@ -4612,6 +4810,132 @@
       "norm_label": "note on `design/`"
     },
     {
+      "label": "Development Process",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L96",
+      "id": "baha_ui_claude_development_process",
+      "community": 11,
+      "norm_label": "development process"
+    },
+    {
+      "label": "Step 1 \u2014 Create a numbered branch",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L102",
+      "id": "baha_ui_claude_step_1_create_a_numbered_branch",
+      "community": 11,
+      "norm_label": "step 1 \u2014 create a numbered branch"
+    },
+    {
+      "label": "code:bash (git checkout main && git pull)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L103",
+      "id": "baha_ui_claude_codeblock_2",
+      "community": 11,
+      "norm_label": "code:bash (git checkout main && git pull)"
+    },
+    {
+      "label": "Step 2 \u2014 Clarify before coding",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L111",
+      "id": "baha_ui_claude_step_2_clarify_before_coding",
+      "community": 11,
+      "norm_label": "step 2 \u2014 clarify before coding"
+    },
+    {
+      "label": "Step 3 \u2014 Append to `db/setup.sql` *(only if DB changed)*",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L114",
+      "id": "baha_ui_claude_step_3_append_to_db_setup_sql_only_if_db_changed",
+      "community": 11,
+      "norm_label": "step 3 \u2014 append to `db/setup.sql` *(only if db changed)*"
+    },
+    {
+      "label": "Step 4 \u2014 Create `db/<NNN>-<type>-<desc>/migration.sql` *(only if DB changed)*",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L117",
+      "id": "baha_ui_claude_step_4_create_db_nnn_type_desc_migration_sql_only_if_db_changed",
+      "community": 11,
+      "norm_label": "step 4 \u2014 create `db/<nnn>-<type>-<desc>/migration.sql` *(only if db changed)*"
+    },
+    {
+      "label": "Step 5 \u2014 Create `db/<NNN>-<type>-<desc>/rollback.sql` *(only if DB changed)*",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L120",
+      "id": "baha_ui_claude_step_5_create_db_nnn_type_desc_rollback_sql_only_if_db_changed",
+      "community": 11,
+      "norm_label": "step 5 \u2014 create `db/<nnn>-<type>-<desc>/rollback.sql` *(only if db changed)*"
+    },
+    {
+      "label": "Step 6 \u2014 Update `documentations/CHANGELOG.md` (backend repo)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L123",
+      "id": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo",
+      "community": 11,
+      "norm_label": "step 6 \u2014 update `documentations/changelog.md` (backend repo)"
+    },
+    {
+      "label": "code:markdown (## [<NNN>-<type>-<short-description>] \u2014 YYYY-MM-DD)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L125",
+      "id": "baha_ui_claude_codeblock_3",
+      "community": 11,
+      "norm_label": "code:markdown (## [<nnn>-<type>-<short-description>] \u2014 yyyy-mm-dd)"
+    },
+    {
+      "label": "Step 7 \u2014 Apply migration locally & provide execution summary *(only if DB changed)*",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L148",
+      "id": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed",
+      "community": 11,
+      "norm_label": "step 7 \u2014 apply migration locally & provide execution summary *(only if db changed)*"
+    },
+    {
+      "label": "code:block4 (psql \"$DB_URL\" -f db/<NNN>-<type>-<desc>/migration.sql)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L150",
+      "id": "baha_ui_claude_codeblock_4",
+      "community": 11,
+      "norm_label": "code:block4 (psql \"$db_url\" -f db/<nnn>-<type>-<desc>/migration.sql)"
+    },
+    {
+      "label": "Step 8 \u2014 Completion report",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L154",
+      "id": "baha_ui_claude_step_8_completion_report",
+      "community": 11,
+      "norm_label": "step 8 \u2014 completion report"
+    },
+    {
+      "label": "code:block5 (COMPLETION REPORT \u2014 <NNN>-<type>-<short-description>)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L155",
+      "id": "baha_ui_claude_codeblock_5",
+      "community": 11,
+      "norm_label": "code:block5 (completion report \u2014 <nnn>-<type>-<short-description>)"
+    },
+    {
+      "label": "Rules",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L163",
+      "id": "baha_ui_claude_rules",
+      "community": 11,
+      "norm_label": "rules"
+    },
+    {
       "label": "APP_VERSION",
       "file_type": "code",
       "source_file": "src/buildInfo.ts",
@@ -4652,7 +4976,7 @@
       "file_type": "code",
       "source_file": "src/components/panels/RescueChartModal.tsx",
       "source_location": "L16",
-      "community": 13,
+      "community": 24,
       "norm_label": "status_style",
       "id": "panels_rescuechartmodal_status_style"
     },
@@ -6778,6 +7102,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "panels_searchbox_searchboxhandle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L31",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -7001,6 +7336,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_components_panels_locationhelpmodal_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L32",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -7061,6 +7407,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "src_components_panels_roadconditionsmodal_tsx"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_components_panels_searchbox_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7204,6 +7561,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "src_hooks_usevisitcounter_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_i18n_tformat",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7408,6 +7776,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_utils_geolocate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L23",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -7424,6 +7803,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "src_utils_share_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_utils_turnstile_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7457,6 +7847,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "utils_floodmeta_severity_preset"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "utils_geolocate_locatewithaccuracy",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7501,6 +7902,17 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "utils_share_buildsharetext"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "utils_turnstile_getcaptchatoken",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7728,6 +8140,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/App.tsx",
+      "source_location": "L982",
+      "weight": 1.0,
+      "source": "src_app_app",
+      "target": "src_i18n_tformat"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
       "source_location": "L91",
       "weight": 1.0,
       "source": "src_app_app",
@@ -7764,6 +8187,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_topbar_tsx",
       "target": "src_buildinfo_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "src_i18n_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7816,9 +8250,9 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sosmodal_tsx",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -8049,6 +8483,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "src_i18n_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L9",
       "weight": 1.0,
@@ -8110,6 +8555,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_notifymodal_tsx",
       "target": "src_i18n_msgkey"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "src_i18n_msgkey",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -8347,6 +8803,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "panels_locationhelpmodal_locationhelpmodal",
+      "target": "src_i18n_usei18n"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L34",
       "weight": 1.0,
@@ -8434,6 +8901,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "src_i18n_usei18n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
@@ -8481,9 +8959,9 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sosmodal_tsx",
-      "target": "src_i18n_usei18n",
-      "confidence_score": 1.0
+      "target": "src_i18n_usei18n"
     },
     {
       "relation": "imports",
@@ -8876,6 +9354,16 @@
       "confidence_score": 1.0,
       "source": "src_types_ts",
       "target": "src_types_newrescue"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_types_ts",
+      "target": "src_types_reportertrust",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -10533,6 +11021,58 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/AdminPanel.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_components_panels_adminpanel_tsx",
+      "target": "src_utils_geolocate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_utils_geolocate_ts",
+      "target": "utils_geolocate_fix",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_utils_geolocate_ts",
+      "target": "utils_geolocate_locateoptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/geolocate.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "src_utils_geolocate_ts",
+      "target": "utils_geolocate_locatewithaccuracy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/AdminPanel.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_components_panels_adminpanel_tsx",
+      "target": "utils_geolocate_locatewithaccuracy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -10855,6 +11395,79 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_sharemodal_tsx",
       "target": "utils_share_sharelink"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "src_utils_locationhelp_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "utils_locationhelp_detecthelpbucket",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "utils_locationhelp_helpbucket",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "utils_locationhelp_locationhelpsteps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/locationHelp.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "src_utils_locationhelp_ts",
+      "target": "utils_locationhelp_steps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "utils_locationhelp_detecthelpbucket",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "utils_locationhelp_locationhelpsteps",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -12767,6 +13380,77 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_captchaenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_getcaptchatoken",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_loadscript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_site_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_turnstileapi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_window",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "utils_turnstile_getcaptchatoken",
+      "target": "utils_turnstile_loadscript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L25",
       "weight": 1.0,
@@ -13256,6 +13940,26 @@
       "target": "panels_feedbackformmodal_types"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "panels_locationhelpmodal_locationhelpmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/LocationHelpModal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_components_panels_locationhelpmodal_tsx",
+      "target": "panels_locationhelpmodal_locationhelpmodalprops",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -13359,6 +14063,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_topbar_tsx",
       "target": "hooks_useauth_authstate"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_components_panels_topbar_tsx",
+      "target": "panels_searchbox_searchboxhandle",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -13486,6 +14201,17 @@
       "confidence_score": 1.0,
       "source": "panels_topbar_topbarprops",
       "target": "hooks_useauth_authstate"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/TopBar.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "panels_topbar_topbarprops",
+      "target": "panels_searchbox_searchboxhandle",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -13777,6 +14503,16 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_searchbox_tsx",
       "target": "panels_searchbox_searchbox"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SearchBox.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_components_panels_searchbox_tsx",
+      "target": "panels_searchbox_searchboxhandle",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -14897,6 +15633,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/hooks/useAuth.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_hooks_useauth_ts",
+      "target": "hooks_useauth_getdeviceid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useAuth.ts",
       "source_location": "L25",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -15738,6 +16484,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CLAUDE.md",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "baha_ui_claude_claude_md",
+      "target": "baha_ui_claude_development_process",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
       "source_location": "L81",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -15783,8 +16539,138 @@
       "confidence_score": 1.0,
       "source": "baha_ui_claude_commands",
       "target": "baha_ui_claude_env"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_1_create_a_numbered_branch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_2_clarify_before_coding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_3_append_to_db_setup_sql_only_if_db_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_4_create_db_nnn_type_desc_migration_sql_only_if_db_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_5_create_db_nnn_type_desc_rollback_sql_only_if_db_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L154",
+      "weight": 1.0,
+      "source": "baha_ui_claude_development_process",
+      "target": "baha_ui_claude_step_8_completion_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "baha_ui_claude_step_1_create_a_numbered_branch",
+      "target": "baha_ui_claude_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo",
+      "target": "baha_ui_claude_codeblock_3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L150",
+      "weight": 1.0,
+      "source": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed",
+      "target": "baha_ui_claude_codeblock_4",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "baha_ui_claude_step_8_completion_report",
+      "target": "baha_ui_claude_codeblock_5",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3c3dfe66b0f85c1fc334bfab674efe44a5f0d2a2"
+  "built_at_commit": "394dc31f9f147adc559aad0e5581afa4a94d2ac7"
 }

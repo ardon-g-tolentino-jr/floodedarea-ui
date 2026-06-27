@@ -36,6 +36,12 @@ server.post('/auth/login', (req, res) => res.json(fakeSession(req.body.email)));
 server.post('/auth/register', (req, res) => res.status(201).json(fakeSession(req.body.email, req.body.name)));
 server.post('/auth/google', (_req, res) => res.json(fakeSession('google.user@bahawatch.ph', 'Google User')));
 server.get('/auth/me', (_req, res) => res.json({ ...fakeSession(), token: null }));
+// Guest (no-login) session — mirrors POST /auth/guest on baha-api. A fixed userId lets the
+// "one active report per guest" spam guard and the `mine` flag work in the mock.
+const GUEST_TOKEN = 'mock-guest-jwt';
+server.post('/auth/guest', (_req, res) => res.json({
+  token: GUEST_TOKEN, userId: 2000, email: 'guest@local', name: 'Guest', picture: null, role: 'GUEST', isNew: true,
+}));
 
 // ── Flood-report writes ──
 server.post('/reports', (req, res) => {
@@ -43,6 +49,7 @@ server.post('/reports', (req, res) => {
   const ids = db.get('reports').map('id').value();
   const id = ids.length ? Math.max(...ids) + 1 : 1;
   const now = new Date().toISOString();
+  const isGuest = req.headers.authorization === `Bearer ${GUEST_TOKEN}`;
   const report = {
     id,
     name: req.body.name,
@@ -55,7 +62,8 @@ server.post('/reports', (req, res) => {
     road: req.body.road || 'risky',
     reportsCount: 1,
     status: 'active',
-    reporterUserId: 1,
+    reporterUserId: isGuest ? 2000 : 1,
+    reporterTrust: isGuest ? 'guest' : 'verified',
     createdAt: now,
     updatedAt: now,
   };

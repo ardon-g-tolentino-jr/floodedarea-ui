@@ -342,6 +342,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 <span style={{ color: tm.color, fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}><span>{tm.sym}</span>{trendLabel(lang, r.trend)}</span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: '#5A6875' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: rm.color }} />{roadLabel(lang, r.road)}</span>
                 <span style={{ fontSize: 11, color: '#9AA8B4', fontWeight: 600 }}>{r.reportsCount}× {t('report.confirmed')}</span>
+                {r.guest && (
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#B45309', background: '#FFF7ED', padding: '2px 7px', borderRadius: 6 }}>⚠ {t('report.unverified')}</span>
+                )}
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {r.expiresInMin}m {t('report.left')}</span>
               </div>
             </div>

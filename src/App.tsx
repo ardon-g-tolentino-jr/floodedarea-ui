@@ -1,6 +1,7 @@
 import React from 'react';
 import type { AlertLevel, FeedbackStatus, FloodAlert, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
+import { getCaptchaToken } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
@@ -88,7 +89,7 @@ type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => voi
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
 
 const App: React.FC = () => {
-  const { auth, loginWithGoogle, logout } = useAuth();
+  const { auth, loginWithGoogle, ensureGuest, logout } = useAuth();
   const isMobile = useIsMobile();
   const visitCount = useVisitCounter();
   const { t, lang } = useI18n();
@@ -245,7 +246,7 @@ const App: React.FC = () => {
   const isAdmin = auth?.role === 'ADMIN';
 
   // Refresh the feedback lists once a user who can see them is present (handles login after mount).
-  React.useEffect(() => { if (auth) void acceptedFeatures.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => { if (auth && auth.role !== 'GUEST') void acceptedFeatures.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
   React.useEffect(() => { if (isAdmin) void allFeedback.refetch(true); }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
   const streamEnabled = !isAdmin || liveStream;
 
@@ -472,8 +473,11 @@ const App: React.FC = () => {
   }, [alertList, showToast, playAlertSound]);
 
   // ── Actions ──
-  const requireAuth = (reason: string): boolean => {
-    if (auth) return true;
+  // Full-account gate for higher-stakes actions (SOS, the responder/rescue views, feedback). A
+  // no-login guest session does NOT satisfy this — prompt sign-in so the guest can upgrade. Low-stakes
+  // writes (report/confirm) skip this and silently provision a guest via `ensureGuest` instead.
+  const requireFullAuth = (reason: string): boolean => {
+    if (auth && auth.role !== 'GUEST') return true;
     setLogin({ open: true, reason });
     return false;
   };
@@ -491,8 +495,8 @@ const App: React.FC = () => {
     return false;
   };
 
-  // The rescue chart reads /rescue, which needs a valid session. `requireAuth` only checks that a
-  // local session exists, so an expired/invalid JWT lets the chart open but the read then 401s.
+  // The rescue chart reads /rescue, which needs a valid session. `requireFullAuth` only checks that a
+  // local (non-guest) session exists, so an expired/invalid JWT lets the chart open but the read then 401s.
   // Recover like the write paths: drop the dead session, close the chart and re-prompt — otherwise
   // reopening just loops on the same error. Only a 401 (no/invalid session) triggers this; a 403
   // means we're signed in but lack permission, and signing in again as the same user won't help —
@@ -520,8 +524,15 @@ const App: React.FC = () => {
     });
   }, []);
 
-  const startReport = (): void => {
-    if (!requireAuth('Sign in to report a flood in your area.')) return;
+  const startReport = async (): Promise<void> => {
+    // No login wall: silently provision a no-login guest session (idempotent per device) so anyone
+    // can report in seconds. The guest still gets a real userId, which keeps the spam guard,
+    // "my reports", and "can't confirm your own" working exactly as for full accounts.
+    const session = await ensureGuest();
+    if (!session) {
+      showToast('Could not start reporting right now. Please try again.');
+      return;
+    }
     // Anti-spam: one live report per person. While the user's last report is still within its
     // 30-min window, point them at it instead of letting them post another.
     const existing = enriched.find((r) => r.mine && !r.expired);
@@ -584,6 +595,14 @@ const App: React.FC = () => {
     const preset = SEVERITY_PRESET[sev];
     setBusyPick(true);
     try {
+      // Ensure a session (guest is fine) before posting, and capture a CAPTCHA token for guest
+      // submissions when Turnstile is configured (a no-op — undefined — otherwise).
+      const session = await ensureGuest();
+      if (!session) {
+        showToast('Could not post your report. Please try again.');
+        return;
+      }
+      const captchaToken = session.role === 'GUEST' ? await getCaptchaToken() : undefined;
       // The label identifies WHICH street is flooded (reverse-geocoded from the pin, then editable
       // by the reporter). Lead with the public street and append the barangay for context
       // ("Lilac St, Batasan Hills"). With no public street, fall back to the barangay, then
@@ -604,6 +623,7 @@ const App: React.FC = () => {
         depthCm,
         trend: preset.trend,
         road: preset.road,
+        captchaToken,
       });
       await reports.refetch(true);
       setMode('idle');
@@ -611,7 +631,13 @@ const App: React.FC = () => {
       setDetectedRoad({ road: null, district: null, barangay: null });
       setTab('activity');
       setSelectedReportId(created.id);
-      showToast('Flood report posted — thank you!');
+      if (session.role === 'GUEST') {
+        showToast('Posted as guest — sign in to verify your reports.', 'Sign in', () =>
+          setLogin({ open: true, reason: 'Sign in to verify and manage your reports.' })
+        );
+      } else {
+        showToast('Flood report posted — thank you!');
+      }
     } catch (err) {
       if (handleAuthError(err, 'Your session expired. Please sign in again to post a report.')) return;
       showToast('Could not post your report. Please try again.');
@@ -621,7 +647,10 @@ const App: React.FC = () => {
   };
 
   const confirmReport = async (id: number): Promise<void> => {
-    if (!requireAuth('Sign in to confirm flood reports.')) return;
+    if (!(await ensureGuest())) {
+      showToast('Could not confirm right now. Please try again.');
+      return;
+    }
     setConfirming(true);
     try {
       await mutations.confirmReport(id);
@@ -636,7 +665,12 @@ const App: React.FC = () => {
   };
 
   const removeReport = async (id: number): Promise<void> => {
-    if (!requireAuth('Sign in to manage your reports.')) return;
+    // Only ever shown for the user's own report (`mine`), so a session already exists; ensureGuest
+    // just guarantees one before the authed DELETE.
+    if (!(await ensureGuest())) {
+      showToast('Could not remove the report. Please try again.');
+      return;
+    }
     setRemoving(true);
     try {
       await mutations.deleteReport(id);
@@ -652,7 +686,7 @@ const App: React.FC = () => {
   };
 
   const sendRescue = async (): Promise<void> => {
-    if (!requireAuth('Sign in to send a rescue request with your location.')) {
+    if (!requireFullAuth('Sign in to send a rescue request with your location.')) {
       setSosOpen(false);
       return;
     }
@@ -770,7 +804,7 @@ const App: React.FC = () => {
 
   // Any signed-in user files a bug report or feature request.
   const submitFeedback = async (body: NewFeedback): Promise<void> => {
-    if (!requireAuth('Sign in to send feedback.')) return;
+    if (!requireFullAuth('Sign in to send feedback.')) return;
     setFeedbackSending(true);
     try {
       await mutations.createFeedback(body);
@@ -870,7 +904,9 @@ const App: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', color: 'var(--bw-ink)' }}>
       <TopBar
         isMobile={isMobile}
-        auth={auth}
+        // A guest session is intentionally shown as "not signed in" in the bar, so the guest still
+        // sees a "Sign in" affordance to upgrade (rather than a profile avatar + Sign out).
+        auth={auth?.role === 'GUEST' ? null : auth}
         onReport={startReport}
         onShare={() => setShareOpen(true)}
         onSOS={() => setSosOpen(true)}
@@ -884,17 +920,17 @@ const App: React.FC = () => {
         onWaterChart={() => setWaterChartOpen(true)}
         onRescueChart={() => {
           // The backend requires auth to read /rescue, so prompt sign-in before opening the chart.
-          if (!requireAuth('Sign in to view rescue requests by district.')) return;
+          if (!requireFullAuth('Sign in to view rescue requests by district.')) return;
           setRescueChartOpen(true);
           void rescues.refetch(true);
         }}
         onSupport={() => setSupportOpen(true)}
-        onShowFeatures={() => { setFeaturesOpen(true); if (auth) void acceptedFeatures.refetch(true); }}
+        onShowFeatures={() => { setFeaturesOpen(true); if (auth && auth.role !== 'GUEST') void acceptedFeatures.refetch(true); }}
         isAdmin={!!isAdmin}
         onAdmin={() => { setAdminOpen(true); void allFeedback.refetch(true); }}
         onResponse={() => {
           // /rescue reads need auth; prompt sign-in before opening, then warm the data.
-          if (!requireAuth('Sign in to open the response console.')) return;
+          if (!requireFullAuth('Sign in to open the response console.')) return;
           setResponseOpen(true);
           void rescues.refetch(true);
         }}
@@ -1113,7 +1149,7 @@ const App: React.FC = () => {
           isMobile={isMobile}
           auth={auth}
           acceptedFeatures={acceptedFeatures.data ?? []}
-          onSuggest={() => { if (requireAuth('Sign in to suggest a feature or report a bug.')) setFeedbackOpen(true); }}
+          onSuggest={() => { if (requireFullAuth('Sign in to suggest a feature or report a bug.')) setFeedbackOpen(true); }}
           onClose={() => setFeaturesOpen(false)}
         />
       )}

@@ -70,6 +70,8 @@ export interface EnrichedReport extends FloodReport {
   edgeKm: number;
   time: string;
   mine: boolean;
+  /** Authored by a no-login guest/device session — surfaced as lower-trust until corroborated. */
+  guest: boolean;
   ageMin: number;
   expiresInMin: number;
   expired: boolean;
@@ -109,6 +111,7 @@ export function enrichReports(
       edgeKm: distKm - affectedKm,
       time: timeAgo(r.createdAt),
       mine: authUserId != null && r.reporterUserId === authUserId,
+      guest: r.reporterTrust === 'guest',
       ageMin,
       expiresInMin,
       expired: r.status === 'resolved' || expiresInMin <= 0,
@@ -175,7 +178,11 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       new Date(r.createdAt).getTime() > new Date(acc.createdAt).getTime() ? r : acc
     );
     // Corroborated when ≥2 reports mention this road, or confirmations push the tally to ≥2.
+    // Guest-only clusters need a higher bar (≥3 reports) so one no-login device can't self-"confirm";
+    // a single verified reporter in the mix restores the normal ≥2 threshold. (reporterTrust absent
+    // on older payloads counts as verified, preserving prior behavior.)
     const totalReports = rs.reduce((n, r) => n + Math.max(1, r.reportsCount), 0);
+    const hasVerified = rs.some((r) => r.reporterTrust !== 'guest');
     // Prefer the snapped road's canonical name + real geometry — the representative's snap, else any
     // snapped report in the group; falls back to the report's own label when nothing snapped.
     const repSnap = snaps.get(rep.id) ?? rs.map((r) => snaps.get(r.id)).find(Boolean) ?? null;
@@ -187,7 +194,7 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       severity: rep.severity,
       depthCm: rep.depthCm,
       reportCount: rs.length,
-      confirmed: rs.length >= 2 || totalReports >= 2,
+      confirmed: hasVerified ? rs.length >= 2 || totalReports >= 2 : rs.length >= 3,
       latitude: rep.latitude,
       longitude: rep.longitude,
       reportId: rep.id,

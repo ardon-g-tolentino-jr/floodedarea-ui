@@ -233,6 +233,7 @@ const MESSAGES = {
   'report.yours': { en: 'YOURS', fil: 'IYO' },
   'report.kmAway': { en: 'km away', fil: 'km ang layo' },
   'report.confirmed': { en: 'confirmed', fil: 'nakumpirma' },
+  'report.unverified': { en: 'unverified', fil: 'hindi beripikado' },
   'report.left': { en: 'left', fil: 'natitira' },
 
   // ── Severity ──

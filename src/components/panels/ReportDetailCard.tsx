@@ -57,6 +57,14 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
           >
             ⏳ {report.expired ? 'Expired' : `Expires in ${report.expiresInMin}m`}
           </span>
+          {report.guest && (
+            <span
+              title="Posted by a guest (no account). Treat as unverified until others confirm it."
+              style={{ background: '#FFF7ED', color: '#B45309', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
+            >
+              ⚠ Unverified
+            </span>
+          )}
         </div>
       </div>
 
