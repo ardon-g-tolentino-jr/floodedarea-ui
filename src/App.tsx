@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AlertLevel, FeedbackStatus, FloodAlert, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
-import { getCaptchaToken } from './utils/turnstile';
+import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
@@ -590,19 +590,22 @@ const App: React.FC = () => {
     runReverseGeocode(latlng);
   };
 
-  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean, road: string): Promise<void> => {
+  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string): Promise<void> => {
     if (!pending) return;
     const preset = SEVERITY_PRESET[sev];
     setBusyPick(true);
     try {
-      // Ensure a session (guest is fine) before posting, and capture a CAPTCHA token for guest
-      // submissions when Turnstile is configured (a no-op — undefined — otherwise).
+      // Ensure a session (guest is fine) before posting.
       const session = await ensureGuest();
       if (!session) {
         showToast('Could not post your report. Please try again.');
         return;
       }
-      const captchaToken = session.role === 'GUEST' ? await getCaptchaToken() : undefined;
+      // Guests must clear the CAPTCHA (the report form shows the widget) when Turnstile is enabled.
+      if (session.role === 'GUEST' && captchaEnabled() && !captchaToken) {
+        showToast('Please complete the security check, then post again.');
+        return;
+      }
       // The label identifies WHICH street is flooded (reverse-geocoded from the pin, then editable
       // by the reporter). Lead with the public street and append the barangay for context
       // ("Lilac St, Batasan Hills"). With no public street, fall back to the barangay, then
@@ -1018,7 +1021,8 @@ const App: React.FC = () => {
               reporterName={auth?.name ?? ''}
               detectedRoad={detectedRoad.road}
               detecting={detectingRoad}
-              onPick={(s, d, id, road) => void pickSeverity(s, d, id, road)}
+              captchaRequired={captchaEnabled() && auth?.role === 'GUEST'}
+              onPick={(s, d, id, road, token) => void pickSeverity(s, d, id, road, token)}
               onCancel={cancelReport}
             />
           )}

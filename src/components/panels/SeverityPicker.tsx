@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Severity } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
+import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
   sev: Severity;
@@ -25,11 +26,15 @@ interface SeverityPickerProps {
   detectedRoad: string | null;
   /** True while the reverse-geocode lookup is in flight. */
   detecting: boolean;
-  onPick: (sev: Severity, depthCm: number, identify: boolean, road: string) => void;
+  /** Show a CAPTCHA the reporter must clear before posting (guest submits with Turnstile enabled). */
+  captchaRequired: boolean;
+  onPick: (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string) => void;
   onCancel: () => void;
 }
 
-const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporterName, detectedRoad, detecting, onPick, onCancel }) => {
+const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporterName, detectedRoad, detecting, captchaRequired, onPick, onCancel }) => {
+  // Solved Turnstile token (Managed widget below); required before posting when captchaRequired.
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   // Step 1: choose a category. Step 2: dial in the depth (seeded from the category's preset).
   const [sev, setSev] = React.useState<Severity | null>(null);
   const [depth, setDepth] = React.useState(0);
@@ -170,10 +175,20 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: '10px 12px 14px' }}>
+          {captchaRequired && (
+            <div style={{ padding: '0 3px' }}>
+              <TurnstileWidget onToken={setCaptchaToken} />
+              {!captchaToken && (
+                <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 2 }}>
+                  Quick security check — confirms you’re human before posting.
+                </div>
+              )}
+            </div>
+          )}
           <button
-            disabled={busy}
-            onClick={() => onPick(sev, depth, identify, road.trim())}
-            style={{ border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}
+            disabled={busy || (captchaRequired && !captchaToken)}
+            onClick={() => onPick(sev, depth, identify, road.trim(), captchaToken ?? undefined)}
+            style={{ border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy || (captchaRequired && !captchaToken) ? 'not-allowed' : 'pointer', opacity: busy || (captchaRequired && !captchaToken) ? 0.6 : 1 }}
           >
             {busy ? 'Posting…' : 'Post flood report'}
           </button>

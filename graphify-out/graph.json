@@ -1530,7 +1530,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L292",
       "id": "src_i18n_translate",
-      "community": 8,
+      "community": 25,
       "norm_label": "translate()"
     },
     {
@@ -1548,7 +1548,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L307",
       "id": "src_i18n_sevlabel",
-      "community": 8,
+      "community": 25,
       "norm_label": "sevlabel()"
     },
     {
@@ -1557,7 +1557,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L310",
       "id": "src_i18n_roadlabel",
-      "community": 8,
+      "community": 25,
       "norm_label": "roadlabel()"
     },
     {
@@ -1566,7 +1566,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L313",
       "id": "src_i18n_roadshort",
-      "community": 8,
+      "community": 25,
       "norm_label": "roadshort()"
     },
     {
@@ -1575,7 +1575,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L316",
       "id": "src_i18n_trendlabel",
-      "community": 8,
+      "community": 25,
       "norm_label": "trendlabel()"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_file": "src/types.ts",
       "source_location": "L6",
       "id": "src_types_road",
-      "community": 8,
+      "community": 23,
       "norm_label": "road"
     },
     {
@@ -1656,7 +1656,7 @@
       "source_file": "src/types.ts",
       "source_location": "L10",
       "id": "src_types_userrole",
-      "community": 3,
+      "community": 5,
       "norm_label": "userrole"
     },
     {
@@ -1674,7 +1674,7 @@
       "source_file": "src/types.ts",
       "source_location": "L14",
       "id": "src_types_floodreport",
-      "community": 8,
+      "community": 23,
       "norm_label": "floodreport"
     },
     {
@@ -1836,7 +1836,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L1",
       "id": "src_utils_geolocate_ts",
-      "community": 5,
+      "community": 2,
       "norm_label": "geolocate.ts"
     },
     {
@@ -1845,7 +1845,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L7",
       "id": "utils_geolocate_fix",
-      "community": 5,
+      "community": 2,
       "norm_label": "fix"
     },
     {
@@ -1854,7 +1854,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L14",
       "id": "utils_geolocate_locateoptions",
-      "community": 5,
+      "community": 2,
       "norm_label": "locateoptions"
     },
     {
@@ -1863,7 +1863,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L28",
       "id": "utils_geolocate_locatewithaccuracy",
-      "community": 5,
+      "community": 2,
       "norm_label": "locatewithaccuracy()"
     },
     {
@@ -1908,7 +1908,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L42",
       "id": "utils_waterchart_buildwaterchart",
-      "community": 20,
+      "community": 21,
       "norm_label": "buildwaterchart()"
     },
     {
@@ -1935,7 +1935,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L127",
       "id": "utils_waterchart_builddailywaterbars",
-      "community": 21,
+      "community": 27,
       "norm_label": "builddailywaterbars()"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L1",
       "id": "src_utils_viewmodel_ts",
-      "community": 13,
+      "community": 23,
       "norm_label": "viewmodel.ts"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L20",
       "id": "utils_viewmodel_affectedradiuskm",
-      "community": 23,
+      "community": 20,
       "norm_label": "affectedradiuskm()"
     },
     {
@@ -2088,7 +2088,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L57",
       "id": "utils_viewmodel_report_ttl_min",
-      "community": 13,
+      "community": 23,
       "norm_label": "report_ttl_min"
     },
     {
@@ -2097,7 +2097,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L66",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 0,
+      "community": 20,
       "norm_label": "enrichedreport"
     },
     {
@@ -2106,7 +2106,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L80",
       "id": "utils_viewmodel_safetystatus",
-      "community": 8,
+      "community": 25,
       "norm_label": "safetystatus"
     },
     {
@@ -2115,7 +2115,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L89",
       "id": "utils_viewmodel_enrichreports",
-      "community": 13,
+      "community": 23,
       "norm_label": "enrichreports()"
     },
     {
@@ -2124,7 +2124,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L123",
       "id": "utils_viewmodel_roadentry",
-      "community": 8,
+      "community": 23,
       "norm_label": "roadentry"
     },
     {
@@ -2133,7 +2133,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L140",
       "id": "utils_viewmodel_districtroads",
-      "community": 8,
+      "community": 23,
       "norm_label": "districtroads"
     },
     {
@@ -2142,7 +2142,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L153",
       "id": "utils_viewmodel_buildroaddirectory",
-      "community": 13,
+      "community": 23,
       "norm_label": "buildroaddirectory()"
     },
     {
@@ -2151,7 +2151,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L224",
       "id": "utils_viewmodel_possibleclosure",
-      "community": 8,
+      "community": 23,
       "norm_label": "possibleclosure"
     },
     {
@@ -2169,7 +2169,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L264",
       "id": "utils_viewmodel_rescuedistrictcount",
-      "community": 13,
+      "community": 23,
       "norm_label": "rescuedistrictcount"
     },
     {
@@ -2187,7 +2187,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L282",
       "id": "utils_viewmodel_localdatekey",
-      "community": 21,
+      "community": 27,
       "norm_label": "localdatekey()"
     },
     {
@@ -2205,7 +2205,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L299",
       "id": "utils_viewmodel_enrichedrescue",
-      "community": 23,
+      "community": 13,
       "norm_label": "enrichedrescue"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L384",
       "id": "utils_viewmodel_surgebucket",
-      "community": 13,
+      "community": 23,
       "norm_label": "surgebucket"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L424",
       "id": "utils_viewmodel_localityparts",
-      "community": 13,
+      "community": 23,
       "norm_label": "localityparts()"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L432",
       "id": "utils_viewmodel_nearbyclosure",
-      "community": 8,
+      "community": 23,
       "norm_label": "nearbyclosure"
     },
     {
@@ -2286,7 +2286,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L450",
       "id": "utils_viewmodel_closuresnearlocation",
-      "community": 6,
+      "community": 23,
       "norm_label": "closuresnearlocation()"
     },
     {
@@ -2304,7 +2304,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L521",
       "id": "utils_viewmodel_recentreportrows",
-      "community": 13,
+      "community": 23,
       "norm_label": "recentreportrows()"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L549",
       "id": "utils_viewmodel_rank",
-      "community": 13,
+      "community": 23,
       "norm_label": "rank"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L551",
       "id": "utils_viewmodel_computestatus",
-      "community": 8,
+      "community": 25,
       "norm_label": "computestatus()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 0,
+      "community": 20,
       "norm_label": "sevmeta"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L13",
       "id": "utils_floodmeta_sev_meta",
-      "community": 21,
+      "community": 27,
       "norm_label": "sev_meta"
     },
     {
@@ -2457,7 +2457,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L61",
       "id": "utils_floodmeta_roadfromdepth",
-      "community": 13,
+      "community": 23,
       "norm_label": "roadfromdepth()"
     },
     {
@@ -2475,7 +2475,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L71",
       "id": "utils_floodmeta_depth_ticks",
-      "community": 21,
+      "community": 27,
       "norm_label": "depth_ticks"
     },
     {
@@ -2511,7 +2511,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L99",
       "id": "utils_floodmeta_waterseries",
-      "community": 20,
+      "community": 21,
       "norm_label": "waterseries()"
     },
     {
@@ -2538,62 +2538,53 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L1",
       "id": "src_utils_turnstile_ts",
-      "community": 5,
+      "community": 26,
       "norm_label": "turnstile.ts"
     },
     {
-      "label": "SITE_KEY",
+      "label": "TURNSTILE_SITE_KEY",
       "file_type": "code",
       "source_file": "src/utils/turnstile.ts",
-      "source_location": "L7",
-      "id": "utils_turnstile_site_key",
-      "community": 5,
-      "norm_label": "site_key"
+      "source_location": "L9",
+      "id": "utils_turnstile_turnstile_site_key",
+      "community": 26,
+      "norm_label": "turnstile_site_key"
     },
     {
       "label": "captchaEnabled()",
       "file_type": "code",
       "source_file": "src/utils/turnstile.ts",
-      "source_location": "L10",
+      "source_location": "L12",
       "id": "utils_turnstile_captchaenabled",
-      "community": 5,
+      "community": 26,
       "norm_label": "captchaenabled()"
     },
     {
       "label": "TurnstileApi",
       "file_type": "code",
       "source_file": "src/utils/turnstile.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "id": "utils_turnstile_turnstileapi",
-      "community": 5,
+      "community": 26,
       "norm_label": "turnstileapi"
     },
     {
       "label": "Window",
       "file_type": "code",
       "source_file": "src/utils/turnstile.ts",
-      "source_location": "L20",
+      "source_location": "L22",
       "id": "utils_turnstile_window",
-      "community": 5,
+      "community": 26,
       "norm_label": "window"
     },
     {
-      "label": "loadScript()",
+      "label": "loadTurnstile()",
       "file_type": "code",
       "source_file": "src/utils/turnstile.ts",
-      "source_location": "L26",
-      "id": "utils_turnstile_loadscript",
-      "community": 5,
-      "norm_label": "loadscript()"
-    },
-    {
-      "label": "getCaptchaToken()",
-      "file_type": "code",
-      "source_file": "src/utils/turnstile.ts",
-      "source_location": "L45",
-      "id": "utils_turnstile_getcaptchatoken",
-      "community": 5,
-      "norm_label": "getcaptchatoken()"
+      "source_location": "L30",
+      "id": "utils_turnstile_loadturnstile",
+      "community": 26,
+      "norm_label": "loadturnstile()"
     },
     {
       "label": "roadSnap.ts",
@@ -2794,6 +2785,33 @@
       "norm_label": "walkminutes()"
     },
     {
+      "label": "TurnstileWidget.tsx",
+      "file_type": "code",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L1",
+      "id": "src_components_turnstilewidget_tsx",
+      "community": 26,
+      "norm_label": "turnstilewidget.tsx"
+    },
+    {
+      "label": "TurnstileWidgetProps",
+      "file_type": "code",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L4",
+      "id": "components_turnstilewidget_turnstilewidgetprops",
+      "community": 26,
+      "norm_label": "turnstilewidgetprops"
+    },
+    {
+      "label": "TurnstileWidget()",
+      "file_type": "code",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L14",
+      "id": "components_turnstilewidget_turnstilewidget",
+      "community": 26,
+      "norm_label": "turnstilewidget()"
+    },
+    {
       "label": "AlertRibbon.tsx",
       "file_type": "code",
       "source_file": "src/components/panels/AlertRibbon.tsx",
@@ -2898,7 +2916,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_publicdashboardmodal_tsx",
-      "community": 8,
+      "community": 23,
       "norm_label": "publicdashboardmodal.tsx"
     },
     {
@@ -2907,7 +2925,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L9",
       "id": "panels_publicdashboardmodal_publicdashboardmodalprops",
-      "community": 8,
+      "community": 23,
       "norm_label": "publicdashboardmodalprops"
     },
     {
@@ -2916,7 +2934,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L24",
       "id": "panels_publicdashboardmodal_radius_options",
-      "community": 8,
+      "community": 23,
       "norm_label": "radius_options"
     },
     {
@@ -2925,7 +2943,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L26",
       "id": "panels_publicdashboardmodal_page_size_options",
-      "community": 8,
+      "community": 23,
       "norm_label": "page_size_options"
     },
     {
@@ -2934,7 +2952,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L30",
       "id": "panels_publicdashboardmodal_conditionpill",
-      "community": 8,
+      "community": 25,
       "norm_label": "conditionpill()"
     },
     {
@@ -3024,7 +3042,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_notifymodal_tsx",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodal.tsx"
     },
     {
@@ -3033,7 +3051,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L8",
       "id": "panels_notifymodal_notifyprefs",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifyprefs"
     },
     {
@@ -3042,7 +3060,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L14",
       "id": "panels_notifymodal_default_notify_prefs",
-      "community": 21,
+      "community": 8,
       "norm_label": "default_notify_prefs"
     },
     {
@@ -3051,7 +3069,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L20",
       "id": "panels_notifymodal_fmtkm",
-      "community": 21,
+      "community": 8,
       "norm_label": "fmtkm()"
     },
     {
@@ -3060,7 +3078,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L23",
       "id": "panels_notifymodal_notifymodalprops",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodalprops"
     },
     {
@@ -3069,7 +3087,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L31",
       "id": "panels_notifymodal_sev_order",
-      "community": 21,
+      "community": 8,
       "norm_label": "sev_order"
     },
     {
@@ -3078,7 +3096,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L33",
       "id": "panels_notifymodal_notifymodal",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodal()"
     },
     {
@@ -3141,7 +3159,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_roadconditionsmodal_tsx",
-      "community": 8,
+      "community": 23,
       "norm_label": "roadconditionsmodal.tsx"
     },
     {
@@ -3150,7 +3168,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L5",
       "id": "panels_roadconditionsmodal_roadconditionsmodalprops",
-      "community": 8,
+      "community": 23,
       "norm_label": "roadconditionsmodalprops"
     },
     {
@@ -3159,7 +3177,7 @@
       "source_file": "src/components/panels/RoadConditionsModal.tsx",
       "source_location": "L17",
       "id": "panels_roadconditionsmodal_roadconditionsmodal",
-      "community": 8,
+      "community": 23,
       "norm_label": "roadconditionsmodal()"
     },
     {
@@ -3562,7 +3580,7 @@
       "label": "Option",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "id": "panels_severitypicker_option",
       "community": 21,
       "norm_label": "option"
@@ -3571,7 +3589,7 @@
       "label": "OPTIONS",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "id": "panels_severitypicker_options",
       "community": 21,
       "norm_label": "options"
@@ -3580,7 +3598,7 @@
       "label": "SeverityPickerProps",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "panels_severitypicker_severitypickerprops",
       "community": 21,
       "norm_label": "severitypickerprops"
@@ -3589,7 +3607,7 @@
       "label": "SeverityPicker()",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L32",
+      "source_location": "L35",
       "id": "panels_severitypicker_severitypicker",
       "community": 21,
       "norm_label": "severitypicker()"
@@ -3600,7 +3618,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sidebar_tsx",
-      "community": 8,
+      "community": 25,
       "norm_label": "sidebar.tsx"
     },
     {
@@ -3609,7 +3627,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L18",
       "id": "panels_sidebar_tab",
-      "community": 8,
+      "community": 25,
       "norm_label": "tab"
     },
     {
@@ -3618,7 +3636,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L20",
       "id": "panels_sidebar_sidebarprops",
-      "community": 8,
+      "community": 25,
       "norm_label": "sidebarprops"
     },
     {
@@ -3627,7 +3645,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L54",
       "id": "panels_sidebar_tone",
-      "community": 8,
+      "community": 25,
       "norm_label": "tone"
     },
     {
@@ -3636,7 +3654,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L61",
       "id": "panels_sidebar_fmtradius",
-      "community": 8,
+      "community": 25,
       "norm_label": "fmtradius()"
     },
     {
@@ -3645,7 +3663,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L64",
       "id": "panels_sidebar_sectionkey",
-      "community": 8,
+      "community": 25,
       "norm_label": "sectionkey"
     },
     {
@@ -3654,7 +3672,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L68",
       "id": "panels_sidebar_default_open",
-      "community": 8,
+      "community": 25,
       "norm_label": "default_open"
     },
     {
@@ -3663,7 +3681,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L71",
       "id": "panels_sidebar_collapsiblesection",
-      "community": 8,
+      "community": 25,
       "norm_label": "collapsiblesection()"
     },
     {
@@ -3672,7 +3690,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L96",
       "id": "panels_sidebar_sidebar",
-      "community": 8,
+      "community": 25,
       "norm_label": "sidebar()"
     },
     {
@@ -3708,7 +3726,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_waterlevelmodal_tsx",
-      "community": 21,
+      "community": 27,
       "norm_label": "waterlevelmodal.tsx"
     },
     {
@@ -3717,7 +3735,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L9",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 6,
+      "community": 27,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -3726,7 +3744,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L18",
       "id": "panels_waterlevelmodal_m",
-      "community": 21,
+      "community": 27,
       "norm_label": "m"
     },
     {
@@ -3735,7 +3753,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L25",
       "id": "panels_waterlevelmodal_datelabel",
-      "community": 21,
+      "community": 27,
       "norm_label": "datelabel()"
     },
     {
@@ -3744,7 +3762,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L32",
       "id": "panels_waterlevelmodal_hourlabel",
-      "community": 21,
+      "community": 27,
       "norm_label": "hourlabel()"
     },
     {
@@ -3753,7 +3771,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L38",
       "id": "panels_waterlevelmodal_waterlevelmodal",
-      "community": 21,
+      "community": 27,
       "norm_label": "waterlevelmodal()"
     },
     {
@@ -3870,7 +3888,7 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L5",
       "id": "panels_reportdetailcard_reportdetailcardprops",
-      "community": 0,
+      "community": 20,
       "norm_label": "reportdetailcardprops"
     },
     {
@@ -3951,7 +3969,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L1",
       "id": "src_components_map_floodmap_tsx",
-      "community": 23,
+      "community": 13,
       "norm_label": "floodmap.tsx"
     },
     {
@@ -3960,7 +3978,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L9",
       "id": "map_floodmap_mapfocus",
-      "community": 23,
+      "community": 13,
       "norm_label": "mapfocus"
     },
     {
@@ -3969,7 +3987,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L14",
       "id": "map_floodmap_searchmark",
-      "community": 23,
+      "community": 13,
       "norm_label": "searchmark"
     },
     {
@@ -3978,7 +3996,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L18",
       "id": "map_floodmap_floodmapprops",
-      "community": 23,
+      "community": 13,
       "norm_label": "floodmapprops"
     },
     {
@@ -3987,7 +4005,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L47",
       "id": "map_floodmap_sheltericonhtml",
-      "community": 23,
+      "community": 13,
       "norm_label": "sheltericonhtml()"
     },
     {
@@ -3996,7 +4014,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L52",
       "id": "map_floodmap_sheltericon",
-      "community": 23,
+      "community": 13,
       "norm_label": "sheltericon()"
     },
     {
@@ -4005,7 +4023,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L56",
       "id": "map_floodmap_youicon",
-      "community": 23,
+      "community": 13,
       "norm_label": "youicon()"
     },
     {
@@ -4014,7 +4032,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L66",
       "id": "map_floodmap_pendingicon",
-      "community": 23,
+      "community": 13,
       "norm_label": "pendingicon()"
     },
     {
@@ -4023,7 +4041,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L71",
       "id": "map_floodmap_searchicon",
-      "community": 23,
+      "community": 13,
       "norm_label": "searchicon()"
     },
     {
@@ -4032,7 +4050,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L81",
       "id": "map_floodmap_flyto",
-      "community": 23,
+      "community": 13,
       "norm_label": "flyto()"
     },
     {
@@ -4041,7 +4059,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L91",
       "id": "map_floodmap_clickcatcher",
-      "community": 23,
+      "community": 13,
       "norm_label": "clickcatcher()"
     },
     {
@@ -4050,7 +4068,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L100",
       "id": "map_floodmap_floodmap",
-      "community": 23,
+      "community": 13,
       "norm_label": "floodmap()"
     },
     {
@@ -4077,7 +4095,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L1",
       "id": "src_hooks_useauth_ts",
-      "community": 3,
+      "community": 5,
       "norm_label": "useauth.ts"
     },
     {
@@ -4086,7 +4104,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L11",
       "id": "hooks_useauth_getdeviceid",
-      "community": 3,
+      "community": 5,
       "norm_label": "getdeviceid()"
     },
     {
@@ -4104,7 +4122,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L33",
       "id": "hooks_useauth_authresponse",
-      "community": 3,
+      "community": 5,
       "norm_label": "authresponse"
     },
     {
@@ -4113,7 +4131,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L43",
       "id": "hooks_useauth_loadsession",
-      "community": 3,
+      "community": 5,
       "norm_label": "loadsession()"
     },
     {
@@ -4122,7 +4140,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L53",
       "id": "hooks_useauth_decodegooglejwt",
-      "community": 3,
+      "community": 5,
       "norm_label": "decodegooglejwt()"
     },
     {
@@ -4131,7 +4149,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L63",
       "id": "hooks_useauth_useauthresult",
-      "community": 3,
+      "community": 5,
       "norm_label": "useauthresult"
     },
     {
@@ -4410,7 +4428,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L1",
       "id": "src_api_client_ts",
-      "community": 3,
+      "community": 5,
       "norm_label": "client.ts"
     },
     {
@@ -4419,7 +4437,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L8",
       "id": "api_client_apierror",
-      "community": 24,
+      "community": 5,
       "norm_label": "apierror"
     },
     {
@@ -4428,7 +4446,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L9",
       "id": "api_client_apierror_constructor",
-      "community": 24,
+      "community": 5,
       "norm_label": ".constructor()"
     },
     {
@@ -4437,7 +4455,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L19",
       "id": "api_client_request",
-      "community": 3,
+      "community": 5,
       "norm_label": "request()"
     },
     {
@@ -4446,7 +4464,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L70",
       "id": "api_client_api",
-      "community": 3,
+      "community": 5,
       "norm_label": "api"
     },
     {
@@ -4455,7 +4473,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L79",
       "id": "api_client_buildquery",
-      "community": 3,
+      "community": 5,
       "norm_label": "buildquery()"
     },
     {
@@ -4961,6 +4979,33 @@
       "id": "src_buildinfo_build_time",
       "community": 3,
       "norm_label": "build_time"
+    },
+    {
+      "label": "SITE_KEY",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L7",
+      "community": 26,
+      "norm_label": "site_key",
+      "id": "utils_turnstile_site_key"
+    },
+    {
+      "label": "loadScript()",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L26",
+      "community": 26,
+      "norm_label": "loadscript()",
+      "id": "utils_turnstile_loadscript"
+    },
+    {
+      "label": "getCaptchaToken()",
+      "file_type": "code",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L45",
+      "community": 26,
+      "norm_label": "getcaptchatoken()",
+      "id": "utils_turnstile_getcaptchatoken"
     },
     {
       "label": "formatVisits()",
@@ -7104,9 +7149,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "panels_searchbox_searchboxhandle",
-      "confidence_score": 1.0
+      "target": "panels_searchbox_searchboxhandle"
     },
     {
       "relation": "imports",
@@ -7338,9 +7383,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_components_panels_locationhelpmodal_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_locationhelpmodal_tsx"
     },
     {
       "relation": "imports_from",
@@ -7415,9 +7460,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_components_panels_searchbox_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_searchbox_tsx"
     },
     {
       "relation": "imports_from",
@@ -7569,9 +7614,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_i18n_tformat",
-      "confidence_score": 1.0
+      "target": "src_i18n_tformat"
     },
     {
       "relation": "imports_from",
@@ -7778,9 +7823,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_utils_geolocate_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_geolocate_ts"
     },
     {
       "relation": "imports_from",
@@ -7811,9 +7856,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_utils_turnstile_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_turnstile_ts"
     },
     {
       "relation": "imports_from",
@@ -7855,9 +7900,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "utils_geolocate_locatewithaccuracy",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_locatewithaccuracy"
     },
     {
       "relation": "imports",
@@ -7911,8 +7956,19 @@
       "source_location": "L4",
       "weight": 1.0,
       "source": "src_app_tsx",
-      "target": "utils_turnstile_getcaptchatoken",
+      "target": "utils_turnstile_captchaenabled",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_tsx",
+      "target": "utils_turnstile_getcaptchatoken"
     },
     {
       "relation": "imports",
@@ -8157,6 +8213,17 @@
       "target": "src_i18n_usei18n"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "source_location": "L1024",
+      "weight": 1.0,
+      "source": "src_app_app",
+      "target": "utils_turnstile_captchaenabled"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/main.tsx",
@@ -8195,9 +8262,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -8486,9 +8553,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -8563,9 +8630,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "src_i18n_msgkey",
-      "confidence_score": 1.0
+      "target": "src_i18n_msgkey"
     },
     {
       "relation": "calls",
@@ -8904,9 +8971,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "src_i18n_usei18n",
-      "confidence_score": 1.0
+      "target": "src_i18n_usei18n"
     },
     {
       "relation": "imports",
@@ -9361,9 +9428,9 @@
       "source_file": "src/types.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_ts",
-      "target": "src_types_reportertrust",
-      "confidence_score": 1.0
+      "target": "src_types_reportertrust"
     },
     {
       "relation": "contains",
@@ -11024,9 +11091,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
-      "target": "src_utils_geolocate_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_geolocate_ts"
     },
     {
       "relation": "contains",
@@ -11034,9 +11101,9 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_geolocate_ts",
-      "target": "utils_geolocate_fix",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_fix"
     },
     {
       "relation": "contains",
@@ -11044,9 +11111,9 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_geolocate_ts",
-      "target": "utils_geolocate_locateoptions",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_locateoptions"
     },
     {
       "relation": "contains",
@@ -11054,9 +11121,9 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_geolocate_ts",
-      "target": "utils_geolocate_locatewithaccuracy",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_locatewithaccuracy"
     },
     {
       "relation": "imports",
@@ -11065,9 +11132,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
-      "target": "utils_geolocate_locatewithaccuracy",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_locatewithaccuracy"
     },
     {
       "relation": "imports_from",
@@ -11403,9 +11470,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "src_utils_locationhelp_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_locationhelp_ts"
     },
     {
       "relation": "contains",
@@ -11413,9 +11480,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "utils_locationhelp_detecthelpbucket",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_detecthelpbucket"
     },
     {
       "relation": "contains",
@@ -11423,9 +11490,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "utils_locationhelp_helpbucket",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_helpbucket"
     },
     {
       "relation": "contains",
@@ -11433,9 +11500,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "utils_locationhelp_locationhelpsteps",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_locationhelpsteps"
     },
     {
       "relation": "contains",
@@ -11443,9 +11510,9 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_locationhelp_ts",
-      "target": "utils_locationhelp_steps",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_steps"
     },
     {
       "relation": "imports",
@@ -11454,9 +11521,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "utils_locationhelp_detecthelpbucket",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_detecthelpbucket"
     },
     {
       "relation": "imports",
@@ -11465,9 +11532,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "utils_locationhelp_locationhelpsteps",
-      "confidence_score": 1.0
+      "target": "utils_locationhelp_locationhelpsteps"
     },
     {
       "relation": "imports_from",
@@ -13378,14 +13445,25 @@
       "target": "utils_floodmeta_trendnote"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "src_utils_turnstile_ts",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_captchaenabled",
-      "confidence_score": 1.0
+      "target": "utils_turnstile_captchaenabled"
     },
     {
       "relation": "contains",
@@ -13393,9 +13471,9 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_getcaptchatoken",
-      "confidence_score": 1.0
+      "target": "utils_turnstile_getcaptchatoken"
     },
     {
       "relation": "contains",
@@ -13403,8 +13481,18 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_loadscript",
+      "target": "utils_turnstile_loadscript"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_loadturnstile",
       "confidence_score": 1.0
     },
     {
@@ -13413,8 +13501,18 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_site_key",
+      "target": "utils_turnstile_site_key"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_utils_turnstile_ts",
+      "target": "utils_turnstile_turnstile_site_key",
       "confidence_score": 1.0
     },
     {
@@ -13423,9 +13521,9 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_turnstileapi",
-      "confidence_score": 1.0
+      "target": "utils_turnstile_turnstileapi"
     },
     {
       "relation": "contains",
@@ -13433,19 +13531,63 @@
       "source_file": "src/utils/turnstile.ts",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_turnstile_ts",
-      "target": "utils_turnstile_window",
+      "target": "utils_turnstile_window"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "utils_turnstile_turnstile_site_key",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "src/utils/turnstile.ts",
-      "source_location": "L48",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L22",
       "weight": 1.0,
-      "source": "utils_turnstile_getcaptchatoken",
-      "target": "utils_turnstile_loadscript",
+      "source": "components_turnstilewidget_turnstilewidget",
+      "target": "utils_turnstile_captchaenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "utils_turnstile_captchaenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "components_turnstilewidget_turnstilewidget",
+      "target": "utils_turnstile_loadturnstile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "utils_turnstile_loadturnstile",
       "confidence_score": 1.0
     },
     {
@@ -13861,6 +14003,37 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SeverityPicker.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_severitypicker_tsx",
+      "target": "src_components_turnstilewidget_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "components_turnstilewidget_turnstilewidget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TurnstileWidget.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_turnstilewidget_tsx",
+      "target": "components_turnstilewidget_turnstilewidgetprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/AlertModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -13945,9 +14118,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "panels_locationhelpmodal_locationhelpmodal",
-      "confidence_score": 1.0
+      "target": "panels_locationhelpmodal_locationhelpmodal"
     },
     {
       "relation": "contains",
@@ -13955,9 +14128,9 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_locationhelpmodal_tsx",
-      "target": "panels_locationhelpmodal_locationhelpmodalprops",
-      "confidence_score": 1.0
+      "target": "panels_locationhelpmodal_locationhelpmodalprops"
     },
     {
       "relation": "imports",
@@ -14071,9 +14244,9 @@
       "source_file": "src/components/panels/TopBar.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_topbar_tsx",
-      "target": "panels_searchbox_searchboxhandle",
-      "confidence_score": 1.0
+      "target": "panels_searchbox_searchboxhandle"
     },
     {
       "relation": "contains",
@@ -14209,9 +14382,9 @@
       "source_file": "src/components/panels/TopBar.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_topbar_topbarprops",
-      "target": "panels_searchbox_searchboxhandle",
-      "confidence_score": 1.0
+      "target": "panels_searchbox_searchboxhandle"
     },
     {
       "relation": "calls",
@@ -14510,9 +14683,9 @@
       "source_file": "src/components/panels/SearchBox.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_searchbox_tsx",
-      "target": "panels_searchbox_searchboxhandle",
-      "confidence_score": 1.0
+      "target": "panels_searchbox_searchboxhandle"
     },
     {
       "relation": "contains",
@@ -15635,9 +15808,9 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_hooks_useauth_ts",
-      "target": "hooks_useauth_getdeviceid",
-      "confidence_score": 1.0
+      "target": "hooks_useauth_getdeviceid"
     },
     {
       "relation": "contains",
@@ -16486,9 +16659,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_claude_md",
-      "target": "baha_ui_claude_development_process",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_development_process"
     },
     {
       "relation": "contains",
@@ -16546,9 +16719,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L163",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_rules",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_rules"
     },
     {
       "relation": "contains",
@@ -16556,9 +16729,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L102",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_1_create_a_numbered_branch",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_1_create_a_numbered_branch"
     },
     {
       "relation": "contains",
@@ -16566,9 +16739,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_2_clarify_before_coding",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_2_clarify_before_coding"
     },
     {
       "relation": "contains",
@@ -16576,9 +16749,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L114",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_3_append_to_db_setup_sql_only_if_db_changed",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_3_append_to_db_setup_sql_only_if_db_changed"
     },
     {
       "relation": "contains",
@@ -16586,9 +16759,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L117",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_4_create_db_nnn_type_desc_migration_sql_only_if_db_changed",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_4_create_db_nnn_type_desc_migration_sql_only_if_db_changed"
     },
     {
       "relation": "contains",
@@ -16596,9 +16769,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_5_create_db_nnn_type_desc_rollback_sql_only_if_db_changed",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_5_create_db_nnn_type_desc_rollback_sql_only_if_db_changed"
     },
     {
       "relation": "contains",
@@ -16606,9 +16779,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo"
     },
     {
       "relation": "contains",
@@ -16616,9 +16789,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L148",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed"
     },
     {
       "relation": "contains",
@@ -16626,9 +16799,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_development_process",
-      "target": "baha_ui_claude_step_8_completion_report",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_step_8_completion_report"
     },
     {
       "relation": "contains",
@@ -16636,9 +16809,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_step_1_create_a_numbered_branch",
-      "target": "baha_ui_claude_codeblock_2",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_codeblock_2"
     },
     {
       "relation": "contains",
@@ -16646,9 +16819,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L125",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_step_6_update_documentations_changelog_md_backend_repo",
-      "target": "baha_ui_claude_codeblock_3",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_codeblock_3"
     },
     {
       "relation": "contains",
@@ -16656,9 +16829,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_step_7_apply_migration_locally_provide_execution_summary_only_if_db_changed",
-      "target": "baha_ui_claude_codeblock_4",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_codeblock_4"
     },
     {
       "relation": "contains",
@@ -16666,11 +16839,22 @@
       "source_file": "CLAUDE.md",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "baha_ui_claude_step_8_completion_report",
-      "target": "baha_ui_claude_codeblock_5",
-      "confidence_score": 1.0
+      "target": "baha_ui_claude_codeblock_5"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/turnstile.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "utils_turnstile_getcaptchatoken",
+      "target": "utils_turnstile_loadscript"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "394dc31f9f147adc559aad0e5581afa4a94d2ac7"
+  "built_at_commit": "cedb92990ad3cf2e6c0d2160b9fe209b90ef1149"
 }
