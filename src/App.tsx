@@ -5,7 +5,7 @@ import { useIsMobile } from './hooks/useBreakpoint';
 import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
-import { useI18n } from './i18n';
+import { useI18n, tFormat } from './i18n';
 import { mutations } from './api/queries';
 import { ApiError } from './api/client';
 import type { GeoResult } from './api/geocode';
@@ -25,6 +25,8 @@ import {
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
 import { loadRoads, roadsLoaded } from './utils/roadSnap';
+import { locateWithAccuracy } from './utils/geolocate';
+import type { SearchBoxHandle } from './components/panels/SearchBox';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
 import AlertModal from './components/panels/AlertModal';
@@ -36,6 +38,7 @@ import ReportDetailCard from './components/panels/ReportDetailCard';
 import EvacDetailCard from './components/panels/EvacDetailCard';
 import SeverityPicker from './components/panels/SeverityPicker';
 import SosModal from './components/panels/SosModal';
+import LocationHelpModal from './components/panels/LocationHelpModal';
 import Toast, { type ToastData } from './components/panels/Toast';
 import NotifyModal, { type NotifyPrefs, DEFAULT_NOTIFY_PREFS } from './components/panels/NotifyModal';
 import WaterLevelModal from './components/panels/WaterLevelModal';
@@ -99,6 +102,13 @@ const App: React.FC = () => {
   const allFeedback = useAllFeedback();
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
+  // Accuracy (meters) of the latest GPS fix — drives the map's uncertainty ring and the
+  // "approximate location" guidance. Null until the first fix lands.
+  const [userAccuracyM, setUserAccuracyM] = React.useState<number | null>(null);
+  // Lets a coarse-fix toast jump focus into the TopBar location search (the manual fallback).
+  const searchBoxRef = React.useRef<SearchBoxHandle>(null);
+  // "How to enable location" help modal — opened from the permission-denied toast.
+  const [locHelpOpen, setLocHelpOpen] = React.useState(false);
 
   // Ticking clock so report expiry (severity-scaled TTL) and the safety status update in real time
   // without waiting on a refetch.
@@ -194,11 +204,18 @@ const App: React.FC = () => {
 
   // Try to use the device location (falls back to the default monitoring area).
   React.useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => {/* keep default */},
-      { enableHighAccuracy: false, timeout: 8000 }
+    // Let the fix converge in the background and keep the best reading; the map's "You" marker
+    // and accuracy ring follow each improvement. On failure we keep the default monitoring area.
+    void locateWithAccuracy({
+      desiredAccuracyM: 60,
+      totalTimeoutMs: 10000,
+      onProgress: (fix) => {
+        setUserLoc({ lat: fix.lat, lng: fix.lng });
+        setUserAccuracyM(fix.accuracyM);
+      },
+    }).then(
+      (fix) => { setUserLoc({ lat: fix.lat, lng: fix.lng }); setUserAccuracyM(fix.accuracyM); },
+      () => {/* keep default */}
     );
   }, []);
 
@@ -526,25 +543,27 @@ const App: React.FC = () => {
     setMapFocus({ ...userLoc, key: Date.now() });
     runReverseGeocode(userLoc);
     // Refresh the GPS fix so the pin/centering reflect where they actually are right now
-    // (the on-mount fix may be stale, or fell back to the default monitoring area).
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          setUserLoc(loc);
-          // Only re-pin/recenter if they haven't already moved the pin themselves.
-          setPending((p) => {
-            if (p && p.atYou) {
-              setMapFocus({ ...loc, key: Date.now() });
-              runReverseGeocode(loc);
-            }
-            return p && p.atYou ? { ...loc, atYou: true } : p;
-          });
-        },
-        () => {/* keep the current location */},
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    }
+    // (the on-mount fix may be stale, or fell back to the default monitoring area). As the fix
+    // converges, re-pin to each better reading — but only while the pin is still "at you", so we
+    // never yank a pin the user has already dragged/searched somewhere else.
+    const applyFix = (loc: LatLng, accuracyM: number): void => {
+      setUserLoc(loc);
+      setUserAccuracyM(accuracyM);
+      setPending((p) => {
+        if (p && p.atYou) {
+          setMapFocus({ ...loc, key: Date.now() });
+          runReverseGeocode(loc);
+        }
+        return p && p.atYou ? { ...loc, atYou: true } : p;
+      });
+    };
+    void locateWithAccuracy({
+      desiredAccuracyM: 30,
+      onProgress: (fix) => applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM),
+    }).then(
+      (fix) => applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM),
+      () => {/* keep the current location */}
+    );
   };
 
   const cancelReport = (): void => {
@@ -768,6 +787,13 @@ const App: React.FC = () => {
   const onSearchSelect = (r: GeoResult): void => {
     setSearchMark({ lat: r.lat, lng: r.lng, label: r.label });
     setMapFocus({ lat: r.lat, lng: r.lng, key: Date.now() });
+    // While reporting, a search is the manual fallback for a poor GPS fix: drop the report pin at
+    // the chosen place (no longer "at you", so a converging fix won't drag it back) and re-resolve
+    // its road/district.
+    if (mode === 'report') {
+      setPending({ lat: r.lat, lng: r.lng, atYou: false });
+      runReverseGeocode({ lat: r.lat, lng: r.lng });
+    }
   };
 
   const setNotifyEnabled = async (on: boolean): Promise<void> => {
@@ -792,32 +818,43 @@ const App: React.FC = () => {
     setMapFocus({ lat: entry.latitude, lng: entry.longitude, key: Date.now() });
   };
 
-  // Floating locate control: grab a fresh high-accuracy GPS fix, then recenter the map on it.
-  // The pulsing "You" marker already renders at userLoc, so flying there pinpoints the user.
+  // Floating locate control: let a high-accuracy fix converge, recenter the map on the best one,
+  // then report how precise it ended up. The pulsing "You" marker + accuracy ring track each
+  // improvement. A coarse fix (typically desktop WiFi/IP) points the user at the address search.
   const locateMe = React.useCallback((): void => {
     if (!navigator.geolocation) {
-      showToast('Location isn’t available on this device.');
+      showToast(tFormat(lang, 'loc.unavailable', {}));
       return;
     }
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setUserLoc(loc);
-        setMapFocus({ ...loc, key: Date.now() });
+    const track = (lat: number, lng: number, accuracyM: number): void => {
+      setUserLoc({ lat, lng });
+      setUserAccuracyM(accuracyM);
+    };
+    void locateWithAccuracy({
+      desiredAccuracyM: 30,
+      onProgress: (fix) => track(fix.lat, fix.lng, fix.accuracyM),
+    }).then(
+      (fix) => {
+        track(fix.lat, fix.lng, fix.accuracyM);
+        setMapFocus({ lat: fix.lat, lng: fix.lng, key: Date.now() });
         setLocating(false);
+        const m = Math.round(fix.accuracyM);
+        if (fix.accuracyM > 100) {
+          showToast(tFormat(lang, 'loc.approx', { m }), tFormat(lang, 'loc.searchAction', {}), () => searchBoxRef.current?.focus());
+        } else {
+          showToast(tFormat(lang, 'loc.found', { m }));
+        }
       },
-      (err) => {
+      (err: unknown) => {
         setLocating(false);
-        showToast(
-          err.code === err.PERMISSION_DENIED
-            ? 'Location permission denied — enable it in your browser settings.'
-            : 'Couldn’t get your location. Please try again.'
-        );
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
+        const denied = typeof err === 'object' && err !== null && (err as GeolocationPositionError).code === 1;
+        // A denied permission is fixable — offer step-by-step help to re-enable it.
+        if (denied) showToast(tFormat(lang, 'loc.denied', {}), tFormat(lang, 'loc.enableHelp', {}), () => setLocHelpOpen(true));
+        else showToast(tFormat(lang, 'loc.failed', {}));
+      }
     );
-  }, [showToast]);
+  }, [showToast, lang]);
 
   const highCount = filterCounts.high;
   const totalCount = active.length;
@@ -840,6 +877,7 @@ const App: React.FC = () => {
         onSignIn={() => setLogin({ open: true })}
         onSignOut={logout}
         onSearchSelect={onSearchSelect}
+        searchRef={searchBoxRef}
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}
         onDashboard={() => setDashboardOpen(true)}
@@ -872,6 +910,7 @@ const App: React.FC = () => {
         <div style={mapAreaStyle}>
           <FloodMap
             userLoc={userLoc}
+            userAccuracyM={userAccuracyM}
             reports={visible}
             centers={centerList}
             roadSegments={visibleRoadSegments}
@@ -900,7 +939,13 @@ const App: React.FC = () => {
           {mode === 'report' && (
             <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0EA5E9', boxShadow: '0 0 0 4px rgba(14,165,233,.3)', flex: 'none' }} />
-              <span style={{ lineHeight: 1.3 }}>{pending?.atYou ? 'Reporting at your location — tap the map to move the pin' : 'Tap the map where it’s flooding'}</span>
+              <span style={{ lineHeight: 1.3 }}>{
+                !pending?.atYou
+                  ? t('report.hintTap')
+                  : userAccuracyM != null
+                    ? tFormat(lang, 'report.hintAtYouAcc', { m: Math.round(userAccuracyM) })
+                    : t('report.hintAtYou')
+              }</span>
               <button onClick={cancelReport} style={{ border: 0, background: 'rgba(255,255,255,.14)', color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>Cancel</button>
             </div>
           )}
@@ -989,6 +1034,10 @@ const App: React.FC = () => {
 
       {sosOpen && (
         <SosModal hotlines={hotlineList} sending={sending} onSendRescue={() => void sendRescue()} onClose={() => setSosOpen(false)} />
+      )}
+
+      {locHelpOpen && (
+        <LocationHelpModal onRetry={() => { setLocHelpOpen(false); locateMe(); }} onClose={() => setLocHelpOpen(false)} />
       )}
 
       {notifyOpen && (

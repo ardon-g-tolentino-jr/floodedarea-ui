@@ -178,6 +178,57 @@ const MESSAGES = {
   'sos.callHotline': { en: 'CALL A HOTLINE', fil: 'TUMAWAG SA HOTLINE' },
   'sos.danger911': { en: 'If you are in immediate danger, move to the highest safe floor and call 911.', fil: 'Kung nasa agarang panganib ka, pumunta sa pinakamataas na ligtas na palapag at tumawag sa 911.' },
 
+  // ── Location / GPS ──
+  'loc.unavailable': { en: 'Location isn’t available on this device.', fil: 'Hindi available ang lokasyon sa device na ito.' },
+  'loc.denied': { en: 'Location permission denied — enable it in your browser settings.', fil: 'Tinanggihan ang pahintulot sa lokasyon — paganahin ito sa iyong browser settings.' },
+  'loc.failed': { en: 'Couldn’t get your location. Please try again.', fil: 'Hindi makuha ang iyong lokasyon. Pakisubukang muli.' },
+  'loc.found': { en: 'Location found (±{m} m).', fil: 'Nahanap ang lokasyon (±{m} m).' },
+  'loc.approx': { en: 'Location is approximate (±{m} m) — search your address instead.', fil: 'Tinatantya lang ang lokasyon (±{m} m) — hanapin na lang ang iyong address.' },
+  'loc.searchAction': { en: 'Search', fil: 'Hanapin' },
+  'loc.enableHelp': { en: 'How to enable', fil: 'Paano i-enable' },
+
+  // ── "How to enable location" help modal ──
+  'locHelp.title': { en: 'Turn on location', fil: 'I-on ang lokasyon' },
+  'locHelp.intro': { en: 'FloodedArea uses your location to center the map and place your reports accurately. It looks blocked right now — here’s how to allow it.', fil: 'Ginagamit ng FloodedArea ang iyong lokasyon para i-gitna ang mapa at tumpak na mailagay ang iyong mga ulat. Mukhang naka-block ito ngayon — narito kung paano ito payagan.' },
+  'locHelp.stepsFor': { en: 'STEPS FOR YOUR BROWSER', fil: 'MGA HAKBANG PARA SA IYONG BROWSER' },
+  'locHelp.tryAgain': { en: 'Try again', fil: 'Subukang muli' },
+  'locHelp.privacy': { en: 'Your location stays on your device — it’s only sent when you submit a report or an SOS.', fil: 'Nananatili sa iyong device ang lokasyon — ipinapadala lamang ito kapag nagsumite ka ng ulat o SOS.' },
+
+  // Desktop Chrome / Edge / Brave / Opera
+  'locHelp.chromium.1': { en: 'Click the lock or tune icon at the left of the address bar.', fil: 'I-click ang lock o tune na icon sa kaliwa ng address bar.' },
+  'locHelp.chromium.2': { en: 'Find “Location” and switch it to “Allow”.', fil: 'Hanapin ang “Location” at gawing “Allow”.' },
+  'locHelp.chromium.3': { en: 'Reload the page, then tap “Try again”.', fil: 'I-reload ang pahina, pagkatapos ay i-tap ang “Subukang muli”.' },
+
+  // Desktop Firefox
+  'locHelp.firefox.1': { en: 'Click the lock icon at the left of the address bar.', fil: 'I-click ang lock na icon sa kaliwa ng address bar.' },
+  'locHelp.firefox.2': { en: 'Under Permissions, clear the block on “Access your location”.', fil: 'Sa ilalim ng Permissions, alisin ang block sa “Access your location”.' },
+  'locHelp.firefox.3': { en: 'Reload the page and choose “Allow” when asked.', fil: 'I-reload ang pahina at piliin ang “Allow” kapag tinanong.' },
+
+  // Desktop Safari (macOS)
+  'locHelp.safari.1': { en: 'Open Safari → Settings → Websites → Location.', fil: 'Buksan ang Safari → Settings → Websites → Location.' },
+  'locHelp.safari.2': { en: 'Set this website to “Allow”.', fil: 'Gawing “Allow” ang website na ito.' },
+  'locHelp.safari.3': { en: 'Also enable System Settings → Privacy & Security → Location Services → Safari.', fil: 'I-enable din ang System Settings → Privacy & Security → Location Services → Safari.' },
+
+  // iOS (iPhone / iPad)
+  'locHelp.ios.1': { en: 'Open the iOS Settings app → Privacy & Security → Location Services and turn it on.', fil: 'Buksan ang iOS Settings app → Privacy & Security → Location Services at i-on ito.' },
+  'locHelp.ios.2': { en: 'Scroll to your browser (Safari or Chrome) and set it to “While Using the App”.', fil: 'Mag-scroll sa iyong browser (Safari o Chrome) at gawing “While Using the App”.' },
+  'locHelp.ios.3': { en: 'Return here and tap “Try again”.', fil: 'Bumalik dito at i-tap ang “Subukang muli”.' },
+
+  // Android (Chrome)
+  'locHelp.android.1': { en: 'Tap the lock icon next to the address bar → Permissions → Location → Allow.', fil: 'I-tap ang lock na icon katabi ng address bar → Permissions → Location → Allow.' },
+  'locHelp.android.2': { en: 'Make sure the phone’s Location is on (Settings → Location).', fil: 'Tiyaking naka-on ang Location ng telepono (Settings → Location).' },
+  'locHelp.android.3': { en: 'Reload the page and tap “Try again”.', fil: 'I-reload ang pahina at i-tap ang “Subukang muli”.' },
+
+  // Unknown browser — generic guidance
+  'locHelp.generic.1': { en: 'Open your browser’s site settings for this page.', fil: 'Buksan ang site settings ng iyong browser para sa pahinang ito.' },
+  'locHelp.generic.2': { en: 'Set the Location permission to “Allow”.', fil: 'Gawing “Allow” ang permission para sa Location.' },
+  'locHelp.generic.3': { en: 'Reload the page, then tap “Try again”.', fil: 'I-reload ang pahina, pagkatapos ay i-tap ang “Subukang muli”.' },
+
+  // ── Report-mode hint ──
+  'report.hintTap': { en: 'Tap the map where it’s flooding', fil: 'I-tap ang mapa kung saan may baha' },
+  'report.hintAtYou': { en: 'Reporting at your location — tap the map or search an address to fine-tune', fil: 'Nag-uulat sa iyong lokasyon — i-tap ang mapa o maghanap ng address para iayos' },
+  'report.hintAtYouAcc': { en: 'Reporting near your location (±{m} m) — tap the map or search an address to fine-tune', fil: 'Nag-uulat malapit sa iyong lokasyon (±{m} m) — i-tap ang mapa o maghanap ng address para iayos' },
+
   // ── Report list item ──
   'report.yours': { en: 'YOURS', fil: 'IYO' },
   'report.kmAway': { en: 'km away', fil: 'km ang layo' },

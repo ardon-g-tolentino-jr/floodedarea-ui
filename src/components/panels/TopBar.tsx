@@ -3,7 +3,7 @@ import type { AuthState } from '../../hooks/useAuth';
 import type { GeoResult } from '../../api/geocode';
 import { BUILD_COMMIT, BUILD_LABEL, BUILD_TIME } from '../../buildInfo';
 import { useI18n } from '../../i18n';
-import SearchBox from './SearchBox';
+import SearchBox, { type SearchBoxHandle } from './SearchBox';
 
 interface TopBarProps {
   isMobile: boolean;
@@ -14,6 +14,8 @@ interface TopBarProps {
   onSignIn: () => void;
   onSignOut: () => void;
   onSearchSelect: (r: GeoResult) => void;
+  /** Lets App focus the location search imperatively (e.g. from a "search instead" toast). */
+  searchRef?: React.Ref<SearchBoxHandle>;
   onNotify: () => void;
   notifyOn: boolean;
   onDashboard: () => void;
@@ -61,6 +63,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onSignIn,
   onSignOut,
   onSearchSelect,
+  searchRef,
   onNotify,
   notifyOn,
   onDashboard,
@@ -234,7 +237,7 @@ const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Location search */}
-      <SearchBox isMobile={isMobile} onSelect={onSearchSelect} onExpandedChange={setSearchExpanded} />
+      <SearchBox ref={searchRef} isMobile={isMobile} onSelect={onSearchSelect} onExpandedChange={setSearchExpanded} />
 
       {/* The action cluster yields the whole row to the search field while it's expanded on mobile. */}
       {!(isMobile && searchExpanded) && (

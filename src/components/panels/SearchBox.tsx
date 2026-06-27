@@ -8,9 +8,14 @@ interface SearchBoxProps {
   onExpandedChange?: (expanded: boolean) => void;
 }
 
+/** Imperative handle so callers (e.g. a "search instead" toast) can jump focus into the field. */
+export interface SearchBoxHandle {
+  focus: () => void;
+}
+
 const DEBOUNCE_MS = 350;
 
-const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect, onExpandedChange }) => {
+const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile, onSelect, onExpandedChange }, ref) => {
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -28,6 +33,15 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect, onExpandedCha
   const rootRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const abortRef = React.useRef<AbortController | null>(null);
+
+  // Expose focus(): on mobile the field is collapsed behind an icon, so expand it first, then
+  // focus on the next tick once the input has actually rendered.
+  React.useImperativeHandle(ref, () => ({
+    focus: () => {
+      if (isMobile) setExpanded(true);
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+    },
+  }), [isMobile]);
 
   // Debounced geocode whenever the query changes.
   React.useEffect(() => {
@@ -219,6 +233,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({ isMobile, onSelect, onExpandedCha
       {dropdown}
     </div>
   );
-};
+});
+
+SearchBox.displayName = 'SearchBox';
 
 export default SearchBox;

@@ -17,6 +17,8 @@ export interface SearchMark extends LatLng {
 
 interface FloodMapProps {
   userLoc: LatLng;
+  /** GPS accuracy radius (meters) for the latest fix; draws the uncertainty ring. Null = unknown. */
+  userAccuracyM?: number | null;
   reports: EnrichedReport[];
   centers: EvacuationCenter[];
   roadSegments: RoadSegment[];
@@ -97,6 +99,7 @@ const ClickCatcher: React.FC<{ onMapClick: (latlng: LatLng) => void }> = ({ onMa
 
 const FloodMap: React.FC<FloodMapProps> = ({
   userLoc,
+  userAccuracyM,
   reports,
   centers,
   roadSegments,
@@ -278,6 +281,16 @@ const FloodMap: React.FC<FloodMapProps> = ({
 
       {/* Pending report pin */}
       {pending && <Marker position={[pending.lat, pending.lng]} icon={pendingIcon()} />}
+
+      {/* GPS uncertainty ring — sized to the fix's accuracy so users can see how precise it is
+          (and watch it shrink as the fix converges). Hidden once the fix is already tight. */}
+      {userAccuracyM != null && userAccuracyM > 15 && (
+        <Circle
+          center={[userLoc.lat, userLoc.lng]}
+          radius={userAccuracyM}
+          pathOptions={{ color: '#0EA5E9', weight: 1, opacity: 0.35, fillColor: '#0EA5E9', fillOpacity: 0.08 }}
+        />
+      )}
 
       {/* You */}
       <Marker position={[userLoc.lat, userLoc.lng]} icon={youIcon()} />

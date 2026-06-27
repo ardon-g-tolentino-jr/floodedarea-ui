@@ -14,6 +14,7 @@ import type {
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { MIN_QUERY_LENGTH, searchPlaces, type GeoResult } from '../../api/geocode';
+import { locateWithAccuracy } from '../../utils/geolocate';
 
 type Tab = 'shelters' | 'hotlines' | 'alerts' | 'reports' | 'requests';
 
@@ -207,9 +208,10 @@ const PlaceField: React.FC<{
       return;
     }
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        onPick(pos.coords.latitude, pos.coords.longitude, 'My current location');
+    // Let the fix converge and keep the best reading, then label the pick with its accuracy.
+    void locateWithAccuracy({ desiredAccuracyM: 30 }).then(
+      (fix) => {
+        onPick(fix.lat, fix.lng, `My current location (±${Math.round(fix.accuracyM)} m)`);
         setQuery('');
         setResults([]);
         setOpen(false);
@@ -218,8 +220,7 @@ const PlaceField: React.FC<{
       () => {
         setGeoError('Could not get your location. Allow location access or search instead.');
         setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
+      }
     );
   };
 
