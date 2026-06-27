@@ -48,6 +48,22 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Statcounter analytics for floodedarea.com. This classic (non-deferred) script runs during
+         page parse, so its document.write injects the counter inline before the app module loads.
+         Counts one visit per full page load (fine for this single-page app). -->
+    <!-- Default Statcounter code for Flooded Area https://floodedarea.com/ -->
+    <script type="text/javascript">
+      var sc_project = 13325648;
+      var sc_invisible = 0;
+      var sc_security = "0a9a0e9e";
+      var scJsHost = "https://";
+      document.write("<sc" + "ript type='text/javascript' src='" + scJsHost +
+        "statcounter.com/counter/counter.js'></" + "script>");
+    </script>
+    <noscript><div class="statcounter"><a title="Web Analytics Made Easy - Statcounter" href="https://statcounter.com/" target="_blank"><img class="statcounter" src="https://c.statcounter.com/13325648/0/0a9a0e9e/0/" alt="Web Analytics Made Easy - Statcounter" referrerpolicy="no-referrer-when-downgrade"></a></div></noscript>
+    <!-- End of Statcounter Code -->
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
