@@ -63,6 +63,12 @@ export const REPORT_TTL_MIN: Record<Severity, number> = {
 /** Default/fallback freshness window (medium), for callers without a specific severity. */
 export const REPORT_TTL_DEFAULT_MIN = REPORT_TTL_MIN.medium;
 
+// Two active reports by the same person must be at least this far apart. Closer than this is
+// treated as the SAME flood (Confirm/update the existing report instead of posting a duplicate);
+// farther — e.g. driven down the road to a new flooded street — is a distinct sighting, so a
+// second report is allowed. This replaces the old blanket "one active report per person" gate.
+export const REPORT_DISTINCT_M = 250; // metres
+
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
   distKm: number;
@@ -117,6 +123,23 @@ export function enrichReports(
       expired: r.status === 'resolved' || expiresInMin <= 0,
     };
   });
+}
+
+/**
+ * The user's nearest still-active report within `withinM` of `loc`, if any — i.e. the report a new
+ * pin at `loc` would duplicate. Returns undefined when `loc` is a distinct area, which is the signal
+ * that a second report is allowed (the "drove to a new flooded street" case). Pure over `enriched`.
+ */
+export function nearbyOwnActiveReport(
+  enriched: EnrichedReport[],
+  loc: LatLng,
+  withinM: number = REPORT_DISTINCT_M
+): EnrichedReport | undefined {
+  return enriched
+    .filter((r) => r.mine && !r.expired)
+    .map((r) => ({ r, m: kmBetween(loc, { lat: r.latitude, lng: r.longitude }) * 1000 }))
+    .filter((x) => x.m <= withinM)
+    .sort((a, b) => a.m - b.m)[0]?.r;
 }
 
 /** One road's aggregated condition, rolled up from every report that mentions it. */

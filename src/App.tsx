@@ -19,6 +19,7 @@ import {
   buildRoadDirectory,
   computeStatus,
   enrichReports,
+  nearbyOwnActiveReport,
   type EnrichedReport,
   type PossibleClosure,
   type RoadEntry,
@@ -533,12 +534,12 @@ const App: React.FC = () => {
       showToast('Could not start reporting right now. Please try again.');
       return;
     }
-    // Anti-spam: one live report per person. While the user's last report is still within its
-    // 30-min window, point them at it instead of letting them post another.
-    const existing = enriched.find((r) => r.mine && !r.expired);
+    // Anti-spam: one live report per LOCATION. A new report in a distinct area is allowed (you may
+    // have driven on to another flooded street), but re-reporting a spot you already have an active
+    // report at is a duplicate — point them at it (to Confirm/update) instead of posting another.
+    const existing = nearbyOwnActiveReport(enriched, userLoc);
     if (existing) {
-      const wait = Math.max(1, existing.expiresInMin);
-      showToast(`You already have an active report — you can post again in ${wait} min.`, 'View', () => {
+      showToast('You already reported flooding here — confirm that report instead. To report a different area, move along and try again.', 'View', () => {
         setTab('nearby');
         setSelEvacId(null);
         setSelectedReportId(existing.id);
@@ -606,6 +607,18 @@ const App: React.FC = () => {
         showToast('Please complete the security check, then post again.');
         return;
       }
+      // Re-check the actual pin location at submit time (the pre-form gate used the GPS fix, but the
+      // user can drag the pin back onto an area they already reported). Same-location → duplicate.
+      const dup = nearbyOwnActiveReport(enriched, pending);
+      if (dup) {
+        showToast('You already reported flooding here. Confirm that report, or move the pin to a different area.', 'View', () => {
+          setTab('nearby');
+          setSelEvacId(null);
+          setSelectedReportId(dup.id);
+          setMapFocus({ lat: dup.latitude, lng: dup.longitude, key: Date.now() });
+        });
+        return;
+      }
       // The label identifies WHICH street is flooded (reverse-geocoded from the pin, then editable
       // by the reporter). Lead with the public street and append the barangay for context
       // ("Lilac St, Batasan Hills"). With no public street, fall back to the barangay, then
@@ -643,6 +656,12 @@ const App: React.FC = () => {
       }
     } catch (err) {
       if (handleAuthError(err, 'Your session expired. Please sign in again to post a report.')) return;
+      // Surface an intentional server rejection (e.g. a backend duplicate/rate-limit guard) so the
+      // user sees the actual reason instead of a generic failure.
+      if (err instanceof ApiError && (err.status === 409 || err.status === 429)) {
+        showToast(err.message);
+        return;
+      }
       showToast('Could not post your report. Please try again.');
     } finally {
       setBusyPick(false);
