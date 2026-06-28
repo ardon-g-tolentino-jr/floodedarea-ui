@@ -146,8 +146,9 @@ export type FeedbackType = 'bug' | 'feature';
 export type FeedbackStatus = 'pending' | 'accepted' | 'declined';
 
 /**
- * A logged-in user's bug report or feature request. Admins accept feature requests in the console;
- * accepted features are shown to all registered users. Bugs stay in the admin queue.
+ * A bug report or feature request. Anyone (including a no-login guest) can submit one; it enters as
+ * `pending`. Admins accept/decline in the console, and accepted items — both bugs and features —
+ * appear on the public Community feedback board, where anyone can upvote them.
  */
 export interface Feedback {
   id: number;
@@ -157,15 +158,21 @@ export interface Feedback {
   status: FeedbackStatus;
   submittedByUserId: number | null;
   submitterName: string | null;
+  /** Total upvotes from the community. */
+  upvotes: number;
+  /** Whether the current caller (account or guest device) has already upvoted — like `mine` on reports. */
+  upvotedByMe: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-/** Payload for submitting feedback (the submitter is taken from the JWT). */
+/** Payload for submitting feedback (the submitter is taken from the JWT, full account or guest). */
 export interface NewFeedback {
   type: FeedbackType;
   title: string;
   details?: string;
+  /** Anti-abuse CAPTCHA proof, sent only for guest submissions when Turnstile is configured. */
+  captchaToken?: string;
 }
 
 /** Site visit tally — `total` is the all-time count returned by the public stats endpoint. */

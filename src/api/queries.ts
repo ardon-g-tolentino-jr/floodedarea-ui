@@ -31,8 +31,8 @@ export const rawApi = {
   alerts: () => api.get<FloodAlert[]>('/alerts'),
   roadStatus: () => api.get<RoadSegment[]>('/road-status'),
   rescues: () => api.get<RescueRequest[]>('/rescue'),
-  /** Accepted feature requests — shown to every registered user. */
-  acceptedFeatures: () => api.get<Feedback[]>('/feedback/accepted'),
+  /** Accepted feedback (bugs + features) — the public Community feedback board, ordered by upvotes. */
+  acceptedFeedback: () => api.get<Feedback[]>('/feedback/accepted'),
   /** Admin: the full feedback moderation queue. */
   allFeedback: () => api.get<Feedback[]>('/feedback'),
   /** Public all-time visit tally (read-only — does not increment). */
@@ -54,10 +54,12 @@ export const mutations = {
   updateRescue: (id: number, body: { status: RescueStatus }) =>
     api.patch<RescueRequest>(`/rescue/${id}`, body),
 
-  // ── Feedback: any logged-in user submits; admin accepts/declines ──
+  // ── Feedback: anyone (account or guest) submits; admin accepts/declines; anyone upvotes ──
   createFeedback: (body: NewFeedback) => api.post<Feedback>('/feedback', body),
   updateFeedbackStatus: (id: number, status: FeedbackStatus) =>
     api.patch<Feedback>(`/feedback/${id}`, { status }),
+  /** Toggle the caller's upvote on a feedback item; returns the updated item (count + upvotedByMe). */
+  upvoteFeedback: (id: number) => api.post<Feedback>(`/feedback/${id}/upvote`, {}),
 
   // ── Admin: evacuation centers ──
   createCenter: (body: NewCenter) => api.post<EvacuationCenter>('/centers', body),

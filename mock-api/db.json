@@ -366,6 +366,8 @@
       "status": "accepted",
       "submittedByUserId": 2,
       "submitterName": "Maria S.",
+      "upvotes": 24,
+      "upvoterIds": [],
       "createdAt": "2026-06-20T03:10:00Z",
       "updatedAt": "2026-06-21T01:00:00Z"
     },
@@ -377,8 +379,23 @@
       "status": "accepted",
       "submittedByUserId": 3,
       "submitterName": "Jun P.",
+      "upvotes": 11,
+      "upvoterIds": [],
       "createdAt": "2026-06-19T22:00:00Z",
       "updatedAt": "2026-06-20T05:00:00Z"
+    },
+    {
+      "id": 1004,
+      "type": "bug",
+      "title": "Search dropdown covers the map on small phones",
+      "details": "When I tap search, the results hide the map underneath.",
+      "status": "accepted",
+      "submittedByUserId": 5,
+      "submitterName": "Carlo M.",
+      "upvotes": 8,
+      "upvoterIds": [],
+      "createdAt": "2026-06-22T09:30:00Z",
+      "updatedAt": "2026-06-22T12:00:00Z"
     },
     {
       "id": 1003,
@@ -388,19 +405,10 @@
       "status": "pending",
       "submittedByUserId": 4,
       "submitterName": "Ana R.",
+      "upvotes": 3,
+      "upvoterIds": [],
       "createdAt": "2026-06-22T08:00:00Z",
       "updatedAt": "2026-06-22T08:00:00Z"
-    },
-    {
-      "id": 1004,
-      "type": "bug",
-      "title": "Search dropdown covers the map on small phones",
-      "details": "When I tap search, the results hide the map underneath.",
-      "status": "pending",
-      "submittedByUserId": 5,
-      "submitterName": "Carlo M.",
-      "createdAt": "2026-06-22T09:30:00Z",
-      "updatedAt": "2026-06-22T09:30:00Z"
     }
   ],
   "stats": {

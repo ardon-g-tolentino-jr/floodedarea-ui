@@ -1,9 +1,12 @@
 import React from 'react';
 import type { FeedbackType, NewFeedback } from '../../types';
+import TurnstileWidget from '../TurnstileWidget';
 
 interface FeedbackFormModalProps {
   isMobile: boolean;
   sending: boolean;
+  /** When true (a no-login guest with Turnstile configured), the CAPTCHA must be solved before submit. */
+  captchaRequired: boolean;
   onSubmit: (body: NewFeedback) => void;
   onClose: () => void;
 }
@@ -15,15 +18,16 @@ const TYPES: { value: FeedbackType; icon: string; label: string }[] = [
 
 /** Lets a signed-in user file a bug report or feature request. Opened from the Features modal;
  *  renders above it (a bottom sheet on mobile, a centered card on desktop). */
-const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending, onSubmit, onClose }) => {
+const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending, captchaRequired, onSubmit, onClose }) => {
   const [type, setType] = React.useState<FeedbackType>('feature');
   const [title, setTitle] = React.useState('');
   const [details, setDetails] = React.useState('');
-  const canSubmit = title.trim().length > 0 && !sending;
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
+  const canSubmit = title.trim().length > 0 && !sending && (!captchaRequired || !!captchaToken);
 
   const submit = (): void => {
     if (!canSubmit) return;
-    onSubmit({ type, title: title.trim(), details: details.trim() || undefined });
+    onSubmit({ type, title: title.trim(), details: details.trim() || undefined, captchaToken: captchaToken ?? undefined });
   };
 
   return (
@@ -85,6 +89,12 @@ const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending
             style={{ width: '100%', boxSizing: 'border-box', padding: '11px 13px', border: '1px solid var(--bw-line)', borderRadius: 11, fontSize: 13.5, color: 'var(--bw-ink)', outline: 'none', background: 'var(--bw-bg-subtle)', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }}
           />
 
+          {captchaRequired && (
+            <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center' }}>
+              <TurnstileWidget onToken={setCaptchaToken} />
+            </div>
+          )}
+
           <button
             onClick={submit}
             disabled={!canSubmit}
@@ -93,7 +103,7 @@ const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending
             {sending ? 'Sending…' : 'Submit'}
           </button>
           <div style={{ marginTop: 10, textAlign: 'center', fontSize: 11, color: 'var(--bw-faint)', lineHeight: 1.4 }}>
-            Feature requests an admin accepts will appear in “What’s inside” for everyone.
+            Once an admin accepts it, it appears on the Community feedback board for everyone to upvote.
           </div>
         </div>
       </div>

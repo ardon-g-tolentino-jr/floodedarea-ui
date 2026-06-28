@@ -3,7 +3,7 @@ import type { AlertLevel, FeedbackStatus, FloodAlert, LatLng, NewAlert, NewCente
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAcceptedFeatures, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
+import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
@@ -51,6 +51,7 @@ import SupportModal from './components/panels/SupportModal';
 import ShareModal from './components/panels/ShareModal';
 import FeaturesModal from './components/panels/FeaturesModal';
 import FeedbackFormModal from './components/panels/FeedbackFormModal';
+import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
 import ResponseConsole from './components/panels/ResponseConsole';
 import LoginView from './views/LoginView';
@@ -100,7 +101,7 @@ const App: React.FC = () => {
   const hotlines = useHotlines();
   const alerts = useAlerts();
   const rescues = useRescues();
-  const acceptedFeatures = useAcceptedFeatures();
+  const acceptedFeedback = useAcceptedFeedback();
   const allFeedback = useAllFeedback();
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
@@ -155,6 +156,7 @@ const App: React.FC = () => {
   const [supportOpen, setSupportOpen] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
   const [featuresOpen, setFeaturesOpen] = React.useState(false);
+  const [feedbackBoardOpen, setFeedbackBoardOpen] = React.useState(false);
   const [feedbackOpen, setFeedbackOpen] = React.useState(false);
   const [feedbackSending, setFeedbackSending] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
@@ -260,8 +262,9 @@ const App: React.FC = () => {
   // Only admins can switch the live stream off; everyone else stays always-on.
   const isAdmin = auth?.role === 'ADMIN';
 
-  // Refresh the feedback lists once a user who can see them is present (handles login after mount).
-  React.useEffect(() => { if (auth && auth.role !== 'GUEST') void acceptedFeatures.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The public board is loaded on mount; re-pull when the identity changes so `upvotedByMe` reflects
+  // the new account/guest. The admin queue loads once an admin is present.
+  React.useEffect(() => { if (auth) void acceptedFeedback.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
   React.useEffect(() => { if (isAdmin) void allFeedback.refetch(true); }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
   const streamEnabled = !isAdmin || liveStream;
 
@@ -842,27 +845,56 @@ const App: React.FC = () => {
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
-  // Admin: accept/decline a bug report or feature request; accepted features become public.
+  // Admin: accept/decline a bug report or feature request; accepted items become public on the board.
   const updateFeedbackStatus = (id: number, status: FeedbackStatus) =>
     adminAction(
       () => mutations.updateFeedbackStatus(id, status),
-      () => Promise.all([allFeedback.refetch(true), acceptedFeatures.refetch(true)]),
+      () => Promise.all([allFeedback.refetch(true), acceptedFeedback.refetch(true)]),
       'Request updated.'
     );
 
-  // Any signed-in user files a bug report or feature request.
+  // Anyone — including a no-login guest — files a bug report or feature request. It enters as
+  // `pending` and only appears on the public board once an admin accepts it. Mirrors report posting:
+  // silently provision a guest session, and require the CAPTCHA from guests when Turnstile is on.
   const submitFeedback = async (body: NewFeedback): Promise<void> => {
-    if (!requireFullAuth('Sign in to send feedback.')) return;
     setFeedbackSending(true);
     try {
+      const session = await ensureGuest();
+      if (!session) {
+        showToast('Could not send feedback. Please try again.');
+        return;
+      }
+      if (session.role === 'GUEST' && captchaEnabled() && !body.captchaToken) {
+        showToast('Please complete the security check, then submit again.');
+        return;
+      }
       await mutations.createFeedback(body);
       setFeedbackOpen(false);
-      showToast(body.type === 'bug' ? 'Thanks — your bug report was sent.' : 'Thanks — your feature request was sent for review.');
+      showToast('Thanks — your feedback was sent for review.');
       if (isAdmin) void allFeedback.refetch(true);
     } catch (e) {
+      if (handleAuthError(e, 'Your session expired. Please sign in again to send feedback.')) return;
       showToast(e instanceof ApiError ? e.message : 'Could not send feedback. Please try again.');
     } finally {
       setFeedbackSending(false);
+    }
+  };
+
+  // Anyone can upvote an accepted item; provision a guest session first so the vote is attributable
+  // (one per device/account). The backend toggles the vote, then we refresh the board in the
+  // background (the list re-sorts by upvotes).
+  const toggleUpvote = async (id: number): Promise<void> => {
+    try {
+      const session = await ensureGuest();
+      if (!session) {
+        showToast('Could not record your vote. Please try again.');
+        return;
+      }
+      await mutations.upvoteFeedback(id);
+      await acceptedFeedback.refetch(true);
+    } catch (e) {
+      if (handleAuthError(e, 'Your session expired. Please sign in again to vote.')) return;
+      showToast(e instanceof ApiError ? e.message : 'Could not record your vote. Please try again.');
     }
   };
 
@@ -975,7 +1007,8 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onSupport={() => setSupportOpen(true)}
-        onShowFeatures={() => { setFeaturesOpen(true); if (auth && auth.role !== 'GUEST') void acceptedFeatures.refetch(true); }}
+        onShowFeatures={() => setFeaturesOpen(true)}
+        onShowFeedback={() => { setFeedbackBoardOpen(true); void acceptedFeedback.refetch(true); }}
         isAdmin={!!isAdmin}
         onAdmin={() => { setAdminOpen(true); void allFeedback.refetch(true); }}
         onResponse={() => {
@@ -1223,15 +1256,32 @@ const App: React.FC = () => {
       {featuresOpen && (
         <FeaturesModal
           isMobile={isMobile}
-          auth={auth}
-          acceptedFeatures={acceptedFeatures.data ?? []}
-          onSuggest={() => { if (requireFullAuth('Sign in to suggest a feature or report a bug.')) setFeedbackOpen(true); }}
+          onShowFeedback={() => { setFeaturesOpen(false); setFeedbackBoardOpen(true); void acceptedFeedback.refetch(true); }}
           onClose={() => setFeaturesOpen(false)}
         />
       )}
 
+      {feedbackBoardOpen && (
+        <CommunityFeedbackModal
+          isMobile={isMobile}
+          items={acceptedFeedback.data ?? []}
+          loading={acceptedFeedback.loading}
+          onUpvote={(id) => void toggleUpvote(id)}
+          onSuggest={() => setFeedbackOpen(true)}
+          onClose={() => setFeedbackBoardOpen(false)}
+        />
+      )}
+
       {feedbackOpen && (
-        <FeedbackFormModal isMobile={isMobile} sending={feedbackSending} onSubmit={submitFeedback} onClose={() => setFeedbackOpen(false)} />
+        <FeedbackFormModal
+          isMobile={isMobile}
+          sending={feedbackSending}
+          // The form can be opened with no session yet; submit provisions a guest. So show the CAPTCHA
+          // to anyone who isn't already a full account (guest or not-signed-in), matching the submit guard.
+          captchaRequired={captchaEnabled() && (!auth || auth.role === 'GUEST')}
+          onSubmit={submitFeedback}
+          onClose={() => setFeedbackOpen(false)}
+        />
       )}
 
       {adminOpen && isAdmin && (

@@ -33,9 +33,9 @@ export function useRescues(): FetchResult<RescueRequest[]> {
   return useFetch(() => rawApi.rescues(), []);
 }
 
-/** Accepted feature requests — the public list shown to registered users. */
-export function useAcceptedFeatures(): FetchResult<Feedback[]> {
-  return useFetch(() => rawApi.acceptedFeatures(), []);
+/** Accepted feedback (bugs + features) — the public Community feedback board feed. */
+export function useAcceptedFeedback(): FetchResult<Feedback[]> {
+  return useFetch(() => rawApi.acceptedFeedback(), []);
 }
 
 /** Admin: the full feedback moderation queue. */

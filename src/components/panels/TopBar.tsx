@@ -26,6 +26,7 @@ interface TopBarProps {
   onAdmin: () => void;
   onResponse: () => void;
   onShowFeatures: () => void;
+  onShowFeedback: () => void;
 }
 
 /** Shared style for the square 40×40 icon buttons in the action row. */
@@ -74,6 +75,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onAdmin,
   onResponse,
   onShowFeatures,
+  onShowFeedback,
 }) => {
   const { t } = useI18n();
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
@@ -264,6 +266,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="📈" label={t('topbar.waterLevels')} onClick={runAndClose(onWaterChart)} />
                   <MenuItem icon="🛟" label={t('topbar.rescue')} onClick={runAndClose(onRescueChart)} />
                   <MenuItem icon="💙" label={t('topbar.support')} onClick={runAndClose(onSupport)} />
+                  <MenuItem icon="💬" label={t('topbar.feedback')} onClick={runAndClose(onShowFeedback)} />
                   <MenuItem icon="✨" label={t('topbar.features')} onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
@@ -297,6 +300,10 @@ const TopBar: React.FC<TopBarProps> = ({
             </button>
 
             {notifyBtn}
+
+            <button onClick={onShowFeedback} title="Community feedback — suggest & vote" aria-label="Community feedback" style={ICON_BTN}>
+              💬
+            </button>
 
             <button onClick={onSupport} title="About FloodedArea & support" aria-label="About FloodedArea & support" style={ICON_BTN}>
               💙

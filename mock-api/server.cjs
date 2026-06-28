@@ -218,32 +218,86 @@ server.post('/alerts/:id/toggle', (req, res) => {
   res.json(updated);
 });
 
-// ── Feedback (bug reports & feature requests). GET /feedback (all) and PATCH /feedback/:id fall
-// through to json-server; /feedback/accepted and the defaulted POST are custom. Role gating is the
-// UI's job here (the mock accepts anything). ──
-server.get('/feedback/accepted', (_req, res) => {
-  const db = router.db;
-  const items = (db.get('feedback').value() || []).filter((f) => f.type === 'feature' && f.status === 'accepted');
+// ── Feedback (bug reports & feature requests). Anyone (account or guest) can submit; an admin
+// accepts/declines; accepted items appear on the public board where anyone can upvote. The custom
+// routes below win over json-server (declared before `server.use(router)`); PATCH /feedback/:id
+// (status moderation) still falls through to it. Role gating is the UI's job (the mock accepts anything). ──
+
+// Map the bearer token to a stable voter id: the guest token → 2000, any full-account token → 1,
+// nothing → null (anonymous, can't vote). Mirrors how the report routes tell guests from accounts.
+function callerId(req) {
+  const auth = req.headers.authorization || '';
+  if (auth === `Bearer ${GUEST_TOKEN}`) return 2000;
+  if (auth.startsWith('Bearer ')) return 1;
+  return null;
+}
+
+// Public shape: hide the internal voter list and derive `upvotedByMe` for the caller.
+function publicFeedback(item, viewerId) {
+  const { upvoterIds = [], ...rest } = item;
+  return {
+    ...rest,
+    upvotes: typeof item.upvotes === 'number' ? item.upvotes : upvoterIds.length,
+    upvotedByMe: viewerId != null && upvoterIds.includes(viewerId),
+  };
+}
+
+// Public board: accepted bugs + features, ordered by upvotes desc.
+server.get('/feedback/accepted', (req, res) => {
+  const viewer = callerId(req);
+  const items = (router.db.get('feedback').value() || [])
+    .filter((f) => f.status === 'accepted')
+    .map((f) => publicFeedback(f, viewer))
+    .sort((a, b) => b.upvotes - a.upvotes);
   res.json(items);
 });
+
+// Admin queue: every item with derived fields (newest first). Custom so `upvoterIds` is never leaked.
+server.get('/feedback', (req, res) => {
+  const viewer = callerId(req);
+  const items = (router.db.get('feedback').value() || [])
+    .map((f) => publicFeedback(f, viewer))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json(items);
+});
+
 server.post('/feedback', (req, res) => {
   const db = router.db;
   const ids = db.get('feedback').map('id').value();
   const id = ids.length ? Math.max(...ids) + 1 : 1000;
   const now = new Date().toISOString();
+  const isGuest = req.headers.authorization === `Bearer ${GUEST_TOKEN}`;
   const item = {
     id,
     type: req.body.type === 'bug' ? 'bug' : 'feature',
     title: req.body.title || '',
     details: req.body.details || null,
     status: 'pending',
-    submittedByUserId: 1,
-    submitterName: 'Demo User',
+    submittedByUserId: isGuest ? 2000 : 1,
+    submitterName: isGuest ? 'Guest' : 'Demo User',
+    upvotes: 0,
+    upvoterIds: [],
     createdAt: now,
     updatedAt: now,
   };
   db.get('feedback').push(item).write();
-  res.status(201).json(item);
+  res.status(201).json(publicFeedback(item, callerId(req)));
+});
+
+// Toggle the caller's upvote (one per device/account). Returns the updated item.
+server.post('/feedback/:id/upvote', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const item = db.get('feedback').find({ id }).value();
+  if (!item) return res.status(404).json({ message: 'Feedback not found' });
+  const viewer = callerId(req);
+  if (viewer == null) return res.status(401).json({ message: 'Sign in to upvote' });
+  const voters = Array.isArray(item.upvoterIds) ? item.upvoterIds : [];
+  const has = voters.includes(viewer);
+  const nextVoters = has ? voters.filter((v) => v !== viewer) : [...voters, viewer];
+  const nextCount = Math.max(0, (typeof item.upvotes === 'number' ? item.upvotes : 0) + (has ? -1 : 1));
+  db.get('feedback').find({ id }).assign({ upvoterIds: nextVoters, upvotes: nextCount, updatedAt: new Date().toISOString() }).write();
+  res.json(publicFeedback(db.get('feedback').find({ id }).value(), viewer));
 });
 
 // ── Visit counter — mirrors baha-api's public stats endpoints. POST increments the all-time

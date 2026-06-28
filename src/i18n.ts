@@ -82,6 +82,7 @@ const MESSAGES = {
   'topbar.rescue': { en: 'Rescue requests', fil: 'Mga hiling ng rescue' },
   'topbar.support': { en: 'About & support', fil: 'Tungkol at suporta' },
   'topbar.features': { en: 'What’s in this app', fil: 'Mga features ng app' },
+  'topbar.feedback': { en: 'Community feedback', fil: 'Feedback ng komunidad' },
   'topbar.admin': { en: 'Admin', fil: 'Admin' },
   'topbar.adminConsole': { en: 'Admin console', fil: 'Admin console' },
   'topbar.response': { en: 'Response', fil: 'Tugon' },

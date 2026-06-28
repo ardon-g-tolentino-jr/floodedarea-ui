@@ -474,7 +474,8 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                           {isFeature ? '💡 Feature' : '🐞 Bug'}
                         </span>
                         <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: sc.bg, color: sc.fg, textTransform: 'capitalize' }}>{f.status}</span>
-                        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--bw-faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '45%' }}>{f.submitterName ?? 'Someone'}</span>
+                        <span title={`${f.upvotes} upvote${f.upvotes === 1 ? '' : 's'}`} style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: '#EFF8FF', color: 'var(--bw-primary)' }}>▲ {f.upvotes}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--bw-faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40%' }}>{f.submitterName ?? 'Someone'}</span>
                       </div>
                       <div style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)' }}>{f.title}</div>
                       {f.details && <div style={{ fontSize: 12, color: 'var(--bw-muted)', lineHeight: 1.45, marginTop: 2 }}>{f.details}</div>}
