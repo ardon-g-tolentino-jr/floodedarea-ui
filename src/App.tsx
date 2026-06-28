@@ -27,7 +27,7 @@ import {
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
 import { loadRoads, roadsLoaded } from './utils/roadSnap';
-import { locateWithAccuracy } from './utils/geolocate';
+import { locateWithAccuracy, WEAK_FIX_M } from './utils/geolocate';
 import type { SearchBoxHandle } from './components/panels/SearchBox';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
@@ -111,6 +111,9 @@ const App: React.FC = () => {
   const searchBoxRef = React.useRef<SearchBoxHandle>(null);
   // "How to enable location" help modal — opened from the permission-denied toast.
   const [locHelpOpen, setLocHelpOpen] = React.useState(false);
+  // True while the report flow is converging a GPS fix, so the report banner shows a transient
+  // "Finding your location…" instead of prematurely declaring that location couldn't be found.
+  const [reportLocating, setReportLocating] = React.useState(false);
 
   // Ticking clock so report expiry (severity-scaled TTL) and the safety status update in real time
   // without waiting on a refetch.
@@ -536,6 +539,35 @@ const App: React.FC = () => {
     });
   }, []);
 
+  // Converge a high-accuracy GPS fix for the report flow, keeping the best reading. While the pin
+  // is still "at you", re-pin/recenter to each improvement — but never yank a pin the user has
+  // already tapped/searched somewhere else. Drives `reportLocating` so the banner can tell
+  // "still finding" apart from "couldn't find" (which then guides the user to settings).
+  // `repin` snaps the pin back onto the user first — used by the help-modal retry after the user
+  // grants permission, so the fresh fix re-applies even if they'd moved the pin.
+  const locateForReport = React.useCallback((repin = false): void => {
+    if (repin) setPending((p) => (p ? { lat: p.lat, lng: p.lng, atYou: true } : p));
+    const applyFix = (loc: LatLng, accuracyM: number): void => {
+      setUserLoc(loc);
+      setUserAccuracyM(accuracyM);
+      setPending((p) => {
+        if (p && p.atYou) {
+          setMapFocus({ ...loc, key: Date.now() });
+          runReverseGeocode(loc);
+        }
+        return p && p.atYou ? { ...loc, atYou: true } : p;
+      });
+    };
+    setReportLocating(true);
+    void locateWithAccuracy({
+      desiredAccuracyM: 30,
+      onProgress: (fix) => applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM),
+    }).then(
+      (fix) => { applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM); setReportLocating(false); },
+      () => { setReportLocating(false); /* keep current location; the banner guides the user */ }
+    );
+  }, [runReverseGeocode]);
+
   const startReport = async (): Promise<void> => {
     // No login wall: silently provision a no-login guest session (idempotent per device) so anyone
     // can report in seconds. The guest still gets a real userId, which keeps the spam guard,
@@ -565,33 +597,16 @@ const App: React.FC = () => {
     setPending({ ...userLoc, atYou: true });
     setMapFocus({ ...userLoc, key: Date.now() });
     runReverseGeocode(userLoc);
-    // Refresh the GPS fix so the pin/centering reflect where they actually are right now
-    // (the on-mount fix may be stale, or fell back to the default monitoring area). As the fix
-    // converges, re-pin to each better reading — but only while the pin is still "at you", so we
-    // never yank a pin the user has already dragged/searched somewhere else.
-    const applyFix = (loc: LatLng, accuracyM: number): void => {
-      setUserLoc(loc);
-      setUserAccuracyM(accuracyM);
-      setPending((p) => {
-        if (p && p.atYou) {
-          setMapFocus({ ...loc, key: Date.now() });
-          runReverseGeocode(loc);
-        }
-        return p && p.atYou ? { ...loc, atYou: true } : p;
-      });
-    };
-    void locateWithAccuracy({
-      desiredAccuracyM: 30,
-      onProgress: (fix) => applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM),
-    }).then(
-      (fix) => applyFix({ lat: fix.lat, lng: fix.lng }, fix.accuracyM),
-      () => {/* keep the current location */}
-    );
+    // Refresh the GPS fix so the pin/centering reflect where they actually are right now (the
+    // on-mount fix may be stale, or fell back to the default monitoring area). If it can't get a
+    // fix, the report-mode banner surfaces guidance — reporting is never blocked.
+    locateForReport();
   };
 
   const cancelReport = (): void => {
     setMode('idle');
     setPending(null);
+    setReportLocating(false);
     setDetectedRoad({ road: null, district: null, barangay: null });
     setDetectingRoad(false);
   };
@@ -916,9 +931,11 @@ const App: React.FC = () => {
       (err: unknown) => {
         setLocating(false);
         const denied = typeof err === 'object' && err !== null && (err as GeolocationPositionError).code === 1;
-        // A denied permission is fixable — offer step-by-step help to re-enable it.
-        if (denied) showToast(tFormat(lang, 'loc.denied', {}), tFormat(lang, 'loc.enableHelp', {}), () => setLocHelpOpen(true));
-        else showToast(tFormat(lang, 'loc.failed', {}));
+        // Every failure here is usually fixable — a blocked permission OR the device's Location
+        // Services being off (timeout / position-unavailable). Offer step-by-step help either way;
+        // the modal's steps cover both. (Distinct messages keep "denied" clearer than a timeout.)
+        const msg = denied ? 'loc.denied' : 'loc.failed';
+        showToast(tFormat(lang, msg, {}), tFormat(lang, 'loc.enableHelp', {}), () => setLocHelpOpen(true));
       }
     );
   }, [showToast, lang]);
@@ -1005,19 +1022,35 @@ const App: React.FC = () => {
           <LocateButton onClick={locateMe} locating={locating} />
 
           {/* Report-mode hint */}
-          {mode === 'report' && (
+          {mode === 'report' && (() => {
+            const atYou = !!pending?.atYou;
+            const m = userAccuracyM != null ? Math.round(userAccuracyM) : 0;
+            // Settled with no fix → location couldn't be determined: guide the user to settings.
+            const noFix = atYou && !reportLocating && userAccuracyM == null;
+            // A fix landed but it's too coarse to trust the auto-pin → nudge manual placement.
+            const weak = atYou && userAccuracyM != null && userAccuracyM > WEAK_FIX_M;
+            const hint = !atYou
+              ? t('report.hintTap')
+              : reportLocating && userAccuracyM == null
+                ? t('report.hintLocating')
+                : noFix
+                  ? t('report.hintNoFix')
+                  : weak
+                    ? tFormat(lang, 'report.hintWeak', { m })
+                    : tFormat(lang, 'report.hintAtYouAcc', { m });
+            // Amber dot flags a location problem the user can act on; blue = all good.
+            const attention = noFix || weak;
+            return (
             <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0EA5E9', boxShadow: '0 0 0 4px rgba(14,165,233,.3)', flex: 'none' }} />
-              <span style={{ lineHeight: 1.3 }}>{
-                !pending?.atYou
-                  ? t('report.hintTap')
-                  : userAccuracyM != null
-                    ? tFormat(lang, 'report.hintAtYouAcc', { m: Math.round(userAccuracyM) })
-                    : t('report.hintAtYou')
-              }</span>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', flex: 'none', background: attention ? '#F59E0B' : '#0EA5E9', boxShadow: attention ? '0 0 0 4px rgba(245,158,11,.3)' : '0 0 0 4px rgba(14,165,233,.3)' }} />
+              <span style={{ lineHeight: 1.3 }}>{hint}</span>
+              {noFix && (
+                <button onClick={() => setLocHelpOpen(true)} style={{ border: 0, background: 'rgba(255,255,255,.92)', color: '#0F172A', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', flex: 'none' }}>{t('report.enableLoc')}</button>
+              )}
               <button onClick={cancelReport} style={{ border: 0, background: 'rgba(255,255,255,.14)', color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>Cancel</button>
             </div>
-          )}
+            );
+          })()}
 
           {selectedReport && (
             <ReportDetailCard
@@ -1107,7 +1140,16 @@ const App: React.FC = () => {
       )}
 
       {locHelpOpen && (
-        <LocationHelpModal onRetry={() => { setLocHelpOpen(false); locateMe(); }} onClose={() => setLocHelpOpen(false)} />
+        <LocationHelpModal
+          onRetry={() => {
+            setLocHelpOpen(false);
+            // In report mode, re-pin onto the user (the freshly granted fix re-applies); otherwise
+            // just recenter via the floating-locate flow.
+            if (mode === 'report') locateForReport(true);
+            else locateMe();
+          }}
+          onClose={() => setLocHelpOpen(false)}
+        />
       )}
 
       {notifyOpen && (

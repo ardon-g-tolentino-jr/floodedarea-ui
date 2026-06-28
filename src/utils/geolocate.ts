@@ -11,6 +11,13 @@ export interface Fix {
   accuracyM: number;
 }
 
+/**
+ * Accuracy radius (m) above which an auto-placed pin is likely off enough that the reporter
+ * should drop it manually instead. Intentionally looser than the locate button's 100 m "approx"
+ * toast: a report can still be filed at this accuracy, we just nudge tap/search placement.
+ */
+export const WEAK_FIX_M = 200;
+
 export interface LocateOptions {
   /** Resolve early once a fix is at least this good. Default 40 m. */
   desiredAccuracyM?: number;

@@ -228,6 +228,10 @@ const MESSAGES = {
   'report.hintTap': { en: 'Tap the map where it’s flooding', fil: 'I-tap ang mapa kung saan may baha' },
   'report.hintAtYou': { en: 'Reporting at your location — tap the map or search an address to fine-tune', fil: 'Nag-uulat sa iyong lokasyon — i-tap ang mapa o maghanap ng address para iayos' },
   'report.hintAtYouAcc': { en: 'Reporting near your location (±{m} m) — tap the map or search an address to fine-tune', fil: 'Nag-uulat malapit sa iyong lokasyon (±{m} m) — i-tap ang mapa o maghanap ng address para iayos' },
+  'report.hintLocating': { en: 'Finding your location…', fil: 'Hinahanap ang iyong lokasyon…' },
+  'report.hintNoFix': { en: 'We couldn’t find your location — tap the map or search your address to place your report.', fil: 'Hindi namin mahanap ang iyong lokasyon — i-tap ang mapa o hanapin ang iyong address para mailagay ang ulat.' },
+  'report.hintWeak': { en: 'Your location is rough (±{m} m) — tap the map or search to place the pin exactly.', fil: 'Magaspang ang iyong lokasyon (±{m} m) — i-tap ang mapa o maghanap para tumpak na mailagay ang pin.' },
+  'report.enableLoc': { en: 'Enable location', fil: 'I-enable ang lokasyon' },
 
   // ── Report list item ──
   'report.yours': { en: 'YOURS', fil: 'IYO' },
