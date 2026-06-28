@@ -102,7 +102,9 @@ const App: React.FC = () => {
   const alerts = useAlerts();
   const rescues = useRescues();
   const acceptedFeedback = useAcceptedFeedback();
-  const allFeedback = useAllFeedback();
+  // Admin-only queue — gated so a normal visitor never hits the admin endpoint (it 403s). The fetch
+  // starts automatically when an admin session appears.
+  const allFeedback = useAllFeedback(auth?.role === 'ADMIN');
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
   // Accuracy (meters) of the latest GPS fix — drives the map's uncertainty ring and the
@@ -263,9 +265,8 @@ const App: React.FC = () => {
   const isAdmin = auth?.role === 'ADMIN';
 
   // The public board is loaded on mount; re-pull when the identity changes so `upvotedByMe` reflects
-  // the new account/guest. The admin queue loads once an admin is present.
+  // the new account/guest. (The admin queue auto-loads via its `enabled` gate once an admin appears.)
   React.useEffect(() => { if (auth) void acceptedFeedback.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
-  React.useEffect(() => { if (isAdmin) void allFeedback.refetch(true); }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
   const streamEnabled = !isAdmin || liveStream;
 
   // Live activity → refresh the affected collection in the background.

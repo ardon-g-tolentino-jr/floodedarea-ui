@@ -38,7 +38,8 @@ export function useAcceptedFeedback(): FetchResult<Feedback[]> {
   return useFetch(() => rawApi.acceptedFeedback(), []);
 }
 
-/** Admin: the full feedback moderation queue. */
-export function useAllFeedback(): FetchResult<Feedback[]> {
-  return useFetch(() => rawApi.allFeedback(), []);
+/** Admin: the full feedback moderation queue. `enabled` (admin present) gates the fetch so a normal
+ *  visitor never hits the admin-only endpoint (which 403s). */
+export function useAllFeedback(enabled: boolean): FetchResult<Feedback[]> {
+  return useFetch(() => rawApi.allFeedback(), [], { enabled });
 }
