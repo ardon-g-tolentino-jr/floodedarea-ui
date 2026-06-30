@@ -76,23 +76,24 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isMobile }) => {
             position: 'fixed',
             right: isMobile ? 16 : 24,
             bottom: isMobile ? 84 : 24,
-            width: 56,
-            height: 56,
+            height: 54,
+            padding: '0 20px 0 16px',
             border: 0,
-            borderRadius: '50%',
+            borderRadius: 27,
             background: 'linear-gradient(150deg,#0EA5E9,#0369A1)',
             color: '#fff',
-            fontSize: 24,
-            lineHeight: 1,
+            fontSize: 15,
+            fontWeight: 800,
             cursor: 'pointer',
-            boxShadow: '0 8px 22px rgba(3,105,161,.42)',
+            boxShadow: '0 10px 26px rgba(3,105,161,.5)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: 9,
             zIndex: 1100,
           }}
         >
-          💬
+          <span style={{ fontSize: 22, lineHeight: 1 }}>💬</span>
+          <span>Chat</span>
         </button>
       )}
 
