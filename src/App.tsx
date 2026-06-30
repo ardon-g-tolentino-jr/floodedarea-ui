@@ -54,6 +54,7 @@ import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
 import ResponseConsole from './components/panels/ResponseConsole';
+import ChatWidget from './components/panels/ChatWidget';
 import LoginView from './views/LoginView';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
@@ -1328,6 +1329,9 @@ const App: React.FC = () => {
           onClose={() => setResponseOpen(false)}
         />
       )}
+
+      {/* Floating community-chat bubble — self-contained, always available over the map. */}
+      <ChatWidget isMobile={isMobile} />
 
       {toast && <Toast toast={toast} />}
 
