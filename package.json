@@ -1,7 +1,7 @@
 {
   "name": "baha-ui",
   "private": true,
-  "version": "1.33.0",
+  "version": "1.33.1",
   "type": "module",
   "description": "FloodedArea — a flood-watch web app for the Philippines (reports, shelters, alerts, SOS).",
   "scripts": {

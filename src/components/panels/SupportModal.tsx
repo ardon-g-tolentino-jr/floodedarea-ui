@@ -11,10 +11,9 @@ interface SupportModalProps {
  *  only the truth (lives depend on it), and offers an optional GCash donation to keep the app
  *  running. Opened on demand from the TopBar heart. Renders as a bottom sheet on mobile and a
  *  centered card on desktop, matching the app's other adaptive dialogs. */
-const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose }) => {
-  // The donation QR is hidden behind a toggle, collapsed by default.
-  const [qrOpen, setQrOpen] = React.useState(false);
-
+// NOTE: the `qrSrc` prop is intentionally not destructured while the donation section is hidden
+// (see below). Re-add it to the params and restore the QR state when re-enabling that section.
+const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
   return (
     <div
       onClick={onClose}
@@ -68,7 +67,9 @@ const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose })
             </p>
           </div>
 
-          {/* Support / donate */}
+          {/* Support / donate — HIDDEN FOR NOW. Re-enable this block (and the `qrSrc` prop +
+              `qrOpen` state above) to show the "keep the lights on" GCash donation section. */}
+          {/*
           <div style={{ marginTop: 18 }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--bw-ink)' }}>Help keep the lights on</div>
             <p style={{ margin: '5px 0 0', fontSize: 12.5, lineHeight: 1.55, color: 'var(--bw-muted)' }}>
@@ -77,7 +78,6 @@ const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose })
               GCash — every peso goes to the servers that keep it online. No pressure at all. 🙏
             </p>
 
-            {/* GCash QR — collapsed by default */}
             <div style={{ marginTop: 14, border: '1px solid var(--bw-line)', borderRadius: 14, overflow: 'hidden', background: 'var(--bw-bg-subtle)' }}>
               <button
                 onClick={() => setQrOpen((o) => !o)}
@@ -106,6 +106,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ qrSrc, isMobile, onClose })
               )}
             </div>
           </div>
+          */}
 
           <button
             onClick={onClose}
