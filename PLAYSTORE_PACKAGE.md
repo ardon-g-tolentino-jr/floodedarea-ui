@@ -9,6 +9,62 @@ Spec of record: `../baha-api/PLAYSTORE_PACKAGE_REQUIREMENTS.md`.
 
 ---
 
+## Status & outstanding TODOs
+
+**Last verified: 2026-06-30** — against `main` @ v1.32.1 and the live site.
+
+**Phase 1 (PWA readiness) — DONE & deployed.** All of it is on `main` (not just the stale
+`playstore-package` branch, which points at v1.26.0 and can be ignored). The manifest resolves
+live at `https://floodedarea.com/manifest.webmanifest` (HTTP 200, valid PWA JSON), so the
+Phase-2 ordering dependency below is **already satisfied** — Bubblewrap can read it now.
+
+Remaining work, in order:
+
+- [ ] **Fix the manifest `Content-Type`** (repo, do first). It is currently served as
+      `application/octet-stream` because nginx's default `mime.types` has no `.webmanifest`
+      entry. Add the `location` block in the [nginx section](#nginx--serve-the-manifest-with-the-right-content-type)
+      below to `nginx/default.conf.template`, rebuild `dist/`, redeploy, and re-verify.
+      Bubblewrap tolerates octet-stream, but this fails strict PWA/Lighthouse installability
+      and the verification step in this runbook.
+- [ ] **Phase 2 — TWA init.** `bubblewrap init` against the live manifest; lock Application ID
+      `com.floodedarea.app` (**permanent & unchangeable on Play**), create + back up a new
+      keystore offline, set `targetSdkVersion 36` / `minSdkVersion ≥ 23`, `bubblewrap update`.
+- [ ] **Phase 3 — build.** `bubblewrap build` → signed `.aab`; record the SHA-256 fingerprint.
+- [ ] **Phase 4 — Digital Asset Links.** Generate `assetlinks.json`, commit it to
+      `public/.well-known/assetlinks.json`, redeploy, and confirm
+      `https://floodedarea.com/.well-known/assetlinks.json` returns `200 application/json`
+      (currently **404**). Use the **app-signing** fingerprint if Play App Signing is enabled.
+- [ ] **Phase 5 — output.** Copy deliverables to the OUTPUT dir and finalize that README.
+- [ ] **Play Console prerequisites** (account owner, manual): privacy-policy URL (app collects
+      geolocation + account email + crowd-sourced reports), store listing + screenshots +
+      feature graphic, content rating, data-safety form, and the **closed test: 12 testers ×
+      14 continuous days** before production unlocks. Start the closed test early — longest pole.
+
+### nginx — serve the manifest with the right Content-Type
+
+Production is served by **nginx** (`Dockerfile` + `nginx/default.conf.template`), not Caddy.
+Add this inside the `server { }` block:
+
+```nginx
+location = /manifest.webmanifest {
+    add_header Content-Type "application/manifest+json";
+    add_header Cache-Control "public, max-age=3600";
+}
+```
+
+Re-verify after redeploy:
+
+```bash
+curl -sI https://floodedarea.com/manifest.webmanifest | grep -i content-type
+# expect: content-type: application/manifest+json
+```
+
+> The `.well-known/assetlinks.json` route needs **no** nginx change: the template has no
+> dotfile-deny block and `.json` already maps to `application/json`, so dropping the file into
+> `public/.well-known/` ships it to `dist/` and serves it correctly.
+
+---
+
 ## What is done in this repo (Phase 1 — PWA readiness) ✅
 
 A TWA requires the site to be an installable PWA. This branch (`playstore-package`) adds that:
@@ -34,12 +90,15 @@ Verify locally: `npm run build` → confirm `dist/manifest.webmanifest`, `dist/s
 
 ### ⚠️ Hard ordering dependency — deploy before Phase 2
 
-**Bubblewrap reads the manifest from the production URL.** This branch must be merged and the
-site **redeployed** so that `https://floodedarea.com/manifest.webmanifest` resolves live
-**before** running `bubblewrap init`. Confirm with:
+**Bubblewrap reads the manifest from the production URL**, so the site must serve a live
+manifest **before** running `bubblewrap init`.
+
+**Status (2026-06-30): satisfied.** `https://floodedarea.com/manifest.webmanifest` resolves
+(HTTP 200, valid PWA JSON). The only caveat is the `Content-Type` — see the first TODO above.
 
 ```bash
-curl -sI https://floodedarea.com/manifest.webmanifest   # expect 200, Content-Type ...manifest
+curl -sI https://floodedarea.com/manifest.webmanifest
+# 200 — but currently content-type: application/octet-stream (should be application/manifest+json)
 ```
 
 ---
@@ -97,7 +156,9 @@ Generate `assetlinks.json` (template provided in the output dir) with:
 > swap to the app-signing one post-upload.
 
 Serve it at `https://floodedarea.com/.well-known/assetlinks.json` with
-`Content-Type: application/json` (Caddy snippet provided in the output dir).
+`Content-Type: application/json`. On this stack that just means committing the file to
+`public/.well-known/assetlinks.json` (Vite copies it into `dist/`, and nginx serves `.json` as
+`application/json` with no config change). Verify: `curl -sI .../.well-known/assetlinks.json`.
 
 ### Phase 5 — Output + document
 
@@ -107,7 +168,7 @@ All deliverables go to (Phase 6 of the spec):
 /Users/ardontolentinojr./Documents/CLAUDE DEV/OUTPUT/DB/FLOODEDAREA/
 ```
 
-Copy in the `.aab`, `assetlinks.json`, Caddy snippet, and keystore, and finalize the README
+Copy in the `.aab`, `assetlinks.json`, the nginx snippet, and keystore, and finalize the README
 there with the exact fingerprint(s) used.
 
 ---
