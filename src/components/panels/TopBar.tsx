@@ -14,6 +14,8 @@ interface TopBarProps {
   onSignIn: () => void;
   onSignOut: () => void;
   onSearchSelect: (r: GeoResult) => void;
+  /** User's current location — softly biases location-search results toward nearby places (worldwide). */
+  searchNear?: { lat: number; lng: number };
   /** Lets App focus the location search imperatively (e.g. from a "search instead" toast). */
   searchRef?: React.Ref<SearchBoxHandle>;
   onNotify: () => void;
@@ -64,6 +66,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onSignIn,
   onSignOut,
   onSearchSelect,
+  searchNear,
   searchRef,
   onNotify,
   notifyOn,
@@ -239,7 +242,7 @@ const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Location search */}
-      <SearchBox ref={searchRef} isMobile={isMobile} onSelect={onSearchSelect} onExpandedChange={setSearchExpanded} />
+      <SearchBox ref={searchRef} isMobile={isMobile} onSelect={onSearchSelect} onExpandedChange={setSearchExpanded} near={searchNear} />
 
       {/* The action cluster yields the whole row to the search field while it's expanded on mobile. */}
       {!(isMobile && searchExpanded) && (

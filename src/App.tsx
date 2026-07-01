@@ -997,6 +997,7 @@ const App: React.FC = () => {
         onSignIn={() => setLogin({ open: true })}
         onSignOut={logout}
         onSearchSelect={onSearchSelect}
+        searchNear={userLoc}
         searchRef={searchBoxRef}
         onNotify={() => setNotifyOpen(true)}
         notifyOn={notifyPrefs.enabled}

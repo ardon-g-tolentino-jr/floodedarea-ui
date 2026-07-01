@@ -6,6 +6,8 @@ interface SearchBoxProps {
   onSelect: (r: GeoResult) => void;
   /** Notifies the parent when the mobile field expands, so the TopBar can free the row for it. */
   onExpandedChange?: (expanded: boolean) => void;
+  /** User's current location — softly biases search results toward nearby places (worldwide). */
+  near?: { lat: number; lng: number };
 }
 
 /** Imperative handle so callers (e.g. a "search instead" toast) can jump focus into the field. */
@@ -15,7 +17,7 @@ export interface SearchBoxHandle {
 
 const DEBOUNCE_MS = 350;
 
-const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile, onSelect, onExpandedChange }, ref) => {
+const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile, onSelect, onExpandedChange, near }, ref) => {
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -57,7 +59,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
-      const found = await searchPlaces(q, ac.signal);
+      const found = await searchPlaces(q, ac.signal, near);
       if (ac.signal.aborted) return;
       setResults(found);
       setActiveIndex(found.length ? 0 : -1);

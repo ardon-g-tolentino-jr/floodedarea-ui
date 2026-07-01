@@ -8,10 +8,21 @@
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
 
-// Bias results toward Metro Manila & Rizal: viewbox is lon1,lat1,lon2,lat2 (NW → SE).
-const METRO_VIEWBOX = '120.9,14.85,121.5,14.25';
-
 export const MIN_QUERY_LENGTH = 3;
+
+// Half-width (in degrees, ≈ 65 km) of the soft viewbox used to bias search toward the
+// caller's current location. `bounded=0` keeps it a preference, not a hard limit, so places
+// anywhere in the world still resolve — the app is not restricted to any country/region.
+const NEAR_BIAS_DEG = 0.6;
+
+/** Build a `viewbox` string (lon1,lat1,lon2,lat2, NW → SE) around a bias point. */
+function nearViewbox({ lat, lng }: { lat: number; lng: number }): string {
+  const w = (lng - NEAR_BIAS_DEG).toFixed(4);
+  const n = (lat + NEAR_BIAS_DEG).toFixed(4);
+  const e = (lng + NEAR_BIAS_DEG).toFixed(4);
+  const s = (lat - NEAR_BIAS_DEG).toFixed(4);
+  return `${w},${n},${e},${s}`;
+}
 
 export interface GeoResult {
   id: string;
@@ -28,23 +39,30 @@ interface NominatimRow {
 }
 
 /**
- * Geocode `query` to a handful of place suggestions, biased to the monitoring region.
- * Returns `[]` for short queries, network errors, or aborted requests (caller can render
- * an empty dropdown). Pass an `AbortSignal` to cancel a superseded request.
+ * Geocode `query` to a handful of place suggestions. Search is worldwide — the app works in
+ * any country/region, not just Metro Manila & Rizal. Pass `near` (typically the user's current
+ * location) to softly rank nearby results first; it is only a bias (`bounded=0`), so places
+ * outside that area still resolve. Returns `[]` for short queries, network errors, or aborted
+ * requests. Pass an `AbortSignal` to cancel a superseded request.
  */
-export async function searchPlaces(query: string, signal?: AbortSignal): Promise<GeoResult[]> {
+export async function searchPlaces(
+  query: string,
+  signal?: AbortSignal,
+  near?: { lat: number; lng: number }
+): Promise<GeoResult[]> {
   const q = query.trim();
   if (q.length < MIN_QUERY_LENGTH) return [];
 
   const params = new URLSearchParams({
     format: 'jsonv2',
     q,
-    countrycodes: 'ph',
-    viewbox: METRO_VIEWBOX,
-    bounded: '0', // prefer the viewbox but still resolve places outside it
     limit: '6',
     addressdetails: '0',
   });
+  if (near) {
+    params.set('viewbox', nearViewbox(near));
+    params.set('bounded', '0'); // prefer nearby, but still resolve places anywhere
+  }
 
   let res: Response;
   try {
