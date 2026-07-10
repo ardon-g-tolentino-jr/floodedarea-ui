@@ -12,6 +12,10 @@ interface ReportDetailCardProps {
   removing: boolean;
   onRemove: () => void;
   onShowLocation: () => void;
+  /** Absolute URL to the report's flood photo, or null when none was attached. */
+  photoSrc: string | null;
+  /** Share this report to Facebook (native photo share on mobile, web sharer fallback). */
+  onShareReport: () => void;
   projectedRiseCm: number;
   onClose: () => void;
 }
@@ -23,7 +27,7 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, projectedRiseCm, onClose }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, photoSrc, onShareReport, projectedRiseCm, onClose }) => {
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
   const sev = report.sev;
@@ -68,6 +72,15 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         </div>
       </div>
 
+      {photoSrc && (
+        <img
+          src={photoSrc}
+          alt={`Flood photo — ${report.name}`}
+          loading="lazy"
+          style={{ width: '100%', maxHeight: 200, objectFit: 'cover', display: 'block', borderBottom: '1px solid var(--bw-line-soft)' }}
+        />
+      )}
+
       <div style={{ padding: '13px 15px' }}>
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 7 }}>WATER DEPTH</div>
         <div style={{ position: 'relative', height: 10, background: '#EEF2F5', borderRadius: 6, overflow: 'hidden', marginBottom: 4 }}>
@@ -110,6 +123,13 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         </div>
 
         <div style={{ marginTop: 11, padding: '10px 12px', background: advice.bg, color: advice.col, borderRadius: 11, fontSize: 12, fontWeight: 600, lineHeight: 1.4 }}>{advice.txt}</div>
+
+        <button
+          onClick={onShareReport}
+          style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: '#1877F2', color: '#fff', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+        >
+          <span style={{ fontSize: 15 }}>ⓕ</span> Share to Facebook
+        </button>
 
         {canConfirm && (
           <button

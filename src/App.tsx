@@ -8,12 +8,12 @@ import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
 import { mutations } from './api/queries';
-import { ApiError } from './api/client';
+import { ApiError, API_BASE } from './api/client';
 import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
-import { buildShareText, buildShareLinks } from './utils/share';
+import { buildShareText, buildShareLinks, buildReportShareText } from './utils/share';
 import {
   buildPossibleClosures,
   buildRoadDirectory,
@@ -622,7 +622,7 @@ const App: React.FC = () => {
     runReverseGeocode(latlng);
   };
 
-  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string): Promise<void> => {
+  const pickSeverity = async (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string, photoDataUrl?: string): Promise<void> => {
     if (!pending) return;
     const preset = SEVERITY_PRESET[sev];
     setBusyPick(true);
@@ -671,6 +671,7 @@ const App: React.FC = () => {
         trend: preset.trend,
         road: preset.road,
         captchaToken,
+        photoDataUrl,
       });
       await reports.refetch(true);
       setMode('idle');
@@ -820,6 +821,36 @@ const App: React.FC = () => {
     } catch {
       showToast('Could not copy — please copy it manually');
     }
+  };
+
+  // Share a single report to Facebook. Hybrid: on mobile with a photo, use the Web Share API to
+  // push the actual image file to the native sheet (the user picks Facebook there — Facebook's own
+  // sharer can't accept an uploaded photo). Everywhere else, open Facebook's web sharer with the
+  // app link (it builds its preview from the page's OG tags).
+  const shareReport = async (report: EnrichedReport): Promise<void> => {
+    const url = window.location.href;
+    const { title, text } = buildReportShareText(report, active.length, url);
+    try {
+      if (report.photoUrl && typeof navigator.canShare === 'function') {
+        const resp = await fetch(`${API_BASE}${report.photoUrl}`);
+        if (resp.ok) {
+          const blob = await resp.blob();
+          const file = new File([blob], 'flood.jpg', { type: blob.type || 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title, text });
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      // User dismissed the native sheet → done. Otherwise fall through to the web sharer.
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+    }
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   // ── Admin data management ──
@@ -1099,6 +1130,8 @@ const App: React.FC = () => {
               removing={removing}
               onRemove={() => void removeReport(selectedReport.id)}
               onShowLocation={() => setMapFocus({ lat: selectedReport.latitude, lng: selectedReport.longitude, key: Date.now() })}
+              photoSrc={selectedReport.photoUrl ? `${API_BASE}${selectedReport.photoUrl}` : null}
+              onShareReport={() => void shareReport(selectedReport)}
               projectedRiseCm={projectedRiseCm}
               onClose={() => setSelectedReportId(null)}
             />
@@ -1121,7 +1154,7 @@ const App: React.FC = () => {
               detectedRoad={detectedRoad.road}
               detecting={detectingRoad}
               captchaRequired={captchaEnabled() && auth?.role === 'GUEST'}
-              onPick={(s, d, id, road, token) => void pickSeverity(s, d, id, road, token)}
+              onPick={(s, d, id, road, token, photo) => void pickSeverity(s, d, id, road, token, photo)}
               onCancel={cancelReport}
             />
           )}

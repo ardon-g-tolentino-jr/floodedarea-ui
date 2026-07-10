@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Severity } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
+import { fileToCompressedDataUrl } from '../../utils/image';
 import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
@@ -28,7 +29,7 @@ interface SeverityPickerProps {
   detecting: boolean;
   /** Show a CAPTCHA the reporter must clear before posting (guest submits with Turnstile enabled). */
   captchaRequired: boolean;
-  onPick: (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string) => void;
+  onPick: (sev: Severity, depthCm: number, identify: boolean, road: string, captchaToken?: string, photoDataUrl?: string) => void;
   onCancel: () => void;
 }
 
@@ -49,6 +50,70 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
   React.useEffect(() => {
     if (!roadEdited.current && detectedRoad) setRoad(detectedRoad);
   }, [detectedRoad]);
+
+  // Optional flood photo, held as a compressed JPEG data-URL. Compression runs on select so the
+  // preview and the eventual upload use the same shrunk image.
+  const [photo, setPhoto] = React.useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = React.useState(false);
+  const [photoError, setPhotoError] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const onPickPhoto = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file after a remove
+    if (!file) return;
+    setPhotoError(null);
+    setPhotoBusy(true);
+    try {
+      setPhoto(await fileToCompressedDataUrl(file));
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : 'Could not add that photo.');
+      setPhoto(null);
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const photoField = (
+    <div style={{ padding: '10px 15px 4px' }}>
+      <label style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 6 }}>
+        PHOTO <span style={{ fontWeight: 700, letterSpacing: 0 }}>(optional)</span>
+      </label>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={(e) => void onPickPhoto(e)}
+        style={{ display: 'none' }}
+      />
+      {photo ? (
+        <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #E2E8F0' }}>
+          <img src={photo} alt="Flood photo preview" style={{ width: '100%', maxHeight: 150, objectFit: 'cover', display: 'block' }} />
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => { setPhoto(null); setPhotoError(null); }}
+            style={{ position: 'absolute', top: 6, right: 6, border: 0, background: 'rgba(15,23,42,.62)', color: '#fff', borderRadius: 8, padding: '4px 9px', fontSize: 11, fontWeight: 800, cursor: busy ? 'wait' : 'pointer' }}
+          >
+            Remove
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={busy || photoBusy}
+          onClick={() => fileInputRef.current?.click()}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px', border: '1.5px dashed #CBD5E1', borderRadius: 10, background: '#F8FAFC', color: 'var(--bw-ink-soft)', fontSize: 12.5, fontWeight: 800, cursor: busy || photoBusy ? 'wait' : 'pointer' }}
+        >
+          {photoBusy ? 'Processing photo…' : '📷 Add a photo'}
+        </button>
+      )}
+      <div style={{ fontSize: 10.5, color: photoError ? 'var(--bw-danger)' : 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>
+        {photoError ?? 'Attach a photo of the flooding as proof — optional.'}
+      </div>
+    </div>
+  );
 
   const roadField = (
     <div style={{ padding: '13px 15px 4px' }}>
@@ -186,11 +251,11 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
             </div>
           )}
           <button
-            disabled={busy || (captchaRequired && !captchaToken)}
-            onClick={() => onPick(sev, depth, identify, road.trim(), captchaToken ?? undefined)}
-            style={{ border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy || (captchaRequired && !captchaToken) ? 'not-allowed' : 'pointer', opacity: busy || (captchaRequired && !captchaToken) ? 0.6 : 1 }}
+            disabled={busy || photoBusy || (captchaRequired && !captchaToken)}
+            onClick={() => onPick(sev, depth, identify, road.trim(), captchaToken ?? undefined, photo ?? undefined)}
+            style={{ border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy || photoBusy || (captchaRequired && !captchaToken) ? 'not-allowed' : 'pointer', opacity: busy || photoBusy || (captchaRequired && !captchaToken) ? 0.6 : 1 }}
           >
-            {busy ? 'Posting…' : 'Post flood report'}
+            {busy ? 'Posting…' : photoBusy ? 'Processing photo…' : 'Post flood report'}
           </button>
           <button
             onClick={() => setSev(null)}
@@ -207,6 +272,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
   const card = (
     <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       {roadField}
+      {photoField}
       {sev == null ? categoryStep : depthStep}
     </div>
   );

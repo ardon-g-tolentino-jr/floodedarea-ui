@@ -26,6 +26,8 @@ export interface FloodReport {
   reporterUserId: number | null;
   /** Backend-provided author trust. Absent (older payloads) is treated as 'verified'. */
   reporterTrust?: ReporterTrust;
+  /** Relative URL to the report's photo (`/reports/:id/photo`), or null/absent when none was attached. */
+  photoUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -90,6 +92,8 @@ export interface NewReport {
   road: Road;
   /** Anti-abuse CAPTCHA proof, sent only for guest submissions when Turnstile is configured. */
   captchaToken?: string;
+  /** Optional flood photo as a compressed JPEG data-URL; the backend stores the bytes in the DB. */
+  photoDataUrl?: string;
 }
 
 /**

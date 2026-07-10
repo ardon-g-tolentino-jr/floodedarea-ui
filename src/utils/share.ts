@@ -72,6 +72,20 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
   return { title: `${APP_NAME} — live flood map`, body, text: `${body}\n${url}` };
 }
 
+/** Share message for a SPECIFIC report (used by the per-report "Share to Facebook" action). Reuses
+ *  the reporter-snapshot wording so any report — not just the caller's own — reads naturally. */
+export function buildReportShareText(report: EnrichedReport, activeCount: number, url: string): ShareText {
+  const where = report.district ? `${report.name} (${report.district})` : report.name;
+  const trend = report.trend === 'rising' || report.trend === 'receding'
+    ? `, ${TREND_META[report.trend].label.toLowerCase()}`
+    : '';
+  const body =
+    `⚠️ ${report.sev.label.toUpperCase()} flooding reported on ${where} — ` +
+    `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
+    `Track live flood conditions on ${PITCH}`;
+  return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}` };
+}
+
 /** A single social-network share target. `href` opens that network's web (or app) composer. */
 export interface ShareLink {
   key: 'facebook' | 'x' | 'whatsapp' | 'telegram' | 'email';

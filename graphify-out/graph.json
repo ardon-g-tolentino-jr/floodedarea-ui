@@ -1213,7 +1213,7 @@
       "label": "stats",
       "file_type": "code",
       "source_file": "mock-api/db.json",
-      "source_location": "L406",
+      "source_location": "L414",
       "id": "mock_api_db_stats",
       "community": 14,
       "norm_label": "stats"
@@ -1222,7 +1222,7 @@
       "label": "visits",
       "file_type": "code",
       "source_file": "mock-api/db.json",
-      "source_location": "L407",
+      "source_location": "L415",
       "id": "mock_api_db_stats_visits",
       "community": 14,
       "norm_label": "visits"
@@ -1339,7 +1339,7 @@
       "label": "loadNotifyPrefs()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L64",
+      "source_location": "L66",
       "id": "src_app_loadnotifyprefs",
       "community": 5,
       "norm_label": "loadnotifyprefs()"
@@ -1348,7 +1348,7 @@
       "label": "loadLivePref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L73",
+      "source_location": "L75",
       "id": "src_app_loadlivepref",
       "community": 5,
       "norm_label": "loadlivepref()"
@@ -1357,7 +1357,7 @@
       "label": "DEFAULT_LOCATION",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L81",
+      "source_location": "L83",
       "id": "src_app_default_location",
       "community": 5,
       "norm_label": "default_location"
@@ -1366,7 +1366,7 @@
       "label": "PendingPin",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L83",
+      "source_location": "L85",
       "id": "src_app_pendingpin",
       "community": 5,
       "norm_label": "pendingpin"
@@ -1375,7 +1375,7 @@
       "label": "AlertDialog",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L87",
+      "source_location": "L89",
       "id": "src_app_alertdialog",
       "community": 5,
       "norm_label": "alertdialog"
@@ -1384,7 +1384,7 @@
       "label": "SEV_TO_LEVEL",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L90",
+      "source_location": "L92",
       "id": "src_app_sev_to_level",
       "community": 5,
       "norm_label": "sev_to_level"
@@ -1393,7 +1393,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L92",
+      "source_location": "L94",
       "id": "src_app_app",
       "community": 5,
       "norm_label": "app()"
@@ -1519,7 +1519,7 @@
       "label": "MsgKey",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L294",
+      "source_location": "L295",
       "id": "src_i18n_msgkey",
       "community": 8,
       "norm_label": "msgkey"
@@ -1528,7 +1528,7 @@
       "label": "translate()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L296",
+      "source_location": "L297",
       "id": "src_i18n_translate",
       "community": 8,
       "norm_label": "translate()"
@@ -1537,7 +1537,7 @@
       "label": "tFormat()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L303",
+      "source_location": "L304",
       "id": "src_i18n_tformat",
       "community": 8,
       "norm_label": "tformat()"
@@ -1546,7 +1546,7 @@
       "label": "sevLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L311",
+      "source_location": "L312",
       "id": "src_i18n_sevlabel",
       "community": 8,
       "norm_label": "sevlabel()"
@@ -1555,7 +1555,7 @@
       "label": "roadLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L314",
+      "source_location": "L315",
       "id": "src_i18n_roadlabel",
       "community": 8,
       "norm_label": "roadlabel()"
@@ -1564,7 +1564,7 @@
       "label": "roadShort()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L317",
+      "source_location": "L318",
       "id": "src_i18n_roadshort",
       "community": 8,
       "norm_label": "roadshort()"
@@ -1573,7 +1573,7 @@
       "label": "trendLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L320",
+      "source_location": "L321",
       "id": "src_i18n_trendlabel",
       "community": 8,
       "norm_label": "trendlabel()"
@@ -1582,7 +1582,7 @@
       "label": "useI18n()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L325",
+      "source_location": "L326",
       "id": "src_i18n_usei18n",
       "community": 8,
       "norm_label": "usei18n()"
@@ -1681,7 +1681,7 @@
       "label": "EvacuationCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "id": "src_types_evacuationcenter",
       "community": 2,
       "norm_label": "evacuationcenter"
@@ -1690,7 +1690,7 @@
       "label": "Hotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "id": "src_types_hotline",
       "community": 2,
       "norm_label": "hotline"
@@ -1699,7 +1699,7 @@
       "label": "FloodAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L51",
+      "source_location": "L53",
       "id": "src_types_floodalert",
       "community": 2,
       "norm_label": "floodalert"
@@ -1708,7 +1708,7 @@
       "label": "LatLng",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L62",
+      "source_location": "L64",
       "id": "src_types_latlng",
       "community": 13,
       "norm_label": "latlng"
@@ -1717,7 +1717,7 @@
       "label": "RoadSegment",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L72",
+      "source_location": "L74",
       "id": "src_types_roadsegment",
       "community": 2,
       "norm_label": "roadsegment"
@@ -1726,7 +1726,7 @@
       "label": "NewReport",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L82",
+      "source_location": "L84",
       "id": "src_types_newreport",
       "community": 2,
       "norm_label": "newreport"
@@ -1735,7 +1735,7 @@
       "label": "RescueRequest",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L99",
+      "source_location": "L103",
       "id": "src_types_rescuerequest",
       "community": 2,
       "norm_label": "rescuerequest"
@@ -1744,7 +1744,7 @@
       "label": "NewRescue",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L113",
+      "source_location": "L117",
       "id": "src_types_newrescue",
       "community": 2,
       "norm_label": "newrescue"
@@ -1753,7 +1753,7 @@
       "label": "NewCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L123",
+      "source_location": "L127",
       "id": "src_types_newcenter",
       "community": 2,
       "norm_label": "newcenter"
@@ -1762,7 +1762,7 @@
       "label": "NewHotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L130",
+      "source_location": "L134",
       "id": "src_types_newhotline",
       "community": 2,
       "norm_label": "newhotline"
@@ -1771,7 +1771,7 @@
       "label": "NewAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L137",
+      "source_location": "L141",
       "id": "src_types_newalert",
       "community": 2,
       "norm_label": "newalert"
@@ -1780,7 +1780,7 @@
       "label": "FeedbackType",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L145",
+      "source_location": "L149",
       "id": "src_types_feedbacktype",
       "community": 2,
       "norm_label": "feedbacktype"
@@ -1789,7 +1789,7 @@
       "label": "FeedbackStatus",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L146",
+      "source_location": "L150",
       "id": "src_types_feedbackstatus",
       "community": 2,
       "norm_label": "feedbackstatus"
@@ -1798,7 +1798,7 @@
       "label": "Feedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L152",
+      "source_location": "L157",
       "id": "src_types_feedback",
       "community": 2,
       "norm_label": "feedback"
@@ -1807,7 +1807,7 @@
       "label": "NewFeedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L165",
+      "source_location": "L174",
       "id": "src_types_newfeedback",
       "community": 2,
       "norm_label": "newfeedback"
@@ -1816,7 +1816,7 @@
       "label": "VisitStats",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L172",
+      "source_location": "L183",
       "id": "src_types_visitstats",
       "community": 2,
       "norm_label": "visitstats"
@@ -1865,6 +1865,33 @@
       "id": "utils_geolocate_locatewithaccuracy",
       "community": 5,
       "norm_label": "locatewithaccuracy()"
+    },
+    {
+      "label": "image.ts",
+      "file_type": "code",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L1",
+      "id": "src_utils_image_ts",
+      "community": 21,
+      "norm_label": "image.ts"
+    },
+    {
+      "label": "loadImage()",
+      "file_type": "code",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L15",
+      "id": "utils_image_loadimage",
+      "community": 21,
+      "norm_label": "loadimage()"
+    },
+    {
+      "label": "fileToCompressedDataUrl()",
+      "file_type": "code",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L35",
+      "id": "utils_image_filetocompresseddataurl",
+      "community": 21,
+      "norm_label": "filetocompresseddataurl()"
     },
     {
       "label": "waterChart.ts",
@@ -1993,10 +2020,19 @@
       "norm_label": "buildsharetext()"
     },
     {
+      "label": "buildReportShareText()",
+      "file_type": "code",
+      "source_file": "src/utils/share.ts",
+      "source_location": "L77",
+      "id": "utils_share_buildreportsharetext",
+      "community": 0,
+      "norm_label": "buildreportsharetext()"
+    },
+    {
       "label": "ShareLink",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L76",
+      "source_location": "L90",
       "id": "utils_share_sharelink",
       "community": 8,
       "norm_label": "sharelink"
@@ -2005,7 +2041,7 @@
       "label": "buildShareLinks()",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L87",
+      "source_location": "L101",
       "id": "utils_share_buildsharelinks",
       "community": 0,
       "norm_label": "buildsharelinks()"
@@ -2097,7 +2133,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L72",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 13,
+      "community": 0,
       "norm_label": "enrichedreport"
     },
     {
@@ -2106,7 +2142,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L86",
       "id": "utils_viewmodel_safetystatus",
-      "community": 13,
+      "community": 8,
       "norm_label": "safetystatus"
     },
     {
@@ -2169,7 +2205,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L263",
       "id": "utils_viewmodel_buildpossibleclosures",
-      "community": 6,
+      "community": 13,
       "norm_label": "buildpossibleclosures()"
     },
     {
@@ -2286,7 +2322,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L455",
       "id": "utils_viewmodel_nearbyclosure",
-      "community": 8,
+      "community": 13,
       "norm_label": "nearbyclosure"
     },
     {
@@ -2313,7 +2349,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L544",
       "id": "utils_viewmodel_recentreportrows",
-      "community": 8,
+      "community": 13,
       "norm_label": "recentreportrows()"
     },
     {
@@ -2385,7 +2421,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 13,
+      "community": 0,
       "norm_label": "sevmeta"
     },
     {
@@ -2403,7 +2439,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L19",
       "id": "utils_floodmeta_trend_meta",
-      "community": 0,
+      "community": 21,
       "norm_label": "trend_meta"
     },
     {
@@ -2412,7 +2448,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L25",
       "id": "utils_floodmeta_road_meta",
-      "community": 21,
+      "community": 13,
       "norm_label": "road_meta"
     },
     {
@@ -2457,7 +2493,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L51",
       "id": "utils_floodmeta_road_rank",
-      "community": 13,
+      "community": 21,
       "norm_label": "road_rank"
     },
     {
@@ -2601,7 +2637,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L1",
       "id": "src_utils_roadsnap_ts",
-      "community": 6,
+      "community": 13,
       "norm_label": "roadsnap.ts"
     },
     {
@@ -2610,7 +2646,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L8",
       "id": "utils_roadsnap_rawroad",
-      "community": 6,
+      "community": 13,
       "norm_label": "rawroad"
     },
     {
@@ -2619,7 +2655,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L9",
       "id": "utils_roadsnap_roadsasset",
-      "community": 6,
+      "community": 13,
       "norm_label": "roadsasset"
     },
     {
@@ -2637,7 +2673,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L24",
       "id": "utils_roadsnap_mperdeglng",
-      "community": 6,
+      "community": 13,
       "norm_label": "mperdeglng()"
     },
     {
@@ -2646,7 +2682,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L25",
       "id": "utils_roadsnap_cellkey",
-      "community": 6,
+      "community": 13,
       "norm_label": "cellkey()"
     },
     {
@@ -2664,7 +2700,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L28",
       "id": "utils_roadsnap_seg",
-      "community": 6,
+      "community": 13,
       "norm_label": "seg"
     },
     {
@@ -2673,7 +2709,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L33",
       "id": "utils_roadsnap_meters",
-      "community": 6,
+      "community": 13,
       "norm_label": "meters()"
     },
     {
@@ -2682,7 +2718,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L40",
       "id": "utils_roadsnap_project",
-      "community": 6,
+      "community": 13,
       "norm_label": "project()"
     },
     {
@@ -2691,7 +2727,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L52",
       "id": "utils_roadsnap_loadroads",
-      "community": 6,
+      "community": 13,
       "norm_label": "loadroads()"
     },
     {
@@ -2700,7 +2736,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L79",
       "id": "utils_roadsnap_roadsloaded",
-      "community": 6,
+      "community": 13,
       "norm_label": "roadsloaded()"
     },
     {
@@ -2709,7 +2745,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L82",
       "id": "utils_roadsnap_pointat",
-      "community": 6,
+      "community": 13,
       "norm_label": "pointat()"
     },
     {
@@ -2718,7 +2754,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L98",
       "id": "utils_roadsnap_snaptoroad",
-      "community": 6,
+      "community": 13,
       "norm_label": "snaptoroad()"
     },
     {
@@ -2736,7 +2772,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L140",
       "id": "utils_roadsnap_lerp",
-      "community": 6,
+      "community": 13,
       "norm_label": "lerp()"
     },
     {
@@ -2745,7 +2781,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L147",
       "id": "utils_roadsnap_roadswithinradius",
-      "community": 6,
+      "community": 13,
       "norm_label": "roadswithinradius()"
     },
     {
@@ -2754,7 +2790,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L183",
       "id": "utils_roadsnap_cliptocircle",
-      "community": 6,
+      "community": 13,
       "norm_label": "cliptocircle()"
     },
     {
@@ -2857,6 +2893,33 @@
       "norm_label": "alertribbon()"
     },
     {
+      "label": "ChatWidget.tsx",
+      "file_type": "code",
+      "source_file": "src/components/panels/ChatWidget.tsx",
+      "source_location": "L1",
+      "id": "src_components_panels_chatwidget_tsx",
+      "community": 5,
+      "norm_label": "chatwidget.tsx"
+    },
+    {
+      "label": "ChatWidgetProps",
+      "file_type": "code",
+      "source_file": "src/components/panels/ChatWidget.tsx",
+      "source_location": "L21",
+      "id": "panels_chatwidget_chatwidgetprops",
+      "community": 5,
+      "norm_label": "chatwidgetprops"
+    },
+    {
+      "label": "ChatWidget()",
+      "file_type": "code",
+      "source_file": "src/components/panels/ChatWidget.tsx",
+      "source_location": "L25",
+      "id": "panels_chatwidget_chatwidget",
+      "community": 5,
+      "norm_label": "chatwidget()"
+    },
+    {
       "label": "FeedbackFormModal.tsx",
       "file_type": "code",
       "source_file": "src/components/panels/FeedbackFormModal.tsx",
@@ -2869,7 +2932,7 @@
       "label": "FeedbackFormModalProps",
       "file_type": "code",
       "source_file": "src/components/panels/FeedbackFormModal.tsx",
-      "source_location": "L4",
+      "source_location": "L5",
       "id": "panels_feedbackformmodal_feedbackformmodalprops",
       "community": 2,
       "norm_label": "feedbackformmodalprops"
@@ -2878,7 +2941,7 @@
       "label": "TYPES",
       "file_type": "code",
       "source_file": "src/components/panels/FeedbackFormModal.tsx",
-      "source_location": "L11",
+      "source_location": "L14",
       "id": "panels_feedbackformmodal_types",
       "community": 2,
       "norm_label": "types"
@@ -2887,7 +2950,7 @@
       "label": "FeedbackFormModal()",
       "file_type": "code",
       "source_file": "src/components/panels/FeedbackFormModal.tsx",
-      "source_location": "L18",
+      "source_location": "L21",
       "id": "panels_feedbackformmodal_feedbackformmodal",
       "community": 2,
       "norm_label": "feedbackformmodal()"
@@ -2925,7 +2988,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_publicdashboardmodal_tsx",
-      "community": 8,
+      "community": 13,
       "norm_label": "publicdashboardmodal.tsx"
     },
     {
@@ -2943,7 +3006,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L24",
       "id": "panels_publicdashboardmodal_radius_options",
-      "community": 8,
+      "community": 13,
       "norm_label": "radius_options"
     },
     {
@@ -2952,7 +3015,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L26",
       "id": "panels_publicdashboardmodal_page_size_options",
-      "community": 8,
+      "community": 13,
       "norm_label": "page_size_options"
     },
     {
@@ -2972,6 +3035,33 @@
       "id": "panels_publicdashboardmodal_publicdashboardmodal",
       "community": 8,
       "norm_label": "publicdashboardmodal()"
+    },
+    {
+      "label": "CommunityFeedbackModal.tsx",
+      "file_type": "code",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L1",
+      "id": "src_components_panels_communityfeedbackmodal_tsx",
+      "community": 2,
+      "norm_label": "communityfeedbackmodal.tsx"
+    },
+    {
+      "label": "CommunityFeedbackModalProps",
+      "file_type": "code",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L4",
+      "id": "panels_communityfeedbackmodal_communityfeedbackmodalprops",
+      "community": 2,
+      "norm_label": "communityfeedbackmodalprops"
+    },
+    {
+      "label": "CommunityFeedbackModal()",
+      "file_type": "code",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L19",
+      "id": "panels_communityfeedbackmodal_communityfeedbackmodal",
+      "community": 2,
+      "norm_label": "communityfeedbackmodal()"
     },
     {
       "label": "TopBar.tsx",
@@ -2995,7 +3085,7 @@
       "label": "ICON_BTN",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L32",
+      "source_location": "L35",
       "id": "panels_topbar_icon_btn",
       "community": 3,
       "norm_label": "icon_btn"
@@ -3004,7 +3094,7 @@
       "label": "MenuItem()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L47",
+      "source_location": "L50",
       "id": "panels_topbar_menuitem",
       "community": 3,
       "norm_label": "menuitem()"
@@ -3013,7 +3103,7 @@
       "label": "TopBar()",
       "file_type": "code",
       "source_file": "src/components/panels/TopBar.tsx",
-      "source_location": "L57",
+      "source_location": "L60",
       "id": "panels_topbar_topbar",
       "community": 3,
       "norm_label": "topbar()"
@@ -3051,7 +3141,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_notifymodal_tsx",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodal.tsx"
     },
     {
@@ -3060,7 +3150,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L8",
       "id": "panels_notifymodal_notifyprefs",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifyprefs"
     },
     {
@@ -3069,7 +3159,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L14",
       "id": "panels_notifymodal_default_notify_prefs",
-      "community": 21,
+      "community": 8,
       "norm_label": "default_notify_prefs"
     },
     {
@@ -3078,7 +3168,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L20",
       "id": "panels_notifymodal_fmtkm",
-      "community": 21,
+      "community": 8,
       "norm_label": "fmtkm()"
     },
     {
@@ -3087,7 +3177,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L23",
       "id": "panels_notifymodal_notifymodalprops",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodalprops"
     },
     {
@@ -3096,7 +3186,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L31",
       "id": "panels_notifymodal_sev_order",
-      "community": 21,
+      "community": 8,
       "norm_label": "sev_order"
     },
     {
@@ -3105,7 +3195,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L33",
       "id": "panels_notifymodal_notifymodal",
-      "community": 21,
+      "community": 8,
       "norm_label": "notifymodal()"
     },
     {
@@ -3114,7 +3204,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L123",
       "id": "panels_notifymodal_permissionnote",
-      "community": 21,
+      "community": 8,
       "norm_label": "permissionnote()"
     },
     {
@@ -3130,7 +3220,7 @@
       "label": "FeaturesModalProps",
       "file_type": "code",
       "source_file": "src/components/panels/FeaturesModal.tsx",
-      "source_location": "L6",
+      "source_location": "L4",
       "id": "panels_featuresmodal_featuresmodalprops",
       "community": 3,
       "norm_label": "featuresmodalprops"
@@ -3139,7 +3229,7 @@
       "label": "Feature",
       "file_type": "code",
       "source_file": "src/components/panels/FeaturesModal.tsx",
-      "source_location": "L14",
+      "source_location": "L11",
       "id": "panels_featuresmodal_feature",
       "community": 3,
       "norm_label": "feature"
@@ -3148,7 +3238,7 @@
       "label": "GROUPS",
       "file_type": "code",
       "source_file": "src/components/panels/FeaturesModal.tsx",
-      "source_location": "L23",
+      "source_location": "L20",
       "id": "panels_featuresmodal_groups",
       "community": 3,
       "norm_label": "groups"
@@ -3157,7 +3247,7 @@
       "label": "FeaturesModal()",
       "file_type": "code",
       "source_file": "src/components/panels/FeaturesModal.tsx",
-      "source_location": "L54",
+      "source_location": "L51",
       "id": "panels_featuresmodal_featuresmodal",
       "community": 3,
       "norm_label": "featuresmodal()"
@@ -3229,7 +3319,7 @@
       "label": "SearchBoxHandle",
       "file_type": "code",
       "source_file": "src/components/panels/SearchBox.tsx",
-      "source_location": "L12",
+      "source_location": "L14",
       "id": "panels_searchbox_searchboxhandle",
       "community": 3,
       "norm_label": "searchboxhandle"
@@ -3238,7 +3328,7 @@
       "label": "SearchBox",
       "file_type": "code",
       "source_file": "src/components/panels/SearchBox.tsx",
-      "source_location": "L18",
+      "source_location": "L20",
       "id": "panels_searchbox_searchbox",
       "community": 3,
       "norm_label": "searchbox"
@@ -3589,7 +3679,7 @@
       "label": "Option",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L6",
+      "source_location": "L7",
       "id": "panels_severitypicker_option",
       "community": 21,
       "norm_label": "option"
@@ -3598,7 +3688,7 @@
       "label": "OPTIONS",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "id": "panels_severitypicker_options",
       "community": 21,
       "norm_label": "options"
@@ -3607,7 +3697,7 @@
       "label": "SeverityPickerProps",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "panels_severitypicker_severitypickerprops",
       "community": 21,
       "norm_label": "severitypickerprops"
@@ -3616,7 +3706,7 @@
       "label": "SeverityPicker()",
       "file_type": "code",
       "source_file": "src/components/panels/SeverityPicker.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "panels_severitypicker_severitypicker",
       "community": 21,
       "norm_label": "severitypicker()"
@@ -3645,7 +3735,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L20",
       "id": "panels_sidebar_sidebarprops",
-      "community": 13,
+      "community": 8,
       "norm_label": "sidebarprops"
     },
     {
@@ -3744,7 +3834,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L9",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 13,
+      "community": 21,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -3832,7 +3922,7 @@
       "label": "SupportModal()",
       "file_type": "code",
       "source_file": "src/components/panels/SupportModal.tsx",
-      "source_location": "L14",
+      "source_location": "L16",
       "id": "panels_supportmodal_supportmodal",
       "community": 5,
       "norm_label": "supportmodal()"
@@ -3897,14 +3987,14 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L5",
       "id": "panels_reportdetailcard_reportdetailcardprops",
-      "community": 13,
+      "community": 0,
       "norm_label": "reportdetailcardprops"
     },
     {
       "label": "DEPTH_TICKS",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L19",
+      "source_location": "L23",
       "id": "panels_reportdetailcard_depth_ticks",
       "community": 21,
       "norm_label": "depth_ticks"
@@ -3913,7 +4003,7 @@
       "label": "ReportDetailCard()",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L26",
+      "source_location": "L30",
       "id": "panels_reportdetailcard_reportdetailcard",
       "community": 21,
       "norm_label": "reportdetailcard()"
@@ -3922,7 +4012,7 @@
       "label": "Cell()",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L177",
+      "source_location": "L197",
       "id": "panels_reportdetailcard_cell",
       "community": 21,
       "norm_label": "cell()"
@@ -4194,7 +4284,7 @@
       "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L10",
       "id": "hooks_usedomaindata_usereporthistory",
-      "community": 21,
+      "community": 5,
       "norm_label": "usereporthistory()"
     },
     {
@@ -4243,19 +4333,19 @@
       "norm_label": "userescues()"
     },
     {
-      "label": "useAcceptedFeatures()",
+      "label": "useAcceptedFeedback()",
       "file_type": "code",
       "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L37",
-      "id": "hooks_usedomaindata_useacceptedfeatures",
+      "id": "hooks_usedomaindata_useacceptedfeedback",
       "community": 5,
-      "norm_label": "useacceptedfeatures()"
+      "norm_label": "useacceptedfeedback()"
     },
     {
       "label": "useAllFeedback()",
       "file_type": "code",
       "source_file": "src/hooks/useDomainData.ts",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "hooks_usedomaindata_useallfeedback",
       "community": 5,
       "norm_label": "useallfeedback()"
@@ -4309,7 +4399,7 @@
       "label": "useFetch()",
       "file_type": "code",
       "source_file": "src/hooks/useFetch.ts",
-      "source_location": "L18",
+      "source_location": "L22",
       "id": "hooks_usefetch_usefetch",
       "community": 5,
       "norm_label": "usefetch()"
@@ -4369,10 +4459,19 @@
       "norm_label": "geocode.ts"
     },
     {
+      "label": "nearViewbox()",
+      "file_type": "code",
+      "source_file": "src/api/geocode.ts",
+      "source_location": "L19",
+      "id": "api_geocode_nearviewbox",
+      "community": 3,
+      "norm_label": "nearviewbox()"
+    },
+    {
       "label": "GeoResult",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L16",
+      "source_location": "L27",
       "id": "api_geocode_georesult",
       "community": 3,
       "norm_label": "georesult"
@@ -4381,7 +4480,7 @@
       "label": "NominatimRow",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L23",
+      "source_location": "L34",
       "id": "api_geocode_nominatimrow",
       "community": 3,
       "norm_label": "nominatimrow"
@@ -4390,7 +4489,7 @@
       "label": "searchPlaces()",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L35",
+      "source_location": "L48",
       "id": "api_geocode_searchplaces",
       "community": 3,
       "norm_label": "searchplaces()"
@@ -4399,7 +4498,7 @@
       "label": "ReverseResult",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L71",
+      "source_location": "L89",
       "id": "api_geocode_reverseresult",
       "community": 3,
       "norm_label": "reverseresult"
@@ -4408,7 +4507,7 @@
       "label": "NominatimAddress",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L79",
+      "source_location": "L97",
       "id": "api_geocode_nominatimaddress",
       "community": 3,
       "norm_label": "nominatimaddress"
@@ -4417,7 +4516,7 @@
       "label": "NominatimReverseRow",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L96",
+      "source_location": "L114",
       "id": "api_geocode_nominatimreverserow",
       "community": 3,
       "norm_label": "nominatimreverserow"
@@ -4426,7 +4525,7 @@
       "label": "reverseGeocode()",
       "file_type": "code",
       "source_file": "src/api/geocode.ts",
-      "source_location": "L108",
+      "source_location": "L126",
       "id": "api_geocode_reversegeocode",
       "community": 3,
       "norm_label": "reversegeocode()"
@@ -4639,10 +4738,46 @@
       "norm_label": "floodedarea \u2014 google play packaging (twa) runbook"
     },
     {
-      "label": "What is done in this repo (Phase 1 \u2014 PWA readiness) \u2705",
+      "label": "Status & outstanding TODOs",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
       "source_location": "L12",
+      "id": "baha_ui_playstore_package_status_outstanding_todos",
+      "community": 22,
+      "norm_label": "status & outstanding todos"
+    },
+    {
+      "label": "nginx \u2014 serve the manifest with the right Content-Type",
+      "file_type": "document",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L43",
+      "id": "baha_ui_playstore_package_nginx_serve_the_manifest_with_the_right_content_type",
+      "community": 22,
+      "norm_label": "nginx \u2014 serve the manifest with the right content-type"
+    },
+    {
+      "label": "code:nginx (location = /manifest.webmanifest {)",
+      "file_type": "document",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L48",
+      "id": "baha_ui_playstore_package_codeblock_1",
+      "community": 22,
+      "norm_label": "code:nginx (location = /manifest.webmanifest {)"
+    },
+    {
+      "label": "code:bash (curl -sI https://floodedarea.com/manifest.webmanifest | grep)",
+      "file_type": "document",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L57",
+      "id": "baha_ui_playstore_package_codeblock_2",
+      "community": 22,
+      "norm_label": "code:bash (curl -si https://floodedarea.com/manifest.webmanifest | grep)"
+    },
+    {
+      "label": "What is done in this repo (Phase 1 \u2014 PWA readiness) \u2705",
+      "file_type": "document",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L68",
       "id": "baha_ui_playstore_package_what_is_done_in_this_repo_phase_1_pwa_readiness",
       "community": 22,
       "norm_label": "what is done in this repo (phase 1 \u2014 pwa readiness) \u2705"
@@ -4651,25 +4786,25 @@
       "label": "\u26a0\ufe0f Hard ordering dependency \u2014 deploy before Phase 2",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L35",
+      "source_location": "L91",
       "id": "baha_ui_playstore_package_hard_ordering_dependency_deploy_before_phase_2",
       "community": 22,
       "norm_label": "\u26a0\ufe0f hard ordering dependency \u2014 deploy before phase 2"
     },
     {
-      "label": "code:bash (curl -sI https://floodedarea.com/manifest.webmanifest   # ex)",
+      "label": "code:bash (curl -sI https://floodedarea.com/manifest.webmanifest)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L41",
-      "id": "baha_ui_playstore_package_codeblock_1",
+      "source_location": "L99",
+      "id": "baha_ui_playstore_package_codeblock_3",
       "community": 22,
-      "norm_label": "code:bash (curl -si https://floodedarea.com/manifest.webmanifest   # ex)"
+      "norm_label": "code:bash (curl -si https://floodedarea.com/manifest.webmanifest)"
     },
     {
       "label": "Remaining steps (run after the site is redeployed)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L47",
+      "source_location": "L106",
       "id": "baha_ui_playstore_package_remaining_steps_run_after_the_site_is_redeployed",
       "community": 22,
       "norm_label": "remaining steps (run after the site is redeployed)"
@@ -4678,7 +4813,7 @@
       "label": "Phase 2 \u2014 Initialize the TWA",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L52",
+      "source_location": "L111",
       "id": "baha_ui_playstore_package_phase_2_initialize_the_twa",
       "community": 22,
       "norm_label": "phase 2 \u2014 initialize the twa"
@@ -4687,8 +4822,8 @@
       "label": "code:bash (npm install -g @bubblewrap/cli         # or use: npx @bubble)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L54",
-      "id": "baha_ui_playstore_package_codeblock_2",
+      "source_location": "L113",
+      "id": "baha_ui_playstore_package_codeblock_4",
       "community": 22,
       "norm_label": "code:bash (npm install -g @bubblewrap/cli         # or use: npx @bubble)"
     },
@@ -4696,7 +4831,7 @@
       "label": "Phase 3 \u2014 Build",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L77",
+      "source_location": "L136",
       "id": "baha_ui_playstore_package_phase_3_build",
       "community": 22,
       "norm_label": "phase 3 \u2014 build"
@@ -4705,8 +4840,8 @@
       "label": "code:bash (bubblewrap build                       # \u2192 signed .aab + key)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L79",
-      "id": "baha_ui_playstore_package_codeblock_3",
+      "source_location": "L138",
+      "id": "baha_ui_playstore_package_codeblock_5",
       "community": 22,
       "norm_label": "code:bash (bubblewrap build                       # \u2192 signed .aab + key)"
     },
@@ -4714,7 +4849,7 @@
       "label": "Phase 4 \u2014 Digital Asset Links",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L87",
+      "source_location": "L146",
       "id": "baha_ui_playstore_package_phase_4_digital_asset_links",
       "community": 22,
       "norm_label": "phase 4 \u2014 digital asset links"
@@ -4723,25 +4858,25 @@
       "label": "Phase 5 \u2014 Output + document",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L102",
+      "source_location": "L163",
       "id": "baha_ui_playstore_package_phase_5_output_document",
       "community": 22,
       "norm_label": "phase 5 \u2014 output + document"
     },
     {
-      "label": "code:block4 (/Users/ardontolentinojr./Documents/CLAUDE DEV/OUTPUT/DB/FLOO)",
+      "label": "code:block6 (/Users/ardontolentinojr./Documents/CLAUDE DEV/OUTPUT/DB/FLOO)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L106",
-      "id": "baha_ui_playstore_package_codeblock_4",
+      "source_location": "L167",
+      "id": "baha_ui_playstore_package_codeblock_6",
       "community": 22,
-      "norm_label": "code:block4 (/users/ardontolentinojr./documents/claude dev/output/db/floo)"
+      "norm_label": "code:block6 (/users/ardontolentinojr./documents/claude dev/output/db/floo)"
     },
     {
       "label": "Out of scope \u2014 manual steps for Ardz (do NOT automate)",
       "file_type": "document",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L115",
+      "source_location": "L176",
       "id": "baha_ui_playstore_package_out_of_scope_manual_steps_for_ardz_do_not_automate",
       "community": 22,
       "norm_label": "out of scope \u2014 manual steps for ardz (do not automate)"
@@ -4988,6 +5123,15 @@
       "id": "src_buildinfo_build_time",
       "community": 3,
       "norm_label": "build_time"
+    },
+    {
+      "label": "useAcceptedFeatures()",
+      "file_type": "code",
+      "source_file": "src/hooks/useDomainData.ts",
+      "source_location": "L37",
+      "community": 5,
+      "norm_label": "useacceptedfeatures()",
+      "id": "hooks_usedomaindata_useacceptedfeatures"
     },
     {
       "label": "SITE_KEY",
@@ -7024,6 +7168,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "hooks_usedomaindata_useacceptedfeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -7351,6 +7506,28 @@
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "src_components_panels_alertribbon_tsx"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_components_panels_chatwidget_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_components_panels_communityfeedbackmodal_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7940,6 +8117,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "utils_share_buildreportsharetext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L13",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8041,9 +8229,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "utils_viewmodel_nearbyownactivereport",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_nearbyownactivereport"
     },
     {
       "relation": "imports",
@@ -8121,6 +8309,17 @@
       "weight": 1.0,
       "source": "src_app_app",
       "target": "hooks_usedomaindata_useacceptedfeatures"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "src_app_app",
+      "target": "hooks_usedomaindata_useacceptedfeedback"
     },
     {
       "relation": "calls",
@@ -9137,6 +9336,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_alertribbon_tsx",
       "target": "src_types_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_panels_communityfeedbackmodal_tsx",
+      "target": "src_types_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -11009,6 +11219,17 @@
       "relation": "references",
       "context": "field",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "panels_communityfeedbackmodal_communityfeedbackmodalprops",
+      "target": "src_types_feedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/FeaturesModal.tsx",
       "source_location": "L9",
       "weight": 1.0,
@@ -11037,6 +11258,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
       "target": "src_types_feedback"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_panels_communityfeedbackmodal_tsx",
+      "target": "src_types_feedback",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -11155,6 +11387,59 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
       "target": "utils_geolocate_locatewithaccuracy"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SeverityPicker.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_severitypicker_tsx",
+      "target": "src_utils_image_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_utils_image_ts",
+      "target": "utils_image_filetocompresseddataurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_utils_image_ts",
+      "target": "utils_image_loadimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/image.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "utils_image_filetocompresseddataurl",
+      "target": "utils_image_loadimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/SeverityPicker.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_severitypicker_tsx",
+      "target": "utils_image_filetocompresseddataurl",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -11382,6 +11667,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/share.ts",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "src_utils_share_ts",
+      "target": "utils_share_buildreportsharetext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/share.ts",
       "source_location": "L87",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -11449,6 +11744,17 @@
       "confidence_score": 1.0,
       "source": "utils_share_shareinputs",
       "target": "utils_viewmodel_enrichedreport"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/share.ts",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "utils_share_buildreportsharetext",
+      "target": "utils_share_activityclause",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -11985,9 +12291,9 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L133",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_viewmodel_ts",
-      "target": "utils_viewmodel_nearbyownactivereport",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_nearbyownactivereport"
     },
     {
       "relation": "contains",
@@ -14033,6 +14339,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/FeedbackFormModal.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_feedbackformmodal_tsx",
+      "target": "src_components_turnstilewidget_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -14111,6 +14428,26 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_alertmodal_tsx",
       "target": "panels_alertribbon_level_style"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/ChatWidget.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "src_components_panels_chatwidget_tsx",
+      "target": "panels_chatwidget_chatwidget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/ChatWidget.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "src_components_panels_chatwidget_tsx",
+      "target": "panels_chatwidget_chatwidgetprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -14244,6 +14581,26 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_publicdashboardmodal_tsx",
       "target": "src_api_geocode_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_components_panels_communityfeedbackmodal_tsx",
+      "target": "panels_communityfeedbackmodal_communityfeedbackmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/CommunityFeedbackModal.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_communityfeedbackmodal_tsx",
+      "target": "panels_communityfeedbackmodal_communityfeedbackmodalprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -15908,6 +16265,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/hooks/useDomainData.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "src_hooks_usedomaindata_ts",
+      "target": "hooks_usedomaindata_useacceptedfeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -16113,7 +16480,7 @@
       "source_file": "src/hooks/useDomainData.ts",
       "source_location": "L38",
       "weight": 1.0,
-      "source": "hooks_usedomaindata_useacceptedfeatures",
+      "source": "hooks_usedomaindata_useacceptedfeedback",
       "target": "hooks_usefetch_usefetch"
     },
     {
@@ -16165,6 +16532,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_hooks_usefetch_ts",
+      "target": "hooks_usefetch_usefetch"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/hooks/useDomainData.ts",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "hooks_usedomaindata_useacceptedfeatures",
       "target": "hooks_usefetch_usefetch"
     },
     {
@@ -16255,6 +16633,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/api/geocode.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_api_geocode_ts",
+      "target": "api_geocode_nearviewbox",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/api/geocode.ts",
       "source_location": "L79",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -16310,6 +16698,17 @@
       "confidence_score": 1.0,
       "source": "src_api_geocode_ts",
       "target": "api_geocode_searchplaces"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/api/geocode.ts",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "api_geocode_searchplaces",
+      "target": "api_geocode_nearviewbox",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16549,9 +16948,69 @@
       "source_file": "PLAYSTORE_PACKAGE.md",
       "source_location": "L12",
       "weight": 1.0,
+      "source": "baha_ui_playstore_package_floodedarea_google_play_packaging_twa_runbook",
+      "target": "baha_ui_playstore_package_status_outstanding_todos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L12",
+      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "baha_ui_playstore_package_floodedarea_google_play_packaging_twa_runbook",
       "target": "baha_ui_playstore_package_what_is_done_in_this_repo_phase_1_pwa_readiness"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_status_outstanding_todos",
+      "target": "baha_ui_playstore_package_nginx_serve_the_manifest_with_the_right_content_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_nginx_serve_the_manifest_with_the_right_content_type",
+      "target": "baha_ui_playstore_package_codeblock_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_nginx_serve_the_manifest_with_the_right_content_type",
+      "target": "baha_ui_playstore_package_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "baha_ui_playstore_package_hard_ordering_dependency_deploy_before_phase_2",
+      "target": "baha_ui_playstore_package_codeblock_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "baha_ui_playstore_package_phase_2_initialize_the_twa",
+      "target": "baha_ui_playstore_package_codeblock_2"
     },
     {
       "relation": "contains",
@@ -16567,11 +17026,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L41",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_hard_ordering_dependency_deploy_before_phase_2",
+      "target": "baha_ui_playstore_package_codeblock_3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L79",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "baha_ui_playstore_package_hard_ordering_dependency_deploy_before_phase_2",
-      "target": "baha_ui_playstore_package_codeblock_1"
+      "source": "baha_ui_playstore_package_phase_3_build",
+      "target": "baha_ui_playstore_package_codeblock_3"
     },
     {
       "relation": "contains",
@@ -16617,21 +17086,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L54",
+      "source_location": "L113",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "baha_ui_playstore_package_phase_2_initialize_the_twa",
-      "target": "baha_ui_playstore_package_codeblock_2"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "PLAYSTORE_PACKAGE.md",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "baha_ui_playstore_package_phase_3_build",
-      "target": "baha_ui_playstore_package_codeblock_3"
+      "target": "baha_ui_playstore_package_codeblock_4",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16642,6 +17101,26 @@
       "confidence_score": 1.0,
       "source": "baha_ui_playstore_package_phase_5_output_document",
       "target": "baha_ui_playstore_package_codeblock_4"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_phase_3_build",
+      "target": "baha_ui_playstore_package_codeblock_5",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PLAYSTORE_PACKAGE.md",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "baha_ui_playstore_package_phase_5_output_document",
+      "target": "baha_ui_playstore_package_codeblock_6",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16886,5 +17365,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5c0a92feb838593569a44786238b563c628ffb43"
+  "built_at_commit": "7cb9c011d39822719d07e36f380ce33efa073db5"
 }

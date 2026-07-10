@@ -50,6 +50,11 @@ server.post('/reports', (req, res) => {
   const id = ids.length ? Math.max(...ids) + 1 : 1;
   const now = new Date().toISOString();
   const isGuest = req.headers.authorization === `Bearer ${GUEST_TOKEN}`;
+  // Mirror the DB 'photo' column: store the compressed JPEG data-URL, expose only a photoUrl to
+  // clients. The raw `photo` is stripped from every list/detail response (served via /photo instead).
+  const photo = typeof req.body.photoDataUrl === 'string' && req.body.photoDataUrl.startsWith('data:image/')
+    ? req.body.photoDataUrl
+    : null;
   const report = {
     id,
     name: req.body.name,
@@ -64,11 +69,43 @@ server.post('/reports', (req, res) => {
     status: 'active',
     reporterUserId: isGuest ? 2000 : 1,
     reporterTrust: isGuest ? 'guest' : 'verified',
+    photo,
+    photoUrl: photo ? `/reports/${id}/photo` : null,
     createdAt: now,
     updatedAt: now,
   };
   db.get('reports').push(report).write();
-  res.status(201).json(report);
+  res.status(201).json(stripPhoto(report));
+});
+
+// Strip the heavy base64 `photo` out of any report before it goes over the wire; guarantee a
+// photoUrl field (null for older seed records that have no photo).
+function stripPhoto(r) {
+  const { photo, ...rest } = r;
+  return { ...rest, photoUrl: rest.photoUrl ?? null };
+}
+
+// Custom GET /reports (wins over the json-server router below): mirrors baha-api's severity filter
+// and returns reports WITHOUT the base64 photo — the list stays light. The photo is fetched
+// separately via GET /reports/:id/photo.
+server.get('/reports', (req, res) => {
+  const severity = req.query.severity;
+  let items = router.db.get('reports').value() || [];
+  if (severity) items = items.filter((r) => r.severity === severity);
+  res.json(items.map(stripPhoto));
+});
+
+// Stream a report's photo, decoded from its stored data-URL, with the right Content-Type.
+server.get('/reports/:id/photo', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const report = router.db.get('reports').find({ id }).value();
+  const m = report && typeof report.photo === 'string'
+    ? /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/s.exec(report.photo)
+    : null;
+  if (!m) return res.status(404).json({ message: 'No photo for this report' });
+  res.setHeader('Content-Type', m[1]);
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.end(Buffer.from(m[2], 'base64'));
 });
 
 server.post('/reports/:id/confirm', (req, res) => {
@@ -89,7 +126,7 @@ server.get('/reports/history', (req, res) => {
     const t = Date.parse(r.createdAt);
     return (Number.isNaN(from) || t >= from) && (Number.isNaN(to) || t < to);
   });
-  res.json(reports);
+  res.json(reports.map(stripPhoto));
 });
 
 // ── Road status (stub) — synthesize a ~150 m segment through each non-passable report so the
