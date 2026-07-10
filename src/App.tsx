@@ -91,7 +91,8 @@ type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => voi
 
 /** Map a report severity onto an alert level for the dialog's color/label. */
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
-const ARCHIVE_WINDOW_MIN = 12 * 60; // expired reports stay in the Archive tab for 12h, then drop off
+const ARCHIVE_MAX = 10; // Archive keeps the 10 most recent expired reports; they linger indefinitely
+// with no activity and are only pushed out as newer reports expire — a lasting record that flooding happened.
 
 const App: React.FC = () => {
   const { auth, loginWithGoogle, ensureGuest, logout } = useAuth();
@@ -344,19 +345,20 @@ const App: React.FC = () => {
     () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     [active]
   );
-  // Recently-expired reports linger here for 12h so others can see a report happened,
-  // even after it drops off the live map/feed. Windowed from createdAt ("when it happened").
+  // Expired reports linger here so others can see a report happened, even after it drops off the
+  // live map/feed. We keep the 10 most recent (by createdAt) with no time limit: with no new activity
+  // they stay put, and are only pushed out as newer reports expire — a record that flooding occurred.
   const archived = React.useMemo(
     () =>
       enriched
         .filter(
           (r) =>
             r.expired &&
-            r.status !== 'resolved' && // resolved reports were closed on purpose — not archive
-            (now - new Date(r.createdAt).getTime()) / 60000 <= ARCHIVE_WINDOW_MIN
+            r.status !== 'resolved' // resolved reports were closed on purpose — not archive
         )
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    [enriched, now]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, ARCHIVE_MAX),
+    [enriched]
   );
   const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
 
