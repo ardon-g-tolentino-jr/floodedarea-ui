@@ -1,11 +1,13 @@
 import { api, buildQuery } from './client';
 import type {
+  DraftIncident,
   EvacuationCenter,
   Feedback,
   FeedbackStatus,
   FloodAlert,
   FloodReport,
   Hotline,
+  IncidentApproval,
   NewAlert,
   NewCenter,
   NewFeedback,
@@ -35,6 +37,8 @@ export const rawApi = {
   acceptedFeedback: () => api.get<Feedback[]>('/feedback/accepted'),
   /** Admin: the full feedback moderation queue. */
   allFeedback: () => api.get<Feedback[]>('/feedback'),
+  /** Admin: pending flood incidents the backend drafted from news, awaiting review. */
+  draftIncidents: () => api.get<DraftIncident[]>(`/incidents${buildQuery({ status: 'pending' })}`),
   /** Public all-time visit tally (read-only — does not increment). */
   visitCount: () => api.get<VisitStats>('/stats/visits'),
 };
@@ -60,6 +64,13 @@ export const mutations = {
     api.patch<Feedback>(`/feedback/${id}`, { status }),
   /** Toggle the caller's upvote on a feedback item; returns the updated item (count + upvotedByMe). */
   upvoteFeedback: (id: number) => api.post<Feedback>(`/feedback/${id}/upvote`, {}),
+
+  // ── Admin: news-drafted flood incidents (review queue) ──
+  /** Approve a draft: server creates a system report (optionally with the admin's edits) and returns it. */
+  approveIncident: (id: number, overrides?: IncidentApproval) =>
+    api.post<FloodReport>(`/incidents/${id}/approve`, overrides ?? {}),
+  /** Dismiss a draft without creating a report. */
+  dismissIncident: (id: number) => api.patch<DraftIncident>(`/incidents/${id}`, { status: 'dismissed' }),
 
   // ── Admin: evacuation centers ──
   createCenter: (body: NewCenter) => api.post<EvacuationCenter>('/centers', body),

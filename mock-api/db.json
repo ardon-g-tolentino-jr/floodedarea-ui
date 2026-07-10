@@ -411,6 +411,68 @@
       "updatedAt": "2026-06-22T08:00:00Z"
     }
   ],
+  "incidents": [
+    {
+      "id": 1,
+      "headline": "Marikina River breaches second alarm; Provident Village residents evacuate",
+      "sourceName": "GMA News",
+      "sourceUrl": "https://example.com/marikina-second-alarm",
+      "publishedAt": "2026-07-10T02:30:00Z",
+      "name": "Provident Village",
+      "district": "Marikina",
+      "latitude": 14.6349,
+      "longitude": 121.1035,
+      "severity": "high",
+      "depthCm": 120,
+      "trend": "rising",
+      "road": "impassable",
+      "confidence": 0.88,
+      "status": "pending",
+      "createdReportId": null,
+      "createdAt": "2026-07-10T02:35:00Z",
+      "updatedAt": "2026-07-10T02:35:00Z"
+    },
+    {
+      "id": 2,
+      "headline": "Netizens report knee-deep flooding near Quiapo; details unconfirmed",
+      "sourceName": "Social monitoring",
+      "sourceUrl": "https://example.com/quiapo-flooding",
+      "publishedAt": "2026-07-10T03:10:00Z",
+      "name": "Quiapo (approx.)",
+      "district": "Manila",
+      "latitude": 14.5986,
+      "longitude": 120.9835,
+      "severity": "medium",
+      "depthCm": 40,
+      "trend": "steady",
+      "road": "risky",
+      "confidence": 0.41,
+      "status": "pending",
+      "createdReportId": null,
+      "createdAt": "2026-07-10T03:12:00Z",
+      "updatedAt": "2026-07-10T03:12:00Z"
+    },
+    {
+      "id": 3,
+      "headline": "Minor street flooding subsiding along Ortigas Ave Ext after morning rain",
+      "sourceName": "MMDA Advisory",
+      "sourceUrl": "https://example.com/ortigas-ext",
+      "publishedAt": "2026-07-10T01:05:00Z",
+      "name": "Ortigas Ave Ext",
+      "district": "Cainta, Rizal",
+      "latitude": 14.5789,
+      "longitude": 121.1220,
+      "severity": "low",
+      "depthCm": 15,
+      "trend": "receding",
+      "road": "passable",
+      "confidence": 0.66,
+      "status": "pending",
+      "createdReportId": null,
+      "createdAt": "2026-07-10T01:08:00Z",
+      "updatedAt": "2026-07-10T01:08:00Z"
+    }
+  ],
   "stats": {
     "visits": 1247
   }

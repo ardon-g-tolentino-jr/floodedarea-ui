@@ -1,9 +1,9 @@
 import React from 'react';
-import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
+import type { AlertLevel, DraftIncident, FeedbackStatus, FloodAlert, FloodReport, IncidentApproval, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
+import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useDraftIncidents, useHotlines, useReports, useRescues } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
@@ -54,6 +54,7 @@ import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
+import IncidentInboxModal from './components/panels/IncidentInboxModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
 import LoginView from './views/LoginView';
@@ -108,6 +109,8 @@ const App: React.FC = () => {
   // Admin-only queue — gated so a normal visitor never hits the admin endpoint (it 403s). The fetch
   // starts automatically when an admin session appears.
   const allFeedback = useAllFeedback(auth?.role === 'ADMIN');
+  // Admin-only queue of flood incidents drafted from news, awaiting review. Same gating as feedback.
+  const draftIncidents = useDraftIncidents(auth?.role === 'ADMIN');
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
   // Accuracy (meters) of the latest GPS fix — drives the map's uncertainty ring and the
@@ -168,6 +171,10 @@ const App: React.FC = () => {
   const [responseOpen, setResponseOpen] = React.useState(false);
   // Admin "Report incident" modal, and the report currently offered up for social sharing.
   const [incidentOpen, setIncidentOpen] = React.useState(false);
+  // Incident inbox (news-drafted review queue) open state, and the draft currently being edited
+  // before approval (opens the report form pre-filled). Null ⇒ not editing.
+  const [inboxOpen, setInboxOpen] = React.useState(false);
+  const [incidentEditing, setIncidentEditing] = React.useState<DraftIncident | null>(null);
   const [shareReportTarget, setShareReportTarget] = React.useState<FloodReport | null>(null);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
@@ -281,6 +288,9 @@ const App: React.FC = () => {
       void alerts.refetch(true);
     } else if (event.startsWith('rescue')) {
       void rescues.refetch(true);
+    } else if (event === 'incident-drafted') {
+      // A news-drafted incident landed — refresh the admin inbox badge/queue.
+      if (isAdmin) void draftIncidents.refetch(true);
     } else {
       // Report activity re-derives the road overlay (it's computed from the reports).
       void reports.refetch(true);
@@ -913,6 +923,26 @@ const App: React.FC = () => {
     showToast('System report posted.');
     setShareReportTarget(created);
   };
+
+  // Incident inbox: approve a news-drafted incident. The backend creates the system report (with any
+  // admin edits) and returns it; we then offer to share it — identical tail to onReportIncident.
+  // Throws on failure so the caller (inbox row / edit modal) surfaces the error and stays open.
+  const onApproveIncident = async (id: number, overrides?: IncidentApproval): Promise<void> => {
+    const created = await mutations.approveIncident(id, overrides);
+    await Promise.all([reports.refetch(true), draftIncidents.refetch(true)]);
+    showToast('System report posted from news.');
+    setShareReportTarget(created);
+  };
+  const onDismissIncident = async (id: number): Promise<void> => {
+    await mutations.dismissIncident(id);
+    await draftIncidents.refetch(true);
+    showToast('Incident dismissed.');
+  };
+  // "Edit & approve": hand the draft to the report form (pre-filled) instead of posting as-is.
+  const onEditIncident = (inc: DraftIncident): void => {
+    setInboxOpen(false);
+    setIncidentEditing(inc);
+  };
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
@@ -1090,6 +1120,8 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onReportIncident={() => setIncidentOpen(true)}
+        onIncidentInbox={() => { setInboxOpen(true); void draftIncidents.refetch(true); }}
+        incidentCount={(draftIncidents.data ?? []).filter((d) => d.status === 'pending').length}
       />
 
       {activeAlert && (
@@ -1345,6 +1377,36 @@ const App: React.FC = () => {
           isMobile={isMobile}
           onSubmit={onReportIncident}
           onClose={() => setIncidentOpen(false)}
+        />
+      )}
+      {inboxOpen && isAdmin && (
+        <IncidentInboxModal
+          isMobile={isMobile}
+          incidents={(draftIncidents.data ?? []).filter((d) => d.status === 'pending')}
+          loading={draftIncidents.loading}
+          onApprove={(id) => onApproveIncident(id)}
+          onEdit={onEditIncident}
+          onDismiss={onDismissIncident}
+          onClose={() => setInboxOpen(false)}
+        />
+      )}
+      {incidentEditing && isAdmin && (
+        <AdminReportIncidentModal
+          isMobile={isMobile}
+          initial={{
+            name: incidentEditing.name,
+            district: incidentEditing.district,
+            latitude: incidentEditing.latitude,
+            longitude: incidentEditing.longitude,
+            severity: incidentEditing.severity,
+            depthCm: incidentEditing.depthCm,
+            trend: incidentEditing.trend,
+            road: incidentEditing.road,
+            reportedAt: incidentEditing.publishedAt,
+          }}
+          submitLabel="Approve & post"
+          onSubmit={(b) => onApproveIncident(incidentEditing.id, b)}
+          onClose={() => setIncidentEditing(null)}
         />
       )}
       {supportOpen && (

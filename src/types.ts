@@ -198,3 +198,43 @@ export interface NewFeedback {
 export interface VisitStats {
   total: number;
 }
+
+export type IncidentStatus = 'pending' | 'approved' | 'dismissed';
+
+/**
+ * A flood incident the backend drafted from a news source, awaiting admin review. It carries the
+ * same map fields as a report plus the source it came from and an extraction `confidence`. Approving
+ * it (POST /incidents/:id/approve) creates a system FloodReport (`reporterTrust: 'system'`); the
+ * human is the gate, so a bad extraction never reaches the public map on its own.
+ */
+export interface DraftIncident {
+  id: number;
+  /** The news headline the draft was extracted from. */
+  headline: string;
+  /** Publisher name, e.g. "GMA News". */
+  sourceName: string;
+  /** Link to the original article. */
+  sourceUrl: string;
+  /** When the article was published (ISO) — becomes the report's `reportedAt` on approval. */
+  publishedAt: string;
+  name: string;
+  district: string;
+  latitude: number;
+  longitude: number;
+  severity: Severity;
+  depthCm: number;
+  trend: Trend;
+  road: Road;
+  /** Extraction confidence 0..1; low values flag a draft as needing a closer look. */
+  confidence: number;
+  status: IncidentStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Optional edits an admin applies when approving a draft (e.g. correcting a mis-geocoded location
+ *  or the severity before posting). All optional — the server fills any gap from the stored draft.
+ *  It's the subset of `NewReport` the review form can change; a plain `NewReport` is assignable to it. */
+export type IncidentApproval = Partial<
+  Pick<NewReport, 'name' | 'district' | 'latitude' | 'longitude' | 'severity' | 'depthCm' | 'trend' | 'road' | 'reportedAt' | 'ttlMinutes' | 'photoDataUrl'>
+>;

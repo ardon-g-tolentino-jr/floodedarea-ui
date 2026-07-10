@@ -28,6 +28,7 @@ export function useActivityStream(onActivity: (event: string) => void, enabled =
     const events = [
       'report-created', 'report-confirmed', 'report-updated', 'report-deleted', 'rescue-created',
       'alert-created', 'alert-updated', 'alert-deactivated',
+      'incident-drafted',
     ];
     events.forEach((name) => source?.addEventListener(name, handle(name)));
 

@@ -88,6 +88,8 @@ const MESSAGES = {
   'topbar.response': { en: 'Response', fil: 'Tugon' },
   'topbar.responseConsole': { en: 'Response console', fil: 'Response console' },
   'topbar.incident': { en: 'Report incident', fil: 'Mag-ulat' },
+  'topbar.inbox': { en: 'Inbox', fil: 'Inbox' },
+  'topbar.incidentInbox': { en: 'Incident inbox', fil: 'Incident inbox' },
 
   // ── Sidebar ──
   'sidebar.safetyStatus': { en: 'YOUR SAFETY STATUS', fil: 'IYONG KALAGAYAN SA KALIGTASAN' },

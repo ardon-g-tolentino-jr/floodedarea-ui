@@ -15,7 +15,19 @@ interface Props {
   isMobile: boolean;
   /** Post the report. Throws on failure so the modal keeps the form open and shows an error. */
   onSubmit: (b: NewReport) => Promise<void>;
+  /** Pre-fill the form (used by the Incident inbox's "Edit & approve"). Absent ⇒ blank manual form. */
+  initial?: Partial<NewReport>;
+  /** Footer button label; defaults to the manual "Post system report". */
+  submitLabel?: string;
   onClose: () => void;
+}
+
+/** Whole hours between an ISO time and now, clamped to >= 0 — seeds the "reported how long ago" field. */
+function hoursAgoFrom(iso?: string): string {
+  if (!iso) return '0';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms)) return '0';
+  return String(Math.max(0, Math.round(ms / 3600_000)));
 }
 
 const SEV_ORDER: Severity[] = ['high', 'medium', 'low'];
@@ -44,19 +56,20 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' };
 
-const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose }) => {
-  const [lat, setLat] = React.useState('');
-  const [lng, setLng] = React.useState('');
-  const [placeLabel, setPlaceLabel] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [district, setDistrict] = React.useState('');
-  const [severity, setSeverity] = React.useState<Severity>('high');
-  const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
+const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initial, submitLabel, onClose }) => {
+  const initSeverity: Severity = initial?.severity ?? 'high';
+  const [lat, setLat] = React.useState(initial?.latitude != null ? String(initial.latitude) : '');
+  const [lng, setLng] = React.useState(initial?.longitude != null ? String(initial.longitude) : '');
+  const [placeLabel, setPlaceLabel] = React.useState(initial?.name ?? '');
+  const [name, setName] = React.useState(initial?.name ?? '');
+  const [district, setDistrict] = React.useState(initial?.district ?? '');
+  const [severity, setSeverity] = React.useState<Severity>(initSeverity);
+  const [depth, setDepth] = React.useState(initial?.depthCm ?? SEVERITY_PRESET[initSeverity].depthCm);
   const [note, setNote] = React.useState('');
   // When the source reported the flood ("N hours ago", 0 = now) and how long the report stays live
   // ('' = default by severity, else minutes). Both anchor the client-side TTL countdown.
-  const [reportedHoursAgo, setReportedHoursAgo] = React.useState('0');
-  const [ttl, setTtl] = React.useState('');
+  const [reportedHoursAgo, setReportedHoursAgo] = React.useState(hoursAgoFrom(initial?.reportedAt));
+  const [ttl, setTtl] = React.useState(initial?.ttlMinutes != null ? String(initial.ttlMinutes) : '');
 
   const [photo, setPhoto] = React.useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = React.useState(false);
@@ -267,7 +280,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
           disabled={!canPost}
           style={{ width: '100%', border: 0, background: '#4338CA', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: canPost ? 'pointer' : 'not-allowed', opacity: canPost ? 1 : 0.6 }}
         >
-          {busy ? 'Posting…' : photoBusy ? 'Processing screenshot…' : 'Post system report'}
+          {busy ? 'Posting…' : photoBusy ? 'Processing screenshot…' : (submitLabel ?? 'Post system report')}
         </button>
       </div>
     </div>

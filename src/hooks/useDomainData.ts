@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
+import type { DraftIncident, EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -42,4 +42,10 @@ export function useAcceptedFeedback(): FetchResult<Feedback[]> {
  *  visitor never hits the admin-only endpoint (which 403s). */
 export function useAllFeedback(enabled: boolean): FetchResult<Feedback[]> {
   return useFetch(() => rawApi.allFeedback(), [], { enabled });
+}
+
+/** Admin: pending flood incidents drafted from news, awaiting review. `enabled` (admin present)
+ *  gates the fetch so a normal visitor never hits the admin-only endpoint (which 403s). */
+export function useDraftIncidents(enabled: boolean): FetchResult<DraftIncident[]> {
+  return useFetch(() => rawApi.draftIncidents(), [], { enabled });
 }

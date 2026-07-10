@@ -343,6 +343,99 @@ server.post('/feedback/:id/upvote', (req, res) => {
   res.json(publicFeedback(db.get('feedback').find({ id }).value(), viewer));
 });
 
+// ── News-drafted flood incidents (admin review queue). In production baha-api classifies flood
+// news into draft incidents; an admin approves each (→ system report) or dismisses it. The mock
+// seeds a few drafts in db.json and stubs the three routes. Role gating is the UI's job. ──
+server.get('/incidents', (req, res) => {
+  const status = req.query.status;
+  let items = (router.db.get('incidents').value() || []).slice();
+  if (status) items = items.filter((i) => i.status === status);
+  items.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  res.json(items);
+});
+
+// Approve a draft: create a system report (applying any admin overrides from the body), mark the
+// draft approved with the new report id, and return the created report. Mirrors POST /reports.
+server.post('/incidents/:id/approve', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const inc = db.get('incidents').find({ id }).value();
+  if (!inc) return res.status(404).json({ message: 'Incident not found' });
+  const o = req.body || {};
+  const ids = db.get('reports').map('id').value();
+  const reportId = ids.length ? Math.max(...ids) + 1 : 1;
+  const now = new Date().toISOString();
+  const photo = typeof o.photoDataUrl === 'string' && o.photoDataUrl.startsWith('data:image/') ? o.photoDataUrl : null;
+  const report = {
+    id: reportId,
+    name: o.name ?? inc.name,
+    district: o.district ?? inc.district,
+    latitude: o.latitude ?? inc.latitude,
+    longitude: o.longitude ?? inc.longitude,
+    severity: o.severity ?? inc.severity,
+    depthCm: o.depthCm ?? inc.depthCm,
+    trend: o.trend ?? inc.trend ?? 'steady',
+    road: o.road ?? inc.road ?? 'risky',
+    reportsCount: 1,
+    status: 'active',
+    reporterUserId: 1,
+    reporterTrust: 'system',
+    reportedAt: o.reportedAt ?? inc.publishedAt ?? now,
+    ttlMinutes: typeof o.ttlMinutes === 'number' ? o.ttlMinutes : null,
+    photo,
+    photoUrl: photo ? `/reports/${reportId}/photo` : null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.get('reports').push(report).write();
+  db.get('incidents').find({ id }).assign({ status: 'approved', createdReportId: reportId, updatedAt: now }).write();
+  broadcast('report-created', { id: reportId });
+  res.status(201).json(stripPhoto(report));
+});
+
+// Dismiss (or otherwise patch the status of) a draft incident.
+server.patch('/incidents/:id', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const inc = db.get('incidents').find({ id }).value();
+  if (!inc) return res.status(404).json({ message: 'Incident not found' });
+  const status = ['pending', 'approved', 'dismissed'].includes(req.body.status) ? req.body.status : inc.status;
+  const updated = db.get('incidents').find({ id }).assign({ status, updatedAt: new Date().toISOString() }).write();
+  res.json(updated);
+});
+
+// Dev only: synthesize a new pending draft and push it over SSE, so the inbox badge/live-refresh
+// can be exercised offline. e.g. POST /incidents/dev/draft
+server.post('/incidents/dev/draft', (_req, res) => {
+  const db = router.db;
+  const ids = db.get('incidents').map('id').value();
+  const id = ids.length ? Math.max(...ids) + 1 : 1;
+  const now = new Date().toISOString();
+  const draft = {
+    id,
+    headline: 'Flash flood reported along España Blvd after heavy rain',
+    sourceName: 'Dev Newswire',
+    sourceUrl: 'https://example.com/flood-espana',
+    publishedAt: now,
+    name: 'España Blvd',
+    district: 'Manila',
+    latitude: 14.6098,
+    longitude: 120.9906,
+    severity: 'medium',
+    depthCm: 45,
+    trend: 'rising',
+    road: 'risky',
+    confidence: 0.72,
+    status: 'pending',
+    createdReportId: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.get('incidents').push(draft).write();
+  broadcast('incident-drafted', { id });
+  res.status(201).json(draft);
+});
+
 // ── Visit counter — mirrors baha-api's public stats endpoints. POST increments the all-time
 // tally and returns the new total; GET reads it without incrementing. Persisted in db.json. ──
 function readVisits() {

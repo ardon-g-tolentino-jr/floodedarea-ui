@@ -28,6 +28,10 @@ interface TopBarProps {
   onAdmin: () => void;
   onResponse: () => void;
   onReportIncident: () => void;
+  /** Open the incident inbox (review queue for news-drafted incidents). */
+  onIncidentInbox: () => void;
+  /** Pending draft-incident count — shown as a badge on the inbox launcher. */
+  incidentCount: number;
   onShowFeatures: () => void;
   onShowFeedback: () => void;
 }
@@ -79,6 +83,8 @@ const TopBar: React.FC<TopBarProps> = ({
   onAdmin,
   onResponse,
   onReportIncident,
+  onIncidentInbox,
+  incidentCount,
   onShowFeatures,
   onShowFeedback,
 }) => {
@@ -144,6 +150,23 @@ const TopBar: React.FC<TopBarProps> = ({
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #C7D2FE', background: '#EEF2FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#4338CA', cursor: 'pointer' }}
     >
       🗞 {!isMobile && t('topbar.incident')}
+    </button>
+  ) : null;
+
+  // Incident inbox — ADMIN-only review queue for flood incidents drafted from news. Indigo-tinted to
+  // match the incident/system-report family; a red badge shows the pending count.
+  const inboxBtn = isAdmin ? (
+    <button
+      onClick={onIncidentInbox}
+      title="Incident inbox — review flood incidents drafted from news"
+      style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #C7D2FE', background: '#EEF2FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#4338CA', cursor: 'pointer' }}
+    >
+      📥 {!isMobile && t('topbar.inbox')}
+      {incidentCount > 0 && (
+        <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 18, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: 999, background: 'var(--bw-danger)', color: '#fff', fontSize: 10.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.25)' }}>
+          {incidentCount > 99 ? '99+' : incidentCount}
+        </span>
+      )}
     </button>
   ) : null;
 
@@ -287,6 +310,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="✨" label={t('topbar.features')} onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
                   {isAdmin && <MenuItem icon="🗞" label={t('topbar.incident')} onClick={runAndClose(onReportIncident)} />}
+                  {isAdmin && <MenuItem icon="📥" label={incidentCount > 0 ? `${t('topbar.incidentInbox')} (${incidentCount})` : t('topbar.incidentInbox')} onClick={runAndClose(onIncidentInbox)} />}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
                   {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}
                 </div>
@@ -337,6 +361,7 @@ const TopBar: React.FC<TopBarProps> = ({
             </button>
 
             {incidentBtn}
+            {inboxBtn}
             {responseBtn}
             {adminBtn}
             {authCluster}
