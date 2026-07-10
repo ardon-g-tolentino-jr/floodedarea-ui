@@ -87,6 +87,7 @@ const MESSAGES = {
   'topbar.adminConsole': { en: 'Admin console', fil: 'Admin console' },
   'topbar.response': { en: 'Response', fil: 'Tugon' },
   'topbar.responseConsole': { en: 'Response console', fil: 'Response console' },
+  'topbar.incident': { en: 'Report incident', fil: 'Mag-ulat' },
 
   // ── Sidebar ──
   'sidebar.safetyStatus': { en: 'YOUR SAFETY STATUS', fil: 'IYONG KALAGAYAN SA KALIGTASAN' },
@@ -239,6 +240,7 @@ const MESSAGES = {
   'report.kmAway': { en: 'km away', fil: 'km ang layo' },
   'report.confirmed': { en: 'confirmed', fil: 'nakumpirma' },
   'report.unverified': { en: 'unverified', fil: 'hindi beripikado' },
+  'report.system': { en: 'System report', fil: 'Ulat ng sistema' },
   'report.left': { en: 'left', fil: 'natitira' },
 
   // ── Severity ──

@@ -8,8 +8,11 @@ export type ReportStatus = 'active' | 'resolved';
 export type AlertLevel = 'yellow' | 'orange' | 'red';
 export type RescueStatus = 'pending' | 'dispatched' | 'resolved';
 export type UserRole = 'CITIZEN' | 'ADMIN' | 'GUEST';
-/** How much we trust the report's author: a full account vs. a no-login guest/device session. */
-export type ReporterTrust = 'verified' | 'guest';
+/**
+ * How much we trust the report's author: a full account, a no-login guest/device session, or
+ * `system` — an authoritative report an admin logged from news/other sources.
+ */
+export type ReporterTrust = 'verified' | 'guest' | 'system';
 
 export interface FloodReport {
   id: number;
@@ -94,6 +97,9 @@ export interface NewReport {
   captchaToken?: string;
   /** Optional flood photo as a compressed JPEG data-URL; the backend stores the bytes in the DB. */
   photoDataUrl?: string;
+  /** Admin-only: mark this as an authoritative "system" report (news/other sources). The backend
+   *  honors it only for ADMIN callers and tags it `reporterTrust: 'system'`. */
+  system?: boolean;
 }
 
 /**

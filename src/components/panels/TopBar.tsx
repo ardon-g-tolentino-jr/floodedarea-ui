@@ -27,6 +27,7 @@ interface TopBarProps {
   isAdmin: boolean;
   onAdmin: () => void;
   onResponse: () => void;
+  onReportIncident: () => void;
   onShowFeatures: () => void;
   onShowFeedback: () => void;
 }
@@ -77,6 +78,7 @@ const TopBar: React.FC<TopBarProps> = ({
   isAdmin,
   onAdmin,
   onResponse,
+  onReportIncident,
   onShowFeatures,
   onShowFeedback,
 }) => {
@@ -130,6 +132,18 @@ const TopBar: React.FC<TopBarProps> = ({
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #BAE2FB', background: '#EFF8FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: 'var(--bw-primary)', cursor: 'pointer' }}
     >
       ⚙ {!isMobile && t('topbar.admin')}
+    </button>
+  ) : null;
+
+  // Report incident — ADMIN-only. Log a flood known from news/other sources as a system report.
+  // Indigo-tinted to match the system-report badge.
+  const incidentBtn = isAdmin ? (
+    <button
+      onClick={onReportIncident}
+      title="Report a flood incident (system report)"
+      style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #C7D2FE', background: '#EEF2FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#4338CA', cursor: 'pointer' }}
+    >
+      🗞 {!isMobile && t('topbar.incident')}
     </button>
   ) : null;
 
@@ -272,6 +286,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="💬" label={t('topbar.feedback')} onClick={runAndClose(onShowFeedback)} />
                   <MenuItem icon="✨" label={t('topbar.features')} onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
+                  {isAdmin && <MenuItem icon="🗞" label={t('topbar.incident')} onClick={runAndClose(onReportIncident)} />}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
                   {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}
                 </div>
@@ -321,6 +336,7 @@ const TopBar: React.FC<TopBarProps> = ({
               <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> {t('topbar.report')}
             </button>
 
+            {incidentBtn}
             {responseBtn}
             {adminBtn}
             {authCluster}

@@ -69,6 +69,14 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               ⚠ Unverified
             </span>
           )}
+          {report.system && (
+            <span
+              title="Logged by a FloodedArea admin from news or other sources."
+              style={{ background: '#EEF2FF', color: '#4338CA', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
+            >
+              🛈 System report
+            </span>
+          )}
         </div>
       </div>
 

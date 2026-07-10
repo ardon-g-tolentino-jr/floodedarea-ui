@@ -78,6 +78,8 @@ export interface EnrichedReport extends FloodReport {
   mine: boolean;
   /** Authored by a no-login guest/device session — surfaced as lower-trust until corroborated. */
   guest: boolean;
+  /** An authoritative report an admin logged from news/other sources. */
+  system: boolean;
   ageMin: number;
   expiresInMin: number;
   expired: boolean;
@@ -118,6 +120,7 @@ export function enrichReports(
       time: timeAgo(r.createdAt),
       mine: authUserId != null && r.reporterUserId === authUserId,
       guest: r.reporterTrust === 'guest',
+      system: r.reporterTrust === 'system',
       ageMin,
       expiresInMin,
       expired: r.status === 'resolved' || expiresInMin <= 0,

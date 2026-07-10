@@ -68,7 +68,9 @@ server.post('/reports', (req, res) => {
     reportsCount: 1,
     status: 'active',
     reporterUserId: isGuest ? 2000 : 1,
-    reporterTrust: isGuest ? 'guest' : 'verified',
+    // Admin-logged "system" reports (news/other sources) get their own trust tier. baha-api gates
+    // the flag on the ADMIN role; the mock accepts anything, mirroring its other stubbed auth.
+    reporterTrust: req.body.system ? 'system' : isGuest ? 'guest' : 'verified',
     photo,
     photoUrl: photo ? `/reports/${id}/photo` : null,
     createdAt: now,

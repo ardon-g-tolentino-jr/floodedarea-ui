@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AlertLevel, FeedbackStatus, FloodAlert, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
+import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
@@ -53,6 +53,7 @@ import FeaturesModal from './components/panels/FeaturesModal';
 import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
+import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
 import LoginView from './views/LoginView';
@@ -164,6 +165,9 @@ const App: React.FC = () => {
   const [feedbackSending, setFeedbackSending] = React.useState(false);
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [responseOpen, setResponseOpen] = React.useState(false);
+  // Admin "Report incident" modal, and the report currently offered up for social sharing.
+  const [incidentOpen, setIncidentOpen] = React.useState(false);
+  const [shareReportTarget, setShareReportTarget] = React.useState<FloodReport | null>(null);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -801,6 +805,15 @@ const App: React.FC = () => {
     return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text }) };
   }, [enriched, active.length, activeAlert]);
 
+  // Share data for one specific report (the "post to social media" flow after an admin logs an
+  // incident). Built from the report itself so it works with a freshly-created, not-yet-enriched one.
+  const reportShareData = React.useMemo(() => {
+    if (!shareReportTarget) return null;
+    const url = window.location.href;
+    const st = buildReportShareText(shareReportTarget, active.length, url);
+    return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text }) };
+  }, [shareReportTarget, active.length]);
+
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   // The Share modal's "Share via your apps…" button (mobile native sheet — covers Messenger/Viber/etc).
@@ -827,7 +840,7 @@ const App: React.FC = () => {
   // push the actual image file to the native sheet (the user picks Facebook there — Facebook's own
   // sharer can't accept an uploaded photo). Everywhere else, open Facebook's web sharer with the
   // app link (it builds its preview from the page's OG tags).
-  const shareReport = async (report: EnrichedReport): Promise<void> => {
+  const shareReport = async (report: FloodReport): Promise<void> => {
     const url = window.location.href;
     const { title, text } = buildReportShareText(report, active.length, url);
     try {
@@ -874,7 +887,17 @@ const App: React.FC = () => {
   const onUpdateAlert = (id: number, b: Partial<NewAlert>) => adminAction(() => mutations.updateAlert(id, b), () => alerts.refetch(true), 'Alert updated.');
   const onDeleteAlert = (id: number) => adminAction(() => mutations.deleteAlert(id), () => alerts.refetch(true), 'Alert removed.');
 
-  const onCreateReport = (b: NewReport) => adminAction(() => mutations.createReport(b), () => reports.refetch(true), 'Report added.');
+  // Reports an admin creates are authoritative "system" reports (news/other sources).
+  const onCreateReport = (b: NewReport) => adminAction(() => mutations.createReport({ ...b, system: true }), () => reports.refetch(true), 'Report added.');
+
+  // "Report incident" modal: post a system report, then offer to share it to social media. Throws
+  // on failure (no adminAction wrapper) so the modal keeps its form open and shows an error.
+  const onReportIncident = async (b: NewReport): Promise<void> => {
+    const created = await mutations.createReport({ ...b, system: true });
+    await reports.refetch(true);
+    showToast('System report posted.');
+    setShareReportTarget(created);
+  };
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
@@ -1051,6 +1074,7 @@ const App: React.FC = () => {
           setResponseOpen(true);
           void rescues.refetch(true);
         }}
+        onReportIncident={() => setIncidentOpen(true)}
       />
 
       {activeAlert && (
@@ -1283,6 +1307,29 @@ const App: React.FC = () => {
           onNativeShare={() => void nativeShare()}
           onCopy={(t, msg) => void copyShare(t, msg)}
           onClose={() => setShareOpen(false)}
+        />
+      )}
+
+      {/* Share a specific report to social media (after an admin logs an incident). */}
+      {shareReportTarget && reportShareData && (
+        <ShareModal
+          text={reportShareData.text}
+          url={reportShareData.url}
+          links={reportShareData.links}
+          activeCount={active.length}
+          isMobile={isMobile}
+          canNativeShare={canNativeShare}
+          onNativeShare={() => void shareReport(shareReportTarget)}
+          onCopy={(t, msg) => void copyShare(t, msg)}
+          onClose={() => setShareReportTarget(null)}
+        />
+      )}
+
+      {incidentOpen && isAdmin && (
+        <AdminReportIncidentModal
+          isMobile={isMobile}
+          onSubmit={onReportIncident}
+          onClose={() => setIncidentOpen(false)}
         />
       )}
       {supportOpen && (

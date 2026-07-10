@@ -1,9 +1,9 @@
 // Builds the contextual Share message. Pure: the caller passes the page URL and live data,
 // so this stays side-effect-free (no window/navigator access) per the utils/ convention.
 
-import type { AlertLevel } from '../types';
+import type { AlertLevel, FloodReport } from '../types';
 import type { EnrichedReport } from './viewModel';
-import { TREND_META } from './floodMeta';
+import { SEV_META, TREND_META } from './floodMeta';
 
 const APP_NAME = 'FloodedArea';
 
@@ -74,13 +74,13 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
 
 /** Share message for a SPECIFIC report (used by the per-report "Share to Facebook" action). Reuses
  *  the reporter-snapshot wording so any report — not just the caller's own — reads naturally. */
-export function buildReportShareText(report: EnrichedReport, activeCount: number, url: string): ShareText {
+export function buildReportShareText(report: FloodReport, activeCount: number, url: string): ShareText {
   const where = report.district ? `${report.name} (${report.district})` : report.name;
   const trend = report.trend === 'rising' || report.trend === 'receding'
     ? `, ${TREND_META[report.trend].label.toLowerCase()}`
     : '';
   const body =
-    `⚠️ ${report.sev.label.toUpperCase()} flooding reported on ${where} — ` +
+    `⚠️ ${SEV_META[report.severity].label.toUpperCase()} flooding reported on ${where} — ` +
     `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
     `Track live flood conditions on ${PITCH}`;
   return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}` };

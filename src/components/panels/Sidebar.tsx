@@ -345,6 +345,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 {r.guest && (
                   <span style={{ fontSize: 11, fontWeight: 800, color: '#B45309', background: '#FFF7ED', padding: '2px 7px', borderRadius: 6 }}>⚠ {t('report.unverified')}</span>
                 )}
+                {r.system && (
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#4338CA', background: '#EEF2FF', padding: '2px 7px', borderRadius: 6 }}>🛈 {t('report.system')}</span>
+                )}
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {r.expiresInMin}m {t('report.left')}</span>
               </div>
             </div>
