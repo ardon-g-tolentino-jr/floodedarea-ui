@@ -75,6 +75,33 @@ export const DEPTH_TICKS: { label: string; cm: number }[] = [
   { label: 'Chest', cm: 140 },
 ];
 
+/** Body-scale band a flood depth reaches on an average adult. Matches i18n keys `depthRef.<band>`. */
+export type DepthBand = 'soles' | 'ankle' | 'shin' | 'knee' | 'thigh' | 'waist' | 'chest' | 'neck' | 'overhead';
+/** Vehicle cue for a flood depth. Matches i18n keys `depthVeh.<cue>`. */
+export type VehicleCue = 'curb' | 'halfTire' | 'stall' | 'float';
+
+/** Height (cm) of the reference adult used to fill the depth silhouette. */
+const ADULT_HEIGHT_CM = 170;
+
+/**
+ * Turn a raw water depth (cm) into a real-world reference a reporter/viewer can relate to: which
+ * body part it reaches on an average adult, how far to fill the silhouette (0..1), and a vehicle cue.
+ * Pure — the label text is localized by the caller via the `depthRef.*` / `depthVeh.*` i18n keys.
+ * Vehicle thresholds mirror ROAD_RISKY_CM (50) / ROAD_IMPASSABLE_CM (90) so cues agree with road status.
+ */
+export function depthReference(cm: number): { band: DepthBand; fill: number; vehicle: VehicleCue | null } {
+  const band: DepthBand =
+    cm < 8   ? 'soles'  : cm < 22  ? 'ankle' : cm < 38  ? 'shin'  :
+    cm < 58  ? 'knee'   : cm < 80  ? 'thigh' : cm < 105 ? 'waist' :
+    cm < 135 ? 'chest'  : cm < 165 ? 'neck'  : 'overhead';
+  const vehicle: VehicleCue | null =
+    cm >= ROAD_IMPASSABLE_CM ? 'float' :
+    cm >= ROAD_RISKY_CM      ? 'stall' :
+    cm >= 30                 ? 'halfTire' :
+    cm >= 15                 ? 'curb' : null;
+  return { band, fill: Math.min(cm / ADULT_HEIGHT_CM, 1), vehicle };
+}
+
 export const ADVICE: Record<Road, { txt: string; bg: string; col: string }> = {
   impassable: { txt: 'Do not attempt to cross — water is too deep for vehicles and pedestrians.', bg: '#FEF2F2', col: '#B91C1C' },
   risky: { txt: 'Cross only if necessary and on foot with caution. Avoid low cars and motorbikes.', bg: '#FFFBEB', col: '#B45309' },

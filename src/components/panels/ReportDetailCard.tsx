@@ -2,6 +2,7 @@ import React from 'react';
 import { affectedRiseRatio, type EnrichedReport } from '../../utils/viewModel';
 import { ADVICE, ROAD_META, TREND_META, sparkPaths, trendNote, waterSeries } from '../../utils/floodMeta';
 import { formatDuration, timeAgo } from '../../utils/format';
+import DepthReference from './DepthReference';
 
 interface ReportDetailCardProps {
   report: EnrichedReport;
@@ -54,7 +55,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 7, marginTop: 10 }}>
           <span style={{ background: sev.soft, color: sev.color, fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}>
-            {sev.label} flooding · {report.depthCm} cm
+            {sev.label} flooding · {report.depthCm} cm · <DepthReference depthCm={report.depthCm} color={sev.color} compact />
           </span>
           <span
             title="Reports stay live for a freshness window (longer for more severe floods, or a custom window for system reports), then drop off the map."

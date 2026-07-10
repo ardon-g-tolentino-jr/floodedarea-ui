@@ -1,7 +1,8 @@
 import React from 'react';
 import type { Severity } from '../../types';
-import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
+import { DEPTH_RANGE, SEVERITY_PRESET } from '../../utils/floodMeta';
 import { fileToCompressedDataUrl } from '../../utils/image';
+import DepthReference from './DepthReference';
 import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
@@ -198,7 +199,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginBottom: 8 }}>
             <span style={{ fontSize: 26, fontWeight: 800, color: 'var(--bw-ink)', letterSpacing: '-.02em' }}>{depth}</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--bw-muted)' }}>cm</span>
-            <span style={{ fontSize: 11.5, color: o.dot, fontWeight: 700, marginLeft: 'auto' }}>{SEV_META[sev].depthLabel}</span>
+            <span style={{ fontSize: 11.5, color: o.dot, fontWeight: 700, marginLeft: 'auto' }}><DepthReference depthCm={depth} color={o.dot} compact /></span>
           </div>
           <input
             type="range"
@@ -213,6 +214,9 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 2 }}>
             <span>{range.min} cm</span>
             <span>{range.max} cm</span>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <DepthReference depthCm={depth} color={o.dot} />
           </div>
         </div>
 

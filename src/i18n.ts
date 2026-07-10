@@ -253,6 +253,22 @@ const MESSAGES = {
   'sev.medium': { en: 'Medium', fil: 'Katamtaman' },
   'sev.low': { en: 'Low', fil: 'Mababa' },
 
+  // ── Water-level real-world reference (body scale) — depthReference() bands in floodMeta.ts ──
+  'depthRef.soles': { en: 'Over the soles', fil: 'Lampas talampakan' },
+  'depthRef.ankle': { en: 'Ankle-deep', fil: 'Hanggang bukong-bukong' },
+  'depthRef.shin': { en: 'Shin-deep', fil: 'Hanggang lulod' },
+  'depthRef.knee': { en: 'Knee-deep', fil: 'Hanggang tuhod' },
+  'depthRef.thigh': { en: 'Thigh-deep', fil: 'Hanggang hita' },
+  'depthRef.waist': { en: 'Waist-deep', fil: 'Hanggang baywang' },
+  'depthRef.chest': { en: 'Chest-deep', fil: 'Hanggang dibdib' },
+  'depthRef.neck': { en: 'Neck-deep', fil: 'Hanggang leeg' },
+  'depthRef.overhead': { en: "Over an adult's head", fil: 'Lampas sa ulo' },
+  // ── Vehicle cues — depthReference() cues; thresholds mirror the road passability limits ──
+  'depthVeh.curb': { en: 'About curb height', fil: 'Mga taas ng bangketa' },
+  'depthVeh.halfTire': { en: 'Up to half a car tire', fil: 'Hanggang kalahati ng gulong' },
+  'depthVeh.stall': { en: 'Most cars stall', fil: 'Tumitigil ang karamihan ng sasakyan' },
+  'depthVeh.float': { en: 'Vehicles float or stall', fil: 'Lumulutang o tumitigil ang sasakyan' },
+
   // ── Road condition (full + short) ──
   'road.impassable': { en: 'Impassable', fil: 'Hindi madaanan' },
   'road.impassable.short': { en: 'Impassable', fil: 'Di madaanan' },

@@ -4,6 +4,7 @@ import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import PlaceField from './PlaceField';
+import DepthReference from './DepthReference';
 
 /**
  * Admin-only "Report a flood incident" modal. Lets an admin log a flood known from news or other
@@ -212,6 +213,9 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600 }}>
             <span>{range.min} cm</span>
             <span>{range.max} cm</span>
+          </div>
+          <div style={{ marginTop: 9 }}>
+            <DepthReference depthCm={depth} color={SEV_META[severity].color} />
           </div>
         </div>
 
