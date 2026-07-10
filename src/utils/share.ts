@@ -7,6 +7,13 @@ import { SEV_META, TREND_META } from './floodMeta';
 
 const APP_NAME = 'FloodedArea';
 
+/** The application's official Facebook page — surfaced in the Share dialog and appended to the
+ *  copyable share message so it travels with every share. */
+export const FB_PAGE_URL = 'https://www.facebook.com/share/1DLEBjCZDi/';
+
+/** Follow-us line appended to the full share text (clipboard / WhatsApp / email / native share). */
+const FB_FOLLOW = `\n📘 Follow us on Facebook: ${FB_PAGE_URL}`;
+
 /** One-line pitch tail reused by both message variants. */
 const PITCH =
   `${APP_NAME} — live crowd-sourced flood map for the Philippines: real-time reports, ` +
@@ -55,7 +62,7 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
       `⚠️ I just reported ${myReport.sev.label.toUpperCase()} flooding on ${where} — ` +
       `~${myReport.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
       `Track live flood conditions on ${PITCH}`;
-    return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}` };
+    return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
   }
 
   // Visitor / no active report: an enticing pitch sweetened with live stats.
@@ -69,7 +76,7 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
     stats = ` Right now ${ALERT_NOTE[alertLevel]} 👀`;
   }
   const body = `🌊 ${PITCH}${stats}`;
-  return { title: `${APP_NAME} — live flood map`, body, text: `${body}\n${url}` };
+  return { title: `${APP_NAME} — live flood map`, body, text: `${body}\n${url}${FB_FOLLOW}` };
 }
 
 /** Share message for a SPECIFIC report (used by the per-report "Share to Facebook" action). Reuses
@@ -83,7 +90,7 @@ export function buildReportShareText(report: FloodReport, activeCount: number, u
     `⚠️ ${SEV_META[report.severity].label.toUpperCase()} flooding reported on ${where} — ` +
     `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
     `Track live flood conditions on ${PITCH}`;
-  return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}` };
+  return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
 }
 
 /** A single social-network share target. `href` opens that network's web (or app) composer. */

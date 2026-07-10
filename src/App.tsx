@@ -13,7 +13,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
-import { buildShareText, buildShareLinks, buildReportShareText } from './utils/share';
+import { buildShareText, buildShareLinks, buildReportShareText, FB_PAGE_URL } from './utils/share';
 import {
   buildPossibleClosures,
   buildRoadDirectory,
@@ -1316,6 +1316,7 @@ const App: React.FC = () => {
           text={shareData.text}
           url={shareData.url}
           links={shareData.links}
+          fbPageUrl={FB_PAGE_URL}
           activeCount={active.length}
           isMobile={isMobile}
           canNativeShare={canNativeShare}
@@ -1331,6 +1332,7 @@ const App: React.FC = () => {
           text={reportShareData.text}
           url={reportShareData.url}
           links={reportShareData.links}
+          fbPageUrl={FB_PAGE_URL}
           activeCount={active.length}
           isMobile={isMobile}
           canNativeShare={canNativeShare}

@@ -293,7 +293,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: 'var(--bw-muted)', fontWeight: 600, marginBottom: 11 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} /><b style={{ color: 'var(--bw-ink)' }}>{highCount}</b> {t('sidebar.high')}</span>
           <span style={{ color: '#D5DDE3' }}>·</span>
-          <span><b style={{ color: 'var(--bw-ink)' }}>{totalCount}</b> {t('sidebar.activeReports')}</span>
+          <span><b style={{ color: 'var(--bw-ink)' }}>{totalCount}</b> {t(totalCount === 1 ? 'sidebar.activeReport' : 'sidebar.activeReports')}</span>
           {impassableRoadCount > 0 && (
             <>
               <span style={{ color: '#D5DDE3' }}>·</span>

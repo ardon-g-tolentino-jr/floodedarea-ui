@@ -1519,7 +1519,7 @@
       "label": "MsgKey",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L300",
+      "source_location": "L302",
       "id": "src_i18n_msgkey",
       "community": 8,
       "norm_label": "msgkey"
@@ -1528,7 +1528,7 @@
       "label": "translate()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L302",
+      "source_location": "L304",
       "id": "src_i18n_translate",
       "community": 24,
       "norm_label": "translate()"
@@ -1537,7 +1537,7 @@
       "label": "tFormat()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L309",
+      "source_location": "L311",
       "id": "src_i18n_tformat",
       "community": 5,
       "norm_label": "tformat()"
@@ -1546,7 +1546,7 @@
       "label": "sevLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L317",
+      "source_location": "L319",
       "id": "src_i18n_sevlabel",
       "community": 24,
       "norm_label": "sevlabel()"
@@ -1555,7 +1555,7 @@
       "label": "roadLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L320",
+      "source_location": "L322",
       "id": "src_i18n_roadlabel",
       "community": 24,
       "norm_label": "roadlabel()"
@@ -1564,7 +1564,7 @@
       "label": "roadShort()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L323",
+      "source_location": "L325",
       "id": "src_i18n_roadshort",
       "community": 6,
       "norm_label": "roadshort()"
@@ -1573,7 +1573,7 @@
       "label": "trendLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L326",
+      "source_location": "L328",
       "id": "src_i18n_trendlabel",
       "community": 24,
       "norm_label": "trendlabel()"
@@ -1582,7 +1582,7 @@
       "label": "useI18n()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L331",
+      "source_location": "L333",
       "id": "src_i18n_usei18n",
       "community": 8,
       "norm_label": "usei18n()"
@@ -1978,7 +1978,7 @@
       "label": "ALERT_NOTE",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L15",
+      "source_location": "L22",
       "id": "utils_share_alert_note",
       "community": 5,
       "norm_label": "alert_note"
@@ -1987,7 +1987,7 @@
       "label": "ShareInputs",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L21",
+      "source_location": "L28",
       "id": "utils_share_shareinputs",
       "community": 5,
       "norm_label": "shareinputs"
@@ -1996,7 +1996,7 @@
       "label": "ShareText",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L32",
+      "source_location": "L39",
       "id": "utils_share_sharetext",
       "community": 5,
       "norm_label": "sharetext"
@@ -2005,7 +2005,7 @@
       "label": "activityClause()",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L41",
+      "source_location": "L48",
       "id": "utils_share_activityclause",
       "community": 5,
       "norm_label": "activityclause()"
@@ -2014,7 +2014,7 @@
       "label": "buildShareText()",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L47",
+      "source_location": "L54",
       "id": "utils_share_buildsharetext",
       "community": 5,
       "norm_label": "buildsharetext()"
@@ -2023,7 +2023,7 @@
       "label": "buildReportShareText()",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L77",
+      "source_location": "L84",
       "id": "utils_share_buildreportsharetext",
       "community": 5,
       "norm_label": "buildreportsharetext()"
@@ -2032,7 +2032,7 @@
       "label": "ShareLink",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L90",
+      "source_location": "L97",
       "id": "utils_share_sharelink",
       "community": 5,
       "norm_label": "sharelink"
@@ -2041,7 +2041,7 @@
       "label": "buildShareLinks()",
       "file_type": "code",
       "source_file": "src/utils/share.ts",
-      "source_location": "L101",
+      "source_location": "L108",
       "id": "utils_share_buildsharelinks",
       "community": 5,
       "norm_label": "buildsharelinks()"
@@ -4030,7 +4030,7 @@
       "label": "NET_GLYPH",
       "file_type": "code",
       "source_file": "src/components/panels/ShareModal.tsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "id": "panels_sharemodal_net_glyph",
       "community": 5,
       "norm_label": "net_glyph"
@@ -4039,7 +4039,7 @@
       "label": "Glyph()",
       "file_type": "code",
       "source_file": "src/components/panels/ShareModal.tsx",
-      "source_location": "L42",
+      "source_location": "L44",
       "id": "panels_sharemodal_glyph",
       "community": 5,
       "norm_label": "glyph()"
@@ -4048,7 +4048,7 @@
       "label": "ShareModal()",
       "file_type": "code",
       "source_file": "src/components/panels/ShareModal.tsx",
-      "source_location": "L52",
+      "source_location": "L54",
       "id": "panels_sharemodal_sharemodal",
       "community": 5,
       "norm_label": "sharemodal()"
@@ -17865,5 +17865,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3a6e4a893c40d04cf2e888af6111b39984f90303"
+  "built_at_commit": "f64ce33b76fa6773c6fff18838ac0d803f0d195f"
 }

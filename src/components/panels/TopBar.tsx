@@ -90,6 +90,18 @@ const TopBar: React.FC<TopBarProps> = ({
   // When the mobile location search expands, it takes over the row and the action cluster hides.
   const [searchExpanded, setSearchExpanded] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
+  // The ⋯ trigger sits mid-cluster (notify/SOS/auth to its right), so a menu right-anchored under it
+  // overflows the left viewport edge on a phone and clips the icons. We pin the dropdown to the
+  // viewport's right edge (position: fixed) below the button, measuring the button's bottom on open.
+  const moreBtnRef = React.useRef<HTMLButtonElement>(null);
+  const [menuTop, setMenuTop] = React.useState(56);
+  const toggleMenu = (): void => {
+    if (!menuOpen) {
+      const r = moreBtnRef.current?.getBoundingClientRect();
+      if (r) setMenuTop(r.bottom + 8);
+    }
+    setMenuOpen((o) => !o);
+  };
   React.useEffect(() => {
     if (!menuOpen) return;
     const onDocClick = (e: MouseEvent): void => {
@@ -266,7 +278,8 @@ const TopBar: React.FC<TopBarProps> = ({
             {/* Overflow menu for secondary actions */}
             <div ref={menuRef} style={{ position: 'relative', flex: 'none' }}>
               <button
-                onClick={() => setMenuOpen((o) => !o)}
+                ref={moreBtnRef}
+                onClick={toggleMenu}
                 title={t('topbar.more')}
                 aria-label={t('topbar.more')}
                 aria-expanded={menuOpen}
@@ -276,7 +289,7 @@ const TopBar: React.FC<TopBarProps> = ({
               </button>
               {menuOpen && (
                 <div
-                  style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 1400, minWidth: 212, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 12, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', padding: 6 }}
+                  style={{ position: 'fixed', top: menuTop, right: 12, zIndex: 1400, minWidth: 212, maxWidth: 'calc(100vw - 24px)', background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 12, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', padding: 6 }}
                 >
                   <MenuItem icon="📊" label={t('topbar.dashboard')} onClick={runAndClose(onDashboard)} />
                   <MenuItem icon="⤴" label={t('topbar.share')} onClick={runAndClose(onShare)} />

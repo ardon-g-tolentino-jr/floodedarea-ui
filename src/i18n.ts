@@ -105,6 +105,7 @@ const MESSAGES = {
   'sidebar.archive': { en: 'Archive', fil: 'Archive' },
   'sidebar.high': { en: 'high', fil: 'mataas' },
   'sidebar.activeReports': { en: 'active reports nearby', fil: 'aktibong ulat sa paligid' },
+  'sidebar.activeReport': { en: 'active report nearby', fil: 'aktibong ulat sa paligid' },
   'sidebar.roadImpassable': { en: 'impassable', fil: 'hindi madaanan' },
   'sidebar.road': { en: 'road', fil: 'kalsada' },
   'sidebar.roadsPlural': { en: 'roads', fil: 'mga kalsada' },
@@ -171,6 +172,7 @@ const MESSAGES = {
   'share.linkCopied': { en: 'Link copied to clipboard', fil: 'Nakopya ang link sa clipboard' },
   'share.messageCopied': { en: 'Message copied — paste it anywhere', fil: 'Nakopya ang mensahe — i-paste kahit saan' },
   'share.thanks': { en: 'Salamat for spreading the word — stay safe out there. 💙', fil: 'Salamat sa pagpapakalat — mag-ingat lagi. 💙' },
+  'share.followFb': { en: 'Follow us on Facebook', fil: 'I-follow kami sa Facebook' },
 
   // ── SOS / rescue modal ──
   'sos.title': { en: 'Emergency help', fil: 'Tulong sa emergency' },

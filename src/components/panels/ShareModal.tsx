@@ -9,6 +9,8 @@ interface ShareModalProps {
   url: string;
   /** Pre-built per-network share targets (see buildShareLinks). */
   links: ShareLink[];
+  /** The app's official Facebook page — shown as a "Follow us" link. */
+  fbPageUrl: string;
   /** Live (non-expired) report count, for the impact line. */
   activeCount: number;
   isMobile: boolean;
@@ -39,8 +41,8 @@ const LINK_GLYPH =
 const SHARE_GLYPH =
   'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z';
 
-const Glyph: React.FC<{ d: string; size?: number }> = ({ d, size = 26 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+const Glyph: React.FC<{ d: string; size?: number; color?: string }> = ({ d, size = 26, color = '#fff' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
     <path d={d} />
   </svg>
 );
@@ -53,6 +55,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   text,
   url,
   links,
+  fbPageUrl,
   activeCount,
   isMobile,
   canNativeShare,
@@ -145,8 +148,19 @@ const ShareModal: React.FC<ShareModalProps> = ({
             ))}
           </div>
 
+          {/* Follow the app's official Facebook page */}
+          <a
+            href={fbPageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid #C9DCFB', background: '#F0F5FF', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
+          >
+            <Glyph d={NET_GLYPH.facebook} size={18} color="#1877F2" />
+            {t('share.followFb')}
+          </a>
+
           {/* Copy actions */}
-          <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+          <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
             <button
               onClick={() => onCopy(url, t('share.linkCopied'))}
               style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
