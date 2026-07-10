@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/package.json": {
-    "mtime": 1783690622.182289,
-    "ast_hash": "21291ade04913eb6769c2b1425987add",
+    "mtime": 1783699849.3964138,
+    "ast_hash": "a7dbf3758a3b9c749cfd0ecb978a0d82",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/tsconfig.json": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/App.tsx": {
-    "mtime": 1783686251.431777,
-    "ast_hash": "29d0e3e1df160c7895ed6eac2239a1c3",
+    "mtime": 1783699790.4937005,
+    "ast_hash": "35191c861337c41b7a0cae2c2da409af",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/main.tsx": {
@@ -180,7 +180,7 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useAuth.ts": {
-    "mtime": 1783689853.5302613,
+    "mtime": 1783690776.5464783,
     "ast_hash": "3cbc0798b1a1627d998bae296a752eb7",
     "semantic_hash": ""
   },
@@ -215,7 +215,7 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/api/client.ts": {
-    "mtime": 1783689656.1162317,
+    "mtime": 1783690776.5461195,
     "ast_hash": "ee27b051d9be9fbabf6c36cbc9dbdbec",
     "semantic_hash": ""
   },
