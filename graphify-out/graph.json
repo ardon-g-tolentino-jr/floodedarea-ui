@@ -4336,7 +4336,7 @@
       "label": "getDeviceId()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L11",
+      "source_location": "L13",
       "id": "hooks_useauth_getdeviceid",
       "community": 3,
       "norm_label": "getdeviceid()"
@@ -4345,7 +4345,7 @@
       "label": "AuthState",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L25",
+      "source_location": "L27",
       "id": "hooks_useauth_authstate",
       "community": 3,
       "norm_label": "authstate"
@@ -4354,7 +4354,7 @@
       "label": "AuthResponse",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "id": "hooks_useauth_authresponse",
       "community": 3,
       "norm_label": "authresponse"
@@ -4363,7 +4363,7 @@
       "label": "loadSession()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "id": "hooks_useauth_loadsession",
       "community": 3,
       "norm_label": "loadsession()"
@@ -4372,7 +4372,7 @@
       "label": "decodeGoogleJwt()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L53",
+      "source_location": "L69",
       "id": "hooks_useauth_decodegooglejwt",
       "community": 3,
       "norm_label": "decodegooglejwt()"
@@ -4381,7 +4381,7 @@
       "label": "UseAuthResult",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L63",
+      "source_location": "L79",
       "id": "hooks_useauth_useauthresult",
       "community": 3,
       "norm_label": "useauthresult"
@@ -4390,7 +4390,7 @@
       "label": "useAuth()",
       "file_type": "code",
       "source_file": "src/hooks/useAuth.ts",
-      "source_location": "L72",
+      "source_location": "L88",
       "id": "hooks_useauth_useauth",
       "community": 3,
       "norm_label": "useauth()"
@@ -8647,9 +8647,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "src_i18n_ts",
-      "confidence_score": 1.0
+      "target": "src_i18n_ts"
     },
     {
       "relation": "imports_from",
@@ -9378,9 +9378,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "src_i18n_usei18n",
-      "confidence_score": 1.0
+      "target": "src_i18n_usei18n"
     },
     {
       "relation": "imports",
@@ -13498,9 +13498,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "src_utils_floodmeta_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_floodmeta_ts"
     },
     {
       "relation": "imports_from",
@@ -13637,9 +13637,9 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_floodmeta_ts",
-      "target": "utils_floodmeta_depthband",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_depthband"
     },
     {
       "relation": "contains",
@@ -13647,9 +13647,9 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_floodmeta_ts",
-      "target": "utils_floodmeta_depthreference",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_depthreference"
     },
     {
       "relation": "contains",
@@ -13797,9 +13797,9 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_floodmeta_ts",
-      "target": "utils_floodmeta_vehiclecue",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_vehiclecue"
     },
     {
       "relation": "contains",
@@ -14137,9 +14137,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "utils_floodmeta_depthreference",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_depthreference"
     },
     {
       "relation": "imports",
@@ -15020,9 +15020,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_components_panels_depthreference_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_depthreference_tsx"
     },
     {
       "relation": "imports_from",
@@ -16253,9 +16253,9 @@
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_severitypicker_tsx",
-      "target": "src_components_panels_depthreference_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_depthreference_tsx"
     },
     {
       "relation": "contains",
@@ -16354,9 +16354,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "panels_depthreference_depthreference",
-      "confidence_score": 1.0
+      "target": "panels_depthreference_depthreference"
     },
     {
       "relation": "contains",
@@ -16364,9 +16364,9 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_depthreference_tsx",
-      "target": "panels_depthreference_props",
-      "confidence_score": 1.0
+      "target": "panels_depthreference_props"
     },
     {
       "relation": "imports_from",
@@ -16375,9 +16375,9 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_reportdetailcard_tsx",
-      "target": "src_components_panels_depthreference_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_depthreference_tsx"
     },
     {
       "relation": "contains",
@@ -18057,5 +18057,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7464bba782adddda1a3ee36192289128a7015ff0"
+  "built_at_commit": "cc37882148f7851999c5a5ba82f358f0781a6769"
 }

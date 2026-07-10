@@ -26,7 +26,7 @@ async function request<T>(
   const headers: Record<string, string> = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
-  const token = sessionStorage.getItem(JWT_STORAGE_KEY);
+  const token = localStorage.getItem(JWT_STORAGE_KEY);
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   let res: Response;

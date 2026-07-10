@@ -2,6 +2,8 @@ import React from 'react';
 import { api, JWT_STORAGE_KEY } from '../api/client';
 import type { UserRole } from '../types';
 
+// The signed-in profile + JWT (JWT_STORAGE_KEY) live in localStorage so a session survives tab
+// close/reopen, back-navigation and browser restart — ended only by Sign out or a server 401/403.
 const SESSION_KEY = 'baha_auth_v1';
 // Persisted in localStorage (not sessionStorage) so a guest keeps the same identity across tabs
 // and reloads — this is what lets the "one active report per person" spam guard apply to guests.
@@ -42,7 +44,21 @@ interface AuthResponse {
 
 function loadSession(): AuthState | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    let raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) {
+      // One-time migration from the old per-tab sessionStorage location so upgrading users who
+      // still have a live session aren't signed out. Move the profile + JWT forward, then drop the
+      // legacy copies.
+      const legacy = sessionStorage.getItem(SESSION_KEY);
+      const legacyJwt = sessionStorage.getItem(JWT_STORAGE_KEY);
+      if (legacy && legacyJwt) {
+        localStorage.setItem(SESSION_KEY, legacy);
+        localStorage.setItem(JWT_STORAGE_KEY, legacyJwt);
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(JWT_STORAGE_KEY);
+        raw = legacy;
+      }
+    }
     return raw ? (JSON.parse(raw) as AuthState) : null;
   } catch {
     return null;
@@ -73,7 +89,9 @@ export function useAuth(): UseAuthResult {
   const [auth, setAuth] = React.useState<AuthState | null>(loadSession);
 
   const save = React.useCallback((resp: AuthResponse, fallback?: { name?: string; picture?: string }): AuthState => {
-    sessionStorage.setItem(JWT_STORAGE_KEY, resp.token);
+    // Persist in localStorage so the session survives tab close/reopen, back-navigation and browser
+    // restart — only the Sign-out button (or a server 401/403) ends it.
+    localStorage.setItem(JWT_STORAGE_KEY, resp.token);
     const state: AuthState = {
       userId: resp.userId,
       email: resp.email,
@@ -81,7 +99,7 @@ export function useAuth(): UseAuthResult {
       picture: resp.picture ?? fallback?.picture,
       role: resp.role,
     };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(state));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(state));
     setAuth(state);
     return state;
   }, []);
@@ -109,6 +127,9 @@ export function useAuth(): UseAuthResult {
   );
 
   const logout = React.useCallback((): void => {
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(JWT_STORAGE_KEY);
+    // Also drop any legacy per-tab copies so a stale token can't linger after an upgrade.
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(JWT_STORAGE_KEY);
     setAuth(null);
