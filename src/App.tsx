@@ -91,6 +91,7 @@ type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => voi
 
 /** Map a report severity onto an alert level for the dialog's color/label. */
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
+const ARCHIVE_WINDOW_MIN = 12 * 60; // expired reports stay in the Archive tab for 12h, then drop off
 
 const App: React.FC = () => {
   const { auth, loginWithGoogle, ensureGuest, logout } = useAuth();
@@ -137,7 +138,7 @@ const App: React.FC = () => {
   const geocodeReqId = React.useRef(0);
   const [selectedReportId, setSelectedReportId] = React.useState<number | null>(null);
   const [selEvacId, setSelEvacId] = React.useState<number | null>(null);
-  const [tab, setTab] = React.useState<'nearby' | 'activity'>('nearby');
+  const [tab, setTab] = React.useState<'nearby' | 'activity' | 'archive'>('nearby');
   const [filters, setFilters] = React.useState<Record<Severity, boolean>>({ high: true, medium: true, low: true });
   const [roadFilters, setRoadFilters] = React.useState<Record<Road, boolean>>({ passable: true, risky: true, impassable: true });
   const [projectedRiseCm, setProjectedRiseCm] = React.useState<number>(WATER_RISE_DEFAULT);
@@ -342,6 +343,20 @@ const App: React.FC = () => {
   const feed = React.useMemo(
     () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     [active]
+  );
+  // Recently-expired reports linger here for 12h so others can see a report happened,
+  // even after it drops off the live map/feed. Windowed from createdAt ("when it happened").
+  const archived = React.useMemo(
+    () =>
+      enriched
+        .filter(
+          (r) =>
+            r.expired &&
+            r.status !== 'resolved' && // resolved reports were closed on purpose — not archive
+            (now - new Date(r.createdAt).getTime()) / 60000 <= ARCHIVE_WINDOW_MIN
+        )
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [enriched, now]
   );
   const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
 
@@ -1187,7 +1202,7 @@ const App: React.FC = () => {
         <Sidebar
           isMobile={isMobile}
           status={status}
-          list={tab === 'nearby' ? nearby : feed}
+          list={tab === 'nearby' ? nearby : tab === 'archive' ? archived : feed}
           tab={tab}
           onTab={setTab}
           filters={filters}

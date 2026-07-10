@@ -16,7 +16,7 @@ import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMe
 import { useI18n, sevLabel, roadLabel, roadShort, trendLabel } from '../../i18n';
 import ShelterIcon from './ShelterIcon';
 
-type Tab = 'nearby' | 'activity';
+type Tab = 'nearby' | 'activity' | 'archive';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -305,13 +305,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           )}
         </div>
         <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--bw-bg-subtle)', borderRadius: 12 }}>
-          {(['nearby', 'activity'] as Tab[]).map((t2) => (
+          {(['nearby', 'activity', 'archive'] as Tab[]).map((t2) => (
             <div
               key={t2}
               onClick={() => onTab(t2)}
               style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: tab === t2 ? '#0F172A' : '#94A3B8', background: tab === t2 ? '#fff' : 'transparent', boxShadow: tab === t2 ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
             >
-              {t2 === 'nearby' ? t('sidebar.nearby') : t('sidebar.liveActivity')}
+              {t2 === 'nearby' ? t('sidebar.nearby') : t2 === 'archive' ? t('sidebar.archive') : t('sidebar.liveActivity')}
             </div>
           ))}
         </div>
@@ -322,14 +322,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         ? { overflowY: 'visible', padding: '0 18px 14px', display: 'flex', flexDirection: 'column', gap: 9 }
         : { flex: 1, overflowY: 'auto', padding: '0 18px 12px', display: 'flex', flexDirection: 'column', gap: 9 }}>
         {list.map((r) => {
-          const sel = r.id === selectedReportId;
+          const isArchive = tab === 'archive';
+          const sel = !isArchive && r.id === selectedReportId;
           const tm = TREND_META[r.trend];
           const rm = ROAD_META[r.road];
           return (
             <div
               key={r.id}
-              onClick={() => onSelectReport(r.id)}
-              style={{ padding: '12px 13px', borderRadius: 14, cursor: 'pointer', display: 'block', border: sel ? `1.5px solid ${r.sev.color}` : '1px solid var(--bw-line-soft)', background: sel ? r.sev.soft : '#fff', transition: 'all .12s' }}
+              onClick={isArchive ? undefined : () => onSelectReport(r.id)}
+              style={{ padding: '12px 13px', borderRadius: 14, cursor: isArchive ? 'default' : 'pointer', opacity: isArchive ? 0.72 : 1, display: 'block', border: sel ? `1.5px solid ${r.sev.color}` : '1px solid var(--bw-line-soft)', background: sel ? r.sev.soft : isArchive ? 'var(--bw-bg-subtle)' : '#fff', transition: 'all .12s' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', flex: 'none', background: r.sev.color }} />
@@ -349,13 +350,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 {r.system && (
                   <span style={{ fontSize: 11, fontWeight: 800, color: '#4338CA', background: '#EEF2FF', padding: '2px 7px', borderRadius: 6 }}>🛈 {t('report.system')}</span>
                 )}
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {formatDuration(r.expiresInMin)} {t('report.left')}</span>
+                {r.expired
+                  ? <span style={{ fontSize: 11, fontWeight: 700, color: '#9AA8B4' }}>{t('report.expired')}</span>
+                  : <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {formatDuration(r.expiresInMin)} {t('report.left')}</span>}
               </div>
             </div>
           );
         })}
         {list.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>{t('sidebar.noReports')}</div>
+          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>{tab === 'archive' ? t('sidebar.noArchive') : t('sidebar.noReports')}</div>
         )}
       </div>
 

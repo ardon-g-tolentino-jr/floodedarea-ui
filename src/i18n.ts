@@ -102,6 +102,7 @@ const MESSAGES = {
   'sidebar.searchRoads': { en: 'Search roads by condition', fil: 'Maghanap ng kalsada ayon sa kondisyon' },
   'sidebar.nearby': { en: 'Nearby', fil: 'Malapit' },
   'sidebar.liveActivity': { en: 'Live activity', fil: 'Live na aktibidad' },
+  'sidebar.archive': { en: 'Archive', fil: 'Archive' },
   'sidebar.high': { en: 'high', fil: 'mataas' },
   'sidebar.activeReports': { en: 'active reports nearby', fil: 'aktibong ulat sa paligid' },
   'sidebar.roadImpassable': { en: 'impassable', fil: 'hindi madaanan' },
@@ -114,6 +115,7 @@ const MESSAGES = {
   'sidebar.setUp': { en: 'Set up', fil: 'I-set up' },
   'sidebar.totalVisits': { en: 'total visits', fil: 'kabuuang bisita' },
   'sidebar.noReports': { en: 'No reports match the active filters.', fil: 'Walang ulat na tumutugma sa mga filter.' },
+  'sidebar.noArchive': { en: 'No past reports yet.', fil: 'Wala pang mga nakaraang ulat.' },
 
   // ── Sidebar descriptions / affected-area readout ──
   'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang bilog ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na bilog kung gaano kalayo maaaring kumalat ang baha.' },
@@ -242,6 +244,7 @@ const MESSAGES = {
   'report.unverified': { en: 'unverified', fil: 'hindi beripikado' },
   'report.system': { en: 'System report', fil: 'Ulat ng sistema' },
   'report.left': { en: 'left', fil: 'natitira' },
+  'report.expired': { en: 'expired', fil: 'tapos na' },
 
   // ── Severity ──
   'sev.high': { en: 'High', fil: 'Mataas' },
