@@ -1440,7 +1440,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L10",
       "id": "src_i18n_lang",
-      "community": 8,
+      "community": 21,
       "norm_label": "lang"
     },
     {
@@ -1539,7 +1539,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L306",
       "id": "src_i18n_tformat",
-      "community": 28,
+      "community": 5,
       "norm_label": "tformat()"
     },
     {
@@ -1566,7 +1566,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L320",
       "id": "src_i18n_roadshort",
-      "community": 27,
+      "community": 6,
       "norm_label": "roadshort()"
     },
     {
@@ -1602,7 +1602,7 @@
       "source_file": "src/types.ts",
       "source_location": "L4",
       "id": "src_types_severity",
-      "community": 20,
+      "community": 0,
       "norm_label": "severity"
     },
     {
@@ -1611,7 +1611,7 @@
       "source_file": "src/types.ts",
       "source_location": "L5",
       "id": "src_types_trend",
-      "community": 21,
+      "community": 25,
       "norm_label": "trend"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "src/types.ts",
       "source_location": "L8",
       "id": "src_types_alertlevel",
-      "community": 0,
+      "community": 5,
       "norm_label": "alertlevel"
     },
     {
@@ -1674,14 +1674,14 @@
       "source_file": "src/types.ts",
       "source_location": "L17",
       "id": "src_types_floodreport",
-      "community": 2,
+      "community": 6,
       "norm_label": "floodreport"
     },
     {
       "label": "EvacuationCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L38",
+      "source_location": "L43",
       "id": "src_types_evacuationcenter",
       "community": 2,
       "norm_label": "evacuationcenter"
@@ -1690,7 +1690,7 @@
       "label": "Hotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L48",
+      "source_location": "L53",
       "id": "src_types_hotline",
       "community": 2,
       "norm_label": "hotline"
@@ -1699,7 +1699,7 @@
       "label": "FloodAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L56",
+      "source_location": "L61",
       "id": "src_types_floodalert",
       "community": 2,
       "norm_label": "floodalert"
@@ -1708,7 +1708,7 @@
       "label": "LatLng",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L67",
+      "source_location": "L72",
       "id": "src_types_latlng",
       "community": 23,
       "norm_label": "latlng"
@@ -1717,7 +1717,7 @@
       "label": "RoadSegment",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L77",
+      "source_location": "L82",
       "id": "src_types_roadsegment",
       "community": 2,
       "norm_label": "roadsegment"
@@ -1726,7 +1726,7 @@
       "label": "NewReport",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L87",
+      "source_location": "L92",
       "id": "src_types_newreport",
       "community": 2,
       "norm_label": "newreport"
@@ -1735,7 +1735,7 @@
       "label": "RescueRequest",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L109",
+      "source_location": "L118",
       "id": "src_types_rescuerequest",
       "community": 2,
       "norm_label": "rescuerequest"
@@ -1744,7 +1744,7 @@
       "label": "NewRescue",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L123",
+      "source_location": "L132",
       "id": "src_types_newrescue",
       "community": 2,
       "norm_label": "newrescue"
@@ -1753,7 +1753,7 @@
       "label": "NewCenter",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L133",
+      "source_location": "L142",
       "id": "src_types_newcenter",
       "community": 2,
       "norm_label": "newcenter"
@@ -1762,7 +1762,7 @@
       "label": "NewHotline",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L140",
+      "source_location": "L149",
       "id": "src_types_newhotline",
       "community": 2,
       "norm_label": "newhotline"
@@ -1771,7 +1771,7 @@
       "label": "NewAlert",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L147",
+      "source_location": "L156",
       "id": "src_types_newalert",
       "community": 2,
       "norm_label": "newalert"
@@ -1780,7 +1780,7 @@
       "label": "FeedbackType",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L155",
+      "source_location": "L164",
       "id": "src_types_feedbacktype",
       "community": 2,
       "norm_label": "feedbacktype"
@@ -1789,7 +1789,7 @@
       "label": "FeedbackStatus",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L156",
+      "source_location": "L165",
       "id": "src_types_feedbackstatus",
       "community": 2,
       "norm_label": "feedbackstatus"
@@ -1798,7 +1798,7 @@
       "label": "Feedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L163",
+      "source_location": "L172",
       "id": "src_types_feedback",
       "community": 2,
       "norm_label": "feedback"
@@ -1807,7 +1807,7 @@
       "label": "NewFeedback",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L180",
+      "source_location": "L189",
       "id": "src_types_newfeedback",
       "community": 2,
       "norm_label": "newfeedback"
@@ -1816,7 +1816,7 @@
       "label": "VisitStats",
       "file_type": "code",
       "source_file": "src/types.ts",
-      "source_location": "L189",
+      "source_location": "L198",
       "id": "src_types_visitstats",
       "community": 2,
       "norm_label": "visitstats"
@@ -1899,7 +1899,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L1",
       "id": "src_utils_waterchart_ts",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterchart.ts"
     },
     {
@@ -1908,7 +1908,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L13",
       "id": "utils_waterchart_timeddepth",
-      "community": 21,
+      "community": 23,
       "norm_label": "timeddepth"
     },
     {
@@ -1917,7 +1917,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L18",
       "id": "utils_waterchart_districtseries",
-      "community": 21,
+      "community": 25,
       "norm_label": "districtseries"
     },
     {
@@ -1926,7 +1926,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L27",
       "id": "utils_waterchart_waterchart",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterchart"
     },
     {
@@ -1935,7 +1935,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L42",
       "id": "utils_waterchart_buildwaterchart",
-      "community": 21,
+      "community": 23,
       "norm_label": "buildwaterchart()"
     },
     {
@@ -1944,7 +1944,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L111",
       "id": "utils_waterchart_hourbucket",
-      "community": 21,
+      "community": 23,
       "norm_label": "hourbucket"
     },
     {
@@ -1953,7 +1953,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L117",
       "id": "utils_waterchart_dailywaterbars",
-      "community": 21,
+      "community": 23,
       "norm_label": "dailywaterbars"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L127",
       "id": "utils_waterchart_builddailywaterbars",
-      "community": 21,
+      "community": 23,
       "norm_label": "builddailywaterbars()"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L1",
       "id": "src_utils_share_ts",
-      "community": 0,
+      "community": 5,
       "norm_label": "share.ts"
     },
     {
@@ -1980,7 +1980,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L15",
       "id": "utils_share_alert_note",
-      "community": 0,
+      "community": 5,
       "norm_label": "alert_note"
     },
     {
@@ -1989,7 +1989,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L21",
       "id": "utils_share_shareinputs",
-      "community": 0,
+      "community": 5,
       "norm_label": "shareinputs"
     },
     {
@@ -1998,7 +1998,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L32",
       "id": "utils_share_sharetext",
-      "community": 0,
+      "community": 5,
       "norm_label": "sharetext"
     },
     {
@@ -2007,7 +2007,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L41",
       "id": "utils_share_activityclause",
-      "community": 0,
+      "community": 5,
       "norm_label": "activityclause()"
     },
     {
@@ -2016,7 +2016,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L47",
       "id": "utils_share_buildsharetext",
-      "community": 0,
+      "community": 5,
       "norm_label": "buildsharetext()"
     },
     {
@@ -2025,7 +2025,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L77",
       "id": "utils_share_buildreportsharetext",
-      "community": 0,
+      "community": 5,
       "norm_label": "buildreportsharetext()"
     },
     {
@@ -2034,7 +2034,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L90",
       "id": "utils_share_sharelink",
-      "community": 28,
+      "community": 5,
       "norm_label": "sharelink"
     },
     {
@@ -2043,7 +2043,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L101",
       "id": "utils_share_buildsharelinks",
-      "community": 0,
+      "community": 5,
       "norm_label": "buildsharelinks()"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L1",
       "id": "src_utils_locationhelp_ts",
-      "community": 25,
+      "community": 8,
       "norm_label": "locationhelp.ts"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L8",
       "id": "utils_locationhelp_helpbucket",
-      "community": 25,
+      "community": 8,
       "norm_label": "helpbucket"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L11",
       "id": "utils_locationhelp_detecthelpbucket",
-      "community": 25,
+      "community": 8,
       "norm_label": "detecthelpbucket()"
     },
     {
@@ -2079,7 +2079,7 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L28",
       "id": "utils_locationhelp_steps",
-      "community": 25,
+      "community": 8,
       "norm_label": "steps"
     },
     {
@@ -2088,7 +2088,7 @@
       "source_file": "src/utils/locationHelp.ts",
       "source_location": "L38",
       "id": "utils_locationhelp_locationhelpsteps",
-      "community": 25,
+      "community": 8,
       "norm_label": "locationhelpsteps()"
     },
     {
@@ -2097,7 +2097,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L1",
       "id": "src_utils_viewmodel_ts",
-      "community": 6,
+      "community": 25,
       "norm_label": "viewmodel.ts"
     },
     {
@@ -2106,7 +2106,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L20",
       "id": "utils_viewmodel_affectedradiuskm",
-      "community": 6,
+      "community": 27,
       "norm_label": "affectedradiuskm()"
     },
     {
@@ -2115,7 +2115,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L29",
       "id": "utils_viewmodel_affectedriseratio",
-      "community": 6,
+      "community": 28,
       "norm_label": "affectedriseratio()"
     },
     {
@@ -2124,7 +2124,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L57",
       "id": "utils_viewmodel_report_ttl_min",
-      "community": 6,
+      "community": 25,
       "norm_label": "report_ttl_min"
     },
     {
@@ -2133,7 +2133,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L72",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 6,
+      "community": 25,
       "norm_label": "enrichedreport"
     },
     {
@@ -2142,7 +2142,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L88",
       "id": "utils_viewmodel_safetystatus",
-      "community": 20,
+      "community": 25,
       "norm_label": "safetystatus"
     },
     {
@@ -2151,23 +2151,23 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L97",
       "id": "utils_viewmodel_enrichreports",
-      "community": 5,
+      "community": 25,
       "norm_label": "enrichreports()"
     },
     {
       "label": "nearbyOwnActiveReport()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L136",
+      "source_location": "L141",
       "id": "utils_viewmodel_nearbyownactivereport",
-      "community": 5,
+      "community": 25,
       "norm_label": "nearbyownactivereport()"
     },
     {
       "label": "RoadEntry",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L149",
+      "source_location": "L154",
       "id": "utils_viewmodel_roadentry",
       "community": 6,
       "norm_label": "roadentry"
@@ -2176,7 +2176,7 @@
       "label": "DistrictRoads",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L166",
+      "source_location": "L171",
       "id": "utils_viewmodel_districtroads",
       "community": 6,
       "norm_label": "districtroads"
@@ -2185,16 +2185,16 @@
       "label": "buildRoadDirectory()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L179",
+      "source_location": "L184",
       "id": "utils_viewmodel_buildroaddirectory",
-      "community": 6,
+      "community": 23,
       "norm_label": "buildroaddirectory()"
     },
     {
       "label": "PossibleClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L250",
+      "source_location": "L255",
       "id": "utils_viewmodel_possibleclosure",
       "community": 6,
       "norm_label": "possibleclosure"
@@ -2203,7 +2203,7 @@
       "label": "buildPossibleClosures()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L266",
+      "source_location": "L271",
       "id": "utils_viewmodel_buildpossibleclosures",
       "community": 23,
       "norm_label": "buildpossibleclosures()"
@@ -2212,16 +2212,16 @@
       "label": "RescueDistrictCount",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L290",
+      "source_location": "L295",
       "id": "utils_viewmodel_rescuedistrictcount",
-      "community": 6,
+      "community": 25,
       "norm_label": "rescuedistrictcount"
     },
     {
       "label": "rescueCountsByDistrict()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L296",
+      "source_location": "L301",
       "id": "utils_viewmodel_rescuecountsbydistrict",
       "community": 21,
       "norm_label": "rescuecountsbydistrict()"
@@ -2230,16 +2230,16 @@
       "label": "localDateKey()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L308",
+      "source_location": "L313",
       "id": "utils_viewmodel_localdatekey",
-      "community": 21,
+      "community": 23,
       "norm_label": "localdatekey()"
     },
     {
       "label": "rescuesOnLocalDate()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L317",
+      "source_location": "L322",
       "id": "utils_viewmodel_rescuesonlocaldate",
       "community": 21,
       "norm_label": "rescuesonlocaldate()"
@@ -2248,16 +2248,16 @@
       "label": "EnrichedRescue",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L325",
+      "source_location": "L330",
       "id": "utils_viewmodel_enrichedrescue",
-      "community": 6,
+      "community": 27,
       "norm_label": "enrichedrescue"
     },
     {
       "label": "enrichRescues()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L338",
+      "source_location": "L343",
       "id": "utils_viewmodel_enrichrescues",
       "community": 13,
       "norm_label": "enrichrescues()"
@@ -2266,7 +2266,7 @@
       "label": "rescueQueue()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L361",
+      "source_location": "L366",
       "id": "utils_viewmodel_rescuequeue",
       "community": 13,
       "norm_label": "rescuequeue()"
@@ -2275,16 +2275,16 @@
       "label": "DistrictHotspot",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L367",
+      "source_location": "L372",
       "id": "utils_viewmodel_districthotspot",
-      "community": 20,
+      "community": 0,
       "norm_label": "districthotspot"
     },
     {
       "label": "districtHotspots()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L381",
+      "source_location": "L386",
       "id": "utils_viewmodel_districthotspots",
       "community": 13,
       "norm_label": "districthotspots()"
@@ -2293,16 +2293,16 @@
       "label": "SurgeBucket",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L410",
+      "source_location": "L415",
       "id": "utils_viewmodel_surgebucket",
-      "community": 6,
+      "community": 25,
       "norm_label": "surgebucket"
     },
     {
       "label": "hourlySurge()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L418",
+      "source_location": "L423",
       "id": "utils_viewmodel_hourlysurge",
       "community": 13,
       "norm_label": "hourlysurge()"
@@ -2311,16 +2311,16 @@
       "label": "localityParts()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L450",
+      "source_location": "L455",
       "id": "utils_viewmodel_localityparts",
-      "community": 6,
+      "community": 25,
       "norm_label": "localityparts()"
     },
     {
       "label": "NearbyClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L458",
+      "source_location": "L463",
       "id": "utils_viewmodel_nearbyclosure",
       "community": 6,
       "norm_label": "nearbyclosure"
@@ -2329,7 +2329,7 @@
       "label": "closuresNearLocation()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L476",
+      "source_location": "L481",
       "id": "utils_viewmodel_closuresnearlocation",
       "community": 23,
       "norm_label": "closuresnearlocation()"
@@ -2338,34 +2338,34 @@
       "label": "RecentReportRow",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L527",
+      "source_location": "L532",
       "id": "utils_viewmodel_recentreportrow",
-      "community": 20,
+      "community": 25,
       "norm_label": "recentreportrow"
     },
     {
       "label": "recentReportRows()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L547",
+      "source_location": "L552",
       "id": "utils_viewmodel_recentreportrows",
-      "community": 27,
+      "community": 6,
       "norm_label": "recentreportrows()"
     },
     {
       "label": "RANK",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L575",
+      "source_location": "L580",
       "id": "utils_viewmodel_rank",
-      "community": 6,
+      "community": 25,
       "norm_label": "rank"
     },
     {
       "label": "computeStatus()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L577",
+      "source_location": "L582",
       "id": "utils_viewmodel_computestatus",
       "community": 24,
       "norm_label": "computestatus()"
@@ -2376,7 +2376,7 @@
       "source_file": "src/utils/format.ts",
       "source_location": "L1",
       "id": "src_utils_format_ts",
-      "community": 13,
+      "community": 28,
       "norm_label": "format.ts"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "src/utils/format.ts",
       "source_location": "L2",
       "id": "utils_format_minutessince",
-      "community": 13,
+      "community": 28,
       "norm_label": "minutessince()"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "src/utils/format.ts",
       "source_location": "L9",
       "id": "utils_format_timeago",
-      "community": 13,
+      "community": 28,
       "norm_label": "timeago()"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "src/utils/format.ts",
       "source_location": "L18",
       "id": "utils_format_formatduration",
-      "community": 13,
+      "community": 28,
       "norm_label": "formatduration()"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L1",
       "id": "src_utils_floodmeta_ts",
-      "community": 21,
+      "community": 20,
       "norm_label": "floodmeta.ts"
     },
     {
@@ -2421,7 +2421,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 6,
+      "community": 25,
       "norm_label": "sevmeta"
     },
     {
@@ -2430,7 +2430,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L13",
       "id": "utils_floodmeta_sev_meta",
-      "community": 0,
+      "community": 6,
       "norm_label": "sev_meta"
     },
     {
@@ -2439,7 +2439,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L19",
       "id": "utils_floodmeta_trend_meta",
-      "community": 21,
+      "community": 20,
       "norm_label": "trend_meta"
     },
     {
@@ -2448,7 +2448,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L25",
       "id": "utils_floodmeta_road_meta",
-      "community": 21,
+      "community": 20,
       "norm_label": "road_meta"
     },
     {
@@ -2457,7 +2457,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L32",
       "id": "utils_floodmeta_road_order",
-      "community": 21,
+      "community": 20,
       "norm_label": "road_order"
     },
     {
@@ -2466,7 +2466,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L34",
       "id": "utils_floodmeta_sev_rank",
-      "community": 21,
+      "community": 20,
       "norm_label": "sev_rank"
     },
     {
@@ -2484,7 +2484,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L48",
       "id": "utils_floodmeta_rescue_status_rank",
-      "community": 21,
+      "community": 20,
       "norm_label": "rescue_status_rank"
     },
     {
@@ -2493,7 +2493,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L51",
       "id": "utils_floodmeta_road_rank",
-      "community": 6,
+      "community": 20,
       "norm_label": "road_rank"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L61",
       "id": "utils_floodmeta_roadfromdepth",
-      "community": 6,
+      "community": 23,
       "norm_label": "roadfromdepth()"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L71",
       "id": "utils_floodmeta_depth_ticks",
-      "community": 21,
+      "community": 23,
       "norm_label": "depth_ticks"
     },
     {
@@ -2529,7 +2529,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L78",
       "id": "utils_floodmeta_advice",
-      "community": 21,
+      "community": 28,
       "norm_label": "advice"
     },
     {
@@ -2556,7 +2556,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L99",
       "id": "utils_floodmeta_waterseries",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterseries()"
     },
     {
@@ -2565,7 +2565,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L115",
       "id": "utils_floodmeta_sparkpaths",
-      "community": 21,
+      "community": 28,
       "norm_label": "sparkpaths()"
     },
     {
@@ -2574,7 +2574,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L125",
       "id": "utils_floodmeta_trendnote",
-      "community": 21,
+      "community": 28,
       "norm_label": "trendnote()"
     },
     {
@@ -2947,10 +2947,19 @@
       "norm_label": "sev_order"
     },
     {
+      "label": "TTL_OPTIONS",
+      "file_type": "code",
+      "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
+      "source_location": "L24",
+      "id": "panels_adminreportincidentmodal_ttl_options",
+      "community": 0,
+      "norm_label": "ttl_options"
+    },
+    {
       "label": "inputStyle",
       "file_type": "code",
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
-      "source_location": "L23",
+      "source_location": "L34",
       "id": "panels_adminreportincidentmodal_inputstyle",
       "community": 0,
       "norm_label": "inputstyle"
@@ -2959,7 +2968,7 @@
       "label": "labelStyle",
       "file_type": "code",
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
-      "source_location": "L34",
+      "source_location": "L45",
       "id": "panels_adminreportincidentmodal_labelstyle",
       "community": 0,
       "norm_label": "labelstyle"
@@ -2968,7 +2977,7 @@
       "label": "AdminReportIncidentModal()",
       "file_type": "code",
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
-      "source_location": "L36",
+      "source_location": "L47",
       "id": "panels_adminreportincidentmodal_adminreportincidentmodal",
       "community": 0,
       "norm_label": "adminreportincidentmodal()"
@@ -3015,7 +3024,7 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_locationhelpmodal_tsx",
-      "community": 25,
+      "community": 8,
       "norm_label": "locationhelpmodal.tsx"
     },
     {
@@ -3024,7 +3033,7 @@
       "source_file": "src/components/panels/LocationHelpModal.tsx",
       "source_location": "L5",
       "id": "panels_locationhelpmodal_locationhelpmodalprops",
-      "community": 25,
+      "community": 8,
       "norm_label": "locationhelpmodalprops"
     },
     {
@@ -3042,7 +3051,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_publicdashboardmodal_tsx",
-      "community": 27,
+      "community": 6,
       "norm_label": "publicdashboardmodal.tsx"
     },
     {
@@ -3060,7 +3069,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L24",
       "id": "panels_publicdashboardmodal_radius_options",
-      "community": 27,
+      "community": 6,
       "norm_label": "radius_options"
     },
     {
@@ -3069,7 +3078,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L26",
       "id": "panels_publicdashboardmodal_page_size_options",
-      "community": 27,
+      "community": 6,
       "norm_label": "page_size_options"
     },
     {
@@ -3078,7 +3087,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L30",
       "id": "panels_publicdashboardmodal_conditionpill",
-      "community": 27,
+      "community": 6,
       "norm_label": "conditionpill()"
     },
     {
@@ -3087,7 +3096,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L59",
       "id": "panels_publicdashboardmodal_publicdashboardmodal",
-      "community": 27,
+      "community": 8,
       "norm_label": "publicdashboardmodal()"
     },
     {
@@ -3204,7 +3213,7 @@
       "source_file": "src/components/panels/NotifyModal.tsx",
       "source_location": "L8",
       "id": "panels_notifymodal_notifyprefs",
-      "community": 20,
+      "community": 8,
       "norm_label": "notifyprefs"
     },
     {
@@ -3796,7 +3805,7 @@
       "label": "Tab",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "panels_sidebar_tab",
       "community": 20,
       "norm_label": "tab"
@@ -3805,16 +3814,16 @@
       "label": "SidebarProps",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "panels_sidebar_sidebarprops",
-      "community": 20,
+      "community": 25,
       "norm_label": "sidebarprops"
     },
     {
       "label": "TONE",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "id": "panels_sidebar_tone",
       "community": 20,
       "norm_label": "tone"
@@ -3823,7 +3832,7 @@
       "label": "fmtRadius()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L61",
+      "source_location": "L62",
       "id": "panels_sidebar_fmtradius",
       "community": 20,
       "norm_label": "fmtradius()"
@@ -3832,7 +3841,7 @@
       "label": "SectionKey",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L64",
+      "source_location": "L65",
       "id": "panels_sidebar_sectionkey",
       "community": 20,
       "norm_label": "sectionkey"
@@ -3841,7 +3850,7 @@
       "label": "DEFAULT_OPEN",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L68",
+      "source_location": "L69",
       "id": "panels_sidebar_default_open",
       "community": 20,
       "norm_label": "default_open"
@@ -3850,7 +3859,7 @@
       "label": "CollapsibleSection()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L71",
+      "source_location": "L72",
       "id": "panels_sidebar_collapsiblesection",
       "community": 20,
       "norm_label": "collapsiblesection()"
@@ -3859,7 +3868,7 @@
       "label": "Sidebar()",
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
-      "source_location": "L96",
+      "source_location": "L97",
       "id": "panels_sidebar_sidebar",
       "community": 20,
       "norm_label": "sidebar()"
@@ -3897,7 +3906,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_waterlevelmodal_tsx",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterlevelmodal.tsx"
     },
     {
@@ -3906,7 +3915,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L9",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -3915,7 +3924,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L18",
       "id": "panels_waterlevelmodal_m",
-      "community": 21,
+      "community": 23,
       "norm_label": "m"
     },
     {
@@ -3924,7 +3933,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L25",
       "id": "panels_waterlevelmodal_datelabel",
-      "community": 21,
+      "community": 23,
       "norm_label": "datelabel()"
     },
     {
@@ -3933,7 +3942,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L32",
       "id": "panels_waterlevelmodal_hourlabel",
-      "community": 21,
+      "community": 23,
       "norm_label": "hourlabel()"
     },
     {
@@ -3942,7 +3951,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L38",
       "id": "panels_waterlevelmodal_waterlevelmodal",
-      "community": 21,
+      "community": 23,
       "norm_label": "waterlevelmodal()"
     },
     {
@@ -3951,7 +3960,7 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sosmodal_tsx",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodal.tsx"
     },
     {
@@ -3960,7 +3969,7 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L5",
       "id": "panels_sosmodal_sosmodalprops",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodalprops"
     },
     {
@@ -3969,7 +3978,7 @@
       "source_file": "src/components/panels/SosModal.tsx",
       "source_location": "L12",
       "id": "panels_sosmodal_sosmodal",
-      "community": 2,
+      "community": 8,
       "norm_label": "sosmodal()"
     },
     {
@@ -4005,7 +4014,7 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sharemodal_tsx",
-      "community": 28,
+      "community": 5,
       "norm_label": "sharemodal.tsx"
     },
     {
@@ -4014,7 +4023,7 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L5",
       "id": "panels_sharemodal_sharemodalprops",
-      "community": 28,
+      "community": 5,
       "norm_label": "sharemodalprops"
     },
     {
@@ -4023,7 +4032,7 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L24",
       "id": "panels_sharemodal_net_glyph",
-      "community": 28,
+      "community": 5,
       "norm_label": "net_glyph"
     },
     {
@@ -4032,7 +4041,7 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L42",
       "id": "panels_sharemodal_glyph",
-      "community": 28,
+      "community": 5,
       "norm_label": "glyph()"
     },
     {
@@ -4041,7 +4050,7 @@
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L52",
       "id": "panels_sharemodal_sharemodal",
-      "community": 28,
+      "community": 5,
       "norm_label": "sharemodal()"
     },
     {
@@ -4050,43 +4059,43 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L1",
       "id": "src_components_panels_reportdetailcard_tsx",
-      "community": 21,
+      "community": 28,
       "norm_label": "reportdetailcard.tsx"
     },
     {
       "label": "ReportDetailCardProps",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "id": "panels_reportdetailcard_reportdetailcardprops",
-      "community": 21,
+      "community": 25,
       "norm_label": "reportdetailcardprops"
     },
     {
       "label": "DEPTH_TICKS",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "id": "panels_reportdetailcard_depth_ticks",
-      "community": 21,
+      "community": 28,
       "norm_label": "depth_ticks"
     },
     {
       "label": "ReportDetailCard()",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "id": "panels_reportdetailcard_reportdetailcard",
-      "community": 21,
+      "community": 28,
       "norm_label": "reportdetailcard()"
     },
     {
       "label": "Cell()",
       "file_type": "code",
       "source_file": "src/components/panels/ReportDetailCard.tsx",
-      "source_location": "L205",
+      "source_location": "L211",
       "id": "panels_reportdetailcard_cell",
-      "community": 21,
+      "community": 28,
       "norm_label": "cell()"
     },
     {
@@ -4122,7 +4131,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L1",
       "id": "src_components_map_roadlegend_tsx",
-      "community": 21,
+      "community": 20,
       "norm_label": "roadlegend.tsx"
     },
     {
@@ -4131,7 +4140,7 @@
       "source_file": "src/components/map/RoadLegend.tsx",
       "source_location": "L5",
       "id": "map_roadlegend_roadlegend",
-      "community": 21,
+      "community": 20,
       "norm_label": "roadlegend()"
     },
     {
@@ -4140,7 +4149,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L1",
       "id": "src_components_map_floodmap_tsx",
-      "community": 13,
+      "community": 27,
       "norm_label": "floodmap.tsx"
     },
     {
@@ -4158,7 +4167,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L14",
       "id": "map_floodmap_searchmark",
-      "community": 13,
+      "community": 27,
       "norm_label": "searchmark"
     },
     {
@@ -4167,7 +4176,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L18",
       "id": "map_floodmap_floodmapprops",
-      "community": 6,
+      "community": 27,
       "norm_label": "floodmapprops"
     },
     {
@@ -4176,7 +4185,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L47",
       "id": "map_floodmap_sheltericonhtml",
-      "community": 13,
+      "community": 27,
       "norm_label": "sheltericonhtml()"
     },
     {
@@ -4185,7 +4194,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L52",
       "id": "map_floodmap_sheltericon",
-      "community": 13,
+      "community": 27,
       "norm_label": "sheltericon()"
     },
     {
@@ -4194,7 +4203,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L56",
       "id": "map_floodmap_youicon",
-      "community": 13,
+      "community": 27,
       "norm_label": "youicon()"
     },
     {
@@ -4203,7 +4212,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L66",
       "id": "map_floodmap_pendingicon",
-      "community": 13,
+      "community": 27,
       "norm_label": "pendingicon()"
     },
     {
@@ -4212,7 +4221,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L71",
       "id": "map_floodmap_searchicon",
-      "community": 13,
+      "community": 27,
       "norm_label": "searchicon()"
     },
     {
@@ -4221,7 +4230,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L81",
       "id": "map_floodmap_flyto",
-      "community": 13,
+      "community": 27,
       "norm_label": "flyto()"
     },
     {
@@ -4230,7 +4239,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L91",
       "id": "map_floodmap_clickcatcher",
-      "community": 13,
+      "community": 27,
       "norm_label": "clickcatcher()"
     },
     {
@@ -4239,7 +4248,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L100",
       "id": "map_floodmap_floodmap",
-      "community": 13,
+      "community": 27,
       "norm_label": "floodmap()"
     },
     {
@@ -4608,7 +4617,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L1",
       "id": "src_api_client_ts",
-      "community": 3,
+      "community": 21,
       "norm_label": "client.ts"
     },
     {
@@ -4617,7 +4626,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L8",
       "id": "api_client_apierror",
-      "community": 3,
+      "community": 21,
       "norm_label": "apierror"
     },
     {
@@ -4626,7 +4635,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L9",
       "id": "api_client_apierror_constructor",
-      "community": 3,
+      "community": 21,
       "norm_label": ".constructor()"
     },
     {
@@ -4635,7 +4644,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L19",
       "id": "api_client_request",
-      "community": 3,
+      "community": 21,
       "norm_label": "request()"
     },
     {
@@ -4644,7 +4653,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L70",
       "id": "api_client_api",
-      "community": 3,
+      "community": 21,
       "norm_label": "api"
     },
     {
@@ -4653,7 +4662,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L79",
       "id": "api_client_buildquery",
-      "community": 3,
+      "community": 21,
       "norm_label": "buildquery()"
     },
     {
@@ -4662,7 +4671,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L1",
       "id": "src_views_loginview_tsx",
-      "community": 8,
+      "community": 21,
       "norm_label": "loginview.tsx"
     },
     {
@@ -4671,7 +4680,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L6",
       "id": "views_loginview_google_enabled",
-      "community": 8,
+      "community": 21,
       "norm_label": "google_enabled"
     },
     {
@@ -4680,7 +4689,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L8",
       "id": "views_loginview_loginviewprops",
-      "community": 8,
+      "community": 21,
       "norm_label": "loginviewprops"
     },
     {
@@ -4689,7 +4698,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L14",
       "id": "views_loginview_loginview",
-      "community": 8,
+      "community": 21,
       "norm_label": "loginview()"
     },
     {
@@ -4698,7 +4707,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L111",
       "id": "views_loginview_errorbox",
-      "community": 8,
+      "community": 21,
       "norm_label": "errorbox()"
     },
     {
@@ -7573,9 +7582,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_components_panels_adminreportincidentmodal_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_adminreportincidentmodal_tsx"
     },
     {
       "relation": "imports_from",
@@ -7958,9 +7967,9 @@
       "source_file": "src/App.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_tsx",
-      "target": "src_types_floodreport",
-      "confidence_score": 1.0
+      "target": "src_types_floodreport"
     },
     {
       "relation": "imports",
@@ -9425,9 +9434,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_types_ts",
-      "confidence_score": 1.0
+      "target": "src_types_ts"
     },
     {
       "relation": "imports_from",
@@ -9994,9 +10003,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_types_severity",
-      "confidence_score": 1.0
+      "target": "src_types_severity"
     },
     {
       "relation": "imports",
@@ -10500,9 +10509,9 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_share_ts",
-      "target": "src_types_floodreport",
-      "confidence_score": 1.0
+      "target": "src_types_floodreport"
     },
     {
       "relation": "imports",
@@ -11094,9 +11103,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_adminreportincidentmodal_props",
-      "target": "src_types_newreport",
-      "confidence_score": 1.0
+      "target": "src_types_newreport"
     },
     {
       "relation": "imports",
@@ -11127,9 +11136,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_types_newreport",
-      "confidence_score": 1.0
+      "target": "src_types_newreport"
     },
     {
       "relation": "references",
@@ -11512,9 +11521,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "src_utils_geolocate_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_geolocate_ts"
     },
     {
       "relation": "contains",
@@ -11564,9 +11573,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "utils_geolocate_locatewithaccuracy",
-      "confidence_score": 1.0
+      "target": "utils_geolocate_locatewithaccuracy"
     },
     {
       "relation": "imports_from",
@@ -11575,9 +11584,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_utils_image_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_image_ts"
     },
     {
       "relation": "imports_from",
@@ -11628,9 +11637,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "utils_image_filetocompresseddataurl",
-      "confidence_score": 1.0
+      "target": "utils_image_filetocompresseddataurl"
     },
     {
       "relation": "imports",
@@ -11841,9 +11850,9 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_share_ts",
-      "target": "utils_floodmeta_sev_meta",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_sev_meta"
     },
     {
       "relation": "imports",
@@ -13204,12 +13213,34 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/ReportDetailCard.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_reportdetailcard_tsx",
+      "target": "src_utils_format_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L14",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_panels_responseconsole_tsx",
       "target": "src_utils_format_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/Sidebar.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_sidebar_tsx",
+      "target": "src_utils_format_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -13253,6 +13284,39 @@
       "target": "utils_format_minutessince"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/panels/ReportDetailCard.tsx",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "panels_reportdetailcard_reportdetailcard",
+      "target": "utils_format_timeago"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/ReportDetailCard.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_reportdetailcard_tsx",
+      "target": "utils_format_timeago",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/panels/ReportDetailCard.tsx",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "panels_reportdetailcard_reportdetailcard",
+      "target": "utils_format_formatduration"
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -13267,12 +13331,34 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/ReportDetailCard.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_reportdetailcard_tsx",
+      "target": "utils_format_formatduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L14",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_panels_responseconsole_tsx",
       "target": "utils_format_formatduration"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/Sidebar.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_panels_sidebar_tsx",
+      "target": "utils_format_formatduration",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -13314,9 +13400,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_utils_floodmeta_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_floodmeta_ts"
     },
     {
       "relation": "imports_from",
@@ -13615,9 +13701,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "utils_floodmeta_sev_meta",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_sev_meta"
     },
     {
       "relation": "imports",
@@ -13934,9 +14020,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "utils_floodmeta_severity_preset",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_severity_preset"
     },
     {
       "relation": "imports",
@@ -13956,9 +14042,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "utils_floodmeta_depth_range",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_depth_range"
     },
     {
       "relation": "imports",
@@ -14713,9 +14799,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "api_geocode_reversegeocode",
-      "confidence_score": 1.0
+      "target": "api_geocode_reversegeocode"
     },
     {
       "relation": "contains",
@@ -14723,9 +14809,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "panels_adminreportincidentmodal_adminreportincidentmodal",
-      "confidence_score": 1.0
+      "target": "panels_adminreportincidentmodal_adminreportincidentmodal"
     },
     {
       "relation": "contains",
@@ -14733,9 +14819,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "panels_adminreportincidentmodal_inputstyle",
-      "confidence_score": 1.0
+      "target": "panels_adminreportincidentmodal_inputstyle"
     },
     {
       "relation": "contains",
@@ -14743,9 +14829,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "panels_adminreportincidentmodal_labelstyle",
-      "confidence_score": 1.0
+      "target": "panels_adminreportincidentmodal_labelstyle"
     },
     {
       "relation": "contains",
@@ -14753,9 +14839,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "panels_adminreportincidentmodal_props",
-      "confidence_score": 1.0
+      "target": "panels_adminreportincidentmodal_props"
     },
     {
       "relation": "contains",
@@ -14763,8 +14849,18 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "panels_adminreportincidentmodal_sev_order",
+      "target": "panels_adminreportincidentmodal_sev_order"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "src_components_panels_adminreportincidentmodal_tsx",
+      "target": "panels_adminreportincidentmodal_ttl_options",
       "confidence_score": 1.0
     },
     {
@@ -14774,9 +14870,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_api_geocode_ts",
-      "confidence_score": 1.0
+      "target": "src_api_geocode_ts"
     },
     {
       "relation": "imports_from",
@@ -14785,9 +14881,9 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminreportincidentmodal_tsx",
-      "target": "src_components_panels_placefield_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_placefield_tsx"
     },
     {
       "relation": "contains",
@@ -15483,9 +15579,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
-      "target": "src_components_panels_placefield_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_placefield_tsx"
     },
     {
       "relation": "imports",
@@ -15494,9 +15590,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "api_geocode_georesult",
-      "confidence_score": 1.0
+      "target": "api_geocode_georesult"
     },
     {
       "relation": "imports",
@@ -15505,9 +15601,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "api_geocode_searchplaces",
-      "confidence_score": 1.0
+      "target": "api_geocode_searchplaces"
     },
     {
       "relation": "contains",
@@ -15515,9 +15611,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "panels_placefield_inputstyle",
-      "confidence_score": 1.0
+      "target": "panels_placefield_inputstyle"
     },
     {
       "relation": "contains",
@@ -15525,9 +15621,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "panels_placefield_placefield",
-      "confidence_score": 1.0
+      "target": "panels_placefield_placefield"
     },
     {
       "relation": "imports_from",
@@ -15536,9 +15632,9 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_placefield_tsx",
-      "target": "src_api_geocode_ts",
-      "confidence_score": 1.0
+      "target": "src_api_geocode_ts"
     },
     {
       "relation": "imports",
@@ -17769,5 +17865,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5c4ccb4d95faa2a21b6c6942ffbd0b4c2dad1055"
+  "built_at_commit": "2a774a72bcc8341496ca2cf6f49335cc36babb9b"
 }

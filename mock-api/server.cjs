@@ -71,6 +71,10 @@ server.post('/reports', (req, res) => {
     // Admin-logged "system" reports (news/other sources) get their own trust tier. baha-api gates
     // the flag on the ADMIN role; the mock accepts anything, mirroring its other stubbed auth.
     reporterTrust: req.body.system ? 'system' : isGuest ? 'guest' : 'verified',
+    // Admin-set: when the source reported the flood (anchors the client-side TTL) and a custom
+    // lifetime in minutes. Default reportedAt to now; ttlMinutes null ⇒ severity default.
+    reportedAt: req.body.reportedAt || now,
+    ttlMinutes: typeof req.body.ttlMinutes === 'number' ? req.body.ttlMinutes : null,
     photo,
     photoUrl: photo ? `/reports/${id}/photo` : null,
     createdAt: now,

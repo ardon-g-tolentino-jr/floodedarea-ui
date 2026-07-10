@@ -31,6 +31,11 @@ export interface FloodReport {
   reporterTrust?: ReporterTrust;
   /** Relative URL to the report's photo (`/reports/:id/photo`), or null/absent when none was attached. */
   photoUrl?: string | null;
+  /** When the flood was actually reported by the source (admin system reports). Anchors the TTL
+   *  countdown; absent for citizen reports (they use createdAt/updatedAt). */
+  reportedAt?: string | null;
+  /** Admin-defined lifetime in minutes (system reports). Null/absent ⇒ the severity default TTL. */
+  ttlMinutes?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -100,6 +105,10 @@ export interface NewReport {
   /** Admin-only: mark this as an authoritative "system" report (news/other sources). The backend
    *  honors it only for ADMIN callers and tags it `reporterTrust: 'system'`. */
   system?: boolean;
+  /** Admin-only: when the flood was reported by the source (ISO). Anchors the TTL countdown. */
+  reportedAt?: string;
+  /** Admin-only: how long the report stays live, in minutes. Omit ⇒ severity default TTL. */
+  ttlMinutes?: number;
 }
 
 /**

@@ -104,12 +104,17 @@ export function enrichReports(
     const distKm = kmBetween(userLoc, { lat: r.latitude, lng: r.longitude });
     // Affected radius scales with this report's depth (not a uniform slider).
     const affectedKm = affectedRadiusKm(r.depthCm);
-    // Anchor the TTL on the last activity (confirm/re-report bumps `updatedAt`), so confirmations
-    // reset the timer. Fall back to createdAt if updatedAt is missing/unparseable.
-    const lastActivity = new Date(r.updatedAt ?? r.createdAt).getTime();
-    const anchor = Number.isNaN(lastActivity) ? new Date(r.createdAt).getTime() : lastActivity;
+    // Anchor the TTL on when the flood was reported. Admin "system" reports carry a `reportedAt`
+    // (the source's report time, possibly hours ago) — that anchors the countdown so stale external
+    // reports drop off correctly. Citizen reports have no reportedAt, so they anchor on the last
+    // activity (confirm/re-report bumps `updatedAt`, resetting the timer). Fall back to createdAt if
+    // the chosen anchor is missing/unparseable.
+    const anchorSource = r.reportedAt ?? r.updatedAt ?? r.createdAt;
+    const anchorMs = new Date(anchorSource).getTime();
+    const anchor = Number.isNaN(anchorMs) ? new Date(r.createdAt).getTime() : anchorMs;
     const ageMin = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((now - anchor) / 60000));
-    const ttlMin = REPORT_TTL_MIN[r.severity] ?? REPORT_TTL_DEFAULT_MIN;
+    // A per-report TTL override (admin-defined, minutes) wins over the severity-scaled default.
+    const ttlMin = r.ttlMinutes && r.ttlMinutes > 0 ? r.ttlMinutes : (REPORT_TTL_MIN[r.severity] ?? REPORT_TTL_DEFAULT_MIN);
     const expiresInMin = Math.max(0, ttlMin - ageMin);
     return {
       ...r,

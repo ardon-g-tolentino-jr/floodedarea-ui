@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Road, Severity } from '../../types';
+import { formatDuration } from '../../utils/format';
 import {
   type EnrichedReport,
   type SafetyStatus,
@@ -348,7 +349,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 {r.system && (
                   <span style={{ fontSize: 11, fontWeight: 800, color: '#4338CA', background: '#EEF2FF', padding: '2px 7px', borderRadius: 6 }}>🛈 {t('report.system')}</span>
                 )}
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {r.expiresInMin}m {t('report.left')}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#C2620B' }}>⏳ {formatDuration(r.expiresInMin)} {t('report.left')}</span>
               </div>
             </div>
           );

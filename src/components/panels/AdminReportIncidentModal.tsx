@@ -20,6 +20,17 @@ interface Props {
 
 const SEV_ORDER: Severity[] = ['high', 'medium', 'low'];
 
+// How long a system report stays live. '' = fall back to the severity-scaled default; else minutes.
+const TTL_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Default (by severity)' },
+  { value: '60', label: '1 hour' },
+  { value: '180', label: '3 hours' },
+  { value: '360', label: '6 hours' },
+  { value: '720', label: '12 hours' },
+  { value: '1440', label: '24 hours' },
+  { value: '2880', label: '48 hours' },
+];
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '9px 11px',
@@ -42,6 +53,10 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   const [severity, setSeverity] = React.useState<Severity>('high');
   const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
   const [note, setNote] = React.useState('');
+  // When the source reported the flood ("N hours ago", 0 = now) and how long the report stays live
+  // ('' = default by severity, else minutes). Both anchor the client-side TTL countdown.
+  const [reportedHoursAgo, setReportedHoursAgo] = React.useState('0');
+  const [ttl, setTtl] = React.useState('');
 
   const [photo, setPhoto] = React.useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = React.useState(false);
@@ -97,6 +112,9 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
     }
     const preset = SEVERITY_PRESET[severity];
     const label = note.trim() ? `${name.trim()} (${note.trim()})` : name.trim();
+    // Convert "N hours ago" to an absolute report time; a chosen TTL preset overrides the default.
+    const hoursAgo = Math.max(0, Number(reportedHoursAgo) || 0);
+    const ttlMinutes = ttl ? Number(ttl) : undefined;
     const payload: NewReport = {
       name: label,
       district: district.trim() || 'Unknown area',
@@ -107,6 +125,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
       trend: preset.trend,
       road: preset.road,
       photoDataUrl: photo ?? undefined,
+      reportedAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
+      ttlMinutes,
     };
     setBusy(true);
     setError(null);
@@ -214,6 +234,29 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
         <div>
           <label style={labelStyle}>Source / note <span style={{ fontWeight: 600 }}>(optional)</span></label>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. via DZMM report" style={inputStyle} />
+        </div>
+
+        <div style={{ display: 'flex', gap: 11 }}>
+          <div style={{ flex: 1 }}>
+            <label style={labelStyle}>Reported how long ago?</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <input
+                type="number"
+                min={0}
+                value={reportedHoursAgo}
+                onChange={(e) => setReportedHoursAgo(e.target.value)}
+                style={{ ...inputStyle, width: 80 }}
+              />
+              <span style={{ fontSize: 12.5, color: 'var(--bw-muted)', fontWeight: 600 }}>hours ago</span>
+            </div>
+            <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>0 = just now. The countdown runs from here.</div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={labelStyle}>Keep live for</label>
+            <select value={ttl} onChange={(e) => setTtl(e.target.value)} style={inputStyle}>
+              {TTL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 

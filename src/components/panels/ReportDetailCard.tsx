@@ -1,6 +1,7 @@
 import React from 'react';
 import { affectedRiseRatio, type EnrichedReport } from '../../utils/viewModel';
 import { ADVICE, ROAD_META, TREND_META, sparkPaths, trendNote, waterSeries } from '../../utils/floodMeta';
+import { formatDuration, timeAgo } from '../../utils/format';
 
 interface ReportDetailCardProps {
   report: EnrichedReport;
@@ -56,10 +57,10 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             {sev.label} flooding · {report.depthCm} cm
           </span>
           <span
-            title="Reports stay live for 30 minutes after they're posted."
+            title="Reports stay live for a freshness window (longer for more severe floods, or a custom window for system reports), then drop off the map."
             style={{ background: report.expired ? '#F1F5F9' : '#FFF7ED', color: report.expired ? '#94A3B8' : '#C2620B', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
           >
-            ⏳ {report.expired ? 'Expired' : `Expires in ${report.expiresInMin}m`}
+            ⏳ {report.expired ? 'Expired' : `Expires in ${formatDuration(report.expiresInMin)}`}
           </span>
           {report.guest && (
             <span
@@ -78,6 +79,11 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             </span>
           )}
         </div>
+        {report.system && report.reportedAt && (
+          <div style={{ marginTop: 8, fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>
+            🕑 Reported {timeAgo(report.reportedAt)} · from source
+          </div>
+        )}
       </div>
 
       {photoSrc && (
