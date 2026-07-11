@@ -133,7 +133,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 11 }}>
           <Cell label="TREND"><span style={{ color: tm.color, fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 5 }}><span>{tm.sym}</span>{tm.label}</span></Cell>
           <Cell label="ROADS"><span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 800 }}><span style={{ width: 9, height: 9, borderRadius: '50%', background: rm.color }} />{rm.label}</span></Cell>
-          <Cell label="CONFIRMED BY"><span style={{ fontSize: 13, fontWeight: 800 }}>{report.reportsCount} reports</span></Cell>
+          <Cell label="CONFIRMED BY"><span style={{ fontSize: 13, fontWeight: 800 }}>{report.reportsCount} {report.reportsCount === 1 ? 'report' : 'reports'}</span></Cell>
           <Cell label="LAST UPDATE"><span style={{ fontSize: 13, fontWeight: 800 }}>{report.time}</span></Cell>
         </div>
 
