@@ -111,18 +111,39 @@ export interface ShareLink {
   href: string;
 }
 
+/**
+ * Crawler-facing share URL for a specific report: the backend endpoint that returns this report's
+ * Open Graph tags (severity/depth/location as the preview description) and whose `og:url` points back
+ * to the human deep-link. Facebook/X scrape THIS so their card shows the report's own details —
+ * `<origin>/?report=<id>` can't, because the static site only serves the generic site-wide OG to
+ * crawlers. `apiBase` is the public API origin (`import.meta.env.VITE_API_URL` in prod).
+ */
+export function buildReportOgUrl(apiBase: string, reportId: number): string {
+  return `${apiBase}/reports/${reportId}/share`;
+}
+
 /** Builds the per-network share URLs. Pure — the component renders these as plain links.
  *  `body` (no URL) is used where the network takes the link as its own param; `text` (with URL)
- *  where everything goes in one free-text field. */
-export function buildShareLinks({ url, body, text }: { url: string; body: string; text: string }): ShareLink[] {
+ *  where everything goes in one free-text field.
+ *
+ *  `ogUrl` (optional) is the URL card-building crawlers should scrape for the link preview; it
+ *  defaults to `url`. Pass the per-report `buildReportOgUrl(...)` so Facebook/X preview the report's
+ *  own details. The text-based networks (WhatsApp/Telegram/email) keep the clean human `url` — the
+ *  report details already ride in their message text. */
+export function buildShareLinks(
+  { url, body, text, ogUrl }: { url: string; body: string; text: string; ogUrl?: string }
+): ShareLink[] {
   const u = encodeURIComponent(url);
+  const scrape = encodeURIComponent(ogUrl ?? url); // what FB/X fetch to build the preview card
   const b = encodeURIComponent(body);
   const full = encodeURIComponent(text);
   const subject = encodeURIComponent(`${APP_NAME} — live flood map for the Philippines`);
   return [
-    // Facebook's sharer only accepts the URL; it builds its own preview from the page's OG tags.
-    { key: 'facebook', label: 'Facebook', color: '#1877F2', href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
-    { key: 'x', label: 'X', color: '#000000', href: `https://twitter.com/intent/tweet?text=${b}&url=${u}` },
+    // Facebook & X build their card by scraping the given URL's OG/Twitter tags — point them at the
+    // backend share endpoint so the card carries the report's details (its og:url returns humans to
+    // the deep-link). Text-based networks keep the clean human URL; the details are in their text.
+    { key: 'facebook', label: 'Facebook', color: '#1877F2', href: `https://www.facebook.com/sharer/sharer.php?u=${scrape}` },
+    { key: 'x', label: 'X', color: '#000000', href: `https://twitter.com/intent/tweet?text=${b}&url=${scrape}` },
     { key: 'whatsapp', label: 'WhatsApp', color: '#25D366', href: `https://wa.me/?text=${full}` },
     { key: 'telegram', label: 'Telegram', color: '#229ED9', href: `https://t.me/share/url?url=${u}&text=${b}` },
     { key: 'email', label: 'Email', color: '#64748B', href: `mailto:?subject=${subject}&body=${full}` },

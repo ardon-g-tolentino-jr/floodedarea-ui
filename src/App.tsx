@@ -13,7 +13,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
-import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, FB_PAGE_URL } from './utils/share';
+import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, FB_PAGE_URL } from './utils/share';
 import {
   buildPossibleClosures,
   buildRoadDirectory,
@@ -864,8 +864,11 @@ const App: React.FC = () => {
   const reportShareData = React.useMemo(() => {
     if (!shareReportTarget) return null;
     const url = buildReportUrl(window.location.origin, shareReportTarget.id);
+    // Facebook/X scrape the backend share endpoint so their preview card shows THIS report's details
+    // (the static site only serves generic OG to crawlers). Its og:url returns clickers to `url`.
+    const ogUrl = buildReportOgUrl(API_BASE, shareReportTarget.id);
     const st = buildReportShareText(shareReportTarget, active.length, url);
-    return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text }) };
+    return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text, ogUrl }) };
   }, [shareReportTarget, active.length]);
 
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
@@ -892,11 +895,12 @@ const App: React.FC = () => {
 
   // Share a single report to Facebook. Hybrid: on mobile with a photo, use the Web Share API to
   // push the actual image file to the native sheet (the user picks Facebook there — Facebook's own
-  // sharer can't accept an uploaded photo). Everywhere else, open Facebook's web sharer with the
-  // report's deep-link (its OG tags — served per-report via the /reports/:id/share endpoint behind
-  // nginx's crawler rule — give Facebook the report's own preview card).
+  // sharer can't accept an uploaded photo). Everywhere else, open Facebook's web sharer pointed at
+  // the backend share endpoint, whose per-report OG tags give Facebook the report's own preview card
+  // (and whose og:url returns clickers to the deep-link).
   const shareReport = async (report: FloodReport): Promise<void> => {
     const url = buildReportUrl(window.location.origin, report.id);
+    const ogUrl = buildReportOgUrl(API_BASE, report.id);
     const { title, text } = buildReportShareText(report, active.length, url);
     try {
       if (report.photoUrl && typeof navigator.canShare === 'function') {
@@ -915,7 +919,7 @@ const App: React.FC = () => {
       if (err instanceof DOMException && err.name === 'AbortError') return;
     }
     window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
       '_blank',
       'noopener,noreferrer'
     );
