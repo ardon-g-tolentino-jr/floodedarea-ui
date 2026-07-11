@@ -14,6 +14,15 @@ export const FB_PAGE_URL = 'https://www.facebook.com/share/1DLEBjCZDi/';
 /** Follow-us line appended to the full share text (clipboard / WhatsApp / email / native share). */
 const FB_FOLLOW = `\n📘 Follow us on Facebook: ${FB_PAGE_URL}`;
 
+/**
+ * Deep-link to a specific flood report — opens the app focused on that report (App.tsx reads the
+ * `report` query param on load). Caller passes `origin` (e.g. `window.location.origin`) to keep
+ * this pure per the utils/ convention.
+ */
+export function buildReportUrl(origin: string, reportId: number): string {
+  return `${origin}/?report=${reportId}`;
+}
+
 /** One-line pitch tail reused by both message variants. */
 const PITCH =
   `${APP_NAME} — live crowd-sourced flood map for the Philippines: real-time reports, ` +
