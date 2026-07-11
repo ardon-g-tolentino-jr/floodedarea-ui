@@ -482,12 +482,30 @@ const App: React.FC = () => {
   const modaledAlertLevels = React.useRef<Map<number, AlertLevel>>(new Map());
 
   React.useEffect(() => {
+    // Wait for the first alerts fetch to settle before priming, so we prime against real data and
+    // not the empty initial state — otherwise every already-active alert reads as "new" the moment
+    // data arrives and fires on load.
+    if (alerts.loading) return;
+
     const severe = alertList.filter((a) => a.active && (a.level === 'red' || a.level === 'orange'));
 
-    // Hard interrupt: pop a centered modal + alarm for the worst active severe alert we haven't
-    // shown this session — including one already active on first load. Keyed by id+level so it
-    // re-fires on escalation (orange → red) but not on every refetch. The play() rejection
-    // (autoplay block before the user's first interaction) is swallowed.
+    // First settled load: remember what's already active (id+level) without alerting. A rainfall
+    // warning that was already ongoing when the user opened or navigated to the page must NOT
+    // hard-interrupt them with a modal + alarm on arrival — the persistent AlertRibbon already
+    // surfaces it. Only a genuinely new or escalated alert alarms. (Both the modal and the
+    // OS-notification/toast paths prime here so neither re-nags on every reload.)
+    if (!severeAlertsPrimed.current) {
+      for (const a of severe) {
+        notifiedAlertLevels.current.set(a.id, a.level);
+        modaledAlertLevels.current.set(a.id, a.level);
+      }
+      severeAlertsPrimed.current = true;
+      return;
+    }
+
+    // Hard interrupt: pop a centered modal + alarm for the worst newly-active/escalated severe
+    // alert. Keyed by id+level so it re-fires on escalation (orange → red) but not on every
+    // refetch. The play() rejection (autoplay block before the user's first interaction) is swallowed.
     const worstActive = severe.find((a) => a.level === 'red') ?? severe[0];
     if (worstActive && modaledAlertLevels.current.get(worstActive.id) !== worstActive.level) {
       modaledAlertLevels.current.set(worstActive.id, worstActive.level);
@@ -495,13 +513,7 @@ const App: React.FC = () => {
       playAlertSound();
     }
 
-    // OS notification + toast: only for a newly-active/escalated severe alert. Primed on first
-    // load so we don't re-nag about already-known warnings on every page reload.
-    if (!severeAlertsPrimed.current) {
-      for (const a of severe) notifiedAlertLevels.current.set(a.id, a.level);
-      severeAlertsPrimed.current = true;
-      return;
-    }
+    // OS notification + toast: only for a newly-active/escalated severe alert.
     const fresh = severe.filter((a) => notifiedAlertLevels.current.get(a.id) !== a.level);
     if (!fresh.length) return;
     for (const a of fresh) notifiedAlertLevels.current.set(a.id, a.level);
@@ -511,7 +523,7 @@ const App: React.FC = () => {
       try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
     }
     showToast(worst.title);
-  }, [alertList, showToast, playAlertSound]);
+  }, [alertList, alerts.loading, showToast, playAlertSound]);
 
   // ── Actions ──
   // Full-account gate for higher-stakes actions (SOS, the responder/rescue views, feedback). A
