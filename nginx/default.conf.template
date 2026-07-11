@@ -1,5 +1,14 @@
 # Only ${API_UPSTREAM} is substituted at container start (it's the sole env var the
 # nginx entrypoint knows about); nginx's own $host/$remote_addr/etc. are left intact.
+
+# Social-media link crawlers (Facebook, X, WhatsApp, …) don't run JS, so they can't read the SPA's
+# runtime state. When one requests a shared report link (`/?report=<id>`) we serve server-rendered
+# per-report Open Graph tags from the backend instead of the generic static index.html.
+map $http_user_agent $is_crawler {
+    default 0;
+    "~*facebookexternalhit|Facebot|Twitterbot|Slackbot|WhatsApp|TelegramBot|LinkedInBot|Discordbot|Pinterest|redditbot|Applebot|Googlebot|bingbot|SkypeUriPreview" 1;
+}
+
 server {
     listen       80;
     server_name  _;
@@ -14,8 +23,28 @@ server {
     add_header Cross-Origin-Opener-Policy "same-origin-allow-popups" always;
 
     # Static assets with SPA fallback (no router on the server — index.html handles routes).
+    # A social crawler requesting a specific report (`?report=<id>`) is routed to the backend's
+    # per-report OG renderer; humans and crawlers hitting the bare root get the static SPA (which
+    # already carries the site-wide OG tags). Only `set`/`rewrite last` run inside `if` here — the
+    # safe subset that avoids the "if is evil" proxy_pass/try_files pitfalls.
     location / {
+        set $og "";
+        if ($is_crawler)  { set $og "c"; }
+        if ($arg_report)  { set $og "${og}r"; }
+        if ($og = "cr")   { rewrite ^ /__prerender last; }
         try_files $uri $uri/ /index.html;
+    }
+
+    # Internal-only: server-rendered per-report OG tags for social crawlers (see the `location /`
+    # branch above). Proxies to baha-api's HTML share endpoint; the trailing-slash proxy_pass on
+    # /api/ strips the prefix, but here we hit the upstream directly so the path is explicit.
+    location = /__prerender {
+        internal;
+        proxy_pass ${API_UPSTREAM}/reports/$arg_report/share;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # Long-cache fingerprinted build assets.

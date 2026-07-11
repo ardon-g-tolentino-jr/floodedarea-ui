@@ -13,7 +13,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET } from './utils/floodMeta';
-import { buildShareText, buildShareLinks, buildReportShareText, FB_PAGE_URL } from './utils/share';
+import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, FB_PAGE_URL } from './utils/share';
 import {
   buildPossibleClosures,
   buildRoadDirectory,
@@ -361,6 +361,31 @@ const App: React.FC = () => {
     [enriched]
   );
   const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
+
+  // ── Deep-link: open focused on a shared report (?report=<id>) ──
+  // A shared social link is `…/?report=<id>`. On load, once reports arrive, select that report and
+  // fly the map to it via the canonical focus pattern. Runs once (guarded), then leaves the param in
+  // the URL so the address bar stays shareable.
+  const deepLinkHandled = React.useRef(false);
+  React.useEffect(() => {
+    if (deepLinkHandled.current) return;
+    const idStr = new URLSearchParams(window.location.search).get('report');
+    if (!idStr) { deepLinkHandled.current = true; return; }
+    const id = Number(idStr);
+    if (!Number.isFinite(id)) { deepLinkHandled.current = true; return; }
+    const r = enriched.find((x) => x.id === id);
+    if (r) {
+      deepLinkHandled.current = true;
+      setTab('nearby');
+      setSelectedReportId(id);
+      setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+    } else if (!reports.loading) {
+      // Reports settled but this id is gone (expired/removed) — tell the user instead of silently doing nothing.
+      deepLinkHandled.current = true;
+      showToast('That flood report is no longer active.');
+    }
+    // else: reports still loading — this effect re-runs when `enriched` updates.
+  }, [enriched, reports.loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── New-flood-report alert subscription ──
   // Detect reports that arrive (via the SSE-driven refetch) and alert when they match the
@@ -838,7 +863,7 @@ const App: React.FC = () => {
   // incident). Built from the report itself so it works with a freshly-created, not-yet-enriched one.
   const reportShareData = React.useMemo(() => {
     if (!shareReportTarget) return null;
-    const url = window.location.href;
+    const url = buildReportUrl(window.location.origin, shareReportTarget.id);
     const st = buildReportShareText(shareReportTarget, active.length, url);
     return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text }) };
   }, [shareReportTarget, active.length]);
@@ -868,9 +893,10 @@ const App: React.FC = () => {
   // Share a single report to Facebook. Hybrid: on mobile with a photo, use the Web Share API to
   // push the actual image file to the native sheet (the user picks Facebook there — Facebook's own
   // sharer can't accept an uploaded photo). Everywhere else, open Facebook's web sharer with the
-  // app link (it builds its preview from the page's OG tags).
+  // report's deep-link (its OG tags — served per-report via the /reports/:id/share endpoint behind
+  // nginx's crawler rule — give Facebook the report's own preview card).
   const shareReport = async (report: FloodReport): Promise<void> => {
-    const url = window.location.href;
+    const url = buildReportUrl(window.location.origin, report.id);
     const { title, text } = buildReportShareText(report, active.length, url);
     try {
       if (report.photoUrl && typeof navigator.canShare === 'function') {
@@ -1184,7 +1210,7 @@ const App: React.FC = () => {
               onRemove={() => void removeReport(selectedReport.id)}
               onShowLocation={() => setMapFocus({ lat: selectedReport.latitude, lng: selectedReport.longitude, key: Date.now() })}
               photoSrc={selectedReport.photoUrl ? `${API_BASE}${selectedReport.photoUrl}` : null}
-              onShareReport={() => void shareReport(selectedReport)}
+              onShareReport={() => setShareReportTarget(selectedReport)}
               projectedRiseCm={projectedRiseCm}
               onClose={() => setSelectedReportId(null)}
             />
@@ -1340,7 +1366,8 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Share a specific report to social media (after an admin logs an incident). */}
+      {/* Share a specific report to social media — opened from a report's Share button or after an
+          admin logs an incident. The links carry the report's deep-link (?report=<id>). */}
       {shareReportTarget && reportShareData && (
         <ShareModal
           text={reportShareData.text}
