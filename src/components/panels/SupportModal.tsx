@@ -1,4 +1,6 @@
 import React from 'react';
+import { FB_PAGE_URL, FB_GLYPH_PATH } from '../../utils/share';
+import { useI18n } from '../../i18n';
 
 interface SupportModalProps {
   /** Path to the bundled GCash donation QR (passed from App as `${BASE_URL}gcash-qr.png`). */
@@ -14,6 +16,7 @@ interface SupportModalProps {
 // NOTE: the `qrSrc` prop is intentionally not destructured while the donation section is hidden
 // (see below). Re-add it to the params and restore the QR state when re-enabling that section.
 const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
+  const { t } = useI18n();
   return (
     <div
       onClick={onClose}
@@ -66,6 +69,18 @@ const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
               based on what you post. Honest, accurate reports save lives — false ones can cost them.
             </p>
           </div>
+
+          {/* Follow us on Facebook — the app's official page, surfaced here so it's discoverable
+              without having to open Share first (mirrors the row in ShareModal.tsx). */}
+          <a
+            href={FB_PAGE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid #C9DCFB', background: '#F0F5FF', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true"><path d={FB_GLYPH_PATH} /></svg>
+            {t('share.followFb')}
+          </a>
 
           {/* Support / donate — HIDDEN FOR NOW. Re-enable this block (and the `qrSrc` prop +
               `qrOpen` state above) to show the "keep the lights on" GCash donation section. */}
