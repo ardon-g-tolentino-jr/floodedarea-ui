@@ -27,7 +27,8 @@ import {
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
 import { loadRoads, roadsLoaded } from './utils/roadSnap';
-import { locateWithAccuracy, WEAK_FIX_M } from './utils/geolocate';
+import { locateWithAccuracy, watchLocation, WEAK_FIX_M } from './utils/geolocate';
+import { kmBetween } from './utils/geo';
 import type { SearchBoxHandle } from './components/panels/SearchBox';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
@@ -39,6 +40,7 @@ import LocateButton from './components/map/LocateButton';
 import ReportDetailCard from './components/panels/ReportDetailCard';
 import EvacDetailCard from './components/panels/EvacDetailCard';
 import SeverityPicker from './components/panels/SeverityPicker';
+import QuickReportSheet from './components/panels/QuickReportSheet';
 import SosModal from './components/panels/SosModal';
 import LocationHelpModal from './components/panels/LocationHelpModal';
 import Toast, { type ToastData } from './components/panels/Toast';
@@ -130,8 +132,10 @@ const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, []);
 
-  // UI state
-  const [mode, setMode] = React.useState<'idle' | 'report'>('idle');
+  // UI state. 'quick' is the in-transit mode: a live GPS watch keeps `pending` glued to the
+  // vehicle's current position and each severity tap posts immediately (see the quick-mode effect
+  // and quickPost below), vs. 'report' where the pin is fixed once and adjustable.
+  const [mode, setMode] = React.useState<'idle' | 'report' | 'quick'>('idle');
   const [pending, setPending] = React.useState<PendingPin | null>(null);
   // Road auto-detected from the pending pin via reverse geocoding (which street it's on).
   const [detectedRoad, setDetectedRoad] = React.useState<{ road: string | null; district: string | null; barangay: string | null }>({ road: null, district: null, barangay: null });
@@ -631,6 +635,40 @@ const App: React.FC = () => {
     );
   }, [runReverseGeocode]);
 
+  // In-transit quick mode: keep `pending`/userLoc glued to a continuous GPS watch for as long as
+  // the sheet is open (unlike the detailed flow's one-shot converge), so each severity tap posts at
+  // wherever the vehicle currently is. Reverse-geocoding is throttled to actual movement, not every
+  // fix, so it doesn't spam the geocoder while idling at a light.
+  const lastQuickGeocodeLoc = React.useRef<LatLng | null>(null);
+  React.useEffect(() => {
+    if (mode !== 'quick') return;
+    lastQuickGeocodeLoc.current = null;
+    setReportLocating(true);
+    let firstFix = true;
+    const stop = watchLocation((fix) => {
+      const loc: LatLng = { lat: fix.lat, lng: fix.lng };
+      setUserLoc(loc);
+      setUserAccuracyM(fix.accuracyM);
+      setPending({ ...loc, atYou: true });
+      if (firstFix) { firstFix = false; setReportLocating(false); }
+      if (!lastQuickGeocodeLoc.current || kmBetween(lastQuickGeocodeLoc.current, loc) > 0.12) {
+        lastQuickGeocodeLoc.current = loc;
+        runReverseGeocode(loc);
+      }
+    });
+    return stop;
+  }, [mode, runReverseGeocode]);
+
+  // Switch between the detailed and quick report forms without leaving report mode. Quick mode
+  // always tracks the live GPS fix (any manual pin from detailed mode is discarded on entry).
+  const switchReportMode = (next: 'report' | 'quick'): void => {
+    setMode(next);
+    if (next === 'quick') {
+      setPending({ ...userLoc, atYou: true });
+      runReverseGeocode(userLoc);
+    }
+  };
+
   const startReport = async (): Promise<void> => {
     // No login wall: silently provision a no-login guest session (idempotent per device) so anyone
     // can report in seconds. The guest still gets a real userId, which keeps the spam guard,
@@ -755,6 +793,72 @@ const App: React.FC = () => {
       showToast('Could not post your report. Please try again.');
     } finally {
       setBusyPick(false);
+    }
+  };
+
+  // One-tap in-transit report: posts immediately at the live GPS location with depth/trend/road
+  // from SEVERITY_PRESET (no pin drag, no depth slider — see quickPost's caller, QuickReportSheet).
+  // Unlike pickSeverity, success does NOT leave report mode — the sheet stays open so a passenger
+  // can mark several flooded points along the drive.
+  const quickPost = async (sev: Severity, captchaToken?: string): Promise<void> => {
+    const loc = pending ?? { ...userLoc, atYou: true };
+    const preset = SEVERITY_PRESET[sev];
+    setBusyPick(true);
+    try {
+      const session = await ensureGuest();
+      if (!session) {
+        showToast('Could not post your report. Please try again.');
+        return;
+      }
+      if (session.role === 'GUEST' && captchaEnabled() && !captchaToken) {
+        showToast('Please complete the security check, then post again.');
+        return;
+      }
+      const dup = nearbyOwnActiveReport(enriched, loc);
+      if (dup) {
+        showToast('You already reported flooding here — drive on and try again further along.');
+        return;
+      }
+      const street = detectedRoad.road?.trim() || '';
+      const area = detectedRoad.barangay?.trim() || '';
+      const roadName = street
+        ? (area && area !== street ? `${street}, ${area}` : street)
+        : area || detectedRoad.district?.trim() || 'Flooded area';
+      const created = await mutations.createReport({
+        name: roadName,
+        district: detectedRoad.district ?? 'Unknown area',
+        latitude: loc.lat,
+        longitude: loc.lng,
+        severity: sev,
+        depthCm: preset.depthCm,
+        trend: preset.trend,
+        road: preset.road,
+        captchaToken,
+      });
+      await reports.refetch(true);
+      showToast(t('quick.reported'), t('quick.undo'), () => void undoQuickReport(created.id));
+    } catch (err) {
+      if (handleAuthError(err, 'Your session expired. Please sign in again to post a report.')) return;
+      if (err instanceof ApiError && (err.status === 409 || err.status === 429)) {
+        showToast(err.message);
+        return;
+      }
+      showToast('Could not post your report. Please try again.');
+    } finally {
+      setBusyPick(false);
+    }
+  };
+
+  // Undo for a quick-mode post (voice misrecognition or a mis-tap) — deletes the just-created
+  // report the same way an owner would from the detail card, but without disturbing `removing`/
+  // `selectedReportId` state (quick mode never selects a report).
+  const undoQuickReport = async (id: number): Promise<void> => {
+    try {
+      await mutations.deleteReport(id);
+      await reports.refetch(true);
+      showToast(t('quick.undone'));
+    } catch {
+      showToast('Could not undo — you can remove it from your reports list.');
     }
   };
 
@@ -1171,6 +1275,30 @@ const App: React.FC = () => {
           {/* Floating "show my location" control — recenters the map on a fresh GPS fix. */}
           <LocateButton onClick={locateMe} locating={locating} />
 
+          {/* Detailed / Quick mode toggle — switches the report form without leaving report mode. */}
+          {(mode === 'report' || mode === 'quick') && (
+            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 501, display: 'flex', gap: 3, padding: 3, background: '#0F172A', borderRadius: 11, boxShadow: '0 8px 24px rgba(15,23,42,.35)' }}>
+              {(['report', 'quick'] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => switchReportMode(m)}
+                  style={{
+                    border: 0,
+                    borderRadius: 8,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    background: mode === m ? '#fff' : 'transparent',
+                    color: mode === m ? '#0F172A' : 'rgba(255,255,255,.75)',
+                  }}
+                >
+                  {m === 'report' ? t('report.modeDetailed') : t('report.modeQuick')}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Report-mode hint */}
           {mode === 'report' && (() => {
             const atYou = !!pending?.atYou;
@@ -1191,7 +1319,7 @@ const App: React.FC = () => {
             // Amber dot flags a location problem the user can act on; blue = all good.
             const attention = noFix || weak;
             return (
-            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
+            <div style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', flex: 'none', background: attention ? '#F59E0B' : '#0EA5E9', boxShadow: attention ? '0 0 0 4px rgba(245,158,11,.3)' : '0 0 0 4px rgba(14,165,233,.3)' }} />
               <span style={{ lineHeight: 1.3 }}>{hint}</span>
               {noFix && (
@@ -1241,6 +1369,18 @@ const App: React.FC = () => {
               onCancel={cancelReport}
             />
           )}
+
+          {mode === 'quick' && pending && (
+            <QuickReportSheet
+              isMobile={isMobile}
+              busy={busyPick}
+              detectedRoad={detectedRoad.road}
+              accuracyM={userAccuracyM}
+              captchaRequired={captchaEnabled() && auth?.role === 'GUEST'}
+              onQuick={(sev, token) => void quickPost(sev, token)}
+              onDone={cancelReport}
+            />
+          )}
         </div>
 
         <Sidebar
@@ -1278,7 +1418,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Mobile FAB */}
-      {isMobile && mode !== 'report' && (
+      {isMobile && mode === 'idle' && (
         <button
           onClick={startReport}
           style={{ position: 'fixed', right: 16, bottom: 20, zIndex: 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
@@ -1295,9 +1435,9 @@ const App: React.FC = () => {
         <LocationHelpModal
           onRetry={() => {
             setLocHelpOpen(false);
-            // In report mode, re-pin onto the user (the freshly granted fix re-applies); otherwise
-            // just recenter via the floating-locate flow.
-            if (mode === 'report') locateForReport(true);
+            // In report/quick mode, re-pin onto the user (the freshly granted fix re-applies);
+            // otherwise just recenter via the floating-locate flow.
+            if (mode === 'report' || mode === 'quick') locateForReport(true);
             else locateMe();
           }}
           onClose={() => setLocHelpOpen(false)}

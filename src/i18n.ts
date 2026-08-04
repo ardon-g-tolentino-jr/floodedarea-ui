@@ -238,6 +238,25 @@ const MESSAGES = {
   'report.hintNoFix': { en: 'We couldn’t find your location — tap the map or search your address to place your report.', fil: 'Hindi namin mahanap ang iyong lokasyon — i-tap ang mapa o hanapin ang iyong address para mailagay ang ulat.' },
   'report.hintWeak': { en: 'Your location is rough (±{m} m) — tap the map or search to place the pin exactly.', fil: 'Magaspang ang iyong lokasyon (±{m} m) — i-tap ang mapa o maghanap para tumpak na mailagay ang pin.' },
   'report.enableLoc': { en: 'Enable location', fil: 'I-enable ang lokasyon' },
+  'report.modeDetailed': { en: 'Detailed', fil: 'Detalyado' },
+  'report.modeQuick': { en: '🚗 Quick', fil: '🚗 Mabilis' },
+
+  // ── Quick report (in-transit) ──
+  'quick.safety': { en: 'Passenger reports only — don’t tap while driving.', fil: 'Para sa pasahero lang — huwag i-tap habang nagmamaneho.' },
+  'quick.locating': { en: 'Locating…', fil: 'Hinahanap ang lokasyon…' },
+  'quick.howBad': { en: 'How bad is the flooding here?', fil: 'Gaano kalala ang baha dito?' },
+  'quick.done': { en: 'Done', fil: 'Tapos na' },
+  'quick.posting': { en: 'Posting…', fil: 'Pino-post…' },
+  'quick.reported': { en: 'Reported flooding here ✓', fil: 'Naiulat ang baha dito ✓' },
+  'quick.undo': { en: 'Undo', fil: 'I-undo' },
+  'quick.undone': { en: 'Report removed.', fil: 'Tinanggal ang ulat.' },
+  'quick.voiceTap': { en: 'Tap to report by voice', fil: 'I-tap para mag-ulat gamit ang boses' },
+  'quick.voiceListening': { en: 'Listening…', fil: 'Nakikinig…' },
+  'quick.voiceNoMatch': { en: 'Didn’t catch that — try again or tap a level', fil: 'Hindi na-gets — subukang muli o pumili ng antas' },
+  'quick.voiceError': { en: 'Voice input isn’t available right now — tap a level instead.', fil: 'Hindi gumagana ang boses ngayon — pumili na lang ng antas.' },
+  'quick.voiceSpokenHigh': { en: 'Reported high flood here', fil: 'Naiulat ang mataas na baha dito' },
+  'quick.voiceSpokenMedium': { en: 'Reported medium flood here', fil: 'Naiulat ang katamtamang baha dito' },
+  'quick.voiceSpokenLow': { en: 'Reported low flood here', fil: 'Naiulat ang mababang baha dito' },
 
   // ── Report list item ──
   'report.yours': { en: 'YOURS', fil: 'IYO' },

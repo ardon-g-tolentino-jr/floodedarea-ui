@@ -94,3 +94,21 @@ export function locateWithAccuracy(opts: LocateOptions = {}): Promise<Fix> {
     }, totalTimeoutMs);
   });
 }
+
+/**
+ * Continuously stream position fixes until the returned cleanup function is called. Unlike
+ * {@link locateWithAccuracy} (a one-shot converge that tears the watch down on settle), this keeps
+ * the watch alive so a moving reporter's location stays fresh — used by the in-transit quick-report
+ * mode, where each tap posts at wherever the vehicle currently is. Emits every fix (not just
+ * improvements), so callers see the location move. No-ops (returns a no-op cleanup) when geolocation
+ * is unavailable.
+ */
+export function watchLocation(onFix: (fix: Fix) => void): () => void {
+  if (!navigator.geolocation) return () => {};
+  const watchId = navigator.geolocation.watchPosition(
+    (pos) => onFix({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracyM: pos.coords.accuracy }),
+    () => { /* transient errors: keep watching, hold the last good fix */ },
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+  );
+  return () => navigator.geolocation.clearWatch(watchId);
+}
