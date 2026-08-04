@@ -356,5 +356,20 @@ server.post('/stats/visit', (_req, res) => {
   res.status(201).json({ total });
 });
 
+// ── Global app settings (e.g. community chat visibility). GET is public; PATCH mirrors the
+// baha-api ADMIN gate in spirit only — the mock accepts anything, matching its other stubs. ──
+server.get('/settings', (_req, res) => {
+  const s = router.db.get('settings').value() || {};
+  res.json({ chatEnabled: s.chatEnabled !== false });
+});
+server.patch('/settings', (req, res) => {
+  const db = router.db;
+  const current = db.get('settings').value() || {};
+  const next = { ...current };
+  if (typeof req.body.chatEnabled === 'boolean') next.chatEnabled = req.body.chatEnabled;
+  db.set('settings', next).write();
+  res.json({ chatEnabled: next.chatEnabled !== false });
+});
+
 server.use(router);
 server.listen(3001, () => process.stdout.write('[baha mock-api] http://localhost:3001\n'));

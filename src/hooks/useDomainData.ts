@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
+import type { AppSettings, EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -42,4 +42,9 @@ export function useAcceptedFeedback(): FetchResult<Feedback[]> {
  *  visitor never hits the admin-only endpoint (which 403s). */
 export function useAllFeedback(enabled: boolean): FetchResult<Feedback[]> {
   return useFetch(() => rawApi.allFeedback(), [], { enabled });
+}
+
+/** Global, admin-controlled app settings (e.g. community chat visibility). Public read. */
+export function useSettings(): FetchResult<AppSettings> {
+  return useFetch(() => rawApi.settings(), []);
 }

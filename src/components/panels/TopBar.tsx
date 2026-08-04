@@ -302,6 +302,17 @@ const TopBar: React.FC<TopBarProps> = ({
                   {isAdmin && <MenuItem icon="🗞" label={t('topbar.incident')} onClick={runAndClose(onReportIncident)} />}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
                   {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}
+                  {/* Sign out — the avatar-only auth cluster hides it on mobile (no room for the
+                      inline button), so it must live here or a mobile user can never sign out. */}
+                  {auth && (
+                    <>
+                      <div style={{ margin: '6px 4px', borderTop: '1px solid var(--bw-line-soft)' }} />
+                      <div style={{ padding: '6px 12px 2px', fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {auth.name}
+                      </div>
+                      <MenuItem icon="⏻" label={t('topbar.signOut')} onClick={runAndClose(onSignOut)} />
+                    </>
+                  )}
                 </div>
               )}
             </div>

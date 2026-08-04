@@ -3,6 +3,7 @@ import type { Severity } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET } from '../../utils/floodMeta';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import DepthReference from './DepthReference';
+import ReportModeToggle from './ReportModeToggle';
 import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
@@ -22,6 +23,10 @@ const OPTIONS: Option[] = [
 
 interface SeverityPickerProps {
   isMobile: boolean;
+  /** Current report mode — always 'report' here, but ReportModeToggle needs it to render the
+   *  active state (rendered inline on mobile; see App.tsx for the desktop floating pill). */
+  mode: 'report' | 'quick';
+  onSwitchMode: (mode: 'report' | 'quick') => void;
   busy: boolean;
   reporterName: string;
   /** Road auto-detected from the pin (reverse-geocoded); prefills the editable road field. */
@@ -34,7 +39,7 @@ interface SeverityPickerProps {
   onCancel: () => void;
 }
 
-const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporterName, detectedRoad, detecting, captchaRequired, onPick, onCancel }) => {
+const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, mode, onSwitchMode, busy, reporterName, detectedRoad, detecting, captchaRequired, onPick, onCancel }) => {
   // Solved Turnstile token (Managed widget below); required before posting when captchaRequired.
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   // Step 1: choose a category. Step 2: dial in the depth (seeded from the category's preset).
@@ -275,6 +280,12 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
 
   const card = (
     <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+      {/* Mobile only — desktop keeps the floating pill above the map (App.tsx); see ReportModeToggle. */}
+      {isMobile && (
+        <div style={{ padding: '12px 15px 0' }}>
+          <ReportModeToggle mode={mode} onSwitch={onSwitchMode} />
+        </div>
+      )}
       {roadField}
       {photoField}
       {sev == null ? categoryStep : depthStep}
