@@ -1,5 +1,6 @@
 import { api, buildQuery } from './client';
 import type {
+  AppSettings,
   EvacuationCenter,
   Feedback,
   FeedbackStatus,
@@ -37,6 +38,8 @@ export const rawApi = {
   allFeedback: () => api.get<Feedback[]>('/feedback'),
   /** Public all-time visit tally (read-only — does not increment). */
   visitCount: () => api.get<VisitStats>('/stats/visits'),
+  /** Global app settings (e.g. community chat visibility). Public read. */
+  settings: () => api.get<AppSettings>('/settings'),
 };
 
 /** POST/PATCH/DELETE mutations. */
@@ -78,4 +81,7 @@ export const mutations = {
   updateAlert: (id: number, body: Partial<NewAlert>) =>
     api.patch<FloodAlert>(`/alerts/${id}`, body),
   deleteAlert: (id: number) => api.delete<void>(`/alerts/${id}`),
+
+  // ── Admin: global app settings ──
+  updateSettings: (body: Partial<AppSettings>) => api.patch<AppSettings>('/settings', body),
 };

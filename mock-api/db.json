@@ -413,5 +413,8 @@
   ],
   "stats": {
     "visits": 1249
+  },
+  "settings": {
+    "chatEnabled": true
   }
 }

@@ -3,7 +3,7 @@ import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAl
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
-import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues } from './hooks/useDomainData';
+import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues, useSettings } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
@@ -39,6 +39,7 @@ import RoadLegend from './components/map/RoadLegend';
 import LocateButton from './components/map/LocateButton';
 import ReportDetailCard from './components/panels/ReportDetailCard';
 import EvacDetailCard from './components/panels/EvacDetailCard';
+import ReportModeToggle from './components/panels/ReportModeToggle';
 import SeverityPicker from './components/panels/SeverityPicker';
 import QuickReportSheet from './components/panels/QuickReportSheet';
 import SosModal from './components/panels/SosModal';
@@ -107,6 +108,7 @@ const App: React.FC = () => {
   const hotlines = useHotlines();
   const alerts = useAlerts();
   const rescues = useRescues();
+  const settings = useSettings();
   const acceptedFeedback = useAcceptedFeedback();
   // Admin-only queue — gated so a normal visitor never hits the admin endpoint (it 403s). The fetch
   // starts automatically when an admin session appears.
@@ -661,8 +663,12 @@ const App: React.FC = () => {
 
   // Switch between the detailed and quick report forms without leaving report mode. Quick mode
   // always tracks the live GPS fix (any manual pin from detailed mode is discarded on entry).
+  // Also clears any selected report/evac card — otherwise a report selected before switching modes
+  // stacks its bottom sheet under/over the new report-mode sheet (both are fixed/bottom:0/zIndex:1110).
   const switchReportMode = (next: 'report' | 'quick'): void => {
     setMode(next);
+    setSelectedReportId(null);
+    setSelEvacId(null);
     if (next === 'quick') {
       setPending({ ...userLoc, atYou: true });
       runReverseGeocode(userLoc);
@@ -739,6 +745,9 @@ const App: React.FC = () => {
       const dup = nearbyOwnActiveReport(enriched, pending);
       if (dup) {
         showToast('You already reported flooding here. Confirm that report, or move the pin to a different area.', 'View', () => {
+          // Leave report mode first — otherwise the still-open SeverityPicker sheet stacks with
+          // the detail card that's about to open (both are fixed/bottom:0/zIndex:1110 on mobile).
+          cancelReport();
           setTab('nearby');
           setSelEvacId(null);
           setSelectedReportId(dup.id);
@@ -1050,6 +1059,16 @@ const App: React.FC = () => {
   const onUpdateAlert = (id: number, b: Partial<NewAlert>) => adminAction(() => mutations.updateAlert(id, b), () => alerts.refetch(true), 'Alert updated.');
   const onDeleteAlert = (id: number) => adminAction(() => mutations.deleteAlert(id), () => alerts.refetch(true), 'Alert removed.');
 
+  // Global (server-backed) community-chat visibility toggle, unlike the per-browser `liveStream` pref.
+  const onToggleChat = async (on: boolean): Promise<void> => {
+    try {
+      await mutations.updateSettings({ chatEnabled: on });
+      await settings.refetch(true);
+    } catch {
+      showToast('Could not update the chat setting. Please try again.');
+    }
+  };
+
   // Reports an admin creates are authoritative "system" reports (news/other sources).
   const onCreateReport = (b: NewReport) => adminAction(() => mutations.createReport({ ...b, system: true }), () => reports.refetch(true), 'Report added.');
 
@@ -1275,27 +1294,14 @@ const App: React.FC = () => {
           {/* Floating "show my location" control — recenters the map on a fresh GPS fix. */}
           <LocateButton onClick={locateMe} locating={locating} />
 
-          {/* Detailed / Quick mode toggle — switches the report form without leaving report mode. */}
-          {(mode === 'report' || mode === 'quick') && (
-            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 501, display: 'flex', gap: 3, padding: 3, background: '#0F172A', borderRadius: 11, boxShadow: '0 8px 24px rgba(15,23,42,.35)' }}>
-              {(['report', 'quick'] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => switchReportMode(m)}
-                  style={{
-                    border: 0,
-                    borderRadius: 8,
-                    padding: '6px 12px',
-                    fontSize: 12,
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    background: mode === m ? '#fff' : 'transparent',
-                    color: mode === m ? '#0F172A' : 'rgba(255,255,255,.75)',
-                  }}
-                >
-                  {m === 'report' ? t('report.modeDetailed') : t('report.modeQuick')}
-                </button>
-              ))}
+          {/* Detailed / Quick mode toggle — switches the report form without leaving report mode.
+              Desktop only: on mobile the full-viewport sheet dimmer (zIndex 1100, same stacking
+              context as this floating pill) paints over it once a sheet is open, so mobile instead
+              renders ReportModeToggle as the first row inside the sheet card (SeverityPicker /
+              QuickReportSheet). */}
+          {!isMobile && (mode === 'report' || mode === 'quick') && (
+            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 501 }}>
+              <ReportModeToggle mode={mode} onSwitch={switchReportMode} />
             </div>
           )}
 
@@ -1330,7 +1336,10 @@ const App: React.FC = () => {
             );
           })()}
 
-          {selectedReport && (
+          {/* Gated on idle: a marker tap mid-report must never stack a detail card under/over the
+              report-mode sheet (both are fixed/bottom:0/zIndex:1110 on mobile) — see switchReportMode
+              and the dup-report toast's View action, which both clear the selection/cancel the form. */}
+          {mode === 'idle' && selectedReport && (
             <ReportDetailCard
               report={selectedReport}
               isMobile={isMobile}
@@ -1348,7 +1357,7 @@ const App: React.FC = () => {
             />
           )}
 
-          {selEvac && (
+          {mode === 'idle' && selEvac && (
             <EvacDetailCard
               center={selEvac}
               userLoc={userLoc}
@@ -1360,6 +1369,8 @@ const App: React.FC = () => {
           {mode === 'report' && pending && (
             <SeverityPicker
               isMobile={isMobile}
+              mode="report"
+              onSwitchMode={switchReportMode}
               busy={busyPick}
               reporterName={auth?.name ?? ''}
               detectedRoad={detectedRoad.road}
@@ -1373,6 +1384,8 @@ const App: React.FC = () => {
           {mode === 'quick' && pending && (
             <QuickReportSheet
               isMobile={isMobile}
+              mode="quick"
+              onSwitchMode={switchReportMode}
               busy={busyPick}
               detectedRoad={detectedRoad.road}
               accuracyM={userAccuracyM}
@@ -1577,6 +1590,8 @@ const App: React.FC = () => {
           reports={reportList}
           liveStream={liveStream}
           onToggleLive={setLiveStream}
+          chatEnabled={settings.data?.chatEnabled !== false}
+          onToggleChat={(on) => void onToggleChat(on)}
           onCreateCenter={onCreateCenter}
           onUpdateCenter={onUpdateCenter}
           onDeleteCenter={onDeleteCenter}
@@ -1613,8 +1628,9 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Floating community-chat bubble — self-contained, always available over the map. */}
-      <ChatWidget isMobile={isMobile} />
+      {/* Floating community-chat bubble — self-contained, always available over the map.
+          Admin-gated via server settings; default-on so a fetch failure never silently hides it. */}
+      {settings.data?.chatEnabled !== false && <ChatWidget isMobile={isMobile} />}
 
       {toast && <Toast toast={toast} />}
 

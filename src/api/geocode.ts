@@ -10,9 +10,9 @@ const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
 
 export const MIN_QUERY_LENGTH = 3;
 
-// Half-width (in degrees, ≈ 65 km) of the soft viewbox used to bias search toward the
-// caller's current location. `bounded=0` keeps it a preference, not a hard limit, so places
-// anywhere in the world still resolve — the app is not restricted to any country/region.
+// Half-width (in degrees, ≈ 65 km) of the soft viewbox used to bias search toward the caller's
+// current location, on top of the countrycodes=ph filter below. `bounded=0` keeps it a
+// preference, not a hard limit, within the Philippines.
 const NEAR_BIAS_DEG = 0.6;
 
 /** Build a `viewbox` string (lon1,lat1,lon2,lat2, NW → SE) around a bias point. */
@@ -39,11 +39,11 @@ interface NominatimRow {
 }
 
 /**
- * Geocode `query` to a handful of place suggestions. Search is worldwide — the app works in
- * any country/region, not just Metro Manila & Rizal. Pass `near` (typically the user's current
- * location) to softly rank nearby results first; it is only a bias (`bounded=0`), so places
- * outside that area still resolve. Returns `[]` for short queries, network errors, or aborted
- * requests. Pass an `AbortSignal` to cancel a superseded request.
+ * Geocode `query` to a handful of Philippines place suggestions (`countrycodes=ph` — the app is
+ * PH-only, not worldwide). Pass `near` (typically the user's current location) to softly rank
+ * nearby results first; it is only a bias (`bounded=0`), not a hard limit, within the country.
+ * Returns `[]` for short queries, network errors, or aborted requests. Pass an `AbortSignal` to
+ * cancel a superseded request.
  */
 export async function searchPlaces(
   query: string,
@@ -58,6 +58,7 @@ export async function searchPlaces(
     q,
     limit: '6',
     addressdetails: '0',
+    countrycodes: 'ph',
   });
   if (near) {
     params.set('viewbox', nearViewbox(near));

@@ -2,15 +2,18 @@ import React from 'react';
 import type { NewReport, Severity } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
+import { findIntersection, type Intersection } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import PlaceField from './PlaceField';
+import MapPickField from './MapPickField';
 import DepthReference from './DepthReference';
 
 /**
  * Admin-only "Report a flood incident" modal. Lets an admin log a flood known from news or other
- * sources: pick any location worldwide, set severity/depth, optionally attach a screenshot, and
- * post it. The parent tags it as a system report (reporterTrust: 'system') and, on success, offers
- * to share it to social media.
+ * sources: pin the location — either a street intersection ("Aurora Blvd cor. Katipunan Ave") or
+ * a searched/map-picked point, anywhere in the Philippines — set severity/depth, optionally
+ * attach a screenshot, and post it. The parent tags it as a system report (reporterTrust:
+ * 'system') and, on success, offers to share it to social media.
  */
 interface Props {
   isMobile: boolean;
@@ -51,6 +54,19 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   const [placeLabel, setPlaceLabel] = React.useState('');
   const [name, setName] = React.useState('');
   const [district, setDistrict] = React.useState('');
+
+  // ── Location: two ways to pin a spot — a street intersection (default; PH flood reports are
+  // commonly phrased "A cor. B") or the existing search/current-location field. Both land on the
+  // same lat/lng/placeLabel state, then a shared mini-map lets the admin fine-tune the exact pin. ──
+  const [locTab, setLocTab] = React.useState<'intersection' | 'map'>('intersection');
+  const [streetA, setStreetA] = React.useState('');
+  const [streetB, setStreetB] = React.useState('');
+  const [interCity, setInterCity] = React.useState('');
+  const [interResults, setInterResults] = React.useState<Intersection[]>([]);
+  const [interSearching, setInterSearching] = React.useState(false);
+  const [interSearched, setInterSearched] = React.useState(false);
+  const interAbortRef = React.useRef<AbortController | null>(null);
+  React.useEffect(() => () => interAbortRef.current?.abort(), []);
   const [severity, setSeverity] = React.useState<Severity>('high');
   const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
   const [note, setNote] = React.useState('');
@@ -67,18 +83,49 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const onPickPlace = (la: number, ln: number, label: string): void => {
+  // `skipNameOverwrite` is set when the pick came from the intersection finder — that already
+  // produced the far more legible "A cor. B" name, so a reverse-geocode of the crossing's exact
+  // node (which usually resolves to just ONE of the two streets) must not clobber it.
+  const onPickPlace = (la: number, ln: number, label: string, skipNameOverwrite = false): void => {
     setLat(String(la));
     setLng(String(ln));
     setPlaceLabel(label);
     // Seed name/district from the picked label, then refine with a reverse-geocode.
     const firstSeg = label.split(',')[0]?.trim();
-    if (firstSeg) setName((n) => n || firstSeg);
+    if (!skipNameOverwrite && firstSeg) setName((n) => n || firstSeg);
     void reverseGeocode(la, ln).then((g) => {
-      const street = g.road ?? g.barangay ?? firstSeg ?? '';
-      if (street) setName(street);
+      if (!skipNameOverwrite) {
+        const street = g.road ?? g.barangay ?? firstSeg ?? '';
+        if (street) setName(street);
+      }
       if (g.district) setDistrict(g.district);
     });
+  };
+
+  const findIntersectionPoints = async (): Promise<void> => {
+    if (!streetA.trim() || !streetB.trim()) return;
+    interAbortRef.current?.abort();
+    const ac = new AbortController();
+    interAbortRef.current = ac;
+    setInterSearching(true);
+    setInterSearched(false);
+    const found = await findIntersection(streetA, streetB, interCity, ac.signal);
+    if (ac.signal.aborted) return;
+    setInterResults(found);
+    setInterSearching(false);
+    setInterSearched(true);
+  };
+
+  const chooseIntersection = (pt: Intersection): void => {
+    onPickPlace(pt.lat, pt.lng, pt.label, true);
+    setName(`${streetA.trim()} cor. ${streetB.trim()}`);
+  };
+
+  // Fine-tune (mini-map click/drag) after an initial pick. Within the Intersection tab we keep
+  // skipping the name overwrite (preserve "A cor. B"); the Pick-on-map tab behaves like PlaceField
+  // always has — every move refreshes name/district from the new point.
+  const onFineTune = (la: number, ln: number): void => {
+    onPickPlace(la, ln, placeLabel, locTab === 'intersection');
   };
 
   const chooseSeverity = (s: Severity): void => {
@@ -165,7 +212,100 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
 
         <div>
           <label style={labelStyle}>Location</label>
-          <PlaceField lat={lat} lng={lng} placeLabel={placeLabel} onPick={onPickPlace} />
+
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+            {(['intersection', 'map'] as const).map((tKey) => (
+              <button
+                key={tKey}
+                type="button"
+                onClick={() => setLocTab(tKey)}
+                style={{
+                  flex: 1,
+                  padding: '7px 8px',
+                  borderRadius: 9,
+                  cursor: 'pointer',
+                  border: `1.5px solid ${locTab === tKey ? '#4338CA' : '#E2E8F0'}`,
+                  background: locTab === tKey ? '#EEF2FF' : '#fff',
+                  color: locTab === tKey ? '#4338CA' : 'var(--bw-ink)',
+                  fontSize: 12,
+                  fontWeight: 800,
+                }}
+              >
+                {tKey === 'intersection' ? '✕ Intersection' : '📍 Pick on map'}
+              </button>
+            ))}
+          </div>
+
+          {locTab === 'intersection' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <input value={streetA} onChange={(e) => setStreetA(e.target.value)} placeholder="Street 1 — e.g. Aurora Blvd" style={inputStyle} />
+              <input value={streetB} onChange={(e) => setStreetB(e.target.value)} placeholder="Street 2 — e.g. Katipunan Ave" style={inputStyle} />
+              <input value={interCity} onChange={(e) => setInterCity(e.target.value)} placeholder="City (optional) — e.g. Quezon City" style={inputStyle} />
+              <button
+                type="button"
+                disabled={!streetA.trim() || !streetB.trim() || interSearching}
+                onClick={() => void findIntersectionPoints()}
+                style={{
+                  border: 0,
+                  background: '#4338CA',
+                  color: '#fff',
+                  padding: '9px',
+                  borderRadius: 9,
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  cursor: !streetA.trim() || !streetB.trim() || interSearching ? 'not-allowed' : 'pointer',
+                  opacity: !streetA.trim() || !streetB.trim() || interSearching ? 0.6 : 1,
+                }}
+              >
+                {interSearching ? 'Searching…' : 'Find intersection'}
+              </button>
+              {interSearched && interResults.length === 0 && (
+                <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>No crossing found — check the spelling, or try "Pick on map".</div>
+              )}
+              {interResults.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {interResults.map((r, i) => {
+                    const chosen = lat === String(r.lat) && lng === String(r.lng);
+                    return (
+                      <button
+                        key={`${r.lat},${r.lng}`}
+                        type="button"
+                        onClick={() => chooseIntersection(r)}
+                        style={{
+                          textAlign: 'left',
+                          padding: '8px 10px',
+                          borderRadius: 9,
+                          border: `1.5px solid ${chosen ? '#4338CA' : '#E2E8F0'}`,
+                          background: chosen ? '#EEF2FF' : '#fff',
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ⚲ {interResults.length > 1 ? `Crossing #${i + 1} — ` : ''}{r.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {hasCoords && (
+                <div style={{ fontSize: 11, color: 'var(--bw-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ color: '#9AA8B4' }}>⚲</span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {placeLabel || `Pinned at ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <PlaceField lat={lat} lng={lng} placeLabel={placeLabel} onPick={(la, ln, label) => onPickPlace(la, ln, label)} />
+          )}
+
+          {hasCoords && (
+            <div style={{ marginTop: 8 }}>
+              <MapPickField lat={Number(lat)} lng={Number(lng)} onPick={onFineTune} />
+            </div>
+          )}
         </div>
 
         <div>

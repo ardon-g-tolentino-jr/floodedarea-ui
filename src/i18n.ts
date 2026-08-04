@@ -250,7 +250,7 @@ const MESSAGES = {
   'quick.reported': { en: 'Reported flooding here ✓', fil: 'Naiulat ang baha dito ✓' },
   'quick.undo': { en: 'Undo', fil: 'I-undo' },
   'quick.undone': { en: 'Report removed.', fil: 'Tinanggal ang ulat.' },
-  'quick.voiceTap': { en: 'Tap to report by voice', fil: 'I-tap para mag-ulat gamit ang boses' },
+  'quick.voiceTap': { en: 'Voice Report', fil: 'Ulat sa Boses' },
   'quick.voiceListening': { en: 'Listening…', fil: 'Nakikinig…' },
   'quick.voiceNoMatch': { en: 'Didn’t catch that — try again or tap a level', fil: 'Hindi na-gets — subukang muli o pumili ng antas' },
   'quick.voiceError': { en: 'Voice input isn’t available right now — tap a level instead.', fil: 'Hindi gumagana ang boses ngayon — pumili na lang ng antas.' },

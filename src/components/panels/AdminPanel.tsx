@@ -24,6 +24,9 @@ interface AdminPanelProps {
   reports: FloodReport[];
   liveStream: boolean;
   onToggleLive: (on: boolean) => void;
+  /** Global (server-backed) toggle for the floating community-chat bubble. */
+  chatEnabled: boolean;
+  onToggleChat: (on: boolean) => void;
   onCreateCenter: (b: NewCenter) => Promise<void>;
   onUpdateCenter: (id: number, b: Partial<NewCenter>) => Promise<void>;
   onDeleteCenter: (id: number) => Promise<void>;
@@ -154,7 +157,7 @@ const inputStyle: React.CSSProperties = {
 
 
 const AdminPanel: React.FC<AdminPanelProps> = (props) => {
-  const { centers, hotlines, alerts, reports, liveStream, onToggleLive, onClose } = props;
+  const { centers, hotlines, alerts, reports, liveStream, onToggleLive, chatEnabled, onToggleChat, onClose } = props;
   const [tab, setTab] = React.useState<Tab>('shelters');
   const [editing, setEditing] = React.useState<{ id: number | null; form: FormValues } | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -307,6 +310,21 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: liveStream ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
           >
             <span style={{ position: 'absolute', top: 3, left: liveStream ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+          </button>
+        </div>
+
+        {/* Community chat toggle — global (server-backed), unlike the per-browser live-stream pref above */}
+        <div style={{ padding: '13px 20px', borderBottom: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Community chat button</div>
+            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>Show the floating chat bubble to everyone, everywhere in the app.</div>
+          </div>
+          <button
+            onClick={() => onToggleChat(!chatEnabled)}
+            aria-pressed={chatEnabled}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: chatEnabled ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+          >
+            <span style={{ position: 'absolute', top: 3, left: chatEnabled ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 

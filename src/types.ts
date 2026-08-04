@@ -198,3 +198,9 @@ export interface NewFeedback {
 export interface VisitStats {
   total: number;
 }
+
+/** Global, admin-controlled app settings (`GET /settings`, public read / ADMIN-only patch). */
+export interface AppSettings {
+  /** Whether the floating community-chat bubble is shown. Default true. */
+  chatEnabled: boolean;
+}

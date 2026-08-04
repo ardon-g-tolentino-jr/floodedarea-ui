@@ -2,6 +2,7 @@ import React from 'react';
 import type { Severity } from '../../types';
 import { useI18n } from '../../i18n';
 import { listenForSeverity, speak, speechSupported } from '../../utils/voiceReport';
+import ReportModeToggle from './ReportModeToggle';
 import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
@@ -27,6 +28,10 @@ const VOICE_SPOKEN_KEY: Record<Severity, 'quick.voiceSpokenHigh' | 'quick.voiceS
 
 interface QuickReportSheetProps {
   isMobile: boolean;
+  /** Current report mode — always 'quick' here, but ReportModeToggle needs it to render the
+   *  active state (rendered inline on mobile; see App.tsx for the desktop floating pill). */
+  mode: 'report' | 'quick';
+  onSwitchMode: (mode: 'report' | 'quick') => void;
   busy: boolean;
   detectedRoad: string | null;
   accuracyM: number | null;
@@ -38,10 +43,11 @@ interface QuickReportSheetProps {
 /**
  * One-tap flood reporting for a passenger in transit. Three big severity buttons post instantly at
  * the live GPS location (depth/trend/road come from SEVERITY_PRESET — see App.tsx's quickPost) and
- * the sheet stays open so a passenger can mark several flooded points along the drive. A tap-to-talk
- * mic is a progressive enhancement on top of the buttons, never a replacement.
+ * the sheet stays open so a passenger can mark several flooded points along the drive. A floating
+ * "Voice Report" FAB (anchored above the sheet's top-right corner) is a progressive enhancement on
+ * top of the buttons, never a replacement.
  */
-const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, detectedRoad, accuracyM, captchaRequired, onQuick, onDone }) => {
+const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onSwitchMode, busy, detectedRoad, accuracyM, captchaRequired, onQuick, onDone }) => {
   const { lang, t } = useI18n();
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [justPosted, setJustPosted] = React.useState<Severity | null>(null);
@@ -95,6 +101,12 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
 
   const card = (
     <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+      {/* Mobile only — desktop keeps the floating pill above the map (App.tsx); see ReportModeToggle. */}
+      {isMobile && (
+        <div style={{ padding: '12px 15px 0' }}>
+          <ReportModeToggle mode={mode} onSwitch={onSwitchMode} />
+        </div>
+      )}
       <div style={{ display: 'flex', gap: 9, padding: '11px 15px', background: '#FFF7ED', borderBottom: '1px solid #FED7AA' }}>
         <span style={{ fontSize: 14, flex: 'none', lineHeight: 1.3 }}>⚠️</span>
         <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.45, color: '#7C2D12', fontWeight: 600 }}>{t('quick.safety')}</p>
@@ -141,37 +153,6 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
         })}
       </div>
 
-      {speechSupported() && (
-        <div style={{ padding: '0 12px 10px' }}>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={listening ? stopVoice : startVoice}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              padding: '11px',
-              border: `1.5px solid ${listening ? 'var(--bw-primary)' : '#CBD5E1'}`,
-              borderRadius: 10,
-              background: listening ? 'rgba(14,165,233,.08)' : '#F8FAFC',
-              color: listening ? 'var(--bw-primary-deep)' : 'var(--bw-ink-soft)',
-              fontSize: 12.5,
-              fontWeight: 800,
-              cursor: busy ? 'wait' : 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 15 }}>🎤</span>
-            {listening ? t('quick.voiceListening') : t('quick.voiceTap')}
-          </button>
-          {voiceMsg && (
-            <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4, textAlign: 'center' }}>{voiceMsg}</div>
-          )}
-        </div>
-      )}
-
       {captchaRequired && (
         <div style={{ padding: '0 15px 10px' }}>
           <TurnstileWidget onToken={setCaptchaToken} />
@@ -189,18 +170,64 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
     </div>
   );
 
+  // Floating "Voice Report" FAB — a relocation of the old in-card mic button, styled after the
+  // chat bubble (ChatWidget.tsx) so it reads as a distinct floating action, not a form control.
+  // Anchored to the sheet wrapper (a sibling of `card`) at top:-64/right:16, i.e. just above the
+  // card's top-right corner, so it floats clear of the card and the dimmer at any viewport.
+  const voiceFab = speechSupported() && (
+    <div style={{ position: 'absolute', right: 16, top: -64, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={listening ? stopVoice : startVoice}
+        aria-label={listening ? t('quick.voiceListening') : t('quick.voiceTap')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 9,
+          height: 54,
+          padding: '0 20px 0 16px',
+          border: 0,
+          borderRadius: 27,
+          background: listening ? 'linear-gradient(150deg,#EF4444,#B91C1C)' : 'linear-gradient(150deg,#0EA5E9,#0369A1)',
+          color: '#fff',
+          fontSize: 14,
+          fontWeight: 800,
+          cursor: busy ? 'wait' : 'pointer',
+          boxShadow: listening ? '0 10px 26px rgba(185,28,28,.5)' : '0 10px 26px rgba(3,105,161,.5)',
+          animation: listening ? 'floodPulse 1.3s ease-in-out infinite' : undefined,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span style={{ fontSize: 18, lineHeight: 1 }}>🎤</span>
+        {listening ? t('quick.voiceListening') : t('quick.voiceTap')}
+      </button>
+      {voiceMsg && (
+        <div style={{ maxWidth: 220, background: '#0F172A', color: '#fff', fontSize: 10.5, fontWeight: 600, padding: '6px 10px', borderRadius: 9, textAlign: 'right', boxShadow: '0 6px 18px rgba(15,23,42,.3)' }}>
+          {voiceMsg}
+        </div>
+      )}
+    </div>
+  );
+
   if (isMobile) {
     return (
       <>
         <div onClick={onDone} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.4)', zIndex: 1100 }} />
-        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1110, maxHeight: '82vh', overflowY: 'auto', animation: 'sheetUp .22s ease-out' }}>
-          {card}
+        {/* Outer wrapper has no overflow, so the FAB (positioned above it via top:-64) never gets
+            clipped; the inner div owns the scroll/animation for the card itself. */}
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1110 }}>
+          {voiceFab}
+          <div style={{ maxHeight: '82vh', overflowY: 'auto', animation: 'sheetUp .22s ease-out' }}>
+            {card}
+          </div>
         </div>
       </>
     );
   }
   return (
     <div style={{ position: 'fixed', left: '50%', bottom: 24, transform: 'translateX(-50%)', width: 300, zIndex: 1110, animation: 'popIn .14s ease-out' }}>
+      {voiceFab}
       {card}
     </div>
   );
