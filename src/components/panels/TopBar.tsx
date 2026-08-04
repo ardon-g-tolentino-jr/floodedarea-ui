@@ -3,12 +3,16 @@ import type { AuthState } from '../../hooks/useAuth';
 import type { GeoResult } from '../../api/geocode';
 import { BUILD_COMMIT, BUILD_LABEL, BUILD_TIME } from '../../buildInfo';
 import { useI18n } from '../../i18n';
+import ReportOptions from './ReportOptions';
 import SearchBox, { type SearchBoxHandle } from './SearchBox';
 
 interface TopBarProps {
   isMobile: boolean;
   auth: AuthState | null;
-  onReport: () => void;
+  /** Report flood / Quick report — picked from the chooser popover under this button. */
+  onChooseReport: (target: 'report' | 'quick') => void;
+  /** Remembered preference — orders/highlights the two ReportOptions. */
+  reportPref: 'report' | 'quick';
   onShare: () => void;
   onSOS: () => void;
   onSignIn: () => void;
@@ -61,7 +65,8 @@ const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void }> =
 const TopBar: React.FC<TopBarProps> = ({
   isMobile,
   auth,
-  onReport,
+  onChooseReport,
+  reportPref,
   onShare,
   onSOS,
   onSignIn,
@@ -84,6 +89,19 @@ const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const { t } = useI18n();
   const initials = auth ? auth.name.trim().charAt(0).toUpperCase() || '?' : '';
+
+  // Desktop-only "Report flood" chooser — a small popover anchored beneath the button, offering
+  // the same two ReportOptions as the mobile FAB fan-out (App.tsx has no floating button on desktop).
+  const [reportPickerOpen, setReportPickerOpen] = React.useState(false);
+  const reportBtnRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!reportPickerOpen) return;
+    const onDocClick = (e: MouseEvent): void => {
+      if (reportBtnRef.current && !reportBtnRef.current.contains(e.target as Node)) setReportPickerOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [reportPickerOpen]);
 
   // On mobile the secondary actions collapse into this overflow menu so the bar fits any viewport.
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -353,12 +371,24 @@ const TopBar: React.FC<TopBarProps> = ({
 
             {sosBtn}
 
-            <button
-              onClick={onReport}
-              style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 8, height: 40, padding: '0 17px', border: 0, background: 'var(--bw-primary)', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#fff', cursor: 'pointer', boxShadow: '0 4px 12px rgba(14,165,233,.32)' }}
-            >
-              <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> {t('topbar.report')}
-            </button>
+            <div ref={reportBtnRef} style={{ position: 'relative', flex: 'none' }}>
+              <button
+                onClick={() => setReportPickerOpen((o) => !o)}
+                aria-expanded={reportPickerOpen}
+                aria-haspopup="true"
+                style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 8, height: 40, padding: '0 17px', border: 0, background: 'var(--bw-primary)', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#fff', cursor: 'pointer', boxShadow: '0 4px 12px rgba(14,165,233,.32)' }}
+              >
+                <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> {t('topbar.report')}
+              </button>
+              {reportPickerOpen && (
+                <div style={{ position: 'absolute', top: 48, right: 0, zIndex: 1200, animation: 'popIn .14s ease-out' }}>
+                  <ReportOptions
+                    preferred={reportPref}
+                    onChoose={(target) => { setReportPickerOpen(false); onChooseReport(target); }}
+                  />
+                </div>
+              )}
+            </div>
 
             {incidentBtn}
             {responseBtn}
