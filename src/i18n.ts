@@ -238,8 +238,12 @@ const MESSAGES = {
   'report.hintNoFix': { en: 'We couldn’t find your location — tap the map or search your address to place your report.', fil: 'Hindi namin mahanap ang iyong lokasyon — i-tap ang mapa o hanapin ang iyong address para mailagay ang ulat.' },
   'report.hintWeak': { en: 'Your location is rough (±{m} m) — tap the map or search to place the pin exactly.', fil: 'Magaspang ang iyong lokasyon (±{m} m) — i-tap ang mapa o maghanap para tumpak na mailagay ang pin.' },
   'report.enableLoc': { en: 'Enable location', fil: 'I-enable ang lokasyon' },
-  'report.modeDetailed': { en: 'Detailed', fil: 'Detalyado' },
-  'report.modeQuick': { en: '🚗 Quick', fil: '🚗 Mabilis' },
+  'report.chooseHow': { en: 'How do you want to report?', fil: 'Paano mo gustong mag-ulat?' },
+  'report.optionDetailedSub': { en: 'Pin the spot, add details', fil: 'Markahan ang lugar, magdagdag ng detalye' },
+  'report.optionQuick': { en: 'Quick report', fil: 'Mabilisang ulat' },
+  'report.optionQuickSub': { en: 'Just say how deep it is', fil: 'Sabihin lang kung gaano kalalim' },
+  'report.addDetails': { en: '› Add details', fil: '› Magdagdag ng detalye' },
+  'report.hideDetails': { en: '‹ Hide details', fil: '‹ Itago ang detalye' },
 
   // ── Quick report (in-transit) ──
   'quick.safety': { en: 'Passenger reports only — don’t tap while driving.', fil: 'Para sa pasahero lang — huwag i-tap habang nagmamaneho.' },
@@ -250,6 +254,7 @@ const MESSAGES = {
   'quick.reported': { en: 'Reported flooding here ✓', fil: 'Naiulat ang baha dito ✓' },
   'quick.undo': { en: 'Undo', fil: 'I-undo' },
   'quick.undone': { en: 'Report removed.', fil: 'Tinanggal ang ulat.' },
+  'quick.voiceSay': { en: 'Say: high / medium / low', fil: 'Sabihin: mataas / katamtaman / mababa' },
   'quick.voiceTap': { en: 'Voice Report', fil: 'Ulat sa Boses' },
   'quick.voiceListening': { en: 'Listening…', fil: 'Nakikinig…' },
   'quick.voiceNoMatch': { en: 'Didn’t catch that — try again or tap a level', fil: 'Hindi na-gets — subukang muli o pumili ng antas' },

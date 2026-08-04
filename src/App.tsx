@@ -39,7 +39,7 @@ import RoadLegend from './components/map/RoadLegend';
 import LocateButton from './components/map/LocateButton';
 import ReportDetailCard from './components/panels/ReportDetailCard';
 import EvacDetailCard from './components/panels/EvacDetailCard';
-import ReportModeToggle from './components/panels/ReportModeToggle';
+import ReportOptions from './components/panels/ReportOptions';
 import SeverityPicker from './components/panels/SeverityPicker';
 import QuickReportSheet from './components/panels/QuickReportSheet';
 import SosModal from './components/panels/SosModal';
@@ -63,6 +63,7 @@ import LoginView from './views/LoginView';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
+const REPORT_MODE_STORAGE_KEY = 'baha_report_mode_v1';
 
 /** Bundled GCash donation QR — lives in public/, served under the app's base path. */
 const GCASH_QR_SRC = `${import.meta.env.BASE_URL}gcash-qr.png`;
@@ -81,6 +82,15 @@ function loadLivePref(): boolean {
     return localStorage.getItem(LIVE_STORAGE_KEY) !== '0';
   } catch {
     return true;
+  }
+}
+
+/** Remembered report entry choice — orders/highlights the two ReportOptions, both stay clickable. */
+function loadReportPref(): 'report' | 'quick' {
+  try {
+    return localStorage.getItem(REPORT_MODE_STORAGE_KEY) === 'quick' ? 'quick' : 'report';
+  } catch {
+    return 'report';
   }
 }
 
@@ -139,6 +149,11 @@ const App: React.FC = () => {
   // and quickPost below), vs. 'report' where the pin is fixed once and adjustable.
   const [mode, setMode] = React.useState<'idle' | 'report' | 'quick'>('idle');
   const [pending, setPending] = React.useState<PendingPin | null>(null);
+  // Remembered report entry point — orders/highlights ReportOptions (mobile fan-out + desktop
+  // popover). Persisted below alongside the other localStorage-backed prefs.
+  const [reportPref, setReportPref] = React.useState<'report' | 'quick'>(loadReportPref);
+  // Mobile-only: whether the bottom-center FAB has fanned out its two ReportOptions.
+  const [fanOpen, setFanOpen] = React.useState(false);
   // Road auto-detected from the pending pin via reverse geocoding (which street it's on).
   const [detectedRoad, setDetectedRoad] = React.useState<{ road: string | null; district: string | null; barangay: string | null }>({ road: null, district: null, barangay: null });
   const [detectingRoad, setDetectingRoad] = React.useState(false);
@@ -273,6 +288,11 @@ const App: React.FC = () => {
   React.useEffect(() => {
     try { localStorage.setItem(LIVE_STORAGE_KEY, liveStream ? '1' : '0'); } catch {/* ignore */}
   }, [liveStream]);
+
+  // Persist the remembered report entry-point preference.
+  React.useEffect(() => {
+    try { localStorage.setItem(REPORT_MODE_STORAGE_KEY, reportPref); } catch {/* ignore */}
+  }, [reportPref]);
 
   // Only admins can switch the live stream off; everyone else stays always-on.
   const isAdmin = auth?.role === 'ADMIN';
@@ -661,21 +681,14 @@ const App: React.FC = () => {
     return stop;
   }, [mode, runReverseGeocode]);
 
-  // Switch between the detailed and quick report forms without leaving report mode. Quick mode
-  // always tracks the live GPS fix (any manual pin from detailed mode is discarded on entry).
-  // Also clears any selected report/evac card — otherwise a report selected before switching modes
-  // stacks its bottom sheet under/over the new report-mode sheet (both are fixed/bottom:0/zIndex:1110).
-  const switchReportMode = (next: 'report' | 'quick'): void => {
-    setMode(next);
-    setSelectedReportId(null);
-    setSelEvacId(null);
-    if (next === 'quick') {
-      setPending({ ...userLoc, atYou: true });
-      runReverseGeocode(userLoc);
-    }
-  };
-
-  const startReport = async (): Promise<void> => {
+  // Shared preamble for both entry points (Report flood / Quick report — see ReportOptions).
+  // Provisions a guest session, runs the duplicate-report guard, clears any selected report/evac
+  // card (otherwise a card selected beforehand stacks its bottom sheet under/over the new
+  // report-mode sheet — both are fixed/bottom:0/zIndex:1110), remembers the choice as the
+  // preference, and drops the pin at the user's location. 'report' additionally recenters the map
+  // and converges a fresh GPS fix (a one-shot refinement); 'quick' instead starts a continuous GPS
+  // watch once `mode` flips (see the effect above), which keeps re-pinning as the vehicle moves.
+  const beginReport = async (target: 'report' | 'quick'): Promise<void> => {
     // No login wall: silently provision a no-login guest session (idempotent per device) so anyone
     // can report in seconds. The guest still gets a real userId, which keeps the spam guard,
     // "my reports", and "can't confirm your own" working exactly as for full accounts.
@@ -699,16 +712,22 @@ const App: React.FC = () => {
     }
     setSelectedReportId(null);
     setSelEvacId(null);
-    setMode('report');
-    // Drop the pin at the user's location and recenter the map there.
+    setReportPref(target);
+    setMode(target);
+    // Drop the pin at the user's location (quick mode's GPS-watch effect takes over from here).
     setPending({ ...userLoc, atYou: true });
-    setMapFocus({ ...userLoc, key: Date.now() });
     runReverseGeocode(userLoc);
-    // Refresh the GPS fix so the pin/centering reflect where they actually are right now (the
-    // on-mount fix may be stale, or fell back to the default monitoring area). If it can't get a
-    // fix, the report-mode banner surfaces guidance — reporting is never blocked.
-    locateForReport();
+    if (target === 'report') {
+      setMapFocus({ ...userLoc, key: Date.now() });
+      // Refresh the GPS fix so the pin/centering reflect where they actually are right now (the
+      // on-mount fix may be stale, or fell back to the default monitoring area). If it can't get a
+      // fix, the report-mode banner surfaces guidance — reporting is never blocked.
+      locateForReport();
+    }
   };
+
+  const startReport = (): void => { void beginReport('report'); };
+  const startQuickReport = (): void => { void beginReport('quick'); };
 
   const cancelReport = (): void => {
     setMode('idle');
@@ -1227,7 +1246,8 @@ const App: React.FC = () => {
         // A guest session is intentionally shown as "not signed in" in the bar, so the guest still
         // sees a "Sign in" affordance to upgrade (rather than a profile avatar + Sign out).
         auth={auth?.role === 'GUEST' ? null : auth}
-        onReport={startReport}
+        onChooseReport={(target) => (target === 'report' ? startReport() : startQuickReport())}
+        reportPref={reportPref}
         onShare={() => setShareOpen(true)}
         onSOS={() => setSosOpen(true)}
         onSignIn={() => setLogin({ open: true })}
@@ -1294,17 +1314,6 @@ const App: React.FC = () => {
           {/* Floating "show my location" control — recenters the map on a fresh GPS fix. */}
           <LocateButton onClick={locateMe} locating={locating} />
 
-          {/* Detailed / Quick mode toggle — switches the report form without leaving report mode.
-              Desktop only: on mobile the full-viewport sheet dimmer (zIndex 1100, same stacking
-              context as this floating pill) paints over it once a sheet is open, so mobile instead
-              renders ReportModeToggle as the first row inside the sheet card (SeverityPicker /
-              QuickReportSheet). */}
-          {!isMobile && (mode === 'report' || mode === 'quick') && (
-            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 501 }}>
-              <ReportModeToggle mode={mode} onSwitch={switchReportMode} />
-            </div>
-          )}
-
           {/* Report-mode hint */}
           {mode === 'report' && (() => {
             const atYou = !!pending?.atYou;
@@ -1337,7 +1346,7 @@ const App: React.FC = () => {
           })()}
 
           {/* Gated on idle: a marker tap mid-report must never stack a detail card under/over the
-              report-mode sheet (both are fixed/bottom:0/zIndex:1110 on mobile) — see switchReportMode
+              report-mode sheet (both are fixed/bottom:0/zIndex:1110 on mobile) — see beginReport
               and the dup-report toast's View action, which both clear the selection/cancel the form. */}
           {mode === 'idle' && selectedReport && (
             <ReportDetailCard
@@ -1369,8 +1378,6 @@ const App: React.FC = () => {
           {mode === 'report' && pending && (
             <SeverityPicker
               isMobile={isMobile}
-              mode="report"
-              onSwitchMode={switchReportMode}
               busy={busyPick}
               reporterName={auth?.name ?? ''}
               detectedRoad={detectedRoad.road}
@@ -1384,8 +1391,6 @@ const App: React.FC = () => {
           {mode === 'quick' && pending && (
             <QuickReportSheet
               isMobile={isMobile}
-              mode="quick"
-              onSwitchMode={switchReportMode}
               busy={busyPick}
               detectedRoad={detectedRoad.road}
               accuracyM={userAccuracyM}
@@ -1430,14 +1435,45 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* Mobile FAB */}
+      {/* Mobile FAB — bottom-center. Tapping fans out the two ReportOptions directly above it,
+          centered, with a tap-anywhere scrim that only dismisses the fan-out (never starts a
+          report). Lives outside the map area's isolated stacking context (a root-level sibling),
+          so it's unaffected by Leaflet's z-indexes or the sheet dimmer/zIndex bracket.
+          z-index: the fan-out card sits at the same bottom:84 band as ChatWidget's mobile bubble
+          (right:16, bottom:84, zIndex:1100), and on narrow viewports the two can overlap
+          horizontally. While open, the scrim/FAB/card are lifted to 1140–1150 (above the bubble's
+          1100) so the card is never painted over and a tap on the bubble's area dismisses the
+          fan-out via the scrim instead of opening chat — do not drop these back into the
+          low-40s bracket used for the FAB's resting (closed) state. */}
       {isMobile && mode === 'idle' && (
-        <button
-          onClick={startReport}
-          style={{ position: 'fixed', right: 16, bottom: 20, zIndex: 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: 20, fontWeight: 700 }}>+</span> {t('topbar.report')}
-        </button>
+        <>
+          {fanOpen && (
+            <div
+              onClick={() => setFanOpen(false)}
+              aria-hidden="true"
+              style={{ position: 'fixed', inset: 0, zIndex: 1140 }}
+            />
+          )}
+          {fanOpen && (
+            <div style={{ position: 'fixed', left: '50%', bottom: 84, transform: 'translateX(-50%)', zIndex: 1150, animation: 'popIn .14s ease-out' }}>
+              <ReportOptions
+                preferred={reportPref}
+                onChoose={(target) => {
+                  setFanOpen(false);
+                  if (target === 'report') startReport(); else startQuickReport();
+                }}
+              />
+            </div>
+          )}
+          <button
+            onClick={() => setFanOpen((o) => !o)}
+            aria-expanded={fanOpen}
+            aria-label={t('report.chooseHow')}
+            style={{ position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: fanOpen ? 1145 : 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
+          >
+            <span style={{ fontSize: 20, fontWeight: 700, display: 'inline-block', transition: 'transform .15s', transform: fanOpen ? 'rotate(45deg)' : 'none' }}>+</span> {t('topbar.report')}
+          </button>
+        </>
       )}
 
       {sosOpen && (

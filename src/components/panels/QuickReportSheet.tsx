@@ -2,7 +2,6 @@ import React from 'react';
 import type { Severity } from '../../types';
 import { useI18n } from '../../i18n';
 import { listenForSeverity, speak, speechSupported } from '../../utils/voiceReport';
-import ReportModeToggle from './ReportModeToggle';
 import TurnstileWidget from '../TurnstileWidget';
 
 interface Option {
@@ -28,10 +27,6 @@ const VOICE_SPOKEN_KEY: Record<Severity, 'quick.voiceSpokenHigh' | 'quick.voiceS
 
 interface QuickReportSheetProps {
   isMobile: boolean;
-  /** Current report mode — always 'quick' here, but ReportModeToggle needs it to render the
-   *  active state (rendered inline on mobile; see App.tsx for the desktop floating pill). */
-  mode: 'report' | 'quick';
-  onSwitchMode: (mode: 'report' | 'quick') => void;
   busy: boolean;
   detectedRoad: string | null;
   accuracyM: number | null;
@@ -47,7 +42,7 @@ interface QuickReportSheetProps {
  * "Voice Report" FAB (anchored above the sheet's top-right corner) is a progressive enhancement on
  * top of the buttons, never a replacement.
  */
-const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onSwitchMode, busy, detectedRoad, accuracyM, captchaRequired, onQuick, onDone }) => {
+const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, detectedRoad, accuracyM, captchaRequired, onQuick, onDone }) => {
   const { lang, t } = useI18n();
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [justPosted, setJustPosted] = React.useState<Severity | null>(null);
@@ -55,11 +50,12 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onS
   const [voiceMsg, setVoiceMsg] = React.useState<string | null>(null);
   const cancelListenRef = React.useRef<(() => void) | null>(null);
   const flashTimer = React.useRef<number | undefined>(undefined);
-
-  React.useEffect(() => () => {
-    cancelListenRef.current?.();
-    window.clearTimeout(flashTimer.current);
-  }, []);
+  // Auto-re-arm bookkeeping: only re-listen after a *voice-matched* post (never after a tap post,
+  // never when unmounting). `startVoiceRef` always points at the latest `startVoice` closure so
+  // the delayed re-arm timeout doesn't read stale `busy`/`listening` state.
+  const shouldRearmRef = React.useRef(false);
+  const rearmTimer = React.useRef<number | undefined>(undefined);
+  const startVoiceRef = React.useRef<() => void>(() => {});
 
   const flashPosted = (sev: Severity): void => {
     window.clearTimeout(flashTimer.current);
@@ -80,18 +76,44 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onS
       lang,
       onResult: (sev) => {
         if (sev) {
+          shouldRearmRef.current = true;
           post(sev);
           speak(t(VOICE_SPOKEN_KEY[sev]), lang);
         } else {
+          shouldRearmRef.current = false;
           setVoiceMsg(t('quick.voiceNoMatch'));
         }
       },
-      onError: () => setVoiceMsg(t('quick.voiceError')),
-      onEnd: () => setListening(false),
+      onError: () => { shouldRearmRef.current = false; setVoiceMsg(t('quick.voiceError')); },
+      onEnd: () => {
+        setListening(false);
+        if (shouldRearmRef.current) {
+          shouldRearmRef.current = false;
+          // Small delay lets the TTS confirmation start before the mic reopens.
+          rearmTimer.current = window.setTimeout(() => startVoiceRef.current(), 700);
+        }
+      },
     });
   };
 
+  React.useEffect(() => { startVoiceRef.current = startVoice; });
+
+  // Auto-start listening the moment the sheet opens, so voice costs zero extra taps. Cleans up
+  // (including the re-arm timer) on unmount so a passenger navigating away never leaves a dangling
+  // listener or triggers a state update after the sheet is gone.
+  React.useEffect(() => {
+    if (speechSupported()) startVoice();
+    return () => {
+      cancelListenRef.current?.();
+      window.clearTimeout(flashTimer.current);
+      window.clearTimeout(rearmTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const stopVoice = (): void => {
+    shouldRearmRef.current = false;
+    window.clearTimeout(rearmTimer.current);
     cancelListenRef.current?.();
     setListening(false);
   };
@@ -101,12 +123,6 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onS
 
   const card = (
     <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
-      {/* Mobile only — desktop keeps the floating pill above the map (App.tsx); see ReportModeToggle. */}
-      {isMobile && (
-        <div style={{ padding: '12px 15px 0' }}>
-          <ReportModeToggle mode={mode} onSwitch={onSwitchMode} />
-        </div>
-      )}
       <div style={{ display: 'flex', gap: 9, padding: '11px 15px', background: '#FFF7ED', borderBottom: '1px solid #FED7AA' }}>
         <span style={{ fontSize: 14, flex: 'none', lineHeight: 1.3 }}>⚠️</span>
         <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.45, color: '#7C2D12', fontWeight: 600 }}>{t('quick.safety')}</p>
@@ -118,6 +134,12 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, mode, onS
       </div>
 
       <div style={{ padding: '9px 15px 10px', fontSize: 13.5, fontWeight: 800 }}>{t('quick.howBad')}</div>
+
+      {speechSupported() && (
+        <div style={{ padding: '0 15px 8px', fontSize: 11, color: 'var(--bw-muted)', fontWeight: 600 }}>
+          🎤 {t('quick.voiceSay')}
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: '0 12px 10px' }}>
         {OPTIONS.map((o) => {
