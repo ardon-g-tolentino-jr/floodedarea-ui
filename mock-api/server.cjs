@@ -81,6 +81,9 @@ server.post('/reports', (req, res) => {
     updatedAt: now,
   };
   db.get('reports').push(report).write();
+  // baha-api broadcasts this over SSE on create; mirror it so useActivityStream-driven refetches
+  // (and anything gated on a live "new report" event, e.g. trip-stop alerts) are testable offline.
+  broadcast('report-created', { id });
   res.status(201).json(stripPhoto(report));
 });
 
