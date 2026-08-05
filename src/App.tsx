@@ -1,10 +1,10 @@
 import React from 'react';
-import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity, Trip, TripStop } from './types';
+import type { AlertLevel, FeedbackStatus, FloodAlert, FloodProneArea, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewFloodProneArea, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity, Trip, TripStop, WarnArea } from './types';
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useWakeLock } from './hooks/useWakeLock';
-import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues, useSettings } from './hooks/useDomainData';
+import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useFloodProneAreas, useHotlines, useReports, useRescues, useSettings } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
@@ -16,6 +16,7 @@ import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET, SEV_RANK } from './utils/floodMeta';
 import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, FB_PAGE_URL } from './utils/share';
 import {
+  alertsForUser,
   buildPossibleClosures,
   buildRoadDirectory,
   computeStatus,
@@ -72,6 +73,7 @@ import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
+import AdminWarnZoneModal from './components/panels/AdminWarnZoneModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
 import TripPanel from './components/panels/TripPanel';
@@ -144,6 +146,7 @@ const App: React.FC = () => {
   const centers = useCenters();
   const hotlines = useHotlines();
   const alerts = useAlerts();
+  const floodProne = useFloodProneAreas();
   const rescues = useRescues();
   const settings = useSettings();
   const acceptedFeedback = useAcceptedFeedback();
@@ -236,6 +239,9 @@ const App: React.FC = () => {
   // Admin "Report incident" modal, and the report currently offered up for social sharing.
   const [incidentOpen, setIncidentOpen] = React.useState(false);
   const [shareReportTarget, setShareReportTarget] = React.useState<FloodReport | null>(null);
+  // Admin "Warn this zone" modal target — the manual second action, never auto-triggered by
+  // saving/editing a zone (see AdminWarnZoneModal's doc comment).
+  const [zoneWarnTarget, setZoneWarnTarget] = React.useState<FloodProneArea | null>(null);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -387,7 +393,13 @@ const App: React.FC = () => {
   const centerList = centers.data ?? [];
   const hotlineList = hotlines.data ?? [];
   const alertList = alerts.data ?? [];
+  const floodProneList = floodProne.data ?? [];
   const rescueList = rescues.data ?? [];
+
+  // Proximity-gate the alert list before anything shows it: a global alert (no geometry) always
+  // passes through unchanged; a geo-stamped warning (from a zone's "Warn" action) only applies to
+  // people near it. See alertsForUser's doc comment for the fail-open reasoning.
+  const visibleAlerts = React.useMemo(() => alertsForUser(alertList, userLoc), [alertList, userLoc]);
 
   const enriched = React.useMemo(
     () => enrichReports(reportList, userLoc, auth?.userId ?? null, now),
@@ -560,6 +572,10 @@ const App: React.FC = () => {
             region: null,
             level: SEV_TO_LEVEL[worst.severity],
             active: true,
+            latitude: null,
+            longitude: null,
+            radiusM: null,
+            areaId: null,
             createdAt: nowIso,
             updatedAt: nowIso,
           },
@@ -578,6 +594,10 @@ const App: React.FC = () => {
             region: m.report.name ?? null,
             level: SEV_TO_LEVEL[m.report.severity],
             active: true,
+            latitude: null,
+            longitude: null,
+            radiusM: null,
+            areaId: null,
             createdAt: nowIso,
             updatedAt: nowIso,
           },
@@ -623,6 +643,10 @@ const App: React.FC = () => {
           region: r.name ?? null,
           level: SEV_TO_LEVEL[r.severity],
           active: true,
+          latitude: null,
+          longitude: null,
+          radiusM: null,
+          areaId: null,
           createdAt: nowIso,
           updatedAt: nowIso,
         },
@@ -647,6 +671,10 @@ const App: React.FC = () => {
           region: null,
           level: SEV_TO_LEVEL[worst.severity],
           active: true,
+          latitude: null,
+          longitude: null,
+          radiusM: null,
+          areaId: null,
           createdAt: nowIso,
           updatedAt: nowIso,
         },
@@ -687,10 +715,10 @@ const App: React.FC = () => {
   // Surface the most severe active, non-dismissed alert (red > orange > yellow).
   const activeAlert = React.useMemo(() => {
     const rank: Record<AlertLevel, number> = { red: 3, orange: 2, yellow: 1 };
-    return alertList
+    return visibleAlerts
       .filter((a) => a.active && !dismissedAlerts.has(a.id))
       .sort((a, b) => rank[b.level] - rank[a.level])[0];
-  }, [alertList, dismissedAlerts]);
+  }, [visibleAlerts, dismissedAlerts]);
 
   // Proactively nudge on a newly-active severe (orange/red) rainfall warning. Keyed by id+level
   // so an escalation (e.g. orange → red) re-fires, but a steady warning doesn't repeat.
@@ -704,7 +732,7 @@ const App: React.FC = () => {
     // data arrives and fires on load.
     if (alerts.loading) return;
 
-    const severe = alertList.filter((a) => a.active && (a.level === 'red' || a.level === 'orange'));
+    const severe = visibleAlerts.filter((a) => a.active && (a.level === 'red' || a.level === 'orange'));
 
     // First settled load: remember what's already active (id+level) without alerting. A rainfall
     // warning that was already ongoing when the user opened or navigated to the page must NOT
@@ -726,7 +754,7 @@ const App: React.FC = () => {
     const worstActive = severe.find((a) => a.level === 'red') ?? severe[0];
     if (worstActive && modaledAlertLevels.current.get(worstActive.id) !== worstActive.level) {
       modaledAlertLevels.current.set(worstActive.id, worstActive.level);
-      setAlertModal({ alert: worstActive, source: 'weather' });
+      setAlertModal({ alert: worstActive, source: worstActive.areaId != null ? 'zone' : 'weather' });
       playAlertSound();
     }
 
@@ -740,7 +768,7 @@ const App: React.FC = () => {
       try { new Notification(worst.title, { body: worst.body }); } catch {/* ignore */}
     }
     showToast(worst.title);
-  }, [alertList, alerts.loading, showToast, playAlertSound]);
+  }, [visibleAlerts, alerts.loading, showToast, playAlertSound]);
 
   // ── Actions ──
   // Full-account gate for higher-stakes actions (SOS, the responder/rescue views, feedback). A
@@ -1256,6 +1284,21 @@ const App: React.FC = () => {
   const onUpdateAlert = (id: number, b: Partial<NewAlert>) => adminAction(() => mutations.updateAlert(id, b), () => alerts.refetch(true), 'Alert updated.');
   const onDeleteAlert = (id: number) => adminAction(() => mutations.deleteAlert(id), () => alerts.refetch(true), 'Alert removed.');
 
+  const onCreateZone = (b: NewFloodProneArea) => adminAction(() => mutations.createFloodProneArea(b), () => floodProne.refetch(true), 'Zone added.');
+  const onUpdateZone = (id: number, b: Partial<NewFloodProneArea>) => adminAction(() => mutations.updateFloodProneArea(id, b), () => floodProne.refetch(true), 'Zone updated.');
+  const onDeleteZone = (id: number) => adminAction(() => mutations.deleteFloodProneArea(id), () => floodProne.refetch(true), 'Zone removed.');
+
+  // Manual warning trigger — the deliberate second action the feature is built around. Deliberately
+  // NOT run through adminAction: it must throw on failure so AdminWarnZoneModal keeps its form open
+  // and shows an error (same reasoning as onReportIncident), and it refetches BOTH alerts (the new
+  // warning) and flood-prone areas (the zone's updated lastWarnedAt).
+  const warnZone = async (id: number, b: WarnArea): Promise<void> => {
+    await mutations.warnFloodProneArea(id, b);
+    await alerts.refetch(true);
+    await floodProne.refetch(true);
+    showToast('Warning broadcast.');
+  };
+
   // Global (server-backed) community-chat visibility toggle, unlike the per-browser `liveStream` pref.
   const onToggleChat = async (on: boolean): Promise<void> => {
     try {
@@ -1586,6 +1629,7 @@ const App: React.FC = () => {
             affectedStopIds={tripAlertStopIds}
             selectedStopId={selectedStopId}
             onSelectStop={(id) => { setSelectedStopId(id); setSelectedReportId(null); setSelEvacId(null); }}
+            floodProneAreas={floodProneList}
           />
 
           {!isMobile && <RoadLegend />}
@@ -1932,6 +1976,14 @@ const App: React.FC = () => {
           onClose={() => setIncidentOpen(false)}
         />
       )}
+      {zoneWarnTarget && isAdmin && (
+        <AdminWarnZoneModal
+          isMobile={isMobile}
+          zone={zoneWarnTarget}
+          onSubmit={(b) => warnZone(zoneWarnTarget.id, b)}
+          onClose={() => setZoneWarnTarget(null)}
+        />
+      )}
       {supportOpen && (
         <SupportModal qrSrc={GCASH_QR_SRC} isMobile={isMobile} onClose={() => setSupportOpen(false)} />
       )}
@@ -1972,6 +2024,7 @@ const App: React.FC = () => {
           centers={centerList}
           hotlines={hotlineList}
           alerts={alertList}
+          zones={floodProneList}
           reports={reportList}
           liveStream={liveStream}
           onToggleLive={setLiveStream}
@@ -1986,6 +2039,10 @@ const App: React.FC = () => {
           onCreateAlert={onCreateAlert}
           onUpdateAlert={onUpdateAlert}
           onDeleteAlert={onDeleteAlert}
+          onCreateZone={onCreateZone}
+          onUpdateZone={onUpdateZone}
+          onDeleteZone={onDeleteZone}
+          onWarnZone={(zone) => setZoneWarnTarget(zone)}
           onCreateReport={onCreateReport}
           onUpdateReport={onUpdateReport}
           onDeleteReport={onDeleteReport}

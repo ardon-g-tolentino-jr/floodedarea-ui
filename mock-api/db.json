@@ -288,8 +288,56 @@
       "region": "Metro Manila & Rizal",
       "level": "red",
       "active": true,
+      "latitude": null,
+      "longitude": null,
+      "radiusM": null,
+      "areaId": null,
       "createdAt": "2026-06-20T04:00:00Z",
       "updatedAt": "2026-06-20T16:58:17.147Z"
+    }
+  ],
+  "floodProneAreas": [
+    {
+      "id": 100000,
+      "name": "Marikina Riverside (Tumana)",
+      "district": "Marikina",
+      "latitude": 14.6563,
+      "longitude": 121.0875,
+      "radiusM": 700,
+      "level": "red",
+      "note": "Low-lying riverside barangay — floods first and floods deepest along the Marikina River.",
+      "active": true,
+      "lastWarnedAt": null,
+      "createdAt": "2026-06-01T00:00:00Z",
+      "updatedAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": 100001,
+      "name": "España Blvd underpass",
+      "district": "Manila",
+      "latitude": 14.6091,
+      "longitude": 120.9903,
+      "radiusM": 400,
+      "level": "orange",
+      "note": "Underpass floods quickly in heavy rain — impassable to sedans within the hour.",
+      "active": true,
+      "lastWarnedAt": null,
+      "createdAt": "2026-06-01T00:00:00Z",
+      "updatedAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": 100002,
+      "name": "Provident Village",
+      "district": "Marikina",
+      "latitude": 14.6409,
+      "longitude": 121.1034,
+      "radiusM": 500,
+      "level": "orange",
+      "note": null,
+      "active": true,
+      "lastWarnedAt": null,
+      "createdAt": "2026-06-01T00:00:00Z",
+      "updatedAt": "2026-06-01T00:00:00Z"
     }
   ],
   "rescues": [

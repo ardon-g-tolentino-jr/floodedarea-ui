@@ -5,11 +5,13 @@ import type {
   Feedback,
   FeedbackStatus,
   FloodAlert,
+  FloodProneArea,
   FloodReport,
   Hotline,
   NewAlert,
   NewCenter,
   NewFeedback,
+  NewFloodProneArea,
   NewHotline,
   NewReport,
   NewRescue,
@@ -19,6 +21,7 @@ import type {
   RoadSegment,
   Severity,
   VisitStats,
+  WarnArea,
 } from '../types';
 
 /** Typed GET functions. baha-api returns domain-shaped JSON, so these are direct. */
@@ -40,6 +43,8 @@ export const rawApi = {
   visitCount: () => api.get<VisitStats>('/stats/visits'),
   /** Global app settings (e.g. community chat visibility). Public read. */
   settings: () => api.get<AppSettings>('/settings'),
+  /** Active flood-prone areas (the pin+radius zones drawn on the map). Public read. */
+  floodProneAreas: () => api.get<FloodProneArea[]>('/flood-prone'),
 };
 
 /** POST/PATCH/DELETE mutations. */
@@ -84,4 +89,12 @@ export const mutations = {
 
   // ── Admin: global app settings ──
   updateSettings: (body: Partial<AppSettings>) => api.patch<AppSettings>('/settings', body),
+
+  // ── Admin: flood-prone areas ──
+  createFloodProneArea: (body: NewFloodProneArea) => api.post<FloodProneArea>('/flood-prone', body),
+  updateFloodProneArea: (id: number, body: Partial<NewFloodProneArea>) =>
+    api.patch<FloodProneArea>(`/flood-prone/${id}`, body),
+  deleteFloodProneArea: (id: number) => api.delete<void>(`/flood-prone/${id}`),
+  /** Manual trigger: broadcasts a geo-stamped FloodAlert from this zone. Never fired automatically. */
+  warnFloodProneArea: (id: number, body: WarnArea) => api.post<FloodAlert>(`/flood-prone/${id}/warn`, body),
 };

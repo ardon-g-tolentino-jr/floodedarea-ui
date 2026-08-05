@@ -4,23 +4,27 @@ import type {
   Feedback,
   FeedbackStatus,
   FloodAlert,
+  FloodProneArea,
   FloodReport,
   Hotline,
   NewAlert,
   NewCenter,
+  NewFloodProneArea,
   NewHotline,
   NewReport,
   ReportStatus,
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
+import { timeAgo } from '../../utils/format';
 import PlaceField from './PlaceField';
 
-type Tab = 'shelters' | 'hotlines' | 'alerts' | 'reports' | 'requests';
+type Tab = 'shelters' | 'hotlines' | 'alerts' | 'zones' | 'reports' | 'requests';
 
 interface AdminPanelProps {
   centers: EvacuationCenter[];
   hotlines: Hotline[];
   alerts: FloodAlert[];
+  zones: FloodProneArea[];
   reports: FloodReport[];
   liveStream: boolean;
   onToggleLive: (on: boolean) => void;
@@ -36,6 +40,12 @@ interface AdminPanelProps {
   onCreateAlert: (b: NewAlert) => Promise<void>;
   onUpdateAlert: (id: number, b: Partial<NewAlert>) => Promise<void>;
   onDeleteAlert: (id: number) => Promise<void>;
+  onCreateZone: (b: NewFloodProneArea) => Promise<void>;
+  onUpdateZone: (id: number, b: Partial<NewFloodProneArea>) => Promise<void>;
+  onDeleteZone: (id: number) => Promise<void>;
+  /** Row-level "⚠ Warn" trigger — opens the (separately mounted) confirm modal for this zone. Never
+   *  fires the warning itself; that's an explicit second action in the modal. */
+  onWarnZone: (zone: FloodProneArea) => void;
   onCreateReport: (b: NewReport) => Promise<void>;
   onUpdateReport: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
   onDeleteReport: (id: number) => Promise<void>;
@@ -84,6 +94,15 @@ const FIELDS: Record<Tab, Field[]> = {
     { key: 'level', label: 'Level', type: 'select', options: levelOptions },
     { key: 'active', label: 'Active', type: 'checkbox' },
   ],
+  zones: [
+    { key: 'name', label: 'Name', type: 'text' },
+    { key: 'district', label: 'District', type: 'text' },
+    { key: 'location', label: 'Location', type: 'place' },
+    { key: 'radiusM', label: 'Radius (m)', type: 'number' },
+    { key: 'level', label: 'Level', type: 'select', options: levelOptions },
+    { key: 'note', label: 'Note', type: 'textarea' },
+    { key: 'active', label: 'Active', type: 'checkbox' },
+  ],
   reports: [
     { key: 'name', label: 'Name', type: 'text' },
     { key: 'district', label: 'District', type: 'text' },
@@ -101,6 +120,7 @@ const TAB_LABEL: Record<Tab, string> = {
   shelters: 'Shelters',
   hotlines: 'Hotlines',
   alerts: 'Alerts',
+  zones: 'Zones',
   reports: 'Reports',
   requests: 'Requests',
 };
@@ -123,6 +143,7 @@ function blankForm(tab: Tab): FormValues {
     if (f.type === 'place') { v.latitude = ''; v.longitude = ''; v._place = ''; }
     else if (f.type === 'checkbox') v[f.key] = f.key === 'active' ? true : false;
     else if (f.type === 'select') v[f.key] = f.options?.[0]?.value ?? '';
+    else if (tab === 'zones' && f.key === 'radiusM') v.radiusM = '500';
     else v[f.key] = '';
   }
   return v;
@@ -157,7 +178,7 @@ const inputStyle: React.CSSProperties = {
 
 
 const AdminPanel: React.FC<AdminPanelProps> = (props) => {
-  const { centers, hotlines, alerts, reports, liveStream, onToggleLive, chatEnabled, onToggleChat, onClose } = props;
+  const { centers, hotlines, alerts, zones, reports, liveStream, onToggleLive, chatEnabled, onToggleChat, onClose } = props;
   const [tab, setTab] = React.useState<Tab>('shelters');
   const [editing, setEditing] = React.useState<{ id: number | null; form: FormValues } | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -205,6 +226,17 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         return { name: str(form.name), phoneNumber: str(form.phoneNumber), description: str(form.description) || null, position: num(form.position) } satisfies NewHotline;
       case 'alerts':
         return { title: str(form.title), body: str(form.body), region: str(form.region) || null, level: str(form.level) as NewAlert['level'], active: !!form.active } satisfies NewAlert;
+      case 'zones':
+        return {
+          name: str(form.name),
+          district: str(form.district),
+          latitude: num(form.latitude),
+          longitude: num(form.longitude),
+          radiusM: num(form.radiusM) || 500,
+          level: str(form.level) as NewFloodProneArea['level'],
+          note: str(form.note) || null,
+          active: !!form.active,
+        } satisfies NewFloodProneArea;
       case 'reports':
         return {
           name: str(form.name),
@@ -235,6 +267,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
       if (tab === 'shelters') id == null ? await props.onCreateCenter(payload as NewCenter) : await props.onUpdateCenter(id, payload as Partial<NewCenter>);
       else if (tab === 'hotlines') id == null ? await props.onCreateHotline(payload as NewHotline) : await props.onUpdateHotline(id, payload as Partial<NewHotline>);
       else if (tab === 'alerts') id == null ? await props.onCreateAlert(payload as NewAlert) : await props.onUpdateAlert(id, payload as Partial<NewAlert>);
+      else if (tab === 'zones') id == null ? await props.onCreateZone(payload as NewFloodProneArea) : await props.onUpdateZone(id, payload as Partial<NewFloodProneArea>);
       else id == null ? await props.onCreateReport(payload as NewReport) : await props.onUpdateReport(id, payload as Partial<NewReport & { status: ReportStatus }>);
       setEditing(null);
     } catch {
@@ -251,6 +284,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
       if (tab === 'shelters') await props.onDeleteCenter(id);
       else if (tab === 'hotlines') await props.onDeleteHotline(id);
       else if (tab === 'alerts') await props.onDeleteAlert(id);
+      else if (tab === 'zones') await props.onDeleteZone(id);
       else await props.onDeleteReport(id);
     } catch {
       setError('Could not delete. Please try again.');
@@ -265,10 +299,11 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     if (tab === 'shelters') return centers.map((c) => ({ id: c.id, primary: c.name, secondary: c.contact, rec: c as unknown as Record<string, unknown> }));
     if (tab === 'hotlines') return [...hotlines].sort((a, b) => a.position - b.position).map((h) => ({ id: h.id, primary: h.name, secondary: h.phoneNumber, rec: h as unknown as Record<string, unknown> }));
     if (tab === 'alerts') return alerts.map((a) => ({ id: a.id, primary: a.title, secondary: `${a.level.toUpperCase()} · ${a.active ? 'active' : 'inactive'}`, rec: a as unknown as Record<string, unknown> }));
+    if (tab === 'zones') return zones.map((z) => ({ id: z.id, primary: z.name, secondary: `${z.district} · ${z.radiusM} m · ${z.level.toUpperCase()}${z.active ? '' : ' · inactive'}`, rec: z as unknown as Record<string, unknown> }));
     return [...reports]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .map((r) => ({ id: r.id, primary: r.name, secondary: `${SEV_META[r.severity].label} · ${r.depthCm} cm · ${r.district}`, rec: r as unknown as Record<string, unknown> }));
-  }, [tab, centers, hotlines, alerts, reports]);
+  }, [tab, centers, hotlines, alerts, zones, reports]);
 
   // Paginate the list (10 per page). Clamp the page if the row count shrinks (e.g. after a delete).
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
@@ -278,7 +313,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   }, [page, safePage]);
   const pagedRows = rows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
-  const tabs: Tab[] = ['shelters', 'hotlines', 'alerts', 'reports', 'requests'];
+  const tabs: Tab[] = ['shelters', 'hotlines', 'alerts', 'zones', 'reports', 'requests'];
 
   return (
     <div
@@ -433,12 +468,24 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
               </button>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {rows.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>No records yet.</div>}
-                {pagedRows.map((r) => (
+                {pagedRows.map((r) => {
+                  const zoneRec = tab === 'zones' ? (r.rec as unknown as FloodProneArea) : null;
+                  return (
                   <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FAFB', borderRadius: 11 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.primary}</div>
                       <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.secondary}</div>
+                      {zoneRec && (
+                        <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', marginTop: 2 }}>
+                          {zoneRec.lastWarnedAt ? `Last warned ${timeAgo(zoneRec.lastWarnedAt)}` : 'Never warned'}
+                        </div>
+                      )}
                     </div>
+                    {zoneRec && (
+                      <button onClick={() => props.onWarnZone(zoneRec)} disabled={busy} title="Send a flood warning for this zone" style={{ border: '1px solid #FED7AA', background: '#FFF7ED', color: '#C2410C', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                        ⚠ Warn
+                      </button>
+                    )}
                     <button onClick={() => startEdit(r.id, r.rec)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                       Edit
                     </button>
@@ -446,7 +493,8 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                       Delete
                     </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {pageCount > 1 && (

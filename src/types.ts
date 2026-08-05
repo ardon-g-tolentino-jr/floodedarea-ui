@@ -65,8 +65,56 @@ export interface FloodAlert {
   region: string | null;
   level: AlertLevel;
   active: boolean;
+  /** Geo-stamp: non-null when this alert was broadcast from a flood-prone area (`/flood-prone/:id/warn`).
+   *  Null (the default for every existing/global alert) means it applies everywhere, unchanged. */
+  latitude: number | null;
+  longitude: number | null;
+  radiusM: number | null;
+  /** The flood-prone area this warning was stamped from, if any. */
+  areaId: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * An admin-pinned, persistent "this place floods" advisory: a pin + radius drawn on the map for
+ * everyone. Distinct from a FloodAlert (the individual broadcast) and a FloodReport (crowd-sourced,
+ * expiring, "water is here now") — a zone stands quietly until an admin explicitly warns it.
+ */
+export interface FloodProneArea {
+  id: number;
+  name: string;
+  district: string;
+  latitude: number;
+  longitude: number;
+  radiusM: number;
+  level: AlertLevel;
+  note: string | null;
+  active: boolean;
+  /** When this zone was last warned (a FloodAlert stamped from it), or null if never. */
+  lastWarnedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Admin payload for creating/updating a flood-prone area (id/lastWarnedAt/timestamps are server-set). */
+export interface NewFloodProneArea {
+  name: string;
+  district: string;
+  latitude: number;
+  longitude: number;
+  radiusM: number;
+  level: AlertLevel;
+  note: string | null;
+  active: boolean;
+}
+
+/** Payload for the manual "Warn" action — all fields optional; the backend falls back to the
+ *  zone's own name/note/level when omitted. */
+export interface WarnArea {
+  title?: string;
+  body?: string;
+  level?: AlertLevel;
 }
 
 export interface LatLng {

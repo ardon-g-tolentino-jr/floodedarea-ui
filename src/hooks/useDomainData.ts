@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { AppSettings, EvacuationCenter, Feedback, FloodAlert, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
+import type { AppSettings, EvacuationCenter, Feedback, FloodAlert, FloodProneArea, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -47,4 +47,10 @@ export function useAllFeedback(enabled: boolean): FetchResult<Feedback[]> {
 /** Global, admin-controlled app settings (e.g. community chat visibility). Public read. */
 export function useSettings(): FetchResult<AppSettings> {
   return useFetch(() => rawApi.settings(), []);
+}
+
+/** Admin-pinned flood-prone areas (pin + radius, drawn for everyone). Public read, no `enabled`
+ *  flag — the zones are shown to every visitor, not just admins. */
+export function useFloodProneAreas(): FetchResult<FloodProneArea[]> {
+  return useFetch(() => rawApi.floodProneAreas(), []);
 }
