@@ -12,11 +12,12 @@ const LEVEL_LABEL: Record<FloodAlert['level'], string> = {
 /** Which of the three alert systems (see i18n `alert.source*`) triggered this dialog — shown as a
  *  small chip so the same modal chrome doesn't look identical for a nearby report, a trip-stop
  *  match, and a real PAGASA warning. */
-export type AlertSource = 'nearby' | 'trip' | 'weather';
+export type AlertSource = 'nearby' | 'trip' | 'weather' | 'zone';
 const SOURCE_KEY: Record<AlertSource, MsgKey> = {
   nearby: 'alert.sourceNearby',
   trip: 'alert.sourceTrip',
   weather: 'alert.sourceWeather',
+  zone: 'alert.sourceZone',
 };
 
 interface AlertModalProps {

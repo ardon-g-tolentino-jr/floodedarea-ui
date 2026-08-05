@@ -162,6 +162,7 @@ const MESSAGES = {
   'alert.sourceNearby': { en: 'Nearby', fil: 'Malapit' },
   'alert.sourceTrip': { en: 'Trip', fil: 'Biyahe' },
   'alert.sourceWeather': { en: 'Weather', fil: 'Panahon' },
+  'alert.sourceZone': { en: 'Zone', fil: 'Zone' },
 
   // ── Share modal ──
   'share.title': { en: 'Help your neighbors stay safe', fil: 'Tulungan ang iyong mga kapitbahay na manatiling ligtas' },
@@ -405,6 +406,14 @@ const MESSAGES = {
   'trip.alertTitleMany': { en: '{n} new floods on your trip', fil: '{n} bagong baha sa iyong biyahe' },
   'trip.alertBodyOne': { en: '{sev} flooding reported near {stop} — {name}, about {depth} cm deep.', fil: '{sev} na baha ang naiulat malapit sa {stop} — {name}, humigit-kumulang {depth} cm ang lalim.' },
   'trip.alertBodyMany': { en: '{n} new floods reported near stops on your trip. The worst is {sev} at {name}.', fil: '{n} bagong baha ang naiulat malapit sa mga hinto ng iyong biyahe. Ang pinakamalala ay {sev} sa {name}.' },
+
+  // ── Flood-prone zones (admin-pinned advisory pins + manual warn) ──
+  'zone.warnTitle': { en: 'Send a flood warning', fil: 'Magpadala ng babala sa baha' },
+  'zone.warnBody': { en: 'This broadcasts a warning for this zone to everyone nearby, right now.', fil: 'Ipapadala nito ngayon din ang babala para sa zone na ito sa lahat ng malapit.' },
+  'zone.advisory': { en: 'Reach is proximity-limited — only people within roughly this zone’s radius will see it.', fil: 'Limitado ang saklaw nito sa lugar — makikita lang ito ng mga taong nasa loob ng radius ng zone na ito.' },
+  'zone.sendWarning': { en: 'Send warning', fil: 'Ipadala ang babala' },
+  'zone.lastWarned': { en: 'Last warned', fil: 'Huling binalaan' },
+  'zone.legend': { en: 'Flood-prone zone', fil: 'Zone na madalas bahain' },
 } as const;
 
 export type MsgKey = keyof typeof MESSAGES;

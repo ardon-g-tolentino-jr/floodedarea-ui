@@ -1,10 +1,11 @@
 import React from 'react';
 import L from 'leaflet';
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
-import type { EvacuationCenter, LatLng, RoadSegment, TripStop } from '../../types';
+import type { EvacuationCenter, FloodProneArea, LatLng, RoadSegment, TripStop } from '../../types';
 import { RESCUE_STATUS_META, ROAD_META } from '../../utils/floodMeta';
 import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
 import { formatDuration } from '../../utils/format';
+import { LEVEL_STYLE } from '../panels/AlertRibbon';
 
 export interface MapFocus extends LatLng {
   /** Bumped on every search so re-selecting the same place still re-flies the map. */
@@ -48,6 +49,10 @@ interface FloodMapProps {
   affectedStopIds?: string[];
   selectedStopId?: string | null;
   onSelectStop?: (id: string) => void;
+  /** Admin-pinned flood-prone areas (persistent pin + radius), shown to every visitor. */
+  floodProneAreas?: FloodProneArea[];
+  /** Layer toggle for the flood-prone zones — omit/true shows them, false hides. */
+  showFloodProne?: boolean;
 }
 
 const shelterIconHtml = (color: string): string =>
@@ -136,6 +141,8 @@ const FloodMap: React.FC<FloodMapProps> = ({
   affectedStopIds,
   selectedStopId,
   onSelectStop,
+  floodProneAreas = [],
+  showFloodProne = true,
 }) => {
   return (
     <MapContainer
@@ -195,6 +202,26 @@ const FloodMap: React.FC<FloodMapProps> = ({
                 </Tooltip>
               </Polyline>
             </React.Fragment>
+          );
+        })}
+
+      {/* Admin-pinned flood-prone areas — persistent advisory pins, drawn below the live report
+          layers so an active report never reads as "under" a standing advisory. Dashed + low
+          fill so they read as "watch this place" rather than "water is here now" (that's a report). */}
+      {showFloodProne &&
+        floodProneAreas.map((a) => {
+          const color = (LEVEL_STYLE[a.level] ?? LEVEL_STYLE.orange).chip;
+          return (
+            <Circle
+              key={`zone-${a.id}`}
+              center={[a.latitude, a.longitude]}
+              radius={a.radiusM}
+              pathOptions={{ color, weight: 2, dashArray: '6 5', fill: true, fillColor: color, fillOpacity: 0.08 }}
+            >
+              <Tooltip direction="top" sticky opacity={1}>
+                <span style={{ fontWeight: 700 }}>⚠ {a.name}</span> · {a.district}
+              </Tooltip>
+            </Circle>
           );
         })}
 

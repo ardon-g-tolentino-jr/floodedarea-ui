@@ -374,5 +374,83 @@ server.patch('/settings', (req, res) => {
   res.json({ chatEnabled: next.chatEnabled !== false });
 });
 
+// ── Flood-prone areas (admin-pinned pin+radius zones) + the manual "Warn" action ──────────────
+// The db.json collection is `floodProneAreas` but the API path is `/flood-prone` (matching
+// baha-api), so these need explicit routes rather than json-server's name-derived auto-CRUD.
+server.get('/flood-prone', (_req, res) => {
+  res.json(router.db.get('floodProneAreas').value() || []);
+});
+
+server.post('/flood-prone', (req, res) => {
+  const db = router.db;
+  const ids = db.get('floodProneAreas').map('id').value();
+  const id = ids.length ? Math.max(...ids) + 1 : 100000;
+  const now = new Date().toISOString();
+  const area = {
+    id,
+    name: req.body.name,
+    district: req.body.district,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    radiusM: req.body.radiusM || 500,
+    level: req.body.level || 'orange',
+    note: req.body.note ?? null,
+    active: req.body.active !== false,
+    lastWarnedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.get('floodProneAreas').push(area).write();
+  res.status(201).json(area);
+});
+
+server.patch('/flood-prone/:id', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const area = db.get('floodProneAreas').find({ id }).value();
+  if (!area) return res.status(404).json({ message: 'Flood-prone area not found' });
+  const updated = db.get('floodProneAreas').find({ id }).assign({ ...req.body, updatedAt: new Date().toISOString() }).write();
+  res.json(updated);
+});
+
+server.delete('/flood-prone/:id', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  db.get('floodProneAreas').remove({ id }).write();
+  res.status(200).json({});
+});
+
+// Manual warning trigger: stamp a new alert row with this zone's geometry, bump the zone's
+// lastWarnedAt, and broadcast `alert-created` — the SAME event the existing rainfall-alert path
+// uses, so useActivityStream's `event.startsWith('alert')` refetch picks it up with no changes.
+server.post('/flood-prone/:id/warn', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const area = db.get('floodProneAreas').find({ id }).value();
+  if (!area) return res.status(404).json({ message: 'Flood-prone area not found' });
+
+  const now = new Date().toISOString();
+  const alertIds = db.get('alerts').map('id').value();
+  const alertId = alertIds.length ? Math.max(...alertIds) + 1 : 1;
+  const alert = {
+    id: alertId,
+    title: req.body.title || `Flood-prone area: ${area.name}`,
+    body: req.body.body || area.note || `Flooding is likely near ${area.name}, ${area.district}. Avoid the area and monitor conditions.`,
+    region: area.district,
+    level: req.body.level || area.level,
+    active: true,
+    latitude: area.latitude,
+    longitude: area.longitude,
+    radiusM: area.radiusM,
+    areaId: area.id,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.get('alerts').push(alert).write();
+  db.get('floodProneAreas').find({ id }).assign({ lastWarnedAt: now, updatedAt: now }).write();
+  broadcast('alert-created', { id: alertId });
+  res.status(201).json(alert);
+});
+
 server.use(router);
 server.listen(3001, () => process.stdout.write('[baha mock-api] http://localhost:3001\n'));

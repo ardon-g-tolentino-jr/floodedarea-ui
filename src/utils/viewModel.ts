@@ -1,7 +1,7 @@
 // Derived view model for the flood map + sidebar, ported from the design's renderVals().
 // Pure functions over the live API data + the user's location.
 
-import type { FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
+import type { FloodAlert, FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
 import { kmBetween } from './geo';
 import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
@@ -68,6 +68,34 @@ export const REPORT_TTL_DEFAULT_MIN = REPORT_TTL_MIN.medium;
 // farther — e.g. driven down the road to a new flooded street — is a distinct sighting, so a
 // second report is allowed. This replaces the old blanket "one active report per person" gate.
 export const REPORT_DISTINCT_M = 250; // metres
+
+// ── Flood-prone zone proximity gate ─────────────────────────────────────────────────
+// A geo-stamped FloodAlert (warned from a flood-prone area) only matters to people near that
+// area; a global alert (no geometry — every alert before this feature, and any admin still
+// posts one that way) must keep applying to everyone exactly as it always has.
+
+// Extra slack (km) added on top of the zone's own radius before a geo alert stops applying —
+// covers GPS drift and lets someone just outside the drawn circle still get the warning.
+export const PROXIMITY_MARGIN_KM = 0.3;
+
+/**
+ * Filter alerts to the ones that apply to `userLoc`. Global alerts (no lat/lng) always pass —
+ * that's the pre-existing, non-negotiable behavior. Geo-stamped alerts pass only when the user is
+ * within `radiusM/1000 + PROXIMITY_MARGIN_KM` of the alert's point.
+ *
+ * Fails OPEN when `userLoc` is null (location unknown/denied): a geo alert is shown rather than
+ * hidden. A missed flood warning is worse than a spurious one — the cost of a false positive here
+ * (someone sees a warning that turns out not to apply to them) is far lower than the cost of a
+ * false negative (someone never finds out their area is being actively warned about).
+ */
+export function alertsForUser(alerts: FloodAlert[], userLoc: LatLng | null): FloodAlert[] {
+  return alerts.filter((a) => {
+    if (a.latitude == null || a.longitude == null) return true; // global — always applies
+    if (!userLoc) return true; // fail open — see doc comment above
+    const radiusKm = (a.radiusM ?? 0) / 1000;
+    return kmBetween(userLoc, { lat: a.latitude, lng: a.longitude }) <= radiusKm + PROXIMITY_MARGIN_KM;
+  });
+}
 
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
