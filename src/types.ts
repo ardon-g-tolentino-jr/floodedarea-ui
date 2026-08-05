@@ -204,3 +204,36 @@ export interface AppSettings {
   /** Whether the floating community-chat bubble is shown. Default true. */
   chatEnabled: boolean;
 }
+
+// ── Trip monitoring (client-only) ──────────────────────────────────────────────────
+// A Trip and its Stops exist ONLY on the device (localStorage `baha_trip_v1`). Unlike every other
+// type in this file, nothing here is ever sent to or received from baha-api.
+
+/** One tagged place along a trip, monitored for new flood reports. */
+export interface TripStop {
+  /** Stable client id — never key off array index, stops reorder. */
+  id: string;
+  /** User-facing label, e.g. "EDSA / Ortigas". Seeded from the picked place, editable. */
+  label: string;
+  lat: number;
+  lng: number;
+  /** Per-stop alert radius, km. */
+  radiusKm: number;
+  /** Canonical road name captured when the stop was added (snapToRoad, else reverse geocode).
+   *  Powers the road-name arm of alert matching; null when nothing could be resolved. */
+  roadName: string | null;
+  /** City/municipality at add time — disambiguates common road names ("Rizal St"). */
+  city: string | null;
+}
+
+/** The single active trip. Stops persist across End/Start so a trip can be resumed. */
+export interface Trip {
+  /** Minted fresh on every Start trip; scopes per-trip bookkeeping. */
+  id: string;
+  /** true while stops are being monitored. false keeps the stops but silences alerts. */
+  active: boolean;
+  /** Ordered: [0] = start, last = destination. */
+  stops: TripStop[];
+  /** Epoch ms the trip was last started; 0 if never started. */
+  startedAt: number;
+}

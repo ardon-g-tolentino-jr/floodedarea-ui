@@ -1,7 +1,7 @@
 import React from 'react';
 import L from 'leaflet';
 import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
-import type { EvacuationCenter, LatLng, RoadSegment } from '../../types';
+import type { EvacuationCenter, LatLng, RoadSegment, TripStop } from '../../types';
 import { RESCUE_STATUS_META, ROAD_META } from '../../utils/floodMeta';
 import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
 import { formatDuration } from '../../utils/format';
@@ -42,6 +42,12 @@ interface FloodMapProps {
   rescues?: EnrichedRescue[];
   selectedRescueId?: number | null;
   onSelectRescue?: (id: number) => void;
+  /** Ordered stops of the active trip, if any. */
+  tripStops?: TripStop[];
+  /** Ids of stops with a currently-matching active report — drawn amber instead of violet. */
+  affectedStopIds?: string[];
+  selectedStopId?: string | null;
+  onSelectStop?: (id: string) => void;
 }
 
 const shelterIconHtml = (color: string): string =>
@@ -66,6 +72,12 @@ function youIcon(): L.DivIcon {
 function pendingIcon(): L.DivIcon {
   const html = `<div style="width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:#0EA5E9;border:3px solid #fff;box-shadow:0 4px 12px rgba(15,23,42,.4)"></div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [22, 22], iconAnchor: [11, 22] });
+}
+
+function stopIcon(n: number, alerted: boolean): L.DivIcon {
+  const bg = alerted ? '#F59E0B' : '#7C3AED';
+  const html = `<div style="width:26px;height:26px;border-radius:9px;background:${bg};border:2.5px solid #fff;box-shadow:0 3px 10px rgba(15,23,42,.42);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;font-weight:800;line-height:1">${n}</div>`;
+  return L.divIcon({ html, className: 'bw-divicon', iconSize: [26, 26], iconAnchor: [13, 13] });
 }
 
 function searchIcon(): L.DivIcon {
@@ -120,6 +132,10 @@ const FloodMap: React.FC<FloodMapProps> = ({
   rescues,
   selectedRescueId,
   onSelectRescue,
+  tripStops,
+  affectedStopIds,
+  selectedStopId,
+  onSelectStop,
 }) => {
   return (
     <MapContainer
@@ -268,6 +284,34 @@ const FloodMap: React.FC<FloodMapProps> = ({
                 {r.waitMin > 0 ? ` · waiting ${formatDuration(r.waitMin)}` : ''}
               </Tooltip>
             </CircleMarker>
+          </React.Fragment>
+        );
+      })}
+
+      {/* Trip: dashed order line → per-stop rings → numbered pins. Painted after rescues and before
+          the search/pending/You markers so those stay on top exactly as they do today. */}
+      {tripStops && tripStops.length > 1 && (
+        <Polyline
+          positions={tripStops.map((s) => [s.lat, s.lng] as [number, number])}
+          pathOptions={{ color: '#7C3AED', weight: 3, opacity: 0.45, dashArray: '2 9' }}
+        />
+      )}
+      {tripStops?.map((s, i) => {
+        const alerted = affectedStopIds?.includes(s.id) ?? false;
+        const c = alerted ? '#F59E0B' : '#7C3AED';
+        return (
+          <React.Fragment key={`stop-${s.id}`}>
+            <Circle
+              center={[s.lat, s.lng]}
+              radius={s.radiusKm * 1000}
+              pathOptions={{ color: c, weight: s.id === selectedStopId ? 2.5 : 1.75, dashArray: '3 7', fillColor: c, fillOpacity: 0.05 }}
+              eventHandlers={{ click: () => onSelectStop?.(s.id) }}
+            />
+            <Marker position={[s.lat, s.lng]} icon={stopIcon(i + 1, alerted)} eventHandlers={{ click: () => onSelectStop?.(s.id) }}>
+              <Tooltip direction="top" offset={[0, -14]} opacity={1}>
+                <span style={{ fontWeight: 700 }}>{i + 1}. {s.label}</span>{alerted ? ' · ⚠' : ''}
+              </Tooltip>
+            </Marker>
           </React.Fragment>
         );
       })}

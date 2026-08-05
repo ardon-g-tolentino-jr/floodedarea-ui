@@ -15,6 +15,7 @@ import {
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { useI18n, sevLabel, roadLabel, roadShort, trendLabel } from '../../i18n';
 import ShelterIcon from './ShelterIcon';
+import CollapsibleSection from './CollapsibleSection';
 
 type Tab = 'nearby' | 'activity' | 'archive';
 
@@ -50,6 +51,8 @@ interface SidebarProps {
   onSelectReport: (id: number) => void;
   /** Public all-time visit count; `null` while loading or if the stats endpoint is unavailable. */
   visitCount: number | null;
+  /** Trip-monitoring panel (TripPanel), rendered first — App composes it so Sidebar stays presentational. */
+  tripSlot?: React.ReactNode;
 }
 
 const TONE: Record<SafetyStatus['tone'], { bg: string; border: string; title: string; badge: string }> = {
@@ -68,34 +71,8 @@ type SectionKey = 'filters' | 'roads' | 'affected' | 'monitor';
 const SECTIONS_STORAGE_KEY = 'baha_sidebar_sections_v3';
 const DEFAULT_OPEN: Record<SectionKey, boolean> = { filters: false, roads: true, affected: false, monitor: true };
 
-/** A sidebar control group with a clickable header that collapses its body. */
-const CollapsibleSection: React.FC<{
-  title: string;
-  open: boolean;
-  onToggle: () => void;
-  right?: React.ReactNode;
-  children: React.ReactNode;
-}> = ({ title, open, onToggle, right, children }) => (
-  <div style={{ flex: 'none', padding: '0 18px 12px' }}>
-    <button
-      onClick={onToggle}
-      aria-expanded={open}
-      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0 8px', border: 0, background: 'transparent', cursor: 'pointer' }}
-    >
-      <span
-        style={{ fontSize: 10, color: 'var(--bw-faint)', flex: 'none', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .15s' }}
-      >
-        ▶
-      </span>
-      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)' }}>{title}</span>
-      {right != null && <span style={{ marginLeft: 'auto' }}>{right}</span>}
-    </button>
-    {open && children}
-  </div>
-);
-
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot } = props;
   const { lang, t } = useI18n();
   const tone = TONE[status.tone];
 
@@ -120,6 +97,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   return (
     <div style={sidebarStyle}>
+      {tripSlot}
+
       {/* STATUS */}
       <div style={{ flex: 'none', padding: '18px 18px 14px' }}>
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.13em', color: 'var(--bw-faint)', marginBottom: 9 }}>{t('sidebar.safetyStatus')}</div>

@@ -1,8 +1,9 @@
 import React from 'react';
-import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity } from './types';
+import type { AlertLevel, FeedbackStatus, FloodAlert, FloodReport, LatLng, NewAlert, NewCenter, NewFeedback, NewHotline, NewReport, ReportStatus, RescueStatus, Road, RoadSegment, Severity, Trip, TripStop } from './types';
 import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
+import { useWakeLock } from './hooks/useWakeLock';
 import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useHotlines, useReports, useRescues, useSettings } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
@@ -12,7 +13,7 @@ import { ApiError, API_BASE } from './api/client';
 import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
-import { SEVERITY_PRESET } from './utils/floodMeta';
+import { SEVERITY_PRESET, SEV_RANK } from './utils/floodMeta';
 import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, FB_PAGE_URL } from './utils/share';
 import {
   buildPossibleClosures,
@@ -26,9 +27,22 @@ import {
   WATER_RISE_DEFAULT,
   MONITOR_RADIUS_KM,
 } from './utils/viewModel';
-import { loadRoads, roadsLoaded } from './utils/roadSnap';
+import { loadRoads, roadsLoaded, snapToRoad } from './utils/roadSnap';
 import { locateWithAccuracy, watchLocation, WEAK_FIX_M } from './utils/geolocate';
 import { kmBetween } from './utils/geo';
+import {
+  loadTrip,
+  matchTripStops,
+  groupStopMatches,
+  newStopId,
+  newTripId,
+  EMPTY_TRIP,
+  MAX_STOPS,
+  STOP_RADIUS_DEFAULT,
+  DUPLICATE_STOP_KM,
+  ALERT_BURST,
+  TRIP_STORAGE_KEY,
+} from './utils/tripWatch';
 import type { SearchBoxHandle } from './components/panels/SearchBox';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
@@ -59,6 +73,8 @@ import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
+import TripPanel from './components/panels/TripPanel';
+import AddStopSheet from './components/panels/AddStopSheet';
 import LoginView from './views/LoginView';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
@@ -176,6 +192,17 @@ const App: React.FC = () => {
   const [searchMark, setSearchMark] = React.useState<SearchMark | null>(null);
   const [notifyPrefs, setNotifyPrefs] = React.useState<NotifyPrefs>(loadNotifyPrefs);
   const [notifyOpen, setNotifyOpen] = React.useState(false);
+  // Trip monitoring: an ordered set of tagged stops, watched for new flood reports while active.
+  const [trip, setTrip] = React.useState<Trip>(loadTrip);
+  const [addStopOpen, setAddStopOpen] = React.useState(false);
+  const [addStopBusy, setAddStopBusy] = React.useState(false);
+  const [selectedStopId, setSelectedStopId] = React.useState<string | null>(null);
+  // Mobile-only bottom sheet for the trip panel, opened from the floating trip chip.
+  const [tripSheetOpen, setTripSheetOpen] = React.useState(false);
+  useWakeLock(trip.active);
+  // Two things at fixed/bottom:0/zIndex:1110 stack badly (see the report-mode sheets' own
+  // comments) — force-close the trip sheet the instant a report flow starts.
+  React.useEffect(() => { if (mode !== 'idle') setTripSheetOpen(false); }, [mode]);
   const [waterChartOpen, setWaterChartOpen] = React.useState(false);
   const [roadsModalOpen, setRoadsModalOpen] = React.useState(false);
   const [dashboardOpen, setDashboardOpen] = React.useState(false);
@@ -270,19 +297,26 @@ const App: React.FC = () => {
   // Lazily fetch the bundled road network the first time the Roads overlay is shown, then snap
   // reports to real roads (see utils/roadSnap). Failure degrades the overlay to report pins only.
   React.useEffect(() => {
-    if (!showRoads || roadsLoaded()) return;
+    // A running trip also needs the road index for the road-name arm of stop matching, even if
+    // the visible Roads overlay is off.
+    if ((!showRoads && !trip.active) || roadsLoaded()) return;
     let cancelled = false;
     void fetch(`${import.meta.env.BASE_URL}roads.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((asset) => { if (!cancelled && asset) { loadRoads(asset); setRoadsReady(true); } })
       .catch(() => {/* overlay shows pins only */});
     return () => { cancelled = true; };
-  }, [showRoads]);
+  }, [showRoads, trip.active]);
 
   // Persist the alert subscription across sessions.
   React.useEffect(() => {
     try { localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(notifyPrefs)); } catch {/* ignore */}
   }, [notifyPrefs]);
+
+  // Persist the trip (stops + active flag) across sessions.
+  React.useEffect(() => {
+    try { localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(trip)); } catch {/* ignore */}
+  }, [trip]);
 
   // Persist the admin live-stream preference.
   React.useEffect(() => {
@@ -328,6 +362,19 @@ const App: React.FC = () => {
   // Only reports still within their severity-scaled freshness window count as "live" — expired
   // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
+
+  // Current per-stop status for the trip panel/map badges — separate from the alert effect below,
+  // which only fires for newly-arrived reports. `roadsReady` isn't read directly but the road arm's
+  // quality depends on the index being loaded, so recompute once it lands.
+  const tripStopMatches = React.useMemo(() => {
+    void roadsReady;
+    return matchTripStops(active, trip.stops);
+  }, [active, trip.stops, roadsReady]);
+  const tripStopStatus = React.useMemo(() => groupStopMatches(tripStopMatches), [tripStopMatches]);
+  const tripAlertStopIds = React.useMemo(
+    () => trip.stops.filter((s) => (tripStopStatus.get(s.id)?.length ?? 0) > 0).map((s) => s.id),
+    [trip.stops, tripStopStatus]
+  );
 
   // Snap active reports to real roads (bundled OSM data) → one directory of affected roads with real
   // geometry, shared by the map overlay, the sidebar count, and the Road-conditions modal.
@@ -420,7 +467,11 @@ const App: React.FC = () => {
   const alertsPrimed = React.useRef(false);
 
   React.useEffect(() => {
-    // First population (initial load): remember existing reports without alerting.
+    // First population (initial load): remember existing reports without alerting. Wait for the
+    // real fetch to land — `enriched` is `[]` on the very first render (reports.data is still
+    // null), and priming against that empty set would make every already-existing report look
+    // "new" once the fetch actually resolves.
+    if (reports.loading) return;
     if (!alertsPrimed.current) {
       for (const r of enriched) seenReportIds.current.add(r.id);
       alertsPrimed.current = true;
@@ -430,13 +481,91 @@ const App: React.FC = () => {
     if (!fresh.length) return;
     for (const r of fresh) seenReportIds.current.add(r.id);
 
-    if (!notifyPrefs.enabled) return;
-    const matches = fresh.filter(
-      (r) => !r.mine && r.status === 'active' && r.distKm <= notifyPrefs.radiusKm && notifyPrefs.severities[r.severity]
+    // Shared eligibility for both arms below.
+    const candidates = fresh.filter(
+      (r) => !r.mine && r.status === 'active' && !r.expired && notifyPrefs.severities[r.severity]
     );
-    if (!matches.length) return;
+    if (!candidates.length) return;
 
-    // System notification(s) when permitted; an in-app toast either way.
+    // ── Arm 1: trip stops. Independent of notifyPrefs.enabled — starting a trip IS the opt-in.
+    const stopMatches = trip.active && trip.stops.length ? matchTripStops(candidates, trip.stops) : [];
+    const claimedIds = new Set(stopMatches.map((m) => m.report.id));
+
+    // ── Arm 2: the existing personal-radius alert, minus anything arm 1 already claimed.
+    const nearbyMatches = notifyPrefs.enabled
+      ? candidates.filter((r) => !claimedIds.has(r.id) && r.distKm <= notifyPrefs.radiusKm)
+      : [];
+
+    if (!stopMatches.length && !nearbyMatches.length) return;
+
+    const nowIso = new Date().toISOString();
+    // A stop the user explicitly tagged is a stronger signal than the ambient radius, so trip
+    // matches win the modal; any nearby remainder surfaces as a toast instead of a second dialog.
+    if (stopMatches.length) {
+      const stopReports = [...new Map(stopMatches.map((m) => [m.report.id, m])).values()];
+
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        for (const m of stopMatches.slice(0, 3)) {
+          const stop = trip.stops.find((s) => s.id === m.stopId);
+          try {
+            new Notification(t('trip.alertTitleOne'), {
+              body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: m.report.depthCm }),
+            });
+          } catch {/* ignore */}
+        }
+      }
+
+      if (stopReports.length >= ALERT_BURST) {
+        const worst = stopReports.map((m) => m.report).reduce((w, r) => (SEV_RANK[r.severity] > SEV_RANK[w.severity] ? r : w), stopReports[0].report);
+        setAlertModal({
+          alert: {
+            id: -worst.id,
+            title: tFormat(lang, 'trip.alertTitleMany', { n: stopReports.length }),
+            body: tFormat(lang, 'trip.alertBodyMany', { n: stopReports.length, sev: worst.sev.label.toLowerCase(), name: worst.name }),
+            region: null,
+            level: SEV_TO_LEVEL[worst.severity],
+            active: true,
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          },
+        });
+      } else {
+        const m = stopMatches[0];
+        const stop = trip.stops.find((s) => s.id === m.stopId);
+        const stopsForReport = stopMatches.filter((sm) => sm.report.id === m.report.id).length;
+        setAlertModal({
+          alert: {
+            id: -m.report.id,
+            title: stopReports.length > 1 ? tFormat(lang, 'trip.alertTitleMany', { n: stopReports.length }) : t('trip.alertTitleOne'),
+            body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: m.report.depthCm })
+              + (stopsForReport > 1 ? ` (+${stopsForReport - 1})` : ''),
+            region: m.report.name ?? null,
+            level: SEV_TO_LEVEL[m.report.severity],
+            active: true,
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          },
+          action: {
+            label: t('trip.viewOnMap'),
+            run: () => {
+              setTab('nearby');
+              setSelEvacId(null);
+              setSelectedStopId(null);
+              setSelectedReportId(m.report.id);
+              setMapFocus({ lat: m.report.latitude, lng: m.report.longitude, key: Date.now() });
+            },
+          },
+        });
+      }
+      if (nearbyMatches.length) {
+        showToast(tFormat(lang, 'status.stayAlertLine', { km: nearbyMatches[0].distKm.toFixed(1), name: nearbyMatches[0].name, sev: nearbyMatches[0].sev.label, rising: '' }));
+      }
+      playAlertSound();
+      return;
+    }
+
+    // No trip match this round — the existing "near me" behaviour, unchanged.
+    const matches = nearbyMatches;
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       for (const r of matches.slice(0, 3)) {
         try {
@@ -447,8 +576,6 @@ const App: React.FC = () => {
       }
     }
 
-    // Surface the alert as a dialog box (with sound), not just a toast.
-    const now = new Date().toISOString();
     if (matches.length === 1) {
       const r = matches[0];
       setAlertModal({
@@ -459,8 +586,8 @@ const App: React.FC = () => {
           region: r.name ?? null,
           level: SEV_TO_LEVEL[r.severity],
           active: true,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: nowIso,
+          updatedAt: nowIso,
         },
         action: {
           label: 'View on map',
@@ -482,13 +609,13 @@ const App: React.FC = () => {
           region: null,
           level: SEV_TO_LEVEL[worst.severity],
           active: true,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: nowIso,
+          updatedAt: nowIso,
         },
       });
     }
     playAlertSound();
-  }, [enriched, notifyPrefs, playAlertSound]);
+  }, [enriched, notifyPrefs, trip.active, trip.stops, lang, t, playAlertSound, showToast, reports.loading]);
 
   const filterCounts = React.useMemo(() => {
     const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
@@ -1177,6 +1304,87 @@ const App: React.FC = () => {
     setNotifyPrefs((prev) => ({ ...prev, enabled: on }));
   };
 
+  // ── Trip monitoring ──────────────────────────────────────────────────────────────
+  const startTrip = async (): Promise<void> => {
+    if (!trip.stops.length) { setAddStopOpen(true); return; }
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      try { setNotifyPerm(await Notification.requestPermission()); } catch {/* ignore */}
+    }
+    setTrip((p) => ({ ...p, id: newTripId(), active: true, startedAt: Date.now() }));
+    showToast(tFormat(lang, 'trip.started', { n: trip.stops.length }));
+  };
+
+  const endTrip = (): void => {
+    setTrip((p) => ({ ...p, active: false })); // stops persist so the trip can resume
+    setTripSheetOpen(false);
+    showToast(t('trip.ended'), t('trip.clearStops'), () => setTrip({ ...EMPTY_TRIP, id: newTripId() }));
+  };
+
+  const focusStop = (stop: TripStop): void => {
+    setSelectedStopId(stop.id);
+    setSelectedReportId(null);
+    setSelEvacId(null);
+    setMapFocus({ lat: stop.lat, lng: stop.lng, key: Date.now() });
+  };
+
+  const addStop = async (pick: { lat: number; lng: number; label: string; radiusKm: number }): Promise<void> => {
+    if (trip.stops.length >= MAX_STOPS) { showToast(tFormat(lang, 'trip.maxReached', { n: MAX_STOPS })); return; }
+    const dupe = trip.stops.some((s) => kmBetween(s, pick) * 1000 <= DUPLICATE_STOP_KM * 1000);
+    if (dupe) { showToast(t('trip.duplicate')); return; }
+
+    const id = newStopId();
+    const seededRoadName = pick.label.split(',')[0]?.trim() || null;
+    const newStop: TripStop = { id, label: pick.label, lat: pick.lat, lng: pick.lng, radiusKm: pick.radiusKm, roadName: seededRoadName, city: null };
+    setTrip((p) => ({ ...p, stops: [...p.stops, newStop] }));
+    setAddStopOpen(false);
+
+    const alreadyMatching = matchTripStops(active, [newStop]);
+    if (alreadyMatching.length) showToast(tFormat(lang, 'trip.addedFlooded', { n: alreadyMatching.length }));
+
+    // Resolve the canonical road name/city in the background: the snapped OSM name is preferred
+    // (same source reports snap to, so both sides of a road-name comparison spell it identically)
+    // — reverse geocoding fills in whatever it didn't provide (city always; road as a fallback).
+    // Patches the stop in place by id, a no-op if it was removed before this lands.
+    setAddStopBusy(true);
+    try {
+      const snapped = snapToRoad(pick.lat, pick.lng);
+      const rev = await reverseGeocode(pick.lat, pick.lng);
+      setTrip((p) => ({
+        ...p,
+        stops: p.stops.map((s) => (s.id === id ? { ...s, roadName: snapped?.name ?? rev.road ?? s.roadName, city: rev.city } : s)),
+      }));
+    } catch {
+      // Keep the label-seeded roadName / null city — radius-only matching for this stop.
+    } finally {
+      setAddStopBusy(false);
+    }
+  };
+
+  const removeStop = (id: string): void => setTrip((p) => ({ ...p, stops: p.stops.filter((s) => s.id !== id) }));
+
+  const moveStop = (id: string, dir: -1 | 1): void => {
+    setTrip((p) => {
+      const i = p.stops.findIndex((s) => s.id === id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= p.stops.length) return p;
+      const next = [...p.stops];
+      [next[i], next[j]] = [next[j], next[i]];
+      return { ...p, stops: next };
+    });
+  };
+
+  const setStopRadius = (id: string, km: number): void =>
+    setTrip((p) => ({ ...p, stops: p.stops.map((s) => (s.id === id ? { ...s, radiusKm: km } : s)) }));
+
+  const viewTripReport = (reportId: number): void => {
+    setTab('nearby');
+    setSelEvacId(null);
+    setSelectedStopId(null);
+    setSelectedReportId(reportId);
+    const r = enriched.find((x) => x.id === reportId);
+    if (r) setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+  };
+
   const toggleFilter = (s: Severity): void => setFilters((f) => ({ ...f, [s]: !f[s] }));
   const toggleRoad = (r: Road): void => setRoadFilters((f) => ({ ...f, [r]: !f[r] }));
 
@@ -1307,6 +1515,10 @@ const App: React.FC = () => {
             onMapClick={onMapClick}
             onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
             onSelectEvac={(id) => { setSelEvacId(id); setSelectedReportId(null); }}
+            tripStops={trip.active ? trip.stops : undefined}
+            affectedStopIds={tripAlertStopIds}
+            selectedStopId={selectedStopId}
+            onSelectStop={(id) => { setSelectedStopId(id); setSelectedReportId(null); setSelEvacId(null); }}
           />
 
           {!isMobile && <RoadLegend />}
@@ -1432,6 +1644,21 @@ const App: React.FC = () => {
           selectedReportId={selectedReportId}
           onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
           visitCount={visitCount}
+          tripSlot={
+            <TripPanel
+              trip={trip}
+              matches={tripStopStatus}
+              notifyPermission={notifyPerm}
+              onAddStop={() => setAddStopOpen(true)}
+              onRemoveStop={removeStop}
+              onMoveStop={moveStop}
+              onChangeRadius={setStopRadius}
+              onFocusStop={focusStop}
+              onViewReport={viewTripReport}
+              onStartTrip={() => void startTrip()}
+              onEndTrip={endTrip}
+            />
+          }
         />
       </div>
 
@@ -1474,6 +1701,54 @@ const App: React.FC = () => {
             <span style={{ fontSize: 20, fontWeight: 700, display: 'inline-block', transition: 'transform .15s', transform: fanOpen ? 'rotate(45deg)' : 'none' }}>+</span> {t('topbar.report')}
           </button>
         </>
+      )}
+
+      {/* Mobile floating trip chip — the sidebar's "MY TRIP" section is below a 52vh map and not
+          glanceable mid-drive. Gated on mode === 'idle', same as the report FAB, so the two can
+          never coexist; sits left of the FAB (which is centered) so neither overlaps the other. */}
+      {isMobile && mode === 'idle' && trip.active && (
+        <button
+          onClick={() => setTripSheetOpen(true)}
+          style={{ position: 'fixed', left: 12, bottom: 20, zIndex: 44, display: 'flex', alignItems: 'center', gap: 7, height: 44, padding: '0 15px', border: 0, borderRadius: 22, background: tripAlertStopIds.length > 0 ? '#F59E0B' : '#7C3AED', color: '#fff', fontSize: 12.5, fontWeight: 800, boxShadow: '0 8px 20px rgba(15,23,42,.3)', cursor: 'pointer' }}
+        >
+          🚗 {trip.stops.length}
+          {tripAlertStopIds.length > 0 && <span>· ⚠ {tripAlertStopIds.length}</span>}
+        </button>
+      )}
+
+      {isMobile && tripSheetOpen && (
+        <>
+          <div onClick={() => setTripSheetOpen(false)} aria-hidden="true" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.45)', zIndex: 1100 }} />
+          <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1110, maxHeight: '82vh', overflowY: 'auto', background: '#fff', borderRadius: '18px 18px 0 0', boxShadow: '0 -8px 30px rgba(15,23,42,.3)', animation: 'sheetUp .22s ease-out', padding: '6px 0 10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 14px 0' }}>
+              <button onClick={() => setTripSheetOpen(false)} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
+            </div>
+            <TripPanel
+              trip={trip}
+              matches={tripStopStatus}
+              notifyPermission={notifyPerm}
+              onAddStop={() => setAddStopOpen(true)}
+              onRemoveStop={removeStop}
+              onMoveStop={moveStop}
+              onChangeRadius={setStopRadius}
+              onFocusStop={(s) => { focusStop(s); setTripSheetOpen(false); }}
+              onViewReport={(id) => { viewTripReport(id); setTripSheetOpen(false); }}
+              onStartTrip={() => void startTrip()}
+              onEndTrip={endTrip}
+            />
+          </div>
+        </>
+      )}
+
+      {addStopOpen && (
+        <AddStopSheet
+          isMobile={isMobile}
+          near={userLoc}
+          defaultRadiusKm={STOP_RADIUS_DEFAULT}
+          busy={addStopBusy}
+          onAdd={(pick) => void addStop(pick)}
+          onClose={() => setAddStopOpen(false)}
+        />
       )}
 
       {sosOpen && (

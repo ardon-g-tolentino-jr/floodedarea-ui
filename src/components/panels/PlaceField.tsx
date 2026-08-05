@@ -23,7 +23,11 @@ const PlaceField: React.FC<{
   lng: string;
   placeLabel: string;
   onPick: (lat: number, lng: number, label: string) => void;
-}> = ({ lat, lng, placeLabel, onPick }) => {
+  /** Overrides the search input's placeholder — lets bilingual callers (e.g. AddStopSheet) localize it. */
+  placeholder?: string;
+  /** Overrides the "Current" button label. */
+  currentLabel?: string;
+}> = ({ lat, lng, placeLabel, onPick, placeholder, currentLabel }) => {
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -95,7 +99,7 @@ const PlaceField: React.FC<{
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { if (results.length) setOpen(true); }}
-          placeholder="Search a barangay, street or landmark…"
+          placeholder={placeholder ?? 'Search a barangay, street or landmark…'}
           style={{ ...inputStyle, flex: 1 }}
         />
         <button
@@ -105,7 +109,7 @@ const PlaceField: React.FC<{
           title="Use my current location"
           style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '0 12px', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: locating ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}
         >
-          ◎ {locating ? 'Locating…' : 'Current'}
+          ◎ {locating ? 'Locating…' : (currentLabel ?? 'Current')}
         </button>
       </div>
       {geoError && (
