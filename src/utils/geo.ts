@@ -22,3 +22,8 @@ export function kmBetween(a: LatLng, b: LatLng): number {
 export function walkMinutes(km: number): number {
   return Math.max(1, Math.round(km * 12));
 }
+
+/** Google Maps directions deep link — hands off to the native app on iOS/Android. */
+export function directionsUrl(lat: number, lng: number): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+}

@@ -46,7 +46,8 @@ import {
 import type { SearchBoxHandle } from './components/panels/SearchBox';
 import TopBar from './components/panels/TopBar';
 import AlertRibbon from './components/panels/AlertRibbon';
-import AlertModal from './components/panels/AlertModal';
+import ActivityTicker from './components/panels/ActivityTicker';
+import AlertModal, { type AlertSource } from './components/panels/AlertModal';
 import Sidebar from './components/panels/Sidebar';
 import FloodMap from './components/map/FloodMap';
 import RoadLegend from './components/map/RoadLegend';
@@ -80,6 +81,7 @@ import LoginView from './views/LoginView';
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
 const REPORT_MODE_STORAGE_KEY = 'baha_report_mode_v1';
+const GUEST_NUDGE_STORAGE_KEY = 'baha_guest_nudge_v1';
 
 /** Bundled GCash donation QR — lives in public/, served under the app's base path. */
 const GCASH_QR_SRC = `${import.meta.env.BASE_URL}gcash-qr.png`;
@@ -110,13 +112,22 @@ function loadReportPref(): 'report' | 'quick' {
   }
 }
 
+function loadGuestNudgeDismissed(): boolean {
+  try {
+    return localStorage.getItem(GUEST_NUDGE_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 const DEFAULT_LOCATION: LatLng = { lat: 14.66, lng: 121.12 }; // Marikina Heights
 
 type PendingPin = LatLng & { atYou: boolean };
 
 /** A flood-alert dialog: the alert to show plus an optional primary action (e.g. jump to the
- *  report on the map). Used for both rainfall alerts and new-nearby-report notifications. */
-type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => void } };
+ *  report on the map). Used for rainfall/PAGASA alerts, trip-stop alerts, and new-nearby-report
+ *  notifications alike — `source` drives the AlertModal chip that tells them apart. */
+type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => void }; source?: AlertSource };
 
 /** Map a report severity onto an alert level for the dialog's color/label. */
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
@@ -160,6 +171,11 @@ const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, []);
 
+  // Timestamp of the most recent SSE activity event — drives the ActivityTicker's pulsing "LIVE"
+  // dot (pulsing within ~90s of an event, static otherwise). `now` above already re-renders every
+  // 15s, which is enough resolution to flip the dot off without a dedicated timer.
+  const [lastEventAt, setLastEventAt] = React.useState<number | null>(null);
+
   // UI state. 'quick' is the in-transit mode: a live GPS watch keeps `pending` glued to the
   // vehicle's current position and each severity tap posts immediately (see the quick-mode effect
   // and quickPost below), vs. 'report' where the pin is fixed once and adjustable.
@@ -168,6 +184,8 @@ const App: React.FC = () => {
   // Remembered report entry point — orders/highlights ReportOptions (mobile fan-out + desktop
   // popover). Persisted below alongside the other localStorage-backed prefs.
   const [reportPref, setReportPref] = React.useState<'report' | 'quick'>(loadReportPref);
+  // Dismissible sidebar nudge for guest/no-session visitors — persisted per device.
+  const [guestNudgeDismissed, setGuestNudgeDismissed] = React.useState<boolean>(loadGuestNudgeDismissed);
   // Mobile-only: whether the bottom-center FAB has fanned out its two ReportOptions.
   const [fanOpen, setFanOpen] = React.useState(false);
   // Road auto-detected from the pending pin via reverse geocoding (which street it's on).
@@ -266,6 +284,13 @@ const App: React.FC = () => {
     toastTimer.current = window.setTimeout(() => setToast(null), 4800);
   }, []);
 
+  // Quick mode posts on every severity tap, so the guest nudge is fired at most once per session
+  // (otherwise an in-transit reporter gets a sign-in toast after every tap). The timer is tracked so
+  // a rapid second post can't leave a stray toast queued behind it.
+  const guestNudgeShown = React.useRef(false);
+  const guestNudgeTimer = React.useRef<number | undefined>(undefined);
+  React.useEffect(() => () => window.clearTimeout(guestNudgeTimer.current), []);
+
   // Try to use the device location (falls back to the default monitoring area).
   const didAutoCenter = React.useRef(false);
   React.useEffect(() => {
@@ -328,6 +353,13 @@ const App: React.FC = () => {
     try { localStorage.setItem(REPORT_MODE_STORAGE_KEY, reportPref); } catch {/* ignore */}
   }, [reportPref]);
 
+  // Dismiss is one-way for the device — no un-dismiss path, so a plain write on click (not an
+  // effect) is enough.
+  const dismissGuestNudge = (): void => {
+    setGuestNudgeDismissed(true);
+    try { localStorage.setItem(GUEST_NUDGE_STORAGE_KEY, '1'); } catch {/* ignore */}
+  };
+
   // Only admins can switch the live stream off; everyone else stays always-on.
   const isAdmin = auth?.role === 'ADMIN';
 
@@ -336,8 +368,11 @@ const App: React.FC = () => {
   React.useEffect(() => { if (auth) void acceptedFeedback.refetch(true); }, [auth?.userId]); // eslint-disable-line react-hooks/exhaustive-deps
   const streamEnabled = !isAdmin || liveStream;
 
-  // Live activity → refresh the affected collection in the background.
+  // Live activity → refresh the affected collection in the background. `lastEventAt` only drives the
+  // ActivityTicker's pulsing-vs-static LIVE dot — the stream contract itself (event name only, no
+  // payload) is untouched.
   useActivityStream((event) => {
+    setLastEventAt(Date.now());
     if (event.startsWith('alert')) {
       void alerts.refetch(true);
     } else if (event.startsWith('rescue')) {
@@ -528,6 +563,7 @@ const App: React.FC = () => {
             createdAt: nowIso,
             updatedAt: nowIso,
           },
+          source: 'trip',
         });
       } else {
         const m = stopMatches[0];
@@ -555,6 +591,7 @@ const App: React.FC = () => {
               setMapFocus({ lat: m.report.latitude, lng: m.report.longitude, key: Date.now() });
             },
           },
+          source: 'trip',
         });
       }
       if (nearbyMatches.length) {
@@ -569,7 +606,7 @@ const App: React.FC = () => {
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       for (const r of matches.slice(0, 3)) {
         try {
-          new Notification('New flood reported nearby', {
+          new Notification(t('notify.alertTitleOne'), {
             body: `${r.sev.label} flooding ~${r.distKm.toFixed(1)} km away at ${r.name} (${r.depthCm} cm).`,
           });
         } catch {/* ignore */}
@@ -581,7 +618,7 @@ const App: React.FC = () => {
       setAlertModal({
         alert: {
           id: -r.id, // synthetic id (negative) so it never collides with rainfall alerts
-          title: 'New flood reported nearby',
+          title: t('notify.alertTitleOne'),
           body: `${r.sev.label} flooding reported ~${r.distKm.toFixed(1)} km away at ${r.name} — about ${r.depthCm} cm deep.`,
           region: r.name ?? null,
           level: SEV_TO_LEVEL[r.severity],
@@ -598,13 +635,14 @@ const App: React.FC = () => {
             setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
           },
         },
+        source: 'nearby',
       });
     } else {
       const worst = matches.find((r) => r.severity === 'high') ?? matches.find((r) => r.severity === 'medium') ?? matches[0];
       setAlertModal({
         alert: {
           id: -worst.id,
-          title: `${matches.length} new flood reports near you`,
+          title: tFormat(lang, 'notify.alertTitleMany', { n: matches.length }),
           body: `${matches.length} new floods reported within ${notifyPrefs.radiusKm} km. The nearest is ${worst.sev.label.toLowerCase()} at ${worst.name}.`,
           region: null,
           level: SEV_TO_LEVEL[worst.severity],
@@ -612,6 +650,7 @@ const App: React.FC = () => {
           createdAt: nowIso,
           updatedAt: nowIso,
         },
+        source: 'nearby',
       });
     }
     playAlertSound();
@@ -687,7 +726,7 @@ const App: React.FC = () => {
     const worstActive = severe.find((a) => a.level === 'red') ?? severe[0];
     if (worstActive && modaledAlertLevels.current.get(worstActive.id) !== worstActive.level) {
       modaledAlertLevels.current.set(worstActive.id, worstActive.level);
-      setAlertModal({ alert: worstActive });
+      setAlertModal({ alert: worstActive, source: 'weather' });
       playAlertSound();
     }
 
@@ -931,8 +970,8 @@ const App: React.FC = () => {
       setTab('activity');
       setSelectedReportId(created.id);
       if (session.role === 'GUEST') {
-        showToast('Posted as guest — sign in to verify your reports.', 'Sign in', () =>
-          setLogin({ open: true, reason: 'Sign in to verify and manage your reports.' })
+        showToast(t('guest.quickNudge'), t('topbar.signIn'), () =>
+          setLogin({ open: true, reason: t('guest.defaultReason') })
         );
       } else {
         showToast('Flood report posted — thank you!');
@@ -992,6 +1031,18 @@ const App: React.FC = () => {
       });
       await reports.refetch(true);
       showToast(t('quick.reported'), t('quick.undo'), () => void undoQuickReport(created.id));
+      // quickPost's toast slot is already spent on Undo — queue the guest nudge to appear right
+      // after that toast auto-dismisses (4800ms) instead of showing two toasts at once. Once per
+      // session only: quick mode posts on every severity tap, and nudging each time would nag.
+      if (session.role === 'GUEST' && !guestNudgeShown.current) {
+        guestNudgeShown.current = true;
+        window.clearTimeout(guestNudgeTimer.current);
+        guestNudgeTimer.current = window.setTimeout(() => {
+          showToast(t('guest.quickNudge'), t('topbar.signIn'), () =>
+            setLogin({ open: true, reason: t('guest.defaultReason') })
+          );
+        }, 5000);
+      }
     } catch (err) {
       if (handleAuthError(err, 'Your session expired. Please sign in again to post a report.')) return;
       if (err instanceof ApiError && (err.status === 409 || err.status === 429)) {
@@ -1458,7 +1509,7 @@ const App: React.FC = () => {
         reportPref={reportPref}
         onShare={() => setShareOpen(true)}
         onSOS={() => setSosOpen(true)}
-        onSignIn={() => setLogin({ open: true })}
+        onSignIn={() => setLogin({ open: true, reason: t('guest.defaultReason') })}
         onSignOut={logout}
         onSearchSelect={onSearchSelect}
         searchNear={userLoc}
@@ -1491,7 +1542,23 @@ const App: React.FC = () => {
         <AlertRibbon alert={activeAlert} onClose={() => setDismissedAlerts((s) => new Set(s).add(activeAlert.id))} />
       )}
 
-      {alertModal && <AlertModal alert={alertModal.alert} action={alertModal.action} onClose={() => setAlertModal(null)} />}
+      <ActivityTicker
+        report={feed[0] ?? null}
+        isLive={lastEventAt != null && now - lastEventAt < 90_000}
+        isMobile={isMobile}
+        onClick={() => {
+          const r = feed[0];
+          if (!r) return;
+          // 'activity' (not 'nearby'): the ticker shows the newest report, which is row 1 of the
+          // createdAt-sorted activity tab but could be far down the distance-sorted nearby tab.
+          setTab('activity');
+          setSelEvacId(null);
+          setSelectedReportId(r.id);
+          setMapFocus({ lat: r.latitude, lng: r.longitude, key: Date.now() });
+        }}
+      />
+
+      {alertModal && <AlertModal alert={alertModal.alert} action={alertModal.action} source={alertModal.source} onClose={() => setAlertModal(null)} />}
 
       <div style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: isMobile ? 'auto' : 'hidden' }}>
         <div style={mapAreaStyle}>
@@ -1564,7 +1631,10 @@ const App: React.FC = () => {
             <ReportDetailCard
               report={selectedReport}
               isMobile={isMobile}
-              canConfirm={!!auth && !selectedReport.mine}
+              // No auth gate here on purpose: confirmReport() already mints a guest session on
+              // click (see ensureGuest() below), so a first-time visitor must see this button
+              // before they've done anything else. Do not "restore" a !!auth check.
+              canConfirm={!selectedReport.mine}
               confirming={confirming}
               onConfirm={() => void confirmReport(selectedReport.id)}
               canRemove={selectedReport.mine}
@@ -1644,6 +1714,10 @@ const App: React.FC = () => {
           selectedReportId={selectedReportId}
           onSelectReport={(id) => { setSelectedReportId(id); setSelEvacId(null); }}
           visitCount={visitCount}
+          auth={auth}
+          guestNudgeDismissed={guestNudgeDismissed}
+          onDismissGuestNudge={dismissGuestNudge}
+          onSignIn={(reason) => setLogin({ open: true, reason: reason ?? t('guest.defaultReason') })}
           tripSlot={
             <TripPanel
               trip={trip}

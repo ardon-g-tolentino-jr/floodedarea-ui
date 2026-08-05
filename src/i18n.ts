@@ -88,6 +88,7 @@ const MESSAGES = {
   'topbar.response': { en: 'Response', fil: 'Tugon' },
   'topbar.responseConsole': { en: 'Response console', fil: 'Response console' },
   'topbar.incident': { en: 'Report incident', fil: 'Mag-ulat' },
+  'topbar.nearbyAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
 
   // ── Sidebar ──
   'sidebar.safetyStatus': { en: 'YOUR SAFETY STATUS', fil: 'IYONG KALAGAYAN SA KALIGTASAN' },
@@ -109,9 +110,9 @@ const MESSAGES = {
   'sidebar.roadImpassable': { en: 'impassable', fil: 'hindi madaanan' },
   'sidebar.road': { en: 'road', fil: 'kalsada' },
   'sidebar.roadsPlural': { en: 'roads', fil: 'mga kalsada' },
-  'sidebar.floodAlerts': { en: 'Flood alerts', fil: 'Mga babala sa baha' },
-  'sidebar.alertsOn': { en: 'On · new floods within', fil: 'Naka-on · bagong baha sa loob ng' },
-  'sidebar.alertsOff': { en: 'Off · get notified about new floods nearby', fil: 'Naka-off · ipaalam ang bagong baha sa paligid' },
+  'sidebar.floodAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
+  'sidebar.alertsOn': { en: 'On · new floods near you within', fil: 'Naka-on · bagong baha malapit sa iyo sa loob ng' },
+  'sidebar.alertsOff': { en: 'Off · get notified about new floods near you', fil: 'Naka-off · ipaalam ang bagong baha malapit sa iyo' },
   'sidebar.edit': { en: 'Edit', fil: 'I-edit' },
   'sidebar.setUp': { en: 'Set up', fil: 'I-set up' },
   'sidebar.totalVisits': { en: 'total visits', fil: 'kabuuang bisita' },
@@ -146,7 +147,7 @@ const MESSAGES = {
 
   // ── Notify modal ──
   'notify.subtitle': { en: 'Get notified when a new flood is reported near you', fil: 'Mapaalalahanan kapag may bagong baha na naiulat malapit sa iyo' },
-  'notify.master': { en: 'Notify me about new reports', fil: 'Abisuhan ako tungkol sa mga bagong ulat' },
+  'notify.master': { en: 'Notify me about new reports near me', fil: 'Abisuhan ako tungkol sa mga bagong ulat malapit sa akin' },
   'notify.criteria': { en: 'From other people, matching the criteria below', fil: 'Mula sa ibang tao, na tumutugma sa pamantayan sa ibaba' },
   'notify.withinDistance': { en: 'WITHIN DISTANCE', fil: 'SA LOOB NG LAYO' },
   'notify.forLevels': { en: 'FOR THESE LEVELS', fil: 'PARA SA MGA ANTAS NA ITO' },
@@ -154,6 +155,13 @@ const MESSAGES = {
   'notify.permDenied': { en: 'Browser notifications are blocked in your browser settings. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Naka-block ang mga abiso ng browser sa iyong settings. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
   'notify.permUnsupported': { en: 'This browser can’t show system notifications. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Hindi maipapakita ng browser na ito ang mga system notification. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
   'notify.permDefault': { en: 'Turn the toggle on to allow notifications and get alerts even when this tab is in the background.', fil: 'I-on ang toggle para payagan ang mga abiso at makatanggap kahit nasa background ang tab na ito.' },
+  'notify.alertTitleOne': { en: 'New flood reported nearby', fil: 'May bagong baha na naiulat malapit sa iyo' },
+  'notify.alertTitleMany': { en: '{n} new flood reports near you', fil: '{n} bagong ulat ng baha malapit sa iyo' },
+
+  // ── Alert modal source chip — distinguishes which of the three alert systems fired ──
+  'alert.sourceNearby': { en: 'Nearby', fil: 'Malapit' },
+  'alert.sourceTrip': { en: 'Trip', fil: 'Biyahe' },
+  'alert.sourceWeather': { en: 'Weather', fil: 'Panahon' },
 
   // ── Share modal ──
   'share.title': { en: 'Help your neighbors stay safe', fil: 'Tulungan ang iyong mga kapitbahay na manatiling ligtas' },
@@ -271,6 +279,8 @@ const MESSAGES = {
   'report.system': { en: 'System report', fil: 'Ulat ng sistema' },
   'report.left': { en: 'left', fil: 'natitira' },
   'report.expired': { en: 'expired', fil: 'tapos na' },
+  'report.confirmCta': { en: "I'm seeing this too — confirm", fil: 'Nakikita ko rin ito — kumpirmahin' },
+  'report.confirming': { en: 'Confirming…', fil: 'Kinukumpirma…' },
 
   // ── Severity ──
   'sev.high': { en: 'High', fil: 'Mataas' },
@@ -338,6 +348,26 @@ const MESSAGES = {
   'dash.of': { en: 'of', fil: 'ng' },
   'dash.page': { en: 'Page', fil: 'Pahina' },
 
+  // ── Live activity ticker ──
+  'ticker.live': { en: 'LIVE', fil: 'LIVE' },
+  'ticker.newest': { en: 'Newest', fil: 'Pinakabago' },
+  'ticker.floodIn': { en: '{sev} flood — {district}', fil: '{sev} na baha — {district}' },
+
+  // ── Guest sign-in nudges ──
+  'guest.nudgeBody': { en: 'Browsing as guest — your reports show as ⚠ unverified until others confirm them.', fil: 'Naka-browse bilang guest — lalabas ang mga ulat mo bilang ⚠ hindi beripikado hanggang sa kumpirmahin ito ng iba.' },
+  'guest.signInGoogle': { en: 'Sign in with Google', fil: 'Mag-sign in gamit ang Google' },
+  'guest.defaultReason': { en: 'Sign in to verify your reports and unlock more features.', fil: 'Mag-sign in para ma-verify ang iyong mga ulat at ma-unlock ang higit pang features.' },
+  'guest.quickNudge': { en: 'Posted as guest — sign in to verify your reports.', fil: 'Na-post bilang guest — mag-sign in para ma-verify ang iyong mga ulat.' },
+  'guest.keepBrowsing': { en: 'Keep browsing as guest', fil: 'Magpatuloy bilang guest' },
+
+  // ── Evacuation center detail card ──
+  'evac.center': { en: 'Evacuation center', fil: 'Evacuation center' },
+  'evac.minWalk': { en: 'min walk', fil: 'minutong lakad' },
+  'evac.kmAway': { en: 'km away', fil: 'km ang layo' },
+  'evac.directions': { en: 'Directions', fil: 'Direksyon' },
+  'evac.call': { en: 'Call', fil: 'Tumawag' },
+  'evac.hotline': { en: 'Hotline:', fil: 'Hotline:' },
+
   // ── Trip monitoring ──
   'trip.title': { en: 'MY TRIP', fil: 'AKING BIYAHE' },
   'trip.start': { en: 'Start trip', fil: 'Simulan ang biyahe' },
@@ -350,7 +380,7 @@ const MESSAGES = {
   'trip.reportsMany': { en: '{n} reports', fil: '{n} ulat' },
   'trip.empty': { en: 'Add the places you’ll pass through and we’ll warn you the moment flooding is reported near any of them.', fil: 'Idagdag ang mga lugar na dadaanan mo at bibigyan ka namin ng babala sa sandaling may maiulat na baha malapit sa alinman sa kanila.' },
   'trip.desc': { en: 'Watching every stop along your route — even while this tab is in the background.', fil: 'Binabantayan ang bawat hinto sa iyong ruta — kahit nasa background ang tab na ito.' },
-  'trip.independentNote': { en: 'Trip alerts stay on while a trip is running, even if Flood alerts are off.', fil: 'Mananatiling naka-on ang mga babala sa biyahe habang tumatakbo ito, kahit naka-off ang Mga babala sa baha.' },
+  'trip.independentNote': { en: 'Trip alerts stay on while a trip is running, even if Nearby flood alerts are off.', fil: 'Mananatiling naka-on ang mga babala sa biyahe habang tumatakbo ito, kahit naka-off ang Mga babala sa malapit na baha.' },
   'trip.keepOpen': { en: 'Keep this tab open so alerts keep coming.', fil: 'Panatilihing bukas ang tab na ito para tuloy ang mga abiso.' },
   'trip.started': { en: 'Trip started — watching {n} stops.', fil: 'Nagsimula ang biyahe — binabantayan ang {n} hinto.' },
   'trip.ended': { en: 'Trip ended. Your stops are saved for next time.', fil: 'Tapos na ang biyahe. Nakasave ang iyong mga hinto para sa susunod.' },

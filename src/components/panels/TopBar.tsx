@@ -135,8 +135,8 @@ const TopBar: React.FC<TopBarProps> = ({
   const notifyBtn = (
     <button
       onClick={onNotify}
-      title="Flood alerts"
-      aria-label="Flood alerts"
+      title={t('topbar.nearbyAlerts')}
+      aria-label={t('topbar.nearbyAlerts')}
       style={{ ...ICON_BTN, position: 'relative', border: `1px solid ${notifyOn ? '#BAE2FB' : '#DCE3E9'}`, background: notifyOn ? '#EFF8FF' : '#fff' }}
     >
       🔔
