@@ -102,6 +102,13 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
           )}
 
           {error && <div style={{ marginTop: 14 }}><ErrorBox msg={error} /></div>}
+
+          <button
+            onClick={onClose}
+            style={{ display: 'block', width: '100%', marginTop: 18, border: 0, background: 'transparent', color: 'var(--bw-muted)', padding: '4px 0', fontSize: 12.5, fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            {t('guest.keepBrowsing')}
+          </button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { EvacuationCenter, LatLng } from '../../types';
-import { kmBetween, walkMinutes } from '../../utils/geo';
+import { directionsUrl, kmBetween, walkMinutes } from '../../utils/geo';
+import { useI18n } from '../../i18n';
 import ShelterIcon from './ShelterIcon';
 
 interface EvacDetailCardProps {
@@ -11,6 +12,7 @@ interface EvacDetailCardProps {
 }
 
 const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobile, onClose }) => {
+  const { t } = useI18n();
   const distKm = kmBetween(userLoc, { lat: center.latitude, lng: center.longitude });
 
   const card = (
@@ -23,7 +25,7 @@ const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobi
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.15 }}>{center.name}</div>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>
-              Evacuation center · {distKm.toFixed(1)} km away · ~{walkMinutes(distKm)} min walk
+              {t('evac.center')} · {distKm.toFixed(1)} {t('evac.kmAway')} · ~{walkMinutes(distKm)} {t('evac.minWalk')}
             </div>
           </div>
           <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 26, height: 26, borderRadius: 7, fontSize: 15, cursor: 'pointer', flex: 'none' }}>×</button>
@@ -31,11 +33,24 @@ const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobi
       </div>
 
       <div style={{ padding: '13px 15px' }}>
-        <a href={`tel:${center.contact.replace(/[^0-9+]/g, '')}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-shelter)', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}>
-          Call
-        </a>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a
+            href={directionsUrl(center.latitude, center.longitude)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-primary)', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
+          >
+            {t('evac.directions')}
+          </a>
+          <a
+            href={`tel:${center.contact.replace(/[^0-9+]/g, '')}`}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-shelter)', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
+          >
+            {t('evac.call')}
+          </a>
+        </div>
         <div style={{ marginTop: 9, fontSize: 11.5, color: 'var(--bw-muted)' }}>
-          Hotline: <b style={{ color: 'var(--bw-ink)' }}>{center.contact}</b>
+          {t('evac.hotline')} <b style={{ color: 'var(--bw-ink)' }}>{center.contact}</b>
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ const GROUPS: { title: string; items: Feature[] }[] = [
       { icon: '🗺️', name: 'Live flood map', desc: 'Flooding reported by neighbors across the Philippines, updating as it happens.' },
       { icon: '🧭', name: 'Safety status', desc: 'A plain-language banner that tells you how safe your spot is right now.' },
       { icon: '🚧', name: 'Road conditions', desc: 'See which roads are risky or impassable so you can route around them.' },
-      { icon: '🏠', name: 'Evacuation centers', desc: 'Find the nearest shelter, with its capacity and contact details.' },
+      { icon: '🏠', name: 'Evacuation centers', desc: 'Find the nearest shelter, with directions and contact details.' },
       { icon: '📈', name: 'Water levels over time', desc: 'Check whether water is rising or easing over the last few hours.' },
     ],
   },
@@ -33,7 +33,7 @@ const GROUPS: { title: string; items: Feature[] }[] = [
     items: [
       { icon: '📍', name: 'Report a flood', desc: 'Tap the map to mark where it’s flooding — how deep, how bad, and if the road is passable.' },
       { icon: '✅', name: 'Confirm reports', desc: 'Confirm a report you can see is real, so everyone knows it’s still current.' },
-      { icon: '🔔', name: 'Rainfall alerts', desc: 'Get a heads-up when a rainfall warning is raised — with optional notifications.' },
+      { icon: '🌧️', name: 'Weather warnings', desc: 'Get a heads-up when a rainfall warning is raised — with optional notifications.' },
       { icon: '🔗', name: 'Share', desc: 'Send the live map to family and friends in one tap.' },
     ],
   },

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Road, Severity } from '../../types';
+import type { AuthState } from '../../hooks/useAuth';
 import { formatDuration } from '../../utils/format';
 import {
   type EnrichedReport,
@@ -53,6 +54,13 @@ interface SidebarProps {
   visitCount: number | null;
   /** Trip-monitoring panel (TripPanel), rendered first — App composes it so Sidebar stays presentational. */
   tripSlot?: React.ReactNode;
+  /** The real session (not the TopBar's guest-hidden version) — needed to distinguish a guest from
+   *  no session at all for the dismissible guest nudge card below. */
+  auth: AuthState | null;
+  /** Whether the guest nudge card has been dismissed for this device (`baha_guest_nudge_v1`). */
+  guestNudgeDismissed: boolean;
+  onDismissGuestNudge: () => void;
+  onSignIn: (reason?: string) => void;
 }
 
 const TONE: Record<SafetyStatus['tone'], { bg: string; border: string; title: string; badge: string }> = {
@@ -72,7 +80,7 @@ const SECTIONS_STORAGE_KEY = 'baha_sidebar_sections_v3';
 const DEFAULT_OPEN: Record<SectionKey, boolean> = { filters: false, roads: true, affected: false, monitor: true };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot, auth, guestNudgeDismissed, onDismissGuestNudge, onSignIn } = props;
   const { lang, t } = useI18n();
   const tone = TONE[status.tone];
 
@@ -244,6 +252,28 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <span>{fmtRadius(MONITOR_RADIUS_MAX)}</span>
         </div>
       </CollapsibleSection>
+
+      {/* GUEST NUDGE — only for a guest session or no session at all; dismissible for the device. */}
+      {!guestNudgeDismissed && (auth === null || auth.role === 'GUEST') && (
+        <div style={{ flex: 'none', margin: '0 18px 14px', padding: '11px 12px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, position: 'relative' }}>
+          <button
+            onClick={onDismissGuestNudge}
+            aria-label={t('common.close')}
+            style={{ position: 'absolute', top: 8, right: 8, border: 0, background: 'transparent', color: '#7C8B98', width: 22, height: 22, borderRadius: 6, fontSize: 14, cursor: 'pointer' }}
+          >
+            ×
+          </button>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#1D4ED8', lineHeight: 1.5, paddingRight: 20 }}>
+            {t('guest.nudgeBody')}
+          </div>
+          <button
+            onClick={() => onSignIn(t('guest.defaultReason'))}
+            style={{ marginTop: 9, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '8px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}
+          >
+            {t('guest.signInGoogle')}
+          </button>
+        </div>
+      )}
 
       {/* ALERTS */}
       <div style={{ flex: 'none', padding: '0 18px 14px' }}>

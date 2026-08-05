@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FloodAlert } from '../../types';
 import { LEVEL_STYLE } from './AlertRibbon';
+import { useI18n, type MsgKey } from '../../i18n';
 
 const LEVEL_LABEL: Record<FloodAlert['level'], string> = {
   yellow: 'Advisory',
@@ -8,16 +9,29 @@ const LEVEL_LABEL: Record<FloodAlert['level'], string> = {
   red: 'Emergency',
 };
 
+/** Which of the three alert systems (see i18n `alert.source*`) triggered this dialog — shown as a
+ *  small chip so the same modal chrome doesn't look identical for a nearby report, a trip-stop
+ *  match, and a real PAGASA warning. */
+export type AlertSource = 'nearby' | 'trip' | 'weather';
+const SOURCE_KEY: Record<AlertSource, MsgKey> = {
+  nearby: 'alert.sourceNearby',
+  trip: 'alert.sourceTrip',
+  weather: 'alert.sourceWeather',
+};
+
 interface AlertModalProps {
   alert: FloodAlert;
   /** Optional primary action (e.g. "View on map"). Runs, then closes the dialog. */
   action?: { label: string; run: () => void };
+  /** Which alert system this came from. Omit for existing call sites — no chip is shown then. */
+  source?: AlertSource;
   onClose: () => void;
 }
 
 /** Centered, attention-demanding modal for a severe (orange/red) flood alert. Auto-popped from
  *  App when a newly-active severe alert arrives; the top ribbon persists behind it. */
-const AlertModal: React.FC<AlertModalProps> = ({ alert, action, onClose }) => {
+const AlertModal: React.FC<AlertModalProps> = ({ alert, action, source, onClose }) => {
+  const { t } = useI18n();
   const s = LEVEL_STYLE[alert.level] ?? LEVEL_STYLE.orange;
   return (
     <div
@@ -29,7 +43,14 @@ const AlertModal: React.FC<AlertModalProps> = ({ alert, action, onClose }) => {
         <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'flex-start', gap: 11 }}>
           <div style={{ width: 36, height: 36, borderRadius: 11, background: s.chip, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, flex: 'none' }}>!</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: s.close }}>{LEVEL_LABEL[alert.level]}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: s.close }}>{LEVEL_LABEL[alert.level]}</span>
+              {source && (
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.04em', textTransform: 'uppercase', color: 'var(--bw-muted)', background: 'var(--bw-bg-subtle)', padding: '2px 7px', borderRadius: 6 }}>
+                  {t(SOURCE_KEY[source])}
+                </span>
+              )}
+            </div>
             <div style={{ fontSize: 16.5, fontWeight: 800, marginTop: 1, textWrap: 'pretty' } as React.CSSProperties}>{alert.title}</div>
             {alert.region ? <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>{alert.region}</div> : null}
           </div>

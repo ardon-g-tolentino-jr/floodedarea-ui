@@ -2,6 +2,7 @@ import React from 'react';
 import { affectedRiseRatio, type EnrichedReport } from '../../utils/viewModel';
 import { ADVICE, ROAD_META, TREND_META, sparkPaths, trendNote, waterSeries } from '../../utils/floodMeta';
 import { formatDuration, timeAgo } from '../../utils/format';
+import { useI18n } from '../../i18n';
 import DepthReference from './DepthReference';
 
 interface ReportDetailCardProps {
@@ -30,6 +31,7 @@ const DEPTH_TICKS = [
 ];
 
 const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, photoSrc, onShareReport, projectedRiseCm, onClose }) => {
+  const { t } = useI18n();
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
   const sev = report.sev;
@@ -152,7 +154,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             disabled={confirming}
             style={{ marginTop: 11, width: '100%', border: '1.5px solid var(--bw-primary)', background: '#fff', color: 'var(--bw-primary-deep)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: confirming ? 'wait' : 'pointer', opacity: confirming ? 0.7 : 1 }}
           >
-            {confirming ? 'Confirming…' : "I'm seeing this too — confirm"}
+            {confirming ? t('report.confirming') : t('report.confirmCta')}
           </button>
         )}
 
