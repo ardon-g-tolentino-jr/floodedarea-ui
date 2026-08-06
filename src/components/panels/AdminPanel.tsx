@@ -16,7 +16,9 @@ import type {
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { timeAgo } from '../../utils/format';
+import { reverseGeocode } from '../../api/geocode';
 import PlaceField from './PlaceField';
+import MapPickField from './MapPickField';
 
 type Tab = 'shelters' | 'hotlines' | 'alerts' | 'zones' | 'reports' | 'requests';
 
@@ -185,6 +187,10 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   const [error, setError] = React.useState<string | null>(null);
   const [page, setPage] = React.useState(0);
   const [actingId, setActingId] = React.useState<number | null>(null);
+  // Abort an in-flight reverse-geocode when a newer pick supersedes it or the panel unmounts —
+  // same AbortController-ref pattern as AdminReportIncidentModal.tsx.
+  const geocodeAbortRef = React.useRef<AbortController | null>(null);
+  React.useEffect(() => () => geocodeAbortRef.current?.abort(), []);
   const moderate = async (id: number, status: FeedbackStatus): Promise<void> => {
     setActingId(id);
     try { await props.onUpdateFeedbackStatus(id, status); } finally { setActingId(null); }
@@ -214,6 +220,46 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
 
   const setField = (key: string, value: string | boolean): void =>
     setEditing((e) => (e ? { ...e, form: { ...e.form, [key]: value } } : e));
+
+  /**
+   * Single handler behind BOTH the shared `type: 'place'` field's `PlaceField` (search/current
+   * location) and its `MapPickField` (click-to-move mini-map beneath it) — one pin, two ways to
+   * set it. Always writes latitude/longitude/`_place`; then, for tabs whose `FIELDS` actually
+   * carry a `name`/`district` key (zones, reports, shelters — NOT hotlines, which has neither),
+   * reverse-geocodes the point and fills them in.
+   *
+   * `force` is false for every ordinary pick/drag: it only fills a field that is still blank, so
+   * fine-tuning a pin after the admin has typed their own name never clobbers it — the same
+   * clobbering bug fixed in AdminReportIncidentModal is deliberately not reproduced here. `force`
+   * is true only for the explicit "Resolve name from pin" button, so an admin who *wants* the
+   * overwrite has a one-click way to ask for it.
+   */
+  const pickLocation = (la: number, ln: number, label = '', force = false): void => {
+    setEditing((e) => (e ? { ...e, form: { ...e.form, latitude: String(la), longitude: String(ln), _place: label || String(e.form._place ?? '') } } : e));
+
+    const hasNameField = FIELDS[tab].some((f) => f.key === 'name');
+    const hasDistrictField = FIELDS[tab].some((f) => f.key === 'district');
+    if (!hasNameField && !hasDistrictField) return; // e.g. hotlines — no-op by design
+
+    geocodeAbortRef.current?.abort();
+    const ac = new AbortController();
+    geocodeAbortRef.current = ac;
+    void reverseGeocode(la, ln, ac.signal).then((g) => {
+      if (ac.signal.aborted) return;
+      setEditing((e) => {
+        if (!e) return e;
+        const next = { ...e.form };
+        if (hasNameField) {
+          const resolved = g.road ?? g.barangay ?? label.split(',')[0]?.trim() ?? '';
+          if (resolved && (force || String(next.name ?? '').trim() === '')) next.name = resolved;
+        }
+        if (hasDistrictField && g.district && (force || String(next.district ?? '').trim() === '')) {
+          next.district = g.district;
+        }
+        return { ...e, form: next };
+      });
+    });
+  };
 
   const num = (v: string | boolean): number => (typeof v === 'boolean' ? 0 : Number(v));
   const str = (v: string | boolean): string => (typeof v === 'boolean' ? '' : v.trim());
@@ -423,18 +469,46 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 {editing.id == null ? `Add ${TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}` : `Edit ${TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}`}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
-                {FIELDS[tab].map((f) => (
-                  <label key={f.key} style={{ display: 'block' }}>
+                {FIELDS[tab].map((f) => {
+                  // A `place` field is wrapped in a plain div, not a label: it now contains a
+                  // Leaflet mini-map, and clicking inside a <label> activates the label's first
+                  // form control — which would yank focus to the search box on every map click
+                  // and fight the marker drag.
+                  const Wrap = f.type === 'place' ? 'div' : 'label';
+                  return (
+                  <Wrap key={f.key} style={{ display: 'block' }}>
                     {f.type !== 'checkbox' && (
                       <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4 }}>{f.label}</div>
                     )}
                     {f.type === 'place' ? (
-                      <PlaceField
-                        lat={String(editing.form.latitude ?? '')}
-                        lng={String(editing.form.longitude ?? '')}
-                        placeLabel={String(editing.form._place ?? '')}
-                        onPick={(la, ln, label) => setEditing((e) => (e ? { ...e, form: { ...e.form, latitude: String(la), longitude: String(ln), _place: label } } : e))}
-                      />
+                      <>
+                        <PlaceField
+                          lat={String(editing.form.latitude ?? '')}
+                          lng={String(editing.form.longitude ?? '')}
+                          placeLabel={String(editing.form._place ?? '')}
+                          onPick={(la, ln, label) => pickLocation(la, ln, label)}
+                        />
+                        {/* Guarded on finite numbers, not just non-empty: a half-filled or
+                            malformed record would otherwise mount Leaflet at NaN/NaN. */}
+                        {Number.isFinite(Number(editing.form.latitude || NaN)) && Number.isFinite(Number(editing.form.longitude || NaN)) && (
+                          <div style={{ marginTop: 8 }}>
+                            <MapPickField
+                              lat={Number(editing.form.latitude)}
+                              lng={Number(editing.form.longitude)}
+                              onPick={(la, ln) => pickLocation(la, ln)}
+                            />
+                            {(FIELDS[tab].some((ff) => ff.key === 'name') || FIELDS[tab].some((ff) => ff.key === 'district')) && (
+                              <button
+                                type="button"
+                                onClick={() => pickLocation(Number(editing.form.latitude), Number(editing.form.longitude), String(editing.form._place ?? ''), true)}
+                                style={{ marginTop: 6, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
+                              >
+                                Resolve name from pin
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </>
                     ) : f.type === 'textarea' ? (
                       <textarea value={String(editing.form[f.key] ?? '')} onChange={(e) => setField(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
                     ) : f.type === 'select' ? (
@@ -449,8 +523,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     ) : (
                       <input type={f.type === 'number' ? 'number' : 'text'} value={String(editing.form[f.key] ?? '')} onChange={(e) => setField(f.key, e.target.value)} style={inputStyle} />
                     )}
-                  </label>
-                ))}
+                  </Wrap>
+                  );
+                })}
               </div>
               <div style={{ display: 'flex', gap: 9, marginTop: 16 }}>
                 <button onClick={() => void submit()} disabled={busy} style={{ flex: 1, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 11, borderRadius: 10, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}>

@@ -86,6 +86,55 @@ export async function searchPlaces(
   }));
 }
 
+/**
+ * Resolve a city/municipality name to its Nominatim bounding box, reordered to the `s,w,n,e`
+ * order Overpass's `way(bbox)` filter expects. Used by `overpass.ts` to scope an intersection
+ * search instead of relying on an exact OSM administrative-area name match (`area[name="…"]`),
+ * which is intolerant of "QC" / "Q.C." / a trailing "City" / minor typos. `countrycodes=ph`
+ * keeps this PH-only like the rest of the module. Returns `null` on error/no match — the caller
+ * treats that as "city didn't resolve", not a network failure, since a 200 with an empty array is
+ * the normal Nominatim response for an unrecognized place name.
+ */
+export async function geocodeCityBBox(
+  city: string,
+  signal?: AbortSignal
+): Promise<[number, number, number, number] | null> {
+  const q = city.trim();
+  if (!q) return null;
+
+  const params = new URLSearchParams({
+    format: 'jsonv2',
+    q,
+    limit: '1',
+    countrycodes: 'ph',
+  });
+
+  let res: Response;
+  try {
+    res = await fetch(`${NOMINATIM_URL}?${params.toString()}`, {
+      signal,
+      headers: { Accept: 'application/json' },
+    });
+  } catch {
+    return null; // network error or aborted
+  }
+  if (!res.ok) return null;
+
+  let rows: { boundingbox?: [string, string, string, string] }[];
+  try {
+    rows = (await res.json()) as { boundingbox?: [string, string, string, string] }[];
+  } catch {
+    return null;
+  }
+  const bb = rows[0]?.boundingbox;
+  if (!bb) return null;
+
+  // Nominatim: [south, north, west, east]. Overpass way(bbox): south,west,north,east.
+  const [south, north, west, east] = bb.map(Number);
+  if ([south, north, west, east].some((n) => Number.isNaN(n))) return null;
+  return [south, west, north, east];
+}
+
 /** The road a flood pin sits on, plus its district, city, and barangay, resolved from coordinates. */
 export interface ReverseResult {
   road: string | null;
