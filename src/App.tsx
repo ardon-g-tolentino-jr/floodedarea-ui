@@ -1314,10 +1314,24 @@ const App: React.FC = () => {
 
   // "Report incident" modal: post a system report, then offer to share it to social media. Throws
   // on failure (no adminAction wrapper) so the modal keeps its form open and shows an error.
-  const onReportIncident = async (b: NewReport): Promise<void> => {
+  // `zone` is the optional "Also mark this place as flood-prone" checkbox from the modal — it is
+  // strictly secondary to the report, so its failure must NOT fail the report or reopen the
+  // modal: the admin already has their incident posted, and can always add the zone by hand from
+  // Admin → Zones. Hence it's wrapped in its own try/catch rather than left to propagate.
+  const onReportIncident = async (b: NewReport, zone?: NewFloodProneArea): Promise<void> => {
     const created = await mutations.createReport({ ...b, system: true });
     await reports.refetch(true);
-    showToast('System report posted.');
+    let zoneNote = '';
+    if (zone) {
+      try {
+        await mutations.createFloodProneArea(zone);
+        await floodProne.refetch(true);
+        zoneNote = ' Flood-prone zone added.';
+      } catch {
+        zoneNote = ' (Could not add the flood-prone zone — add it from Admin → Zones.)';
+      }
+    }
+    showToast(`System report posted.${zoneNote}`);
     setShareReportTarget(created);
   };
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');

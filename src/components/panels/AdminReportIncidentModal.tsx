@@ -1,8 +1,8 @@
 import React from 'react';
-import type { NewReport, Severity } from '../../types';
+import type { AlertLevel, NewFloodProneArea, NewReport, Severity } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
-import { findIntersection, type Intersection } from '../../api/overpass';
+import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import PlaceField from './PlaceField';
 import MapPickField from './MapPickField';
@@ -13,16 +13,25 @@ import DepthReference from './DepthReference';
  * sources: pin the location — either a street intersection ("Aurora Blvd cor. Katipunan Ave") or
  * a searched/map-picked point, anywhere in the Philippines — set severity/depth, optionally
  * attach a screenshot, and post it. The parent tags it as a system report (reporterTrust:
- * 'system') and, on success, offers to share it to social media.
+ * 'system') and, on success, offers to share it to social media. Optionally, the same submit can
+ * also create a quiet flood-prone zone at the same pin (see `markProne` below) — that's a second,
+ * best-effort action the parent is expected to swallow the failure of (see `onSubmit`'s doc).
  */
 interface Props {
   isMobile: boolean;
-  /** Post the report. Throws on failure so the modal keeps the form open and shows an error. */
-  onSubmit: (b: NewReport) => Promise<void>;
+  /** Post the report and, if `zone` is given, best-effort create a flood-prone area at the same
+   *  spot. Throws on report failure so the modal keeps the form open and shows an error — a zone
+   *  failure is the parent's problem to swallow non-fatally, not this modal's. */
+  onSubmit: (b: NewReport, zone?: NewFloodProneArea) => Promise<void>;
   onClose: () => void;
 }
 
 const SEV_ORDER: Severity[] = ['high', 'medium', 'low'];
+
+// UI policy for this one form only (not a shared domain constant — floodMeta.ts stays free of
+// it): what alert level a quiet zone gets when tagged straight off an incident report, keyed off
+// the severity already chosen for the report itself.
+const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
 
 // How long a system report stays live. '' = fall back to the severity-scaled default; else minutes.
 const TTL_OPTIONS: { value: string; label: string }[] = [
@@ -62,14 +71,24 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   const [streetA, setStreetA] = React.useState('');
   const [streetB, setStreetB] = React.useState('');
   const [interCity, setInterCity] = React.useState('');
-  const [interResults, setInterResults] = React.useState<Intersection[]>([]);
+  // Single outcome slot replaces the old results/searched pair — the four IntersectionOutcome
+  // statuses (ok/none/unknown-city/busy/aborted) drive four distinct messages below, so the UI
+  // never tells the admin "check the spelling" for what is actually an upstream 504.
+  const [interOutcome, setInterOutcome] = React.useState<IntersectionOutcome | null>(null);
   const [interSearching, setInterSearching] = React.useState(false);
-  const [interSearched, setInterSearched] = React.useState(false);
+  // Flips true ~5s into a search so "Searching…" doesn't look frozen through Overpass's observed
+  // 7–11s successful runs (let alone the busy path's retries+backoff, which can take longer).
+  const [interSlow, setInterSlow] = React.useState(false);
   const interAbortRef = React.useRef<AbortController | null>(null);
   React.useEffect(() => () => interAbortRef.current?.abort(), []);
   const [severity, setSeverity] = React.useState<Severity>('high');
   const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
   const [note, setNote] = React.useState('');
+  // "Also mark this place as flood-prone" — creates a quiet zone (never a broadcast) at the same
+  // pin as a secondary, best-effort action alongside the report itself. See SEV_TO_LEVEL and
+  // `submit` below for how the zone payload is built.
+  const [markProne, setMarkProne] = React.useState(false);
+  const [proneRadius, setProneRadius] = React.useState('500');
   // When the source reported the flood ("N hours ago", 0 = now) and how long the report stays live
   // ('' = default by severity, else minutes). Both anchor the client-side TTL countdown.
   const [reportedHoursAgo, setReportedHoursAgo] = React.useState('0');
@@ -98,7 +117,15 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
         const street = g.road ?? g.barangay ?? firstSeg ?? '';
         if (street) setName(street);
       }
-      if (g.district) setDistrict(g.district);
+      // Bug fix: this used to overwrite District unconditionally on every pick, including a
+      // mini-map fine-tune after choosing an intersection — silently rewriting an admin's typed
+      // value with no feedback. Gated the same way the name write above is: only overwrite when
+      // the pick did NOT come from an intersection (skipNameOverwrite is false), or the field is
+      // still blank (so the *first* fine-tune after an intersection pick can still fill it in).
+      if (g.district) {
+        const resolvedDistrict = g.district;
+        setDistrict((d) => (!skipNameOverwrite || d === '' ? resolvedDistrict : d));
+      }
     });
   };
 
@@ -108,12 +135,17 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
     const ac = new AbortController();
     interAbortRef.current = ac;
     setInterSearching(true);
-    setInterSearched(false);
-    const found = await findIntersection(streetA, streetB, interCity, ac.signal);
+    setInterSlow(false);
+    setInterOutcome(null);
+    const slowTimer = window.setTimeout(() => {
+      if (!ac.signal.aborted) setInterSlow(true);
+    }, 5000);
+    const outcome = await findIntersection(streetA, streetB, interCity, ac.signal);
+    window.clearTimeout(slowTimer);
     if (ac.signal.aborted) return;
-    setInterResults(found);
     setInterSearching(false);
-    setInterSearched(true);
+    setInterSlow(false);
+    setInterOutcome(outcome);
   };
 
   const chooseIntersection = (pt: Intersection): void => {
@@ -176,10 +208,24 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
       reportedAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
       ttlMinutes,
     };
+    // Built from the same already-resolved fields as the report — the *plain* name (not the
+    // note-suffixed report label), so a zone reads as a place, not a specific news blurb.
+    const zone: NewFloodProneArea | undefined = markProne
+      ? {
+          name: name.trim(),
+          district: district.trim() || 'Unknown area',
+          latitude: Number(lat),
+          longitude: Number(lng),
+          radiusM: Math.max(50, Number(proneRadius) || 500),
+          level: SEV_TO_LEVEL[severity],
+          note: note.trim() || null,
+          active: true,
+        }
+      : undefined;
     setBusy(true);
     setError(null);
     try {
-      await onSubmit(payload);
+      await onSubmit(payload, zone);
       onClose();
     } catch {
       setError('Could not post the incident. Please try again.');
@@ -259,12 +305,43 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
               >
                 {interSearching ? 'Searching…' : 'Find intersection'}
               </button>
-              {interSearched && interResults.length === 0 && (
+              {interSearching && interSlow && (
+                <div style={{ fontSize: 11, color: 'var(--bw-muted)' }}>Still searching — OpenStreetMap can be slow.</div>
+              )}
+
+              {/* Outcome-aware messaging: only 'none' and 'unknown-city' are the admin's own typo
+                  to fix. 'busy' is Overpass's fault (observed failing 5/6 attempts with a 504) and
+                  gets a Retry + a one-click escape to the map tab instead of "check the spelling". */}
+              {interOutcome?.status === 'busy' && (
+                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 9, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  <div style={{ fontSize: 11.5, color: '#92400E', fontWeight: 600 }}>OpenStreetMap's lookup service is busy right now. Try again, or use "Pick on map".</div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={() => void findIntersectionPoints()}
+                      style={{ border: 0, background: '#4338CA', color: '#fff', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
+                    >
+                      Retry
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLocTab('map')}
+                      style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
+                    >
+                      Pick on map
+                    </button>
+                  </div>
+                </div>
+              )}
+              {interOutcome?.status === 'unknown-city' && (
+                <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>Couldn't find "{interOutcome.city}" — check the spelling, or leave City blank.</div>
+              )}
+              {interOutcome?.status === 'none' && (
                 <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>No crossing found — check the spelling, or try "Pick on map".</div>
               )}
-              {interResults.length > 0 && (
+              {interOutcome?.status === 'ok' && interOutcome.points.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {interResults.map((r, i) => {
+                  {interOutcome.points.map((r, i, points) => {
                     const chosen = lat === String(r.lat) && lng === String(r.lng);
                     return (
                       <button
@@ -282,7 +359,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
                           cursor: 'pointer',
                         }}
                       >
-                        ⚲ {interResults.length > 1 ? `Crossing #${i + 1} — ` : ''}{r.label}
+                        ⚲ {points.length > 1 ? `Crossing #${i + 1} — ` : ''}{r.label}
                       </button>
                     );
                   })}
@@ -337,6 +414,22 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
               );
             })}
           </div>
+        </div>
+
+        <div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            <input type="checkbox" checked={markProne} onChange={(e) => setMarkProne(e.target.checked)} />
+            ⚠ Also mark this place as flood-prone
+          </label>
+          <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 3, marginLeft: 22 }}>
+            Adds a quiet zone on the map. It does not send a warning; do that from Admin → Zones when you want people alerted.
+          </div>
+          {markProne && (
+            <div style={{ marginTop: 8, marginLeft: 22, maxWidth: 160 }}>
+              <label style={labelStyle}>Radius (m)</label>
+              <input type="number" min={50} value={proneRadius} onChange={(e) => setProneRadius(e.target.value)} style={inputStyle} />
+            </div>
+          )}
         </div>
 
         <div>
