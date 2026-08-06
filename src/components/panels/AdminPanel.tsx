@@ -13,9 +13,12 @@ import type {
   NewHotline,
   NewReport,
   ReportStatus,
+  SocialNetwork,
+  SocialPost,
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { timeAgo } from '../../utils/format';
+import { FB_GLYPH_PATH } from '../../utils/share';
 import { reverseGeocode } from '../../api/geocode';
 import PlaceField from './PlaceField';
 import MapPickField from './MapPickField';
@@ -33,6 +36,13 @@ interface AdminPanelProps {
   /** Global (server-backed) toggle for the floating community-chat bubble. */
   chatEnabled: boolean;
   onToggleChat: (on: boolean) => void;
+  /** Global kill switches for the social auto-post feature — one per network. */
+  socialAutopostFacebook: boolean;
+  socialAutopostX: boolean;
+  onToggleSocialAutopost: (network: SocialNetwork, on: boolean) => void;
+  /** Recent auto-post attempts, newest first — surfaced in the Reports tab. */
+  socialPosts: SocialPost[];
+  onRetrySocialPost: (id: number) => void;
   onCreateCenter: (b: NewCenter) => Promise<void>;
   onUpdateCenter: (id: number, b: Partial<NewCenter>) => Promise<void>;
   onDeleteCenter: (id: number) => Promise<void>;
@@ -134,6 +144,14 @@ const STATUS_PILL: Record<FeedbackStatus, { bg: string; fg: string }> = {
   declined: { bg: '#FEF2F2', fg: '#B91C1C' },
 };
 
+const SOCIAL_STATUS_PILL: Record<SocialPost['status'], { bg: string; fg: string }> = {
+  pending: { bg: 'var(--bw-bg-subtle)', fg: 'var(--bw-ink-soft)' },
+  sent:    { bg: '#F0FDF4', fg: '#15803D' },
+  failed:  { bg: '#FEF2F2', fg: '#B91C1C' },
+  skipped: { bg: '#FFFBEB', fg: '#92400E' },
+};
+const SOCIAL_NETWORK_LABEL: Record<SocialNetwork, string> = { facebook: 'Facebook', x: 'X' };
+
 const PAGE_SIZE = 10;
 
 type FormValues = Record<string, string | boolean>;
@@ -180,7 +198,10 @@ const inputStyle: React.CSSProperties = {
 
 
 const AdminPanel: React.FC<AdminPanelProps> = (props) => {
-  const { centers, hotlines, alerts, zones, reports, liveStream, onToggleLive, chatEnabled, onToggleChat, onClose } = props;
+  const {
+    centers, hotlines, alerts, zones, reports, liveStream, onToggleLive, chatEnabled, onToggleChat,
+    socialAutopostFacebook, socialAutopostX, onToggleSocialAutopost, socialPosts, onRetrySocialPost, onClose,
+  } = props;
   const [tab, setTab] = React.useState<Tab>('shelters');
   const [editing, setEditing] = React.useState<{ id: number | null; form: FormValues } | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -409,6 +430,35 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           </button>
         </div>
 
+        {/* Auto-post kill switches — global; the per-report toggle in the incident modal only
+            takes effect when its network is also enabled here. */}
+        <div style={{ padding: '13px 20px', borderBottom: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Auto-post to Facebook</div>
+            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>System reports post to the FloodedArea Facebook Page automatically.</div>
+          </div>
+          <button
+            onClick={() => onToggleSocialAutopost('facebook', !socialAutopostFacebook)}
+            aria-pressed={socialAutopostFacebook}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostFacebook ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+          >
+            <span style={{ position: 'absolute', top: 3, left: socialAutopostFacebook ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+          </button>
+        </div>
+        <div style={{ padding: '13px 20px', borderBottom: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Auto-post to X</div>
+            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>System reports post to the FloodedArea X account automatically.</div>
+          </div>
+          <button
+            onClick={() => onToggleSocialAutopost('x', !socialAutopostX)}
+            aria-pressed={socialAutopostX}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostX ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+          >
+            <span style={{ position: 'absolute', top: 3, left: socialAutopostX ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+          </button>
+        </div>
+
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, padding: '10px 16px 0', borderBottom: '1px solid var(--bw-line-soft)' }}>
           {tabs.map((t) => (
@@ -591,6 +641,50 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   >
                     Next →
                   </button>
+                </div>
+              )}
+
+              {tab === 'reports' && (
+                <div style={{ marginTop: 18 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--bw-ink-soft)', marginBottom: 8 }}>Social posts</div>
+                  {socialPosts.length === 0 && (
+                    <div style={{ fontSize: 12, color: 'var(--bw-muted)', textAlign: 'center', padding: 12 }}>No auto-post attempts yet.</div>
+                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {socialPosts.map((sp) => {
+                      const reportName = reports.find((r) => r.id === sp.reportId)?.name ?? `Report #${sp.reportId}`;
+                      const pill = SOCIAL_STATUS_PILL[sp.status];
+                      return (
+                        <div key={sp.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', background: '#F7FAFB', borderRadius: 10 }}>
+                          {sp.network === 'facebook' ? (
+                            <svg viewBox="0 0 24 24" width={13} height={13} fill="#1877F2" style={{ flex: 'none' }}><path d={FB_GLYPH_PATH} /></svg>
+                          ) : (
+                            <span style={{ fontSize: 12, fontWeight: 800, flex: 'none' }}>𝕏</span>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{reportName}</div>
+                            <div style={{ fontSize: 10.5, color: 'var(--bw-faint)' }}>
+                              {SOCIAL_NETWORK_LABEL[sp.network]} · {timeAgo(sp.updatedAt)}{sp.lastError ? ` · ${sp.lastError}` : ''}
+                            </div>
+                          </div>
+                          <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: pill.bg, color: pill.fg, textTransform: 'capitalize', flex: 'none' }}>{sp.status}</span>
+                          {/* The payoff of a sent row: open the real post on the network. */}
+                          {sp.externalUrl && (
+                            <a href={sp.externalUrl} target="_blank" rel="noopener noreferrer" style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, textDecoration: 'none', flex: 'none' }}>
+                              View
+                            </a>
+                          )}
+                          {/* Skipped rows are retryable too — that's how a dry-run or
+                              kill-switched post gets published once the blocker is cleared. */}
+                          {(sp.status === 'failed' || sp.status === 'skipped') && (
+                            <button onClick={() => onRetrySocialPost(sp.id)} style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                              Retry
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>

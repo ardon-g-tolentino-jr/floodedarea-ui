@@ -1,9 +1,10 @@
 import React from 'react';
-import type { AlertLevel, NewFloodProneArea, NewReport, Severity } from '../../types';
+import type { AlertLevel, NewFloodProneArea, NewReport, Severity, SocialNetwork } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
 import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
+import { buildIncidentCaption, FB_GLYPH_PATH } from '../../utils/share';
 import PlaceField from './PlaceField';
 import MapPickField from './MapPickField';
 import DepthReference from './DepthReference';
@@ -48,6 +49,26 @@ const TTL_OPTIONS: { value: string; label: string }[] = [
 // (News)" — so readers can see a system report's provenance at a glance.
 const SOURCE_OPTIONS = ['News', 'Social media', 'LGU advisory', 'Field report', 'Other'] as const;
 
+// Remembered "Auto-post" default — which networks the admin last left ticked. Both on by default
+// so a first-time admin gets the intended behaviour without having to discover the toggles.
+const SOCIAL_AUTOPOST_STORAGE_KEY = 'baha_social_autopost_v1';
+
+function loadSocialAutopostPref(): { facebook: boolean; x: boolean } {
+  try {
+    const raw = localStorage.getItem(SOCIAL_AUTOPOST_STORAGE_KEY);
+    if (!raw) return { facebook: true, x: true };
+    const parsed = JSON.parse(raw) as { facebook?: boolean; x?: boolean };
+    return { facebook: parsed.facebook !== false, x: parsed.x !== false };
+  } catch {
+    return { facebook: true, x: true };
+  }
+}
+
+// X counts every URL as this many characters regardless of its real length, budgeted against the
+// 280-char tweet limit; the server appends "\n" + the deep link after this component's caption.
+const X_URL_COST = 23;
+const X_LIMIT = 280;
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '9px 11px',
@@ -89,6 +110,13 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
   const [source, setSource] = React.useState<string>('News');
   const [sourceOther, setSourceOther] = React.useState('');
+  // Auto-post toggles — default from the admin's remembered choice (see loadSocialAutopostPref);
+  // ticking/unticking here re-remembers it for next time.
+  const [postFacebook, setPostFacebook] = React.useState<boolean>(() => loadSocialAutopostPref().facebook);
+  const [postX, setPostX] = React.useState<boolean>(() => loadSocialAutopostPref().x);
+  React.useEffect(() => {
+    try { localStorage.setItem(SOCIAL_AUTOPOST_STORAGE_KEY, JSON.stringify({ facebook: postFacebook, x: postX })); } catch {/* ignore */}
+  }, [postFacebook, postX]);
   // "Also mark this place as flood-prone" — creates a quiet zone (never a broadcast) at the same
   // pin as a secondary, best-effort action alongside the report itself. See SEV_TO_LEVEL and
   // `submit` below for how the zone payload is built.
@@ -201,6 +229,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
     // Convert "N hours ago" to an absolute report time; a chosen TTL preset overrides the default.
     const hoursAgo = Math.max(0, Number(reportedHoursAgo) || 0);
     const ttlMinutes = ttl ? Number(ttl) : undefined;
+    const networks: SocialNetwork[] = [...(postFacebook ? (['facebook'] as const) : []), ...(postX ? (['x'] as const) : [])];
     const payload: NewReport = {
       name: label,
       district: district.trim() || 'Unknown area',
@@ -213,6 +242,9 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
       photoDataUrl: photo ?? undefined,
       reportedAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
       ttlMinutes,
+      ...(networks.length > 0
+        ? { socialNetworks: networks, socialCaption: buildIncidentCaption({ name: label, district: district.trim(), severity, depthCm: depth, trend: preset.trend }) }
+        : {}),
     };
     // Built from the same already-resolved fields as the report — the *plain* name (not the
     // note-suffixed report label), so a zone reads as a place, not a specific news blurb.
@@ -241,6 +273,22 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   };
 
   const range = DEPTH_RANGE[severity];
+
+  // Live preview of the auto-post caption — mirrors exactly what `submit()` will send as
+  // `socialCaption` (same label-with-source-note, same trend), so what the admin sees is what ships.
+  const previewSourceNote = (source === 'Other' ? sourceOther : source).trim();
+  const previewLabel = previewSourceNote ? `${(name.trim() || 'This location')} (${previewSourceNote})` : (name.trim() || 'This location');
+  const captionBody = buildIncidentCaption({
+    name: previewLabel,
+    district: district.trim(),
+    severity,
+    depthCm: depth,
+    trend: SEVERITY_PRESET[severity].trend,
+  });
+  // What actually ships on X: this body + a newline + the deep link, which the server appends and
+  // which X always counts as X_URL_COST chars regardless of the link's real length.
+  const xCharCount = captionBody.length + 1 + X_URL_COST;
+  const xOverBudget = xCharCount > X_LIMIT;
 
   const card = (
     <div
@@ -486,6 +534,31 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
               placeholder="e.g. via DZMM report"
               style={{ ...inputStyle, marginTop: 8 }}
             />
+          )}
+        </div>
+
+        <div>
+          <label style={labelStyle}>Auto-post</label>
+          <div style={{ display: 'flex', gap: 7 }}>
+            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postFacebook ? '#4338CA' : '#E2E8F0'}`, background: postFacebook ? '#EEF2FF' : '#fff', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+              <input type="checkbox" checked={postFacebook} onChange={(e) => setPostFacebook(e.target.checked)} />
+              <svg viewBox="0 0 24 24" width={13} height={13} fill="#1877F2" style={{ flex: 'none' }}><path d={FB_GLYPH_PATH} /></svg>
+              Facebook
+            </label>
+            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postX ? '#4338CA' : '#E2E8F0'}`, background: postX ? '#EEF2FF' : '#fff', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+              <input type="checkbox" checked={postX} onChange={(e) => setPostX(e.target.checked)} />
+              𝕏 X
+            </label>
+          </div>
+          {(postFacebook || postX) && (
+            <div style={{ marginTop: 8, padding: '9px 10px', background: '#F7FAFB', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
+              <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>{captionBody}</div>
+              {postX && (
+                <div style={{ marginTop: 6, fontSize: 10.5, fontWeight: 700, color: xOverBudget ? 'var(--bw-danger)' : 'var(--bw-faint)' }}>
+                  {xCharCount}/{X_LIMIT} on X (link counted as {X_URL_COST} chars)
+                </div>
+              )}
+            </div>
           )}
         </div>
 

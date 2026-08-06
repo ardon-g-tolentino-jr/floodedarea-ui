@@ -1,7 +1,7 @@
 // Builds the contextual Share message. Pure: the caller passes the page URL and live data,
 // so this stays side-effect-free (no window/navigator access) per the utils/ convention.
 
-import type { AlertLevel, FloodReport } from '../types';
+import type { AlertLevel, FloodReport, Severity, Trend } from '../types';
 import type { EnrichedReport } from './viewModel';
 import { SEV_META, TREND_META } from './floodMeta';
 
@@ -112,6 +112,24 @@ export function buildReportShareText(report: FloodReport, activeCount: number, u
     `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
     REPORT_PITCH;
   return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
+}
+
+/** Pre-create form values the admin "Report incident" modal has on hand — no report id yet, so the
+ *  caller sends this caption body and the backend appends the deep link once the report is saved. */
+export interface IncidentCaptionInputs {
+  name: string;
+  district: string;
+  severity: Severity;
+  depthCm: number;
+  trend: Trend;
+}
+
+/** Caption body (no URL) for the admin auto-post preview, wording matched to `buildReportShareText`
+ *  so a citizen sees the same voice whether the report was shared by hand or auto-posted. */
+export function buildIncidentCaption({ name, district, severity, depthCm, trend }: IncidentCaptionInputs): string {
+  const where = district ? `${name} (${district})` : name;
+  const trendTxt = trend === 'rising' || trend === 'receding' ? `, ${TREND_META[trend].label.toLowerCase()}` : '';
+  return `⚠️ ${SEV_META[severity].label.toUpperCase()} flooding reported on ${where} — ~${depthCm} cm${trendTxt}.\n\n${REPORT_PITCH}`;
 }
 
 /** A single social-network share target. `href` opens that network's web (or app) composer. */

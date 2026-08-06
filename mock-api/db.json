@@ -463,6 +463,9 @@
     "visits": 1249
   },
   "settings": {
-    "chatEnabled": true
-  }
+    "chatEnabled": true,
+    "socialAutopostFacebook": true,
+    "socialAutopostX": true
+  },
+  "socialPosts": []
 }

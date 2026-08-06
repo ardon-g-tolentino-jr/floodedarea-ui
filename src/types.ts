@@ -157,6 +157,10 @@ export interface NewReport {
   reportedAt?: string;
   /** Admin-only: how long the report stays live, in minutes. Omit ⇒ severity default TTL. */
   ttlMinutes?: number;
+  /** Admin-only: networks to auto-post this report to (server-side, after the report is saved). */
+  socialNetworks?: SocialNetwork[];
+  /** Admin-only: caption body for the auto-post, WITHOUT any URL — the server appends the deep link. */
+  socialCaption?: string;
 }
 
 /**
@@ -251,6 +255,28 @@ export interface VisitStats {
 export interface AppSettings {
   /** Whether the floating community-chat bubble is shown. Default true. */
   chatEnabled: boolean;
+  /** Kill switch: whether system reports are ever auto-posted to Facebook. Default true. */
+  socialAutopostFacebook: boolean;
+  /** Kill switch: whether system reports are ever auto-posted to X. Default true. */
+  socialAutopostX: boolean;
+}
+
+/** A social network a system report can be auto-posted to. */
+export type SocialNetwork = 'facebook' | 'x';
+
+/** Auto-post status for one (report, network) pair (`GET /social-posts`, ADMIN only). */
+export interface SocialPost {
+  id: number;
+  reportId: number;
+  network: SocialNetwork;
+  status: 'pending' | 'sent' | 'failed' | 'skipped';
+  externalId: string | null;
+  externalUrl: string | null;
+  caption: string | null;
+  attempts: number;
+  lastError: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ── Trip monitoring (client-only) ──────────────────────────────────────────────────
