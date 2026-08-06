@@ -33,6 +33,12 @@ const PITCH =
   `${APP_NAME} — live crowd-sourced flood map for the Philippines: real-time reports, ` +
   `evac centers, road conditions & SOS rescue.`;
 
+/** Tail for the per-report share message. Shorter than PITCH (X's 280-char budget), invites the
+ *  reader to report and not just watch, and ends on a colon so the URL that follows reads as the
+ *  address. Names the domain so a reader who never clicks still knows where to go. */
+const REPORT_PITCH =
+  'Track or report live flood conditions on FloodedArea.com — live crowd-sourced flood map:';
+
 const ALERT_NOTE: Record<AlertLevel, string> = {
   red: 'a RED rainfall warning is up',
   orange: 'an ORANGE rainfall warning is up',
@@ -93,8 +99,9 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
   return { title: `${APP_NAME} — live flood map`, body, text: `${body}\n${url}${FB_FOLLOW}` };
 }
 
-/** Share message for a SPECIFIC report (used by the per-report "Share to Facebook" action). Reuses
- *  the reporter-snapshot wording so any report — not just the caller's own — reads naturally. */
+/** Share message for a SPECIFIC report (used by the detail card's "Share Report" action). Mirrors the
+ *  reporter-snapshot wording so any report — not just the caller's own — reads naturally, but closes
+ *  with REPORT_PITCH rather than PITCH. */
 export function buildReportShareText(report: FloodReport, activeCount: number, url: string): ShareText {
   const where = report.district ? `${report.name} (${report.district})` : report.name;
   const trend = report.trend === 'rising' || report.trend === 'receding'
@@ -103,7 +110,7 @@ export function buildReportShareText(report: FloodReport, activeCount: number, u
   const body =
     `⚠️ ${SEV_META[report.severity].label.toUpperCase()} flooding reported on ${where} — ` +
     `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
-    `Track live flood conditions on ${PITCH}`;
+    REPORT_PITCH;
   return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
 }
 
