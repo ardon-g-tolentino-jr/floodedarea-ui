@@ -1805,14 +1805,16 @@ const App: React.FC = () => {
           low-40s bracket used for the FAB's resting (closed) state. */}
       {isMobile && mode === 'idle' && (
         <>
-          {fanOpen && (
+          {/* Admins post system reports via the incident modal, so the Detailed/Quick fan-out
+              (citizen-only) never opens for them — skip rendering the scrim/card entirely. */}
+          {!isAdmin && fanOpen && (
             <div
               onClick={() => setFanOpen(false)}
               aria-hidden="true"
               style={{ position: 'fixed', inset: 0, zIndex: 1140 }}
             />
           )}
-          {fanOpen && (
+          {!isAdmin && fanOpen && (
             <div style={{ position: 'fixed', left: '50%', bottom: 84, transform: 'translateX(-50%)', zIndex: 1150, animation: 'popIn .14s ease-out' }}>
               <ReportOptions
                 preferred={reportPref}
@@ -1824,12 +1826,12 @@ const App: React.FC = () => {
             </div>
           )}
           <button
-            onClick={() => setFanOpen((o) => !o)}
-            aria-expanded={fanOpen}
-            aria-label={t('report.chooseHow')}
+            onClick={() => (isAdmin ? setIncidentOpen(true) : setFanOpen((o) => !o))}
+            aria-expanded={isAdmin ? undefined : fanOpen}
+            aria-label={isAdmin ? t('topbar.report') : t('report.chooseHow')}
             style={{ position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: fanOpen ? 1145 : 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
           >
-            <span style={{ fontSize: 20, fontWeight: 700, display: 'inline-block', transition: 'transform .15s', transform: fanOpen ? 'rotate(45deg)' : 'none' }}>+</span> {t('topbar.report')}
+            <span style={{ fontSize: 20, fontWeight: 700, display: 'inline-block', transition: 'transform .15s', transform: !isAdmin && fanOpen ? 'rotate(45deg)' : 'none' }}>+</span> {t('topbar.report')}
           </button>
         </>
       )}

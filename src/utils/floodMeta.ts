@@ -112,7 +112,7 @@ export const ADVICE: Record<Road, { txt: string; bg: string; col: string }> = {
 export const SEVERITY_PRESET: Record<Severity, { depthCm: number; road: Road; trend: Trend }> = {
   high: { depthCm: 108, road: 'impassable', trend: 'rising' },
   medium: { depthCm: 46, road: 'risky', trend: 'steady' },
-  low: { depthCm: 18, road: 'passable', trend: 'receding' },
+  low: { depthCm: 8, road: 'passable', trend: 'receding' },
 };
 
 /** Depth range (cm) a reporter can dial in for each severity; defaults to SEVERITY_PRESET.depthCm. */

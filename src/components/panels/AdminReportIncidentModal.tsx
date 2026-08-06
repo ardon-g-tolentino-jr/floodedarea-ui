@@ -44,6 +44,10 @@ const TTL_OPTIONS: { value: string; label: string }[] = [
   { value: '2880', label: '48 hours' },
 ];
 
+// Where the admin learned about the flood. Appended to the report name — "Aurora cor. Katipunan
+// (News)" — so readers can see a system report's provenance at a glance.
+const SOURCE_OPTIONS = ['News', 'Social media', 'LGU advisory', 'Field report', 'Other'] as const;
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '9px 11px',
@@ -83,7 +87,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   React.useEffect(() => () => interAbortRef.current?.abort(), []);
   const [severity, setSeverity] = React.useState<Severity>('high');
   const [depth, setDepth] = React.useState(SEVERITY_PRESET.high.depthCm);
-  const [note, setNote] = React.useState('');
+  const [source, setSource] = React.useState<string>('News');
+  const [sourceOther, setSourceOther] = React.useState('');
   // "Also mark this place as flood-prone" — creates a quiet zone (never a broadcast) at the same
   // pin as a secondary, best-effort action alongside the report itself. See SEV_TO_LEVEL and
   // `submit` below for how the zone payload is built.
@@ -191,7 +196,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
       return;
     }
     const preset = SEVERITY_PRESET[severity];
-    const label = note.trim() ? `${name.trim()} (${note.trim()})` : name.trim();
+    const sourceNote = (source === 'Other' ? sourceOther : source).trim();
+    const label = sourceNote ? `${name.trim()} (${sourceNote})` : name.trim();
     // Convert "N hours ago" to an absolute report time; a chosen TTL preset overrides the default.
     const hoursAgo = Math.max(0, Number(reportedHoursAgo) || 0);
     const ttlMinutes = ttl ? Number(ttl) : undefined;
@@ -218,7 +224,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
           longitude: Number(lng),
           radiusM: Math.max(50, Number(proneRadius) || 500),
           level: SEV_TO_LEVEL[severity],
-          note: note.trim() || null,
+          note: sourceNote || null,
           active: true,
         }
       : undefined;
@@ -469,8 +475,18 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
         </div>
 
         <div>
-          <label style={labelStyle}>Source / note <span style={{ fontWeight: 600 }}>(optional)</span></label>
-          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. via DZMM report" style={inputStyle} />
+          <label style={labelStyle}>Source</label>
+          <select value={source} onChange={(e) => setSource(e.target.value)} style={inputStyle}>
+            {SOURCE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+          </select>
+          {source === 'Other' && (
+            <input
+              value={sourceOther}
+              onChange={(e) => setSourceOther(e.target.value)}
+              placeholder="e.g. via DZMM report"
+              style={{ ...inputStyle, marginTop: 8 }}
+            />
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 11 }}>
