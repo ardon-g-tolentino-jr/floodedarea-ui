@@ -14,14 +14,18 @@ interface ReportDetailCardProps {
   canRemove: boolean;
   removing: boolean;
   onRemove: () => void;
-  onShowLocation: () => void;
   /** Absolute URL to the report's flood photo, or null when none was attached. */
   photoSrc: string | null;
-  /** Share this report to Facebook (native photo share on mobile, web sharer fallback). */
+  /** Share this report (native photo share on mobile, web sharer fallback). */
   onShareReport: () => void;
   projectedRiseCm: number;
   onClose: () => void;
 }
+
+/** Neutral share glyph (24×24 fill path) — the share action isn't Facebook-specific: on mobile it
+ *  opens the native sheet, so the button must not imply one network. */
+const SHARE_GLYPH =
+  'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z';
 
 const DEPTH_TICKS = [
   { l: 'Ankle', cm: 15 },
@@ -30,7 +34,7 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, onShowLocation, photoSrc, onShareReport, projectedRiseCm, onClose }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose }) => {
   const { t } = useI18n();
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
@@ -143,9 +147,12 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 
         <button
           onClick={onShareReport}
-          style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: '#1877F2', color: '#fff', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+          style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
         >
-          <span style={{ fontSize: 15 }}>ⓕ</span> Share to Facebook
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
+            <path d={SHARE_GLYPH} />
+          </svg>
+          Share Report
         </button>
 
         {canConfirm && (
@@ -159,14 +166,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         )}
 
         {canRemove && (
-          <>
-            <button
-              onClick={onShowLocation}
-              style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: '1.5px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
-            >
-              📍 Show my location
-            </button>
-            {confirmRemove ? (
+          confirmRemove ? (
             <div style={{ marginTop: 11, padding: '11px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 11 }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: '#B91C1C', lineHeight: 1.4 }}>Remove this report? It will disappear from the map for everyone.</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
@@ -193,8 +193,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             >
               Remove my report
             </button>
-          )}
-          </>
+          )
         )}
       </div>
     </div>
