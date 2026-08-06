@@ -4,7 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { captchaEnabled } from './utils/turnstile';
 import { useIsMobile } from './hooks/useBreakpoint';
 import { useWakeLock } from './hooks/useWakeLock';
-import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useFloodProneAreas, useHotlines, useReports, useRescues, useSettings } from './hooks/useDomainData';
+import { useAcceptedFeedback, useAlerts, useAllFeedback, useCenters, useFloodProneAreas, useHotlines, useReports, useRescues, useSettings, useSocialPosts } from './hooks/useDomainData';
 import { useActivityStream } from './hooks/useActivityStream';
 import { useVisitCounter } from './hooks/useVisitCounter';
 import { useI18n, tFormat } from './i18n';
@@ -153,6 +153,8 @@ const App: React.FC = () => {
   // Admin-only queue — gated so a normal visitor never hits the admin endpoint (it 403s). The fetch
   // starts automatically when an admin session appears.
   const allFeedback = useAllFeedback(auth?.role === 'ADMIN');
+  // Admin-only social auto-post status list — same gate as allFeedback above.
+  const socialPosts = useSocialPosts(auth?.role === 'ADMIN');
 
   const [userLoc, setUserLoc] = React.useState<LatLng>(DEFAULT_LOCATION);
   // Accuracy (meters) of the latest GPS fix — drives the map's uncertainty ring and the
@@ -1309,6 +1311,27 @@ const App: React.FC = () => {
     }
   };
 
+  // Global (server-backed) auto-post kill switches — one per network, same pattern as onToggleChat.
+  const onToggleSocialAutopost = async (network: 'facebook' | 'x', on: boolean): Promise<void> => {
+    try {
+      await mutations.updateSettings(network === 'facebook' ? { socialAutopostFacebook: on } : { socialAutopostX: on });
+      await settings.refetch(true);
+    } catch {
+      showToast('Could not update the auto-post setting. Please try again.');
+    }
+  };
+
+  // Admin: retry one failed/pending social-post row from the AdminPanel list.
+  const onRetrySocialPost = async (id: number): Promise<void> => {
+    try {
+      await mutations.retrySocialPost(id);
+      await socialPosts.refetch(true);
+      showToast('Retry queued.');
+    } catch {
+      showToast('Could not retry that post. Please try again.');
+    }
+  };
+
   // Reports an admin creates are authoritative "system" reports (news/other sources).
   const onCreateReport = (b: NewReport) => adminAction(() => mutations.createReport({ ...b, system: true }), () => reports.refetch(true), 'Report added.');
 
@@ -1331,8 +1354,14 @@ const App: React.FC = () => {
         zoneNote = ' (Could not add the flood-prone zone — add it from Admin → Zones.)';
       }
     }
-    showToast(`System report posted.${zoneNote}`);
-    setShareReportTarget(created);
+    // When the admin ticked at least one network, the server auto-posts it — reopening the
+    // per-report ShareModal would ask them to do by hand what already just happened.
+    if (b.socialNetworks && b.socialNetworks.length > 0) {
+      showToast(`Report posted · publishing to ${b.socialNetworks.map((n) => (n === 'facebook' ? 'Facebook' : 'X')).join(' + ')}${zoneNote}`);
+    } else {
+      showToast(`System report posted.${zoneNote}`);
+      setShareReportTarget(created);
+    }
   };
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
@@ -1585,7 +1614,7 @@ const App: React.FC = () => {
         onShowFeatures={() => setFeaturesOpen(true)}
         onShowFeedback={() => { setFeedbackBoardOpen(true); void acceptedFeedback.refetch(true); }}
         isAdmin={!!isAdmin}
-        onAdmin={() => { setAdminOpen(true); void allFeedback.refetch(true); }}
+        onAdmin={() => { setAdminOpen(true); void allFeedback.refetch(true); void socialPosts.refetch(true); }}
         onResponse={() => {
           // /rescue reads need auth; prompt sign-in before opening, then warm the data.
           if (!requireFullAuth('Sign in to open the response console.')) return;
@@ -2045,6 +2074,11 @@ const App: React.FC = () => {
           onToggleLive={setLiveStream}
           chatEnabled={settings.data?.chatEnabled !== false}
           onToggleChat={(on) => void onToggleChat(on)}
+          socialAutopostFacebook={settings.data?.socialAutopostFacebook !== false}
+          socialAutopostX={settings.data?.socialAutopostX !== false}
+          onToggleSocialAutopost={(network, on) => void onToggleSocialAutopost(network, on)}
+          socialPosts={socialPosts.data ?? []}
+          onRetrySocialPost={(id) => void onRetrySocialPost(id)}
           onCreateCenter={onCreateCenter}
           onUpdateCenter={onUpdateCenter}
           onDeleteCenter={onDeleteCenter}

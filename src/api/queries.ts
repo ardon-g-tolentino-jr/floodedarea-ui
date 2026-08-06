@@ -20,6 +20,7 @@ import type {
   RescueStatus,
   RoadSegment,
   Severity,
+  SocialPost,
   VisitStats,
   WarnArea,
 } from '../types';
@@ -45,6 +46,8 @@ export const rawApi = {
   settings: () => api.get<AppSettings>('/settings'),
   /** Active flood-prone areas (the pin+radius zones drawn on the map). Public read. */
   floodProneAreas: () => api.get<FloodProneArea[]>('/flood-prone'),
+  /** Admin: recent auto-post attempts (newest first) — powers the AdminPanel "Social posts" list. */
+  socialPosts: () => api.get<SocialPost[]>('/social-posts?limit=50'),
 };
 
 /** POST/PATCH/DELETE mutations. */
@@ -97,4 +100,8 @@ export const mutations = {
   deleteFloodProneArea: (id: number) => api.delete<void>(`/flood-prone/${id}`),
   /** Manual trigger: broadcasts a geo-stamped FloodAlert from this zone. Never fired automatically. */
   warnFloodProneArea: (id: number, body: WarnArea) => api.post<FloodAlert>(`/flood-prone/${id}/warn`, body),
+
+  // ── Admin: social auto-post ──
+  /** Reset attempts and republish one failed/pending row. */
+  retrySocialPost: (id: number) => api.post<SocialPost>(`/social-posts/${id}/retry`, {}),
 };

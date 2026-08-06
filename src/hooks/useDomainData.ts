@@ -1,5 +1,5 @@
 import { rawApi } from '../api/queries';
-import type { AppSettings, EvacuationCenter, Feedback, FloodAlert, FloodProneArea, FloodReport, Hotline, RescueRequest, RoadSegment, Severity } from '../types';
+import type { AppSettings, EvacuationCenter, Feedback, FloodAlert, FloodProneArea, FloodReport, Hotline, RescueRequest, RoadSegment, Severity, SocialPost } from '../types';
 import { useFetch, type FetchResult } from './useFetch';
 
 export function useReports(severity?: Severity): FetchResult<FloodReport[]> {
@@ -53,4 +53,10 @@ export function useSettings(): FetchResult<AppSettings> {
  *  flag — the zones are shown to every visitor, not just admins. */
 export function useFloodProneAreas(): FetchResult<FloodProneArea[]> {
   return useFetch(() => rawApi.floodProneAreas(), []);
+}
+
+/** Admin: recent social auto-post attempts. `enabled` (admin present) gates the fetch, same as
+ *  `useAllFeedback` — the endpoint is ADMIN-only and would otherwise 403 for a normal visitor. */
+export function useSocialPosts(enabled: boolean): FetchResult<SocialPost[]> {
+  return useFetch(() => rawApi.socialPosts(), [], { enabled });
 }

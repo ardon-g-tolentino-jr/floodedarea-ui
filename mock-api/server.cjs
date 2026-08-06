@@ -84,6 +84,31 @@ server.post('/reports', (req, res) => {
   // baha-api broadcasts this over SSE on create; mirror it so useActivityStream-driven refetches
   // (and anything gated on a live "new report" event, e.g. trip-stop alerts) are testable offline.
   broadcast('report-created', { id });
+
+  // Mirror baha-api's after-commit auto-post: when the admin ticked networks, synthesize a
+  // `pending` social_post row per network so the whole admin flow (list + retry) is exercisable
+  // offline. Real posting only happens server-side in baha-api; the mock never calls out.
+  const networks = Array.isArray(req.body.socialNetworks) ? req.body.socialNetworks.filter((n) => n === 'facebook' || n === 'x') : [];
+  if (networks.length > 0) {
+    const spIds = db.get('socialPosts').map('id').value();
+    let nextId = spIds.length ? Math.max(...spIds) + 1 : 1;
+    for (const network of networks) {
+      db.get('socialPosts').push({
+        id: nextId++,
+        reportId: id,
+        network,
+        status: 'pending',
+        externalId: null,
+        externalUrl: null,
+        caption: req.body.socialCaption || null,
+        attempts: 0,
+        lastError: null,
+        createdAt: now,
+        updatedAt: now,
+      }).write();
+    }
+  }
+
   res.status(201).json(stripPhoto(report));
 });
 
@@ -361,17 +386,47 @@ server.post('/stats/visit', (_req, res) => {
 
 // ── Global app settings (e.g. community chat visibility). GET is public; PATCH mirrors the
 // baha-api ADMIN gate in spirit only — the mock accepts anything, matching its other stubs. ──
+function publicSettings(s) {
+  return {
+    chatEnabled: s.chatEnabled !== false,
+    socialAutopostFacebook: s.socialAutopostFacebook !== false,
+    socialAutopostX: s.socialAutopostX !== false,
+  };
+}
 server.get('/settings', (_req, res) => {
-  const s = router.db.get('settings').value() || {};
-  res.json({ chatEnabled: s.chatEnabled !== false });
+  res.json(publicSettings(router.db.get('settings').value() || {}));
 });
 server.patch('/settings', (req, res) => {
   const db = router.db;
   const current = db.get('settings').value() || {};
   const next = { ...current };
   if (typeof req.body.chatEnabled === 'boolean') next.chatEnabled = req.body.chatEnabled;
+  if (typeof req.body.socialAutopostFacebook === 'boolean') next.socialAutopostFacebook = req.body.socialAutopostFacebook;
+  if (typeof req.body.socialAutopostX === 'boolean') next.socialAutopostX = req.body.socialAutopostX;
   db.set('settings', next).write();
-  res.json({ chatEnabled: next.chatEnabled !== false });
+  res.json(publicSettings(next));
+});
+
+// ── Social auto-post status (admin panel list + retry). The mock never calls a real network —
+// retry just resets attempts/lastError and flips the row back to 'pending', mirroring the shape
+// of what baha-api's retry endpoint returns without the actual publish. ──
+server.get('/social-posts', (_req, res) => {
+  const items = [...(router.db.get('socialPosts').value() || [])]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 50);
+  res.json(items);
+});
+server.post('/social-posts/:id/retry', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const post = db.get('socialPosts').find({ id }).value();
+  if (!post) return res.status(404).json({ message: 'Social post not found' });
+  const updated = db.get('socialPosts').find({ id }).assign({
+    status: 'pending',
+    lastError: null,
+    updatedAt: new Date().toISOString(),
+  }).write();
+  res.json(updated);
 });
 
 // ── Flood-prone areas (admin-pinned pin+radius zones) + the manual "Warn" action ──────────────
