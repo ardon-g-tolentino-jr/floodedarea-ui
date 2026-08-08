@@ -11,7 +11,7 @@ Spec of record: `../baha-api/PLAYSTORE_PACKAGE_REQUIREMENTS.md`.
 
 ## Status & outstanding TODOs
 
-**Last verified: 2026-06-30** — against `main` @ v1.32.1 and the live site.
+**Last verified: 2026-08-08** — against `060-feat-playstore-assetlinks` @ v1.54.0 and the live site.
 
 **Phase 1 (PWA readiness) — DONE & deployed.** All of it is on `main` (not just the stale
 `playstore-package` branch, which points at v1.26.0 and can be ignored). The manifest resolves
@@ -20,20 +20,32 @@ Phase-2 ordering dependency below is **already satisfied** — Bubblewrap can re
 
 Remaining work, in order:
 
-- [ ] **Fix the manifest `Content-Type`** (repo, do first). It is currently served as
-      `application/octet-stream` because nginx's default `mime.types` has no `.webmanifest`
-      entry. Add the `location` block in the [nginx section](#nginx--serve-the-manifest-with-the-right-content-type)
-      below to `nginx/default.conf.template`, rebuild `dist/`, redeploy, and re-verify.
-      Bubblewrap tolerates octet-stream, but this fails strict PWA/Lighthouse installability
-      and the verification step in this runbook.
-- [ ] **Phase 2 — TWA init.** `bubblewrap init` against the live manifest; lock Application ID
-      `com.floodedarea.app` (**permanent & unchangeable on Play**), create + back up a new
-      keystore offline, set `targetSdkVersion 36` / `minSdkVersion ≥ 23`, `bubblewrap update`.
-- [ ] **Phase 3 — build.** `bubblewrap build` → signed `.aab`; record the SHA-256 fingerprint.
-- [ ] **Phase 4 — Digital Asset Links.** Generate `assetlinks.json`, commit it to
-      `public/.well-known/assetlinks.json`, redeploy, and confirm
-      `https://floodedarea.com/.well-known/assetlinks.json` returns `200 application/json`
-      (currently **404**). Use the **app-signing** fingerprint if Play App Signing is enabled.
+- [x] **Fix the manifest `Content-Type`** — done on branch `060`. `nginx/default.conf.template`
+      now has a `location = /manifest.webmanifest` block using **`default_type
+      application/manifest+json`**. Note this deviates from the snippet previously recorded
+      below: `add_header Content-Type` does *not* work, because nginx always emits its own
+      `Content-Type` and `add_header` appends a duplicate instead of replacing it. Since
+      `.webmanifest` is simply absent from `mime.types`, `default_type` is the correct lever.
+      **Still needs a redeploy to take effect.**
+- [x] **Phase 2 — TWA init.** Done. Project generated at `../baha-twa/` with Application ID
+      `com.floodedarea.app`, `launcherName` `FloodedArea`, `targetSdkVersion 36`,
+      `minSdkVersion 23` (the library default is 21 — explicitly overridden), `orientation`
+      portrait. Generated non-interactively via Bubblewrap's own `TwaManifest`/`TwaGenerator`
+      library, since `bubblewrap init`'s prompts need a TTY.
+- [x] **Keystore created.** `../baha-twa/android.keystore`, alias `android`, RSA 2048,
+      10000-day validity. ⚠️ **Not backed up yet — do this.** Irreplaceable.
+- [ ] **Phase 3 — build.** `bubblewrap build` in `../baha-twa/` → signed `.aab`. Reads
+      `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD` from the environment, else
+      prompts (prefer prompting — keeps passwords out of shell history).
+- [x] **Phase 4 — Digital Asset Links (upload key).** `public/.well-known/assetlinks.json`
+      committed on branch `060` with the **upload-key** fingerprint
+      `FD:5F:…:41:1E`, generated via Bubblewrap's `DigitalAssetLinks.generateAssetLinks()`.
+      Verified it survives into `dist/.well-known/` (Vite does copy dot-directories out of
+      `public/`). **Still 404 live — needs the redeploy.**
+- [ ] **Phase 4b — add the app-signing fingerprint.** After the first Play upload, copy the
+      **app-signing** SHA-256 from Play Console → App integrity and add it as a *second* entry
+      in the `sha256_cert_fingerprints` array (it is a list — keep both, so verification holds
+      before and after Play re-signs). Redeploy.
 - [ ] **Phase 5 — output.** Copy deliverables to the OUTPUT dir and finalize that README.
 - [ ] **Play Console prerequisites** (account owner, manual): privacy-policy URL (app collects
       geolocation + account email + crowd-sourced reports), store listing + screenshots +
@@ -47,10 +59,16 @@ Add this inside the `server { }` block:
 
 ```nginx
 location = /manifest.webmanifest {
-    add_header Content-Type "application/manifest+json";
+    default_type application/manifest+json;
     add_header Cache-Control "public, max-age=3600";
 }
 ```
+
+> ⚠️ An earlier revision of this runbook used `add_header Content-Type "application/manifest+json"`.
+> That does **not** work: nginx always emits its own `Content-Type`, so `add_header` appends a
+> second one rather than replacing it. `.webmanifest` is missing from nginx's `mime.types`, so
+> the type falls through to the global `default_type` — overriding `default_type` in this one
+> location is the correct fix. This is already applied in `nginx/default.conf.template`.
 
 Re-verify after redeploy:
 

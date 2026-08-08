@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.floodedarea.app",
+      "sha256_cert_fingerprints": [
+        "FD:5F:31:41:D3:FB:99:63:03:72:60:DA:0F:A4:51:1C:D8:E0:B2:A6:54:F4:8D:8E:8D:C6:8F:5B:73:C4:41:1E"
+      ]
+    }
+  }
+]
