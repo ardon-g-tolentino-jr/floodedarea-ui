@@ -54,6 +54,21 @@ server {
         try_files $uri =404;
     }
 
+    # The PWA manifest. nginx's bundled mime.types has no `.webmanifest` entry, so without this
+    # it falls back to the global default_type (application/octet-stream), which fails strict
+    # PWA installability checks. `default_type` — not `add_header Content-Type` — is the right
+    # tool: nginx always emits its own Content-Type, so add_header would append a duplicate
+    # rather than replace it. Bubblewrap reads this URL when building the Play (TWA) package.
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        add_header Cache-Control "public, max-age=3600";
+    }
+
+    # `/.well-known/assetlinks.json` needs no block here: `.json` is already in mime.types and
+    # there is no dotfile-deny rule, so the file shipped in public/ is served correctly as
+    # application/json. It proves domain ownership for the TWA — without it the Android app
+    # launches with a browser URL bar.
+
     # Reverse-proxy the API + SSE. The trailing slash on proxy_pass strips the /api
     # prefix, matching the Vite dev proxy rewrite (/api/reports → <upstream>/reports).
     location /api/ {
