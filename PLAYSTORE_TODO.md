@@ -5,6 +5,10 @@ runbook). That file explains *how*; this file is only *what remains*, in the ord
 done. Owner is marked **[you]** (needs a password, a Google account, or server access) or
 **[claude]** (can be automated).
 
+> **Steps 1 and 2 are done** — the `.aab` is signed and the privacy policy is live. The next
+> action is **step 3 (Play Console)**, then **step 4 (closed test)** the same day you upload.
+> Read step 5 before uploading: it is a submission risk that has no work started on it.
+
 ---
 
 ## Critical path
@@ -13,46 +17,39 @@ The long pole is the **closed test: 12 testers opted in for 14 continuous days**
 start until a signed build is uploaded. Everything in this section is therefore ordered to reach
 that upload as fast as possible.
 
-### 1. Sign the `.aab` — **[you]**
+### 1. ~~Sign the `.aab`~~ — ✅ done 2026-08-08
 
-The bundle is built but **unsigned**. Signing needs the keystore password, which is deliberately
-not stored anywhere in this repo or in the deliverables dir.
-
-```bash
-cd "../baha-twa"
-bubblewrap build          # prompts for keystore password, then key password
-```
-
-Prefer the interactive prompt over `BUBBLEWRAP_KEYSTORE_PASSWORD=... bubblewrap build` — the
-inline form lands in shell history. Gradle is already warm, so this is quick, and the
-`manifest-checksum.txt` is in place so it won't ask to regenerate the project.
-
-Current unsigned artifacts in `../baha-twa/`:
+`../baha-twa/app-release-bundle.aab` (1.6 MB) is signed and ready to upload. Verified: the
+certificate embedded in the bundle has a SHA-256 matching the fingerprint already published in
+`assetlinks.json`, so Digital Asset Links verification will hold for this build.
 
 ```
-app/build/outputs/bundle/release/app-release.aab    1.6M   ← upload artifact
-app-release-unsigned-aligned.apk                    1.4M   ← sideload/testing only
+Owner:   CN=Ardon Tolentino, OU=NA, O=NA, L=NA, ST=NA, C=PH
+SHA-256: FD:5F:…:C4:41:1E    ← matches live assetlinks.json
 ```
 
-### 2. Publish a privacy policy — **[you]** ⚠️ hard blocker
+### 2. ~~Publish a privacy policy~~ — ✅ done 2026-08-09
 
-**None exists.** `/privacy`, `/privacy.html`, `/privacy-policy` and `/terms` all return 404 on
-floodedarea.com, and the app bundle contains no privacy-policy link.
+Live at **`https://floodedarea.com/privacy.html`** — use exactly this URL in Play Console. Source
+is `public/privacy.html`: a self-contained static file with no fonts, scripts, or external
+requests, so it resolves without relying on the SPA `try_files` fallback that production does not
+run.
 
-Play requires a publicly reachable privacy-policy URL *before* the data-safety form can be
-submitted, and this app is squarely in the categories that force it:
+Its disclosures were derived from the source rather than boilerplate, because **Play cross-checks
+the policy against the Data safety form**. Fill that form to match: precise location (including
+continuous tracking via `watchPosition`), account email/name/picture, report payload with stored
+photo, SOS coordinates plus free-text note, a persistent guest device UUID, and nine third parties
+(OSM tiles, Nominatim, Overpass, Google Sign-In, Cloudflare Turnstile, Statcounter, Google Fonts,
+tlk.io, share targets).
 
-| Data collected | Where |
-|---|---|
-| Precise location (geolocation) | flood reports, distance/ETA, SOS |
-| Account email + name | Basic login and Google SSO |
-| User-generated content | crowd-sourced reports, photos |
-| Emergency contact data | SOS rescue requests |
+Two follow-ups:
 
-Simplest route: add a static `public/privacy.html` to this repo so it deploys with `dist/`, then
-point Play Console at `https://floodedarea.com/privacy.html`. **Caveat:** production does not
-appear to run this repo's nginx SPA-fallback config (see *Known issues* below), so verify the URL
-actually resolves after deploying rather than assuming it does.
+- [ ] **Confirm four claims made on your behalf** — [you]. Inferred from code, not verified:
+      (a) "we do not sell your data / no advertising"; (b) that a deletion-on-request process
+      genuinely exists; (c) the SOS retention wording ("while handled and a reasonable period
+      after"); (d) "non-commercial", given `public/gcash-qr.png` implies you accept donations.
+- [ ] **Link the policy from inside the app** — [claude]. It is currently reachable only by
+      direct URL. Reviewers and users expect an in-app link (sidebar or TopBar menu).
 
 ### 3. Play Console — create, upload, configure — **[you]**
 
@@ -65,11 +62,12 @@ All manual, account-owner only. Do not automate; do not store Console credential
         coined word with no organic search volume; the suffix carries the ASO terms.
       - Short description (80), full description (4000).
       - Screenshots (min 2, phone), 512×512 icon, 1024×500 feature graphic.
-- [ ] Data safety form — must match the table in item 2.
+- [ ] **Privacy policy URL:** `https://floodedarea.com/privacy.html` (see step 2).
+- [ ] Data safety form — must match the disclosures in step 2.
 - [ ] Content rating questionnaire.
 - [ ] Target audience / ads declaration.
-- [ ] **Enable Play App Signing** (recommended; assumed by item 4).
-- [ ] Upload the signed `.aab`.
+- [ ] **Enable Play App Signing** (recommended; assumed by step 6).
+- [ ] Upload the signed `.aab` from `../baha-twa/app-release-bundle.aab`.
 
 ### 4. Start the closed test immediately after upload — **[you]**
 
@@ -77,11 +75,40 @@ Personal Play Console accounts require **12 testers opted in for 14 continuous d
 production access unlocks. The clock only starts once testers actually opt in. Nothing else on
 this list gates it, so start it the same day you upload — it is the single longest item here.
 
+### 5. User-generated content compliance — **[you]** ⚠️ nothing started
+
+**This is the biggest un-started risk on the list, and it can fail review on its own** —
+independently of the privacy policy, which does not satisfy it.
+
+FloodedArea carries three streams of user-generated content:
+
+1. **Flood reports** — free-text display name, location.
+2. **Photos** — user-uploaded images, stored in the database.
+3. **Community chat** — a public, anonymous [tlk.io](https://tlk.io) room embedded via iframe in
+   `src/components/panels/ChatWidget.tsx`. It is unmoderated and not under your control.
+
+Play's UGC policy expects, at minimum:
+
+- [ ] A published **content policy / community standards** users agree to.
+- [ ] An **in-app mechanism to report or flag** objectionable content and users.
+- [ ] A way to **block abusive users**.
+- [ ] A **moderation process** you can describe to reviewers, with removal turnaround.
+- [ ] Content rating answers that honestly reflect unmoderated public chat — this alone can push
+      the rating to a higher age band.
+
+The anonymous third-party chat is the weakest point: you cannot moderate it, cannot delete from
+it, and cannot block users in it. **Seriously consider removing `ChatWidget` before submitting**,
+or replacing it with a first-party channel you can moderate. Shipping an unmoderated anonymous
+chat room is a common and avoidable rejection.
+
+> Note: `ChatWidget.tsx` refers readers to "PLAYSTORE_PACKAGE.md for the Play-store UGC
+> follow-ups" — **that section has never existed**. This item is that gap.
+
 ---
 
 ## After the first upload
 
-### 5. Add the app-signing fingerprint to `assetlinks.json` — **[claude]** (needs a value from you)
+### 6. Add the app-signing fingerprint to `assetlinks.json` — **[claude]** (needs a value from you)
 
 With Play App Signing on, Google re-signs the bundle with a **different** key than the upload key.
 The live `assetlinks.json` currently carries only the upload key, so verification will break for
@@ -106,7 +133,7 @@ top instead of running full-screen. It fails silently — the file still returns
 
 ## Not blocking Play, but open
 
-### 6. Manifest `Content-Type` — **[you]** (needs server access)
+### 7. Manifest `Content-Type` — **[you]** (needs server access)
 
 `https://floodedarea.com/manifest.webmanifest` still serves as `application/octet-stream`.
 Bubblewrap tolerated this (the build succeeded), so it does **not** block Play. It does fail
@@ -129,7 +156,7 @@ nginx's bundled `mime.types`, which is why the type falls through to the global 
 
 Verify: `curl -sI https://floodedarea.com/manifest.webmanifest | grep -i content-type`
 
-### 7. Deliverables + docs housekeeping — **[claude]**
+### 8. Deliverables + docs housekeeping — **[claude]**
 
 - [ ] Copy the **signed** `.aab` to `/Users/ardontolentinojr./Documents/CLAUDE DEV/OUTPUT/DB/FLOODEDAREA/`
       and finalize the README there (Phase 5 of the runbook).
@@ -139,11 +166,11 @@ Verify: `curl -sI https://floodedarea.com/manifest.webmanifest | grep -i content
       `nginx/default.conf.template`. That is wrong (see below) and will mislead the next person.
 - [ ] Delete the stale `Caddyfile.snippet` from the OUTPUT dir, or keep it marked unused.
 
-### 8. `versionCode` discipline — **[you]**, ongoing
+### 9. `versionCode` discipline — **[you]**, ongoing
 
 The build is `versionCode 1` / `versionName "1"`. **Every** subsequent Play upload needs a strictly
 higher `versionCode`. Bump it in `../baha-twa/twa-manifest.json` and re-run `bubblewrap build`.
-Note this is independent of the web app's `package.json` version (currently 1.54.0) — they are
+Note this is independent of the web app's `package.json` version (currently 1.55.0) — they are
 different numbering schemes and do not need to track each other.
 
 ---
@@ -194,4 +221,8 @@ appeared and the bundle hash updated) but does not apply this repo's nginx confi
 - `assetlinks.json` live at `https://floodedarea.com/.well-known/assetlinks.json` (200,
   `application/json`) and confirmed by Google's Digital Asset Links API — 1 statement, `errors: []`,
   correct package and fingerprint.
-- Unsigned `.aab` + `.apk` built and verified via `aapt2 dump badging`.
+- **Signed** `.aab` at `../baha-twa/app-release-bundle.aab` — package `com.floodedarea.app`,
+  `versionCode 1`, `targetSdkVersion 36`, verified via `aapt2 dump badging`, and its signing
+  certificate confirmed to match the published assetlinks fingerprint.
+- **Privacy policy** live at `https://floodedarea.com/privacy.html` (`public/privacy.html`,
+  shipped in v1.55.0) — self-contained, no external requests.
