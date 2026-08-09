@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!--
+  Standalone privacy policy for FloodedArea. Lives in public/ so Vite copies it verbatim into
+  dist/ and it is served as a real file at /privacy.html — it does NOT depend on the SPA
+  try_files fallback, which is not active on the production host.
+
+  Deliberately self-contained: no Google Fonts, no analytics, no external requests of any kind.
+  A privacy page that phones out to third parties to render itself is a bad look, and it keeps
+  this page truthful about its own behaviour (see "This page" section).
+
+  Required by Google Play: the Data safety form cannot be submitted without a reachable
+  privacy-policy URL. Keep the disclosures here in sync with that form — Play cross-checks them.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy — FloodedArea</title>
+    <meta name="description" content="How FloodedArea collects, uses, and shares your data." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <style>
+      :root {
+        --ink: #0f172a;
+        --muted: #52637a;
+        --line: #dbe3ec;
+        --bg: #f4f7f9;
+        --card: #ffffff;
+        --accent: #0ea5e9;
+        --warn-bg: #fff7ed;
+        --warn-line: #fdba74;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 72px; }
+      header.top {
+        display: flex; align-items: center; gap: 10px;
+        padding-bottom: 18px; margin-bottom: 28px; border-bottom: 1px solid var(--line);
+      }
+      header.top a { color: var(--accent); font-weight: 700; text-decoration: none; font-size: 18px; }
+      h1 { font-size: 30px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.02em; }
+      h2 {
+        font-size: 19px; margin: 36px 0 10px; letter-spacing: -0.01em;
+        padding-top: 18px; border-top: 1px solid var(--line);
+      }
+      h3 { font-size: 15px; margin: 22px 0 6px; }
+      p, li { color: var(--muted); font-size: 15px; }
+      li { margin-bottom: 6px; }
+      strong { color: var(--ink); }
+      a { color: var(--accent); }
+      .meta { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+      .card {
+        background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+        padding: 16px 18px; margin: 18px 0;
+      }
+      .callout {
+        background: var(--warn-bg); border: 1px solid var(--warn-line);
+        border-radius: 12px; padding: 16px 18px; margin: 18px 0;
+      }
+      .callout p { color: #7c2d12; margin: 0; }
+      .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 18px 0; }
+      table { border-collapse: collapse; width: 100%; min-width: 520px; background: var(--card); }
+      th, td {
+        text-align: left; padding: 10px 12px; border: 1px solid var(--line);
+        font-size: 14px; vertical-align: top; color: var(--muted);
+      }
+      th { background: #eef4f8; color: var(--ink); font-weight: 700; }
+      code {
+        background: #eef2f7; padding: 1px 5px; border-radius: 4px;
+        font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink);
+      }
+      footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); }
+      footer p { font-size: 13px; }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ink: #e8eef6; --muted: #a9b8c9; --line: #24313f;
+          --bg: #0d141c; --card: #131c26; --warn-bg: #2a1c0f; --warn-line: #7c4a1d;
+        }
+        .callout p { color: #fcd9b6; }
+        th { background: #1a2632; }
+        code { background: #1a2632; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top"><a href="/">← FloodedArea</a></header>
+
+      <h1>Privacy Policy</h1>
+      <p class="meta">
+        Effective 9 August 2026 · Applies to the FloodedArea website
+        (<a href="https://floodedarea.com">floodedarea.com</a>) and the FloodedArea Android app
+        (<code>com.floodedarea.app</code>), which is a wrapper around the same site.
+      </p>
+
+      <div class="card">
+        <p style="margin:0">
+          <strong>The short version.</strong> FloodedArea is a free flood-watch map for the
+          Philippines. To be useful it needs your <strong>location</strong>, and anything you
+          report is <strong>published on a public map</strong>. You can browse the whole map
+          without an account. We do not sell your data and we do not run advertising.
+        </p>
+      </div>
+
+      <div class="callout">
+        <p>
+          <strong>Flood reports are public.</strong> When you submit a report, its location, water
+          depth, the display name you entered, and any photo you attach become visible to everyone
+          using FloodedArea — including people who are not signed in. Please do not report from
+          inside your home if you do not want that spot shown, and do not include faces, licence
+          plates, house numbers, or documents in photos.
+        </p>
+      </div>
+
+      <h2>1. Who we are</h2>
+      <p>
+        FloodedArea is an independent, non-commercial community project covering Metro Manila,
+        Rizal, and surrounding areas. Contact:
+        <a href="mailto:floodedareaph@gmail.com">floodedareaph@gmail.com</a>.
+      </p>
+
+      <h2>2. What we collect</h2>
+
+      <h3>Location</h3>
+      <p>
+        With your permission, the app reads your device's <strong>precise location</strong> to
+        centre the map, work out how far you are from nearby floods, attach coordinates to a
+        report you submit, and locate you for an SOS rescue request. While a trip or live view is
+        active the app may follow your location continuously until you close it. You can refuse or
+        revoke this permission in your browser or Android settings; the map still works, but
+        distance, "report here", and SOS will not.
+      </p>
+
+      <h3>Account information</h3>
+      <p>
+        If you create an account or sign in with Google, we store your <strong>email address,
+        display name, and profile picture URL</strong>, plus an internal user id and role. Signing
+        in is only required to report, confirm a report, or send an SOS — browsing is open to all.
+      </p>
+
+      <h3>What you submit</h3>
+      <ul>
+        <li><strong>Flood reports</strong> — display name, district, precise coordinates, severity, water depth, trend, road condition, and the time.</li>
+        <li><strong>Photos</strong> — optional. Compressed and stored by us. Photos can reveal more than you intend; see the notice above.</li>
+        <li><strong>SOS rescue requests</strong> — precise coordinates, district, city, barangay, and an optional free-text note. Shared with responders and administrators so they can reach you.</li>
+        <li><strong>Feedback and confirmations</strong> — anything you send us directly, and taps confirming someone else's report.</li>
+      </ul>
+
+      <h3>A device identifier for guests</h3>
+      <p>
+        If you report without an account, we generate a random identifier and keep it on your
+        device (<code>baha_guest_id_v1</code>). It is not linked to your name or email. Its only
+        purpose is anti-abuse — limiting how many active reports one device can post. Clearing
+        your browser storage resets it.
+      </p>
+
+      <h3>Stored on your device, not sent to us</h3>
+      <p>
+        We use your browser's local storage for your session token and profile, plus preferences:
+        language, notification and live-view toggles, report mode, sidebar layout, trip state, and
+        a per-session visit flag. These stay on your device. Clearing site data removes them and
+        signs you out.
+      </p>
+
+      <h3>Usage measurement</h3>
+      <p>
+        We count total visits to show a public visitor tally, and we use Statcounter for basic
+        traffic statistics. This involves your IP address and general browser information. We do
+        not build advertising profiles.
+      </p>
+
+      <h2>3. How we use it</h2>
+      <ul>
+        <li>To show the live flood map, evacuation centres, road conditions, and alerts.</li>
+        <li>To compute distances, safety status, and routes relative to where you are.</li>
+        <li>To publish the reports you choose to submit.</li>
+        <li>To pass SOS requests to responders and administrators.</li>
+        <li>To prevent spam and abuse.</li>
+        <li>To keep the service working and understand overall usage.</li>
+      </ul>
+      <p>We do not sell your personal data, and we do not use it for advertising.</p>
+
+      <h2>4. Services we rely on</h2>
+      <p>
+        Using FloodedArea causes your device to contact these third parties. Each has its own
+        privacy policy and we do not control what they do with what they receive.
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Service</th><th>What it receives</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>OpenStreetMap tile servers</td><td>IP address; which map tiles you view, which implies your approximate area</td><td>Map imagery</td></tr>
+            <tr><td>Nominatim (OpenStreetMap)</td><td>Coordinates you look up</td><td>Turning coordinates into place names</td></tr>
+            <tr><td>Overpass API</td><td>Coordinates and map queries</td><td>Roads and nearby map features</td></tr>
+            <tr><td>Google Sign-In</td><td>Your Google sign-in, if you choose it</td><td>Authentication</td></tr>
+            <tr><td>Cloudflare Turnstile</td><td>Browser and device signals</td><td>Blocking automated spam reports</td></tr>
+            <tr><td>Statcounter</td><td>IP address, browser information</td><td>Visitor statistics</td></tr>
+            <tr><td>Google Fonts</td><td>IP address</td><td>Page typeface</td></tr>
+            <tr><td>tlk.io</td><td>Everything you type in the community chat</td><td>Community chat — see below</td></tr>
+            <tr><td>Facebook, X, WhatsApp, Telegram</td><td>Only what you share, only when you tap share</td><td>Sharing a report</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. Community chat</h2>
+      <p>
+        The chat bubble embeds a public room hosted by <strong>tlk.io</strong>, a third-party
+        service. Messages go to tlk.io, not to us. We do not store them, and our deletion controls
+        do not reach them. The room is public and anonymous — treat anything you type as visible
+        to strangers, and do not post personal details there.
+      </p>
+
+      <h2>6. How long we keep things</h2>
+      <ul>
+        <li><strong>Flood reports</strong> expire automatically — they are time-limited by design, since stale flood data is misleading.</li>
+        <li><strong>SOS requests</strong> are kept while they are being handled and for a reasonable period afterwards as an operational record.</li>
+        <li><strong>Account details</strong> are kept until you ask us to delete the account.</li>
+        <li><strong>On-device storage</strong> stays until you clear your browser data or uninstall.</li>
+      </ul>
+
+      <h2>7. Your choices</h2>
+      <ul>
+        <li><strong>Location</strong> — refuse or revoke the permission at any time in your browser or Android settings.</li>
+        <li><strong>Browse anonymously</strong> — no account is needed to view the map.</li>
+        <li><strong>Access or delete your data</strong> — email <a href="mailto:floodedareaph@gmail.com">floodedareaph@gmail.com</a> and we will delete your account and associated personal data. Note that a published report may already have been seen, shared, or cached elsewhere.</li>
+        <li><strong>On-device data</strong> — clear site data in your browser, or clear the app's storage in Android settings.</li>
+        <li><strong>Notifications</strong> — turn them off in the app or in your device settings.</li>
+      </ul>
+
+      <h2>8. Children</h2>
+      <p>
+        FloodedArea is not directed at children under 13, and we do not knowingly collect their
+        personal information. If you believe a child has provided us with personal data, contact
+        us and we will remove it.
+      </p>
+
+      <h2>9. Security</h2>
+      <p>
+        Traffic is encrypted in transit over HTTPS, and access to administrative functions is
+        restricted. No service can promise perfect security, and we would rather say that plainly
+        than imply otherwise.
+      </p>
+
+      <h2>10. This page</h2>
+      <p>
+        This page loads no fonts, no analytics, and no external resources of any kind. Opening it
+        tells us nothing beyond an ordinary web-server request.
+      </p>
+
+      <h2>11. Changes</h2>
+      <p>
+        If this policy changes materially we will update the effective date above and, where the
+        change is significant, note it in the app.
+      </p>
+
+      <h2>12. Contact</h2>
+      <p>
+        Questions, corrections, or deletion requests:
+        <a href="mailto:floodedareaph@gmail.com">floodedareaph@gmail.com</a>.
+      </p>
+
+      <footer>
+        <p><a href="/">← Back to the flood map</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
