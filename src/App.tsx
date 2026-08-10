@@ -14,7 +14,7 @@ import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
 import { SEVERITY_PRESET, SEV_RANK } from './utils/floodMeta';
-import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, FB_PAGE_URL } from './utils/share';
+import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, buildFloodDigest, FB_PAGE_URL } from './utils/share';
 import {
   alertsForUser,
   buildPossibleClosures,
@@ -73,6 +73,7 @@ import FeedbackFormModal from './components/panels/FeedbackFormModal';
 import CommunityFeedbackModal from './components/panels/CommunityFeedbackModal';
 import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
+import FloodDigestModal from './components/panels/FloodDigestModal';
 import AdminWarnZoneModal from './components/panels/AdminWarnZoneModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
@@ -241,6 +242,9 @@ const App: React.FC = () => {
   // Admin "Report incident" modal, and the report currently offered up for social sharing.
   const [incidentOpen, setIncidentOpen] = React.useState(false);
   const [shareReportTarget, setShareReportTarget] = React.useState<FloodReport | null>(null);
+  // Admin "Flood digest" modal — the consolidated situational-roundup post (all active reports),
+  // distinct from shareReportTarget's single-report share.
+  const [digestOpen, setDigestOpen] = React.useState(false);
   // Admin "Warn this zone" modal target — the manual second action, never auto-triggered by
   // saving/editing a zone (see AdminWarnZoneModal's doc comment).
   const [zoneWarnTarget, setZoneWarnTarget] = React.useState<FloodProneArea | null>(null);
@@ -1211,6 +1215,13 @@ const App: React.FC = () => {
     return { ...st, url, links: buildShareLinks({ url, body: st.body, text: st.text, ogUrl }) };
   }, [shareReportTarget, active.length]);
 
+  // The admin Flood Digest's contents — every currently-active report, rebuilt whenever `active`
+  // changes (which itself re-derives off the 15s `now` tick, so the digest stays fresh while open).
+  const floodDigest = React.useMemo(
+    () => buildFloodDigest(active, new Date(), window.location.origin),
+    [active]
+  );
+
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   // The Share modal's "Share via your apps…" button (mobile native sheet — covers Messenger/Viber/etc).
@@ -1260,6 +1271,32 @@ const App: React.FC = () => {
     }
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
+  // Post the admin Flood Digest to Facebook. Facebook's sharer.php dropped the `quote` param in
+  // 2017, so a client-side share can carry a URL only — the digest text can't be injected into the
+  // composer. Copy it instead and toast the admin to paste it once the composer opens. Shares the
+  // site origin (not a report deep-link — the digest has no single subject report; index.html
+  // already serves site-wide OG tags for the card).
+  const postDigestFacebook = async (text: string): Promise<void> => {
+    try {
+      await navigator.clipboard?.writeText(text);
+    } catch { /* fall through — the composer still opens, admin can type it manually */ }
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    showToast('Digest copied — paste it into the Facebook composer.');
+  };
+
+  // Post the digest to X. Unlike Facebook, intent/tweet accepts prefilled text, so this is one click.
+  const postDigestX = (body: string): void => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(body)}&url=${encodeURIComponent(window.location.origin)}`,
       '_blank',
       'noopener,noreferrer'
     );
@@ -1622,6 +1659,7 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onReportIncident={() => setIncidentOpen(true)}
+        onFloodDigest={() => setDigestOpen(true)}
       />
 
       {activeAlert && (
@@ -2018,6 +2056,16 @@ const App: React.FC = () => {
           isMobile={isMobile}
           onSubmit={onReportIncident}
           onClose={() => setIncidentOpen(false)}
+        />
+      )}
+      {digestOpen && isAdmin && (
+        <FloodDigestModal
+          digest={floodDigest}
+          isMobile={isMobile}
+          onFacebook={(text) => void postDigestFacebook(text)}
+          onX={postDigestX}
+          onCopy={(text) => void copyShare(text, 'Digest copied.')}
+          onClose={() => setDigestOpen(false)}
         />
       )}
       {zoneWarnTarget && isAdmin && (
