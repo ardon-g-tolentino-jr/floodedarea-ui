@@ -4,7 +4,7 @@ import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
 import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
-import { buildIncidentCaption, FB_GLYPH_PATH } from '../../utils/share';
+import { buildIncidentCaption, FB_GLYPH_PATH, X_LIMIT, X_URL_COST } from '../../utils/share';
 import PlaceField from './PlaceField';
 import MapPickField from './MapPickField';
 import DepthReference from './DepthReference';
@@ -63,11 +63,6 @@ function loadSocialAutopostPref(): { facebook: boolean; x: boolean } {
     return { facebook: true, x: true };
   }
 }
-
-// X counts every URL as this many characters regardless of its real length, budgeted against the
-// 280-char tweet limit; the server appends "\n" + the deep link after this component's caption.
-const X_URL_COST = 23;
-const X_LIMIT = 280;
 
 const inputStyle: React.CSSProperties = {
   width: '100%',

@@ -32,6 +32,8 @@ interface TopBarProps {
   onAdmin: () => void;
   onResponse: () => void;
   onReportIncident: () => void;
+  /** Opens the admin "Flood digest" modal — the consolidated all-active-reports social post. */
+  onFloodDigest: () => void;
   onShowFeatures: () => void;
   onShowFeedback: () => void;
 }
@@ -84,6 +86,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onAdmin,
   onResponse,
   onReportIncident,
+  onFloodDigest,
   onShowFeatures,
   onShowFeedback,
 }) => {
@@ -174,6 +177,19 @@ const TopBar: React.FC<TopBarProps> = ({
       style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #FBCFE8', background: '#FDF2F8', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#BE185D', cursor: 'pointer' }}
     >
       🚑 {!isMobile && t('topbar.response')}
+    </button>
+  ) : null;
+
+  // Flood digest — admin-only, one-click consolidated post covering every active report. Sky-tinted
+  // to read as a social/sharing affordance (matches the Share button family), distinct from the
+  // blue Admin console and rose Response console.
+  const digestBtn = isAdmin ? (
+    <button
+      onClick={onFloodDigest}
+      title="Post flood digest — all active reports to Facebook & X"
+      style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid #BAE2FB', background: '#EFF8FF', borderRadius: 11, fontSize: 13, fontWeight: 800, color: '#0369A1', cursor: 'pointer' }}
+    >
+      📣 {!isMobile && t('topbar.floodDigest')}
     </button>
   ) : null;
 
@@ -306,6 +322,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   <MenuItem icon="✨" label={t('topbar.features')} onClick={runAndClose(onShowFeatures)} />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
+                  {isAdmin && <MenuItem icon="📣" label={t('topbar.floodDigest')} onClick={runAndClose(onFloodDigest)} />}
                   {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}
                   {/* Sign out — the avatar-only auth cluster hides it on mobile (no room for the
                       inline button), so it must live here or a mobile user can never sign out. */}
@@ -381,6 +398,7 @@ const TopBar: React.FC<TopBarProps> = ({
             </div>
 
             {responseBtn}
+            {digestBtn}
             {adminBtn}
             {authCluster}
           </>
