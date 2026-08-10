@@ -4,9 +4,6 @@ import type { StopMatch } from '../../utils/tripWatch';
 import { MAX_STOPS, STOP_RADIUS_OPTIONS } from '../../utils/tripWatch';
 import { SEV_META, SEV_RANK } from '../../utils/floodMeta';
 import { useI18n, tFormat } from '../../i18n';
-import CollapsibleSection from './CollapsibleSection';
-
-const OPEN_STORAGE_KEY = 'baha_trip_open_v1';
 
 const fmtRadius = (km: number): string =>
   km < 1 ? `${Math.round(km * 1000)} m` : `${Number.isInteger(km) ? km : km.toFixed(1)} km`;
@@ -34,34 +31,12 @@ const TripPanel: React.FC<TripPanelProps> = ({
   trip, matches, notifyPermission, onAddStop, onRemoveStop, onMoveStop, onChangeRadius, onFocusStop, onViewReport, onStartTrip, onEndTrip,
 }) => {
   const { lang, t } = useI18n();
-  const [open, setOpen] = React.useState<boolean>(() => {
-    try { return localStorage.getItem(OPEN_STORAGE_KEY) !== '0'; } catch { return true; }
-  });
-  const toggle = (): void => {
-    setOpen((o) => {
-      const next = !o;
-      try { localStorage.setItem(OPEN_STORAGE_KEY, next ? '1' : '0'); } catch {/* ignore */}
-      return next;
-    });
-  };
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
-  const alertCount = React.useMemo(
-    () => trip.stops.reduce((n, s) => n + ((matches.get(s.id)?.length ?? 0) > 0 ? 1 : 0), 0),
-    [trip.stops, matches],
-  );
-
+  // Body only — the sidebar's control strip owns the header, the open/closed state and the
+  // alert badge (see Sidebar's `trip` chip).
   return (
-    <CollapsibleSection
-      title={t('trip.title')}
-      open={open}
-      onToggle={toggle}
-      right={trip.active && alertCount > 0
-        ? <span style={{ fontSize: 12.5, fontWeight: 800, color: '#B45309' }}>⚠ {alertCount}</span>
-        : trip.active
-          ? <span style={{ fontSize: 12.5, fontWeight: 800, color: '#16A34A' }}>{t('trip.clear')}</span>
-          : undefined}
-    >
+    <>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10 }}>
         <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.45, flex: 1 }}>
           {trip.active ? t('trip.desc') : t('trip.empty')}
@@ -176,7 +151,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
       >
         {trip.stops.length >= MAX_STOPS ? tFormat(lang, 'trip.maxReached', { n: MAX_STOPS }) : t('trip.addStop')}
       </button>
-    </CollapsibleSection>
+    </>
   );
 };
 

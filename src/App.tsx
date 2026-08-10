@@ -1842,6 +1842,8 @@ const App: React.FC = () => {
           guestNudgeDismissed={guestNudgeDismissed}
           onDismissGuestNudge={dismissGuestNudge}
           onSignIn={(reason) => setLogin({ open: true, reason: reason ?? t('guest.defaultReason') })}
+          tripActive={trip.active}
+          tripAlertCount={tripAlertStopIds.length}
           tripSlot={
             <TripPanel
               trip={trip}
@@ -1923,19 +1925,24 @@ const App: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 14px 0' }}>
               <button onClick={() => setTripSheetOpen(false)} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
             </div>
-            <TripPanel
-              trip={trip}
-              matches={tripStopStatus}
-              notifyPermission={notifyPerm}
-              onAddStop={() => setAddStopOpen(true)}
-              onRemoveStop={removeStop}
-              onMoveStop={moveStop}
-              onChangeRadius={setStopRadius}
-              onFocusStop={(s) => { focusStop(s); setTripSheetOpen(false); }}
-              onViewReport={(id) => { viewTripReport(id); setTripSheetOpen(false); }}
-              onStartTrip={() => void startTrip()}
-              onEndTrip={endTrip}
-            />
+            {/* TripPanel renders its body only — the sidebar's control strip supplies the heading
+                and padding there, so this sheet supplies its own. */}
+            <div style={{ padding: '0 18px 12px' }}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 10 }}>{t('trip.title')}</div>
+              <TripPanel
+                trip={trip}
+                matches={tripStopStatus}
+                notifyPermission={notifyPerm}
+                onAddStop={() => setAddStopOpen(true)}
+                onRemoveStop={removeStop}
+                onMoveStop={moveStop}
+                onChangeRadius={setStopRadius}
+                onFocusStop={(s) => { focusStop(s); setTripSheetOpen(false); }}
+                onViewReport={(id) => { viewTripReport(id); setTripSheetOpen(false); }}
+                onStartTrip={() => void startTrip()}
+                onEndTrip={endTrip}
+              />
+            </div>
           </div>
         </>
       )}

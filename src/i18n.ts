@@ -91,12 +91,16 @@ const MESSAGES = {
   'topbar.nearbyAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
 
   // ── Sidebar ──
-  'sidebar.safetyStatus': { en: 'YOUR SAFETY STATUS', fil: 'IYONG KALAGAYAN SA KALIGTASAN' },
   'sidebar.updatedLive': { en: 'Updated live', fil: 'Live na update' },
-  'sidebar.filters': { en: 'FILTERS', fil: 'MGA FILTER' },
-  'sidebar.roads': { en: 'ROADS', fil: 'MGA KALSADA' },
   'sidebar.affectedArea': { en: 'AFFECTED AREA', fil: 'APEKTADONG LUGAR' },
   'sidebar.monitoringArea': { en: 'MONITORING AREA', fil: 'BINABANTAYANG LUGAR' },
+
+  // ── Sidebar control strip (accordion chips above the report tabs) ──
+  'sidebar.panelTrip': { en: 'Trip', fil: 'Biyahe' },
+  'sidebar.panelFilters': { en: 'Filters', fil: 'Filter' },
+  'sidebar.panelArea': { en: 'My area', fil: 'Lugar ko' },
+  'sidebar.showOnMap': { en: 'SHOW ON MAP', fil: 'IPAKITA SA MAPA' },
+  'sidebar.roadCondition': { en: 'ROAD CONDITION', fil: 'KONDISYON NG KALSADA' },
   'sidebar.now': { en: 'Now', fil: 'Ngayon' },
   'sidebar.shelters': { en: 'Shelters', fil: 'Mga silungan' },
   'sidebar.floodedRoads': { en: 'Flooded roads', fil: 'Binahang kalsada' },
@@ -105,11 +109,9 @@ const MESSAGES = {
   'sidebar.liveActivity': { en: 'Live activity', fil: 'Live na aktibidad' },
   'sidebar.archive': { en: 'Archive', fil: 'Archive' },
   'sidebar.high': { en: 'high', fil: 'mataas' },
-  'sidebar.activeReports': { en: 'active reports nearby', fil: 'aktibong ulat sa paligid' },
-  'sidebar.activeReport': { en: 'active report nearby', fil: 'aktibong ulat sa paligid' },
-  'sidebar.roadImpassable': { en: 'impassable', fil: 'hindi madaanan' },
-  'sidebar.road': { en: 'road', fil: 'kalsada' },
-  'sidebar.roadsPlural': { en: 'roads', fil: 'mga kalsada' },
+  // Kept short so the summary row stays on one line in the 386px sidebar.
+  'sidebar.activeShort': { en: 'active', fil: 'aktibo' },
+  'sidebar.roadImpassable': { en: 'impassable', fil: 'di-madaanan' },
   'sidebar.floodAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
   'sidebar.alertsOn': { en: 'On · new floods near you within', fil: 'Naka-on · bagong baha malapit sa iyo sa loob ng' },
   'sidebar.alertsOff': { en: 'Off · get notified about new floods near you', fil: 'Naka-off · ipaalam ang bagong baha malapit sa iyo' },
@@ -122,7 +124,6 @@ const MESSAGES = {
   // ── Sidebar descriptions / affected-area readout ──
   'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang bilog ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na bilog kung gaano kalayo maaaring kumalat ang baha.' },
   'sidebar.monitorDesc': { en: 'The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.', fil: 'Ang putol-putol na asul na bilog sa mapa sa paligid mo. I-drag para itakda kung gaano kalayo babantayan ang baha.' },
-  'sidebar.alertsDesc': { en: 'Get a heads-up the moment a new flood is reported near you — even while this tab is in the background.', fil: 'Makatanggap ng abiso sa sandaling may bagong baha na maiulat malapit sa iyo — kahit nasa background ang tab na ito.' },
   'sidebar.affectedAt': { en: 'At', fil: 'Sa' },
   'sidebar.affectedSpread': { en: 'a typical flooded zone spreads', fil: 'kumakalat ang karaniwang binahang lugar nang' },
   'sidebar.affectedWider': { en: 'wider', fil: 'na mas malawak' },
