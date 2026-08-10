@@ -1,6 +1,7 @@
 import React from 'react';
 import { MIN_QUERY_LENGTH, searchPlaces, type GeoResult } from '../../api/geocode';
 import { locateWithAccuracy } from '../../utils/geolocate';
+import PlaceSuggestion from './PlaceSuggestion';
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -22,12 +23,16 @@ const PlaceField: React.FC<{
   lat: string;
   lng: string;
   placeLabel: string;
-  onPick: (lat: number, lng: number, label: string) => void;
+  /** `ctx` carries the picked result's split primary/context (search picks only — a "Current
+   *  location" pick and any caller ignoring the arg both stay compatible). */
+  onPick: (lat: number, lng: number, label: string, ctx?: { primary: string; context: string }) => void;
   /** Overrides the search input's placeholder — lets bilingual callers (e.g. AddStopSheet) localize it. */
   placeholder?: string;
   /** Overrides the "Current" button label. */
   currentLabel?: string;
-}> = ({ lat, lng, placeLabel, onPick, placeholder, currentLabel }) => {
+  /** User's current location — softly biases search results toward nearby places, same as SearchBox. */
+  near?: { lat: number; lng: number };
+}> = ({ lat, lng, placeLabel, onPick, placeholder, currentLabel, near }) => {
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<GeoResult[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -47,7 +52,7 @@ const PlaceField: React.FC<{
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
-      const found = await searchPlaces(q, ac.signal);
+      const found = await searchPlaces(q, ac.signal, near);
       if (ac.signal.aborted) return;
       setResults(found);
       setLoading(false);
@@ -60,7 +65,7 @@ const PlaceField: React.FC<{
   const [geoError, setGeoError] = React.useState<string | null>(null);
 
   const choose = (r: GeoResult): void => {
-    onPick(r.lat, r.lng, r.label);
+    onPick(r.lat, r.lng, r.label, { primary: r.primary, context: r.context });
     setQuery('');
     setResults([]);
     setOpen(false);
@@ -133,10 +138,9 @@ const PlaceField: React.FC<{
                 key={r.id}
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); choose(r); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 9, width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
+                style={{ display: 'flex', alignItems: 'center', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
               >
-                <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none' }}>⚲</span>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
+                <PlaceSuggestion primary={r.primary} context={r.context} />
               </button>
             ))
           )}

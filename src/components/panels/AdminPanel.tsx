@@ -7,6 +7,7 @@ import type {
   FloodProneArea,
   FloodReport,
   Hotline,
+  LatLng,
   NewAlert,
   NewCenter,
   NewFloodProneArea,
@@ -26,6 +27,8 @@ import MapPickField from './MapPickField';
 type Tab = 'shelters' | 'hotlines' | 'alerts' | 'zones' | 'reports' | 'requests';
 
 interface AdminPanelProps {
+  /** User's current location — softly biases the location fields' place search toward nearby spots. */
+  userLoc: LatLng;
   centers: EvacuationCenter[];
   hotlines: Hotline[];
   alerts: FloodAlert[];
@@ -58,6 +61,9 @@ interface AdminPanelProps {
   /** Row-level "⚠ Warn" trigger — opens the (separately mounted) confirm modal for this zone. Never
    *  fires the warning itself; that's an explicit second action in the modal. */
   onWarnZone: (zone: FloodProneArea) => void;
+  /** Opens the (separately mounted) ZoneReportModal — omit the argument for the tab-level bulk
+   *  button, pass a zone for a row's "⚡ Report now" action (preselects just that one). */
+  onReportZones: (preselect?: FloodProneArea) => void;
   onCreateReport: (b: NewReport) => Promise<void>;
   onUpdateReport: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
   onDeleteReport: (id: number) => Promise<void>;
@@ -537,6 +543,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                           lng={String(editing.form.longitude ?? '')}
                           placeLabel={String(editing.form._place ?? '')}
                           onPick={(la, ln, label) => pickLocation(la, ln, label)}
+                          near={props.userLoc}
                         />
                         {/* Guarded on finite numbers, not just non-empty: a half-filled or
                             malformed record would otherwise mount Leaflet at NaN/NaN. */}
@@ -588,6 +595,18 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             </div>
           ) : (
             <div>
+              {/* Zones-only: a bulk "report flooding now" entry point, above the generic + Add
+                  zone form — this is the fast path admins actually reach for during a flood event,
+                  vs. one-off zone bookkeeping. Opens ZoneReportModal (mounted in App) with every
+                  active zone ticked. */}
+              {tab === 'zones' && (
+                <button
+                  onClick={() => props.onReportZones()}
+                  style={{ width: '100%', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 8 }}
+                >
+                  ⚡ Report flooding on zones…
+                </button>
+              )}
               <button onClick={startAdd} style={{ width: '100%', border: '1px dashed var(--bw-primary)', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 12 }}>
                 + Add {TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}
               </button>
@@ -595,9 +614,13 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 {rows.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>No records yet.</div>}
                 {pagedRows.map((r) => {
                   const zoneRec = tab === 'zones' ? (r.rec as unknown as FloodProneArea) : null;
+                  // Zone rows carry four actions (Report now / Warn / Edit / Delete) — one more
+                  // than every other tab — which squeezed the name column down to an ellipsis.
+                  // They alone wrap: the name/district block takes the full first line and the
+                  // button strip drops to a second. Other tabs keep the original single row.
                   return (
-                  <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FAFB', borderRadius: 11 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                  <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FAFB', borderRadius: 11, ...(zoneRec ? { flexWrap: 'wrap' as const } : null) }}>
+                    <div style={{ flex: 1, minWidth: 0, ...(zoneRec ? { flexBasis: '100%' } : null) }}>
                       <div style={{ fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.primary}</div>
                       <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.secondary}</div>
                       {zoneRec && (
@@ -606,6 +629,11 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         </div>
                       )}
                     </div>
+                    {zoneRec && (
+                      <button onClick={() => props.onReportZones(zoneRec)} disabled={busy} title="Report flooding for this zone now" style={{ border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                        ⚡ Report now
+                      </button>
+                    )}
                     {zoneRec && (
                       <button onClick={() => props.onWarnZone(zoneRec)} disabled={busy} title="Send a flood warning for this zone" style={{ border: '1px solid #FED7AA', background: '#FFF7ED', color: '#C2410C', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                         ⚠ Warn

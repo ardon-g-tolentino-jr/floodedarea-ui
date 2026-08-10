@@ -1,5 +1,6 @@
 import React from 'react';
 import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocode';
+import PlaceSuggestion from './PlaceSuggestion';
 
 interface SearchBoxProps {
   isMobile: boolean;
@@ -143,7 +144,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
             style={{
               display: 'flex',
               alignItems: 'flex-start',
-              gap: 9,
+              gap: 0,
               width: '100%',
               textAlign: 'left',
               padding: '10px 13px',
@@ -156,8 +157,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
               lineHeight: 1.35,
             }}
           >
-            <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none', marginTop: 1 }}>⚲</span>
-            <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{r.label}</span>
+            <PlaceSuggestion primary={r.primary} context={r.context} />
           </button>
         ))
       )}

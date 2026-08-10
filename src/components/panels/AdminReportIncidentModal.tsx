@@ -1,6 +1,6 @@
 import React from 'react';
 import type { AlertLevel, NewFloodProneArea, NewReport, Severity, SocialNetwork } from '../../types';
-import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META } from '../../utils/floodMeta';
+import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META, TTL_OPTIONS } from '../../utils/floodMeta';
 import { reverseGeocode } from '../../api/geocode';
 import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
@@ -24,6 +24,9 @@ interface Props {
    *  spot. Throws on report failure so the modal keeps the form open and shows an error — a zone
    *  failure is the parent's problem to swallow non-fatally, not this modal's. */
   onSubmit: (b: NewReport, zone?: NewFloodProneArea) => Promise<void>;
+  /** Where the map tab's mini-map centers before anything has been picked — the user's own
+   *  location (falls back to the app default) so the first click lands somewhere useful. */
+  initialCenter: { lat: number; lng: number };
   onClose: () => void;
 }
 
@@ -33,17 +36,6 @@ const SEV_ORDER: Severity[] = ['high', 'medium', 'low'];
 // it): what alert level a quiet zone gets when tagged straight off an incident report, keyed off
 // the severity already chosen for the report itself.
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
-
-// How long a system report stays live. '' = fall back to the severity-scaled default; else minutes.
-const TTL_OPTIONS: { value: string; label: string }[] = [
-  { value: '', label: 'Default (by severity)' },
-  { value: '60', label: '1 hour' },
-  { value: '180', label: '3 hours' },
-  { value: '360', label: '6 hours' },
-  { value: '720', label: '12 hours' },
-  { value: '1440', label: '24 hours' },
-  { value: '2880', label: '48 hours' },
-];
 
 // Where the admin learned about the flood. Appended to the report name — "Aurora cor. Katipunan
 // (News)" — so readers can see a system report's provenance at a glance.
@@ -77,17 +69,17 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' };
 
-const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose }) => {
+const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initialCenter, onClose }) => {
   const [lat, setLat] = React.useState('');
   const [lng, setLng] = React.useState('');
   const [placeLabel, setPlaceLabel] = React.useState('');
   const [name, setName] = React.useState('');
   const [district, setDistrict] = React.useState('');
 
-  // ── Location: two ways to pin a spot — a street intersection (default; PH flood reports are
-  // commonly phrased "A cor. B") or the existing search/current-location field. Both land on the
-  // same lat/lng/placeLabel state, then a shared mini-map lets the admin fine-tune the exact pin. ──
-  const [locTab, setLocTab] = React.useState<'intersection' | 'map'>('intersection');
+  // ── Location: two ways to pin a spot — the search/map field (default; fastest for the common
+  // "point on a map" case) or a street intersection (PH flood reports are commonly phrased "A cor.
+  // B"). Both land on the same lat/lng/placeLabel state, then a mini-map lets the admin fine-tune. ──
+  const [locTab, setLocTab] = React.useState<'intersection' | 'map'>('map');
   const [streetA, setStreetA] = React.useState('');
   const [streetB, setStreetB] = React.useState('');
   const [interCity, setInterCity] = React.useState('');
@@ -133,13 +125,19 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
   // `skipNameOverwrite` is set when the pick came from the intersection finder — that already
   // produced the far more legible "A cor. B" name, so a reverse-geocode of the crossing's exact
   // node (which usually resolves to just ONE of the two streets) must not clobber it.
-  const onPickPlace = (la: number, ln: number, label: string, skipNameOverwrite = false): void => {
+  // `ctx` (from PlaceField's search results) carries the split primary/context, seeding Name and
+  // District immediately — the reverse-geocode below still runs and refines them once it returns,
+  // subject to the same skipNameOverwrite gate.
+  const onPickPlace = (la: number, ln: number, label: string, skipNameOverwrite = false, ctx?: { primary: string; context: string }): void => {
     setLat(String(la));
     setLng(String(ln));
     setPlaceLabel(label);
-    // Seed name/district from the picked label, then refine with a reverse-geocode.
-    const firstSeg = label.split(',')[0]?.trim();
+    // Seed name/district from the picked label/ctx, then refine with a reverse-geocode. `label`
+    // is '' for a raw map click (no search result) — firstSeg then resolves to '', which the
+    // `if` below already treats as falsy, so it never writes "undefined" into the field.
+    const firstSeg = ctx?.primary || label.split(',')[0]?.trim();
     if (!skipNameOverwrite && firstSeg) setName((n) => n || firstSeg);
+    if (!skipNameOverwrite && ctx?.context) setDistrict((d) => d || ctx.context);
     void reverseGeocode(la, ln).then((g) => {
       if (!skipNameOverwrite) {
         const street = g.road ?? g.barangay ?? firstSeg ?? '';
@@ -309,7 +307,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
           <label style={labelStyle}>Location</label>
 
           <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-            {(['intersection', 'map'] as const).map((tKey) => (
+            {(['map', 'intersection'] as const).map((tKey) => (
               <button
                 key={tKey}
                 type="button"
@@ -422,14 +420,35 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, onClose
                   </span>
                 </div>
               )}
+              {/* Fine-tune mini-map — only once the intersection finder (or a subsequent nudge)
+                  has produced a point; unlike the map tab below, there's nothing to click on
+                  before that (a crossing, not an arbitrary spot, is the whole point of this tab). */}
+              {hasCoords && (
+                <div style={{ marginTop: 8 }}>
+                  <MapPickField lat={Number(lat)} lng={Number(lng)} onPick={onFineTune} />
+                </div>
+              )}
             </div>
           ) : (
-            <PlaceField lat={lat} lng={lng} placeLabel={placeLabel} onPick={(la, ln, label) => onPickPlace(la, ln, label)} />
-          )}
-
-          {hasCoords && (
-            <div style={{ marginTop: 8 }}>
-              <MapPickField lat={Number(lat)} lng={Number(lng)} onPick={onFineTune} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <PlaceField
+                lat={lat}
+                lng={lng}
+                placeLabel={placeLabel}
+                onPick={(la, ln, label, ctx) => onPickPlace(la, ln, label, false, ctx)}
+                near={initialCenter}
+              />
+              {/* Always mounted (unlike the intersection tab's fine-tune map): the map itself is
+                  the primary way to pick a point here, so it must be clickable before a search
+                  even happens. `pinned=hasCoords` hides the marker and shows a tap hint until the
+                  first pick lands; a click before then still routes through onFineTune → onPickPlace
+                  with the empty placeLabel, which reverse-geocodes to fill Name/District. */}
+              <MapPickField
+                lat={hasCoords ? Number(lat) : initialCenter.lat}
+                lng={hasCoords ? Number(lng) : initialCenter.lng}
+                pinned={hasCoords}
+                onPick={onFineTune}
+              />
             </div>
           )}
         </div>

@@ -122,6 +122,23 @@ export const DEPTH_RANGE: Record<Severity, { min: number; max: number; step: num
   low: { min: 5, max: 30, step: 1 },
 };
 
+/** How long an admin-authored system report stays live. '' = fall back to the severity-scaled
+ *  default; else minutes. Shared by AdminReportIncidentModal (single incident) and
+ *  ZoneReportModal (bulk/per-zone) so both "Keep live for" selects offer the same choices. */
+export const TTL_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Default (by severity)' },
+  { value: '60', label: '1 hour' },
+  { value: '180', label: '3 hours' },
+  { value: '360', label: '6 hours' },
+  { value: '720', label: '12 hours' },
+  { value: '1440', label: '24 hours' },
+  { value: '2880', label: '48 hours' },
+];
+
+/** Minimum map zoom at which flood-prone zone name bubbles render — below it only the dashed
+ *  radius circles show, so zoomed-out views don't drown in labels. */
+export const ZONE_LABEL_MIN_ZOOM = 13;
+
 /** Synthesizes a plausible 6-hour water-level series for the detail sparkline. */
 export function waterSeries(depth: number, trend: Trend, seed: number): number[] {
   const n = 7;

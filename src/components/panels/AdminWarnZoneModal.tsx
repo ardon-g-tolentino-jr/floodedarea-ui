@@ -124,10 +124,13 @@ const AdminWarnZoneModal: React.FC<Props> = ({ isMobile, zone, onSubmit, onClose
     </div>
   );
 
+  // zIndex 1300, not the usual 1200: this modal is only ever opened FROM the admin console, which
+  // also sits at 1200 and renders later in App's JSX — at an equal z-index the console won the tie
+  // and buried the warn form behind it, leaving the "⚠ Warn" button looking inert.
   return (
     <div
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : 18 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', backdropFilter: 'blur(3px)', zIndex: 1300, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : 18 }}
     >
       {card}
     </div>
