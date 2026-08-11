@@ -107,3 +107,62 @@ button {
 .bw-report .leaflet-interactive {
   cursor: crosshair !important;
 }
+
+/* Flood-prone zone name bubble (FloodMap.tsx's zoneBubbleIcon) — a Leaflet divIcon's HTML can't
+   take a React style object, so this follows the .bw-divicon convention above: the icon box itself
+   stays transparent/borderless, and the pill + tail are built entirely in CSS. Colors come in as
+   --zone-bg/--zone-fg custom properties (admin-entered zone names are escaped before they reach
+   the HTML string — see escapeHtml in FloodMap.tsx). */
+.bw-zone-bubble {
+  position: relative;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  /* The divIcon is anchored with iconSize [0,0], so this pill's parent box is 0×0 — width:auto
+     would collapse the background to just the padding and let the nowrap text spill outside it.
+     max-content sizes the pill to its own label instead, and the transform above then re-centers
+     it on the zone. */
+  width: max-content;
+  /* No overflow:hidden here — it would clip the ::after tail, which sits below the padding box.
+     The two text lines clip themselves instead. */
+  max-width: 240px;
+  padding: 6px 11px 7px;
+  border-radius: 12px;
+  background: var(--zone-bg, #F59E0B);
+  color: var(--zone-fg, #fff);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .28);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.bw-zone-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: var(--zone-bg, #F59E0B) transparent transparent transparent;
+}
+.bw-zone-bubble-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bw-zone-bubble-sub {
+  font-size: 9.5px;
+  font-weight: 700;
+  opacity: .85;
+  line-height: 1.2;
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bw-zone-bubble--pulse {
+  animation: zoneBubblePulse 1.8s ease-in-out infinite;
+}
+@keyframes zoneBubblePulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(239, 68, 68, .35); }
+  50% { box-shadow: 0 4px 22px rgba(239, 68, 68, .65); }
+}

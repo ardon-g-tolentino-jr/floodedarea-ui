@@ -93,6 +93,7 @@ const AddStopSheet: React.FC<AddStopSheetProps> = ({ isMobile, near, defaultRadi
               onPick={pick}
               placeholder={t('trip.searchPlaceholder')}
               currentLabel={t('trip.useCurrent')}
+              near={near}
             />
           </div>
 

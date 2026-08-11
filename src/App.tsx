@@ -75,6 +75,7 @@ import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
 import FloodDigestModal from './components/panels/FloodDigestModal';
 import AdminWarnZoneModal from './components/panels/AdminWarnZoneModal';
+import ZoneReportModal, { type ZoneReportOptions } from './components/panels/ZoneReportModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
 import TripPanel from './components/panels/TripPanel';
@@ -136,6 +137,9 @@ type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => voi
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
 const ARCHIVE_MAX = 10; // Archive keeps the 10 most recent expired reports; they linger indefinitely
 // with no activity and are only pushed out as newer reports expire — a lasting record that flooding happened.
+// A zone counts as "already reported" (ZoneReportModal's disabled/unticked rows) when an active
+// report's center lies within this of the zone's own center.
+const ZONE_ALREADY_REPORTED_KM = 0.15;
 
 const App: React.FC = () => {
   const { auth, loginWithGoogle, ensureGuest, logout } = useAuth();
@@ -208,6 +212,9 @@ const App: React.FC = () => {
   // Shelter markers start hidden — users opt in via the sidebar toggle.
   const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
+  // Flood-prone zone circles + map name bubbles — on by default so existing behavior is unchanged
+  // until someone actually reaches for the sidebar toggle.
+  const [showFloodProne, setShowFloodProne] = React.useState(true);
   // Flips once the bundled road network finishes loading, so the road overlay re-derives with it.
   const [roadsReady, setRoadsReady] = React.useState(false);
   const [sosOpen, setSosOpen] = React.useState(false);
@@ -248,6 +255,10 @@ const App: React.FC = () => {
   // Admin "Warn this zone" modal target — the manual second action, never auto-triggered by
   // saving/editing a zone (see AdminWarnZoneModal's doc comment).
   const [zoneWarnTarget, setZoneWarnTarget] = React.useState<FloodProneArea | null>(null);
+  // Admin "Report flooding on zones" modal (ZoneReportModal) — bulk from AdminPanel's zones tab,
+  // or a single zone preselected from a row's "⚡ Report now" or a map bubble tap.
+  const [zoneReportOpen, setZoneReportOpen] = React.useState(false);
+  const [zoneReportPreselect, setZoneReportPreselect] = React.useState<number | null>(null);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -415,6 +426,19 @@ const App: React.FC = () => {
   // Only reports still within their severity-scaled freshness window count as "live" — expired
   // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
+
+  // Zones ZoneReportModal should treat as "already reported" — a fixed ~150 m dedup gate distinct
+  // from zonesWithStatus's radius-based "is it currently flooded" signal (that one drives the map
+  // bubble color; this one just keeps the bulk-report checklist from posting an obvious duplicate).
+  const alreadyReportedZoneIds = React.useMemo(
+    () =>
+      floodProneList
+        .filter((z) =>
+          active.some((r) => kmBetween({ lat: z.latitude, lng: z.longitude }, { lat: r.latitude, lng: r.longitude }) <= ZONE_ALREADY_REPORTED_KM)
+        )
+        .map((z) => z.id),
+    [floodProneList, active]
+  );
 
   // Current per-stop status for the trip panel/map badges — separate from the alert effect below,
   // which only fires for newly-arrived reports. `roadsReady` isn't read directly but the road arm's
@@ -1403,6 +1427,45 @@ const App: React.FC = () => {
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
+  // ZoneReportModal: turn one or more flood-prone zones into live system reports. Posted
+  // sequentially (not Promise.all) so partial results stay ordered and the API isn't hammered —
+  // same reasoning as everywhere else a batch of admin writes goes out one at a time. No
+  // adminAction wrapper: ZoneReportModal shows its own per-zone outcome (ok count / failed names)
+  // and decides for itself whether to close or stay open, so this returns that tally instead of
+  // throwing.
+  const reportZones = async (picked: FloodProneArea[], opts: ZoneReportOptions): Promise<{ ok: number; failed: string[] }> => {
+    const preset = SEVERITY_PRESET[opts.severity];
+    let ok = 0;
+    const failed: string[] = [];
+    for (const z of picked) {
+      const payload: NewReport = {
+        name: z.name,
+        district: z.district,
+        latitude: z.latitude,
+        longitude: z.longitude,
+        severity: opts.severity,
+        depthCm: opts.depthCm,
+        trend: preset.trend,
+        road: preset.road,
+        system: true,
+        reportedAt: new Date().toISOString(),
+        ttlMinutes: opts.ttlMinutes,
+      };
+      try {
+        await mutations.createReport(payload);
+        ok++;
+      } catch {
+        failed.push(z.name);
+      }
+    }
+    await reports.refetch(true);
+    // A hint toward the consolidated digest only when it's actually worth consolidating — one
+    // report doesn't need a roundup post.
+    const hint = ok > 1 ? ' Consider the flood digest to share them as one post.' : '';
+    showToast(`Posted ${ok} of ${picked.length} zone report${picked.length === 1 ? '' : 's'}.${hint}`);
+    return { ok, failed };
+  };
+
   // Admin: accept/decline a bug report or feature request; accepted items become public on the board.
   const updateFeedbackStatus = (id: number, status: FeedbackStatus) =>
     adminAction(
@@ -1711,6 +1774,10 @@ const App: React.FC = () => {
             selectedStopId={selectedStopId}
             onSelectStop={(id) => { setSelectedStopId(id); setSelectedReportId(null); setSelEvacId(null); }}
             floodProneAreas={floodProneList}
+            showFloodProne={showFloodProne}
+            // Citizens get no-op — the bubble itself is already the information; only admins jump
+            // into ZoneReportModal from a tap.
+            onSelectZone={(id) => { if (isAdmin) { setZoneReportPreselect(id); setZoneReportOpen(true); } }}
           />
 
           {!isMobile && <RoadLegend />}
@@ -1832,6 +1899,8 @@ const App: React.FC = () => {
           onToggleShelters={() => setShowShelters((v) => !v)}
           showRoads={showRoads}
           onToggleRoads={() => setShowRoads((v) => !v)}
+          showFloodProne={showFloodProne}
+          onToggleFloodProne={() => setShowFloodProne((v) => !v)}
           impassableRoadCount={impassableRoads.length}
           highCount={highCount}
           totalCount={totalCount}
@@ -2062,6 +2131,7 @@ const App: React.FC = () => {
         <AdminReportIncidentModal
           isMobile={isMobile}
           onSubmit={onReportIncident}
+          initialCenter={userLoc ?? DEFAULT_LOCATION}
           onClose={() => setIncidentOpen(false)}
         />
       )}
@@ -2081,6 +2151,16 @@ const App: React.FC = () => {
           zone={zoneWarnTarget}
           onSubmit={(b) => warnZone(zoneWarnTarget.id, b)}
           onClose={() => setZoneWarnTarget(null)}
+        />
+      )}
+      {zoneReportOpen && isAdmin && (
+        <ZoneReportModal
+          isMobile={isMobile}
+          zones={floodProneList.filter((z) => z.active)}
+          alreadyReportedIds={alreadyReportedZoneIds}
+          preselectId={zoneReportPreselect}
+          onSubmit={reportZones}
+          onClose={() => { setZoneReportOpen(false); setZoneReportPreselect(null); }}
         />
       )}
       {supportOpen && (
@@ -2120,6 +2200,7 @@ const App: React.FC = () => {
 
       {adminOpen && isAdmin && (
         <AdminPanel
+          userLoc={userLoc}
           centers={centerList}
           hotlines={hotlineList}
           alerts={alertList}
@@ -2147,6 +2228,7 @@ const App: React.FC = () => {
           onUpdateZone={onUpdateZone}
           onDeleteZone={onDeleteZone}
           onWarnZone={(zone) => setZoneWarnTarget(zone)}
+          onReportZones={(zone) => { setZoneReportPreselect(zone ? zone.id : null); setZoneReportOpen(true); }}
           onCreateReport={onCreateReport}
           onUpdateReport={onUpdateReport}
           onDeleteReport={onDeleteReport}

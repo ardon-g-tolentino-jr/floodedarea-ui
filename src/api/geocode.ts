@@ -29,6 +29,27 @@ export interface GeoResult {
   label: string;
   lat: number;
   lng: number;
+  /** The place's own name — "Lilac Street". */
+  primary: string;
+  /** Disambiguating context beneath it — "Concepcion Dos · Marikina · Metro Manila". */
+  context: string;
+}
+
+interface NominatimAddress {
+  road?: string;
+  pedestrian?: string;
+  footway?: string;
+  residential?: string;
+  quarter?: string;
+  neighbourhood?: string;
+  suburb?: string;
+  village?: string;
+  hamlet?: string;
+  town?: string;
+  city_district?: string;
+  city?: string;
+  municipality?: string;
+  state?: string;
 }
 
 interface NominatimRow {
@@ -36,6 +57,48 @@ interface NominatimRow {
   display_name: string;
   lat: string;
   lon: string;
+  address?: NominatimAddress;
+}
+
+/** PH city/municipality precedence — shared by reverseGeocode and searchPlaces. */
+function pickCity(a: NominatimAddress): string | null {
+  return a.city ?? a.town ?? a.municipality ?? a.city_district ?? null;
+}
+
+/** Smallest PH admin unit (barangay) — Nominatim maps it to one of these depending on the place.
+ *  Shared by reverseGeocode and searchPlaces. */
+function pickBarangay(a: NominatimAddress): string | null {
+  return a.quarter ?? a.neighbourhood ?? a.suburb ?? a.village ?? a.hamlet ?? null;
+}
+
+/** Split a Nominatim `display_name` into a primary name + a couple of trailing segments as
+ *  context. Used verbatim when a row carries no structured `address` object, and also supplies
+ *  `primary` (the first segment) when it does — `buildContext` below replaces the segment-based
+ *  context with a more precise one built from the structured fields in that case. */
+function splitDisplayName(displayName: string): { primary: string; context: string } {
+  const parts = displayName.split(',').map((s) => s.trim()).filter(Boolean);
+  const primary = parts[0] ?? displayName;
+  const context = parts.slice(1, 3).join(' · ');
+  return { primary, context };
+}
+
+/** Build the disambiguating "context" line from structured address fields — barangay, city,
+ *  state — filtering blanks and deduping against `primary` and each other (a barangay and a
+ *  suburb often resolve to the same string, and a search result's own name sometimes repeats in
+ *  its city field for a small municipality). */
+function buildContext(a: NominatimAddress, primary: string): string {
+  const candidates = [pickBarangay(a), pickCity(a), a.state ?? null];
+  const seen = new Set<string>([primary.trim().toLowerCase()]);
+  const out: string[] = [];
+  for (const c of candidates) {
+    const v = c?.trim();
+    if (!v) continue;
+    const key = v.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(v);
+  }
+  return out.join(' · ');
 }
 
 /**
@@ -56,8 +119,8 @@ export async function searchPlaces(
   const params = new URLSearchParams({
     format: 'jsonv2',
     q,
-    limit: '6',
-    addressdetails: '0',
+    limit: '8',
+    addressdetails: '1',
     countrycodes: 'ph',
   });
   if (near) {
@@ -78,12 +141,26 @@ export async function searchPlaces(
   if (!res.ok) return [];
 
   const rows = (await res.json()) as NominatimRow[];
-  return rows.map((r) => ({
-    id: String(r.place_id),
-    label: r.display_name,
-    lat: Number(r.lat),
-    lng: Number(r.lon),
-  }));
+  const out: GeoResult[] = [];
+  const seen = new Set<string>();
+  for (const r of rows) {
+    const { primary, context: fallbackContext } = splitDisplayName(r.display_name);
+    const context = r.address ? buildContext(r.address, primary) : fallbackContext;
+    // Drop a row whose primary+context exactly duplicates one already collected — Nominatim
+    // sometimes returns the same place under two OSM types (e.g. a node and its containing way).
+    const dedupeKey = `${primary.toLowerCase()}|${context.toLowerCase()}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    out.push({
+      id: String(r.place_id),
+      label: r.display_name,
+      lat: Number(r.lat),
+      lng: Number(r.lon),
+      primary,
+      context,
+    });
+  }
+  return out;
 }
 
 /**
@@ -144,23 +221,6 @@ export interface ReverseResult {
   label: string | null;
 }
 
-interface NominatimAddress {
-  road?: string;
-  pedestrian?: string;
-  footway?: string;
-  residential?: string;
-  quarter?: string;
-  neighbourhood?: string;
-  suburb?: string;
-  village?: string;
-  hamlet?: string;
-  town?: string;
-  city_district?: string;
-  city?: string;
-  municipality?: string;
-  state?: string;
-}
-
 interface NominatimReverseRow {
   display_name?: string;
   address?: NominatimAddress;
@@ -206,10 +266,9 @@ export async function reverseGeocode(lat: number, lng: number, signal?: AbortSig
   const road = a.road ?? a.pedestrian ?? a.footway ?? null;
   const area = a.suburb ?? a.village ?? a.town ?? a.city_district ?? a.city ?? a.municipality ?? null;
   const district = [area, a.state].filter(Boolean).join(', ') || null;
-  // PH city/municipality and barangay (the smallest admin unit). Nominatim maps a barangay to
-  // one of quarter/neighbourhood/suburb/village/hamlet depending on the place.
-  const city = a.city ?? a.town ?? a.municipality ?? a.city_district ?? null;
-  const barangay = a.quarter ?? a.neighbourhood ?? a.suburb ?? a.village ?? a.hamlet ?? null;
+  // PH city/municipality and barangay (the smallest admin unit).
+  const city = pickCity(a);
+  const barangay = pickBarangay(a);
 
   return { road, district, city, barangay, label: row.display_name ?? null };
 }

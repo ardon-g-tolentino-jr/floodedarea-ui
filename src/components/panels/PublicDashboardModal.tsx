@@ -5,6 +5,7 @@ import { closuresNearLocation, recentReportRows } from '../../utils/viewModel';
 import { ROAD_META, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocode';
 import { useI18n, roadShort, trendLabel } from '../../i18n';
+import PlaceSuggestion from './PlaceSuggestion';
 
 interface PublicDashboardModalProps {
   /** Raw reports — the table windows these to the last 12 h itself (not the short-TTL active set). */
@@ -173,10 +174,9 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                   key={r.id}
                   type="button"
                   onMouseDown={(e) => { e.preventDefault(); choosePlace(r); }}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 9, width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
+                  style={{ display: 'flex', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
                 >
-                  <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none', marginTop: 1 }}>⚲</span>
-                  <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{r.label}</span>
+                  <PlaceSuggestion primary={r.primary} context={r.context} />
                 </button>
               ))
             )}

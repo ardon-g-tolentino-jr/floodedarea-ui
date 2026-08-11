@@ -1,7 +1,7 @@
 // Derived view model for the flood map + sidebar, ported from the design's renderVals().
 // Pure functions over the live API data + the user's location.
 
-import type { FloodAlert, FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
+import type { FloodAlert, FloodProneArea, FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
 import { kmBetween } from './geo';
 import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
@@ -94,6 +94,34 @@ export function alertsForUser(alerts: FloodAlert[], userLoc: LatLng | null): Flo
     if (!userLoc) return true; // fail open — see doc comment above
     const radiusKm = (a.radiusM ?? 0) / 1000;
     return kmBetween(userLoc, { lat: a.latitude, lng: a.longitude }) <= radiusKm + PROXIMITY_MARGIN_KM;
+  });
+}
+
+/** A flood-prone zone augmented with its current live status, for the map's name-bubble labels. */
+export interface ZoneStatus extends FloodProneArea {
+  /** Whether an active report's center currently lies within this zone's own radiusM. */
+  flooded: boolean;
+  /** Deepest depth among the reports inside, or null when `flooded` is false. */
+  worstDepthCm: number | null;
+}
+
+/**
+ * Zones augmented with their live "is it actually flooded right now" status — drives FloodMap's
+ * bubble color (quiet vs. red-pulse) and sub-line. Same proximity-gate idiom as `alertsForUser`,
+ * but scoped to each zone's own `radiusM` rather than a fixed margin (unlike the App-level
+ * "already reported nearby" check ZoneReportModal uses, which is a fixed ~150 m dedup gate, not
+ * this zone-radius "is it flooded" signal). `reports` should be the currently-visible/active set.
+ */
+export function zonesWithStatus(zones: FloodProneArea[], reports: FloodReport[]): ZoneStatus[] {
+  return zones.map((z) => {
+    const inside = reports.filter(
+      (r) => kmBetween({ lat: z.latitude, lng: z.longitude }, { lat: r.latitude, lng: r.longitude }) * 1000 <= z.radiusM
+    );
+    return {
+      ...z,
+      flooded: inside.length > 0,
+      worstDepthCm: inside.length ? Math.max(...inside.map((r) => r.depthCm)) : null,
+    };
   });
 }
 

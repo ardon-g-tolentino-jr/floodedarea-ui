@@ -1,9 +1,9 @@
 import React from 'react';
 import L from 'leaflet';
-import { Circle, CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { Circle, CircleMarker, MapContainer, Marker, Pane, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { EvacuationCenter, FloodProneArea, LatLng, RoadSegment, TripStop } from '../../types';
-import { RESCUE_STATUS_META, ROAD_META } from '../../utils/floodMeta';
-import { affectedRadiusKm, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
+import { RESCUE_STATUS_META, ROAD_META, ZONE_LABEL_MIN_ZOOM } from '../../utils/floodMeta';
+import { affectedRadiusKm, zonesWithStatus, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
 import { formatDuration } from '../../utils/format';
 import { LEVEL_STYLE } from '../panels/AlertRibbon';
 
@@ -51,8 +51,12 @@ interface FloodMapProps {
   onSelectStop?: (id: string) => void;
   /** Admin-pinned flood-prone areas (persistent pin + radius), shown to every visitor. */
   floodProneAreas?: FloodProneArea[];
-  /** Layer toggle for the flood-prone zones — omit/true shows them, false hides. */
+  /** Layer toggle for the flood-prone zones — omit/true shows them, false hides (circles AND
+   *  name bubbles alike). */
   showFloodProne?: boolean;
+  /** Fired when a zone's name bubble is tapped. Citizens get no-op from the caller — the bubble
+   *  itself is already the information; only admins use this to jump into ZoneReportModal. */
+  onSelectZone?: (id: number) => void;
 }
 
 const shelterIconHtml = (color: string): string =>
@@ -94,6 +98,34 @@ function searchIcon(): L.DivIcon {
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [24, 24], iconAnchor: [12, 24] });
 }
 
+/** Escapes text bound for innerHTML — zone names are admin-entered and land in a divIcon's HTML
+ *  string, so this guards against a stray `<`/`&`/quote breaking out of the markup. */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Google-Maps-style callout pill for a flood-prone zone: a rounded label with a small downward
+ * tail, anchored so the tail tip sits on the zone's center (the pill itself floats above it).
+ * `bg`/`fg` come from the zone's alert-level color (quiet) or a fixed red (flooded) — passed as
+ * CSS custom properties since a divIcon's HTML can't take a React style object (same convention
+ * as `.bw-divicon` elsewhere in this file; see `.bw-zone-bubble` in styles.css for the pill/tail).
+ */
+function zoneBubbleIcon(title: string, sub: string, bg: string, fg: string, pulse: boolean): L.DivIcon {
+  const html = `<div class="bw-zone-bubble${pulse ? ' bw-zone-bubble--pulse' : ''}" style="--zone-bg:${bg};--zone-fg:${fg}">
+      <div class="bw-zone-bubble-title">${escapeHtml(title)}</div>
+      <div class="bw-zone-bubble-sub">${escapeHtml(sub)}</div>
+    </div>`;
+  // Zero-size icon box: the pill sizes itself to its text and centers/lifts itself via CSS
+  // transform (translate(-50%,-100%)), so there's no fixed iconSize to compute an anchor from.
+  return L.divIcon({ html, className: 'bw-divicon', iconSize: [0, 0], iconAnchor: [0, 0] });
+}
+
 /** Imperatively flies the map to `focus` whenever its `key` changes. */
 const FlyTo: React.FC<{ focus: { lat: number; lng: number; key: number } | null }> = ({ focus }) => {
   const map = useMap();
@@ -109,6 +141,18 @@ const ClickCatcher: React.FC<{ onMapClick: (latlng: LatLng) => void }> = ({ onMa
   useMapEvents({
     click(e) {
       onMapClick({ lat: e.latlng.lat, lng: e.latlng.lng });
+    },
+  });
+  return null;
+};
+
+/** Lifts the map's live zoom level into FloodMap state so the zone-bubble labels can gate on it
+ *  (below ZONE_LABEL_MIN_ZOOM only the dashed circles show — avoids label clutter zoomed out). */
+const ZoomWatcher: React.FC<{ onZoom: (z: number) => void }> = ({ onZoom }) => {
+  const map = useMap();
+  useMapEvents({
+    zoomend() {
+      onZoom(map.getZoom());
     },
   });
   return null;
@@ -143,7 +187,10 @@ const FloodMap: React.FC<FloodMapProps> = ({
   onSelectStop,
   floodProneAreas = [],
   showFloodProne = true,
+  onSelectZone,
 }) => {
+  // Matches MapContainer's fixed initial zoom={13} below.
+  const [zoom, setZoom] = React.useState(13);
   return (
     <MapContainer
       center={[userLoc.lat, userLoc.lng]}
@@ -159,6 +206,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
 
       <ClickCatcher onMapClick={onMapClick} />
       <FlyTo focus={focus} />
+      <ZoomWatcher onZoom={setZoom} />
 
       {/* Monitoring boundary (citizen view only — the response console passes 0 to hide it) */}
       {monitorRadiusKm > 0 && (
@@ -224,6 +272,29 @@ const FloodMap: React.FC<FloodMapProps> = ({
             </Circle>
           );
         })}
+
+      {/* Zone name-bubble labels — Google-Maps-style callouts, one per zone, only once zoomed in
+          enough to read them (below ZONE_LABEL_MIN_ZOOM it's dashed circles only, see above). Kept
+          in a custom pane at z-index 399 — just under the default overlayPane (400) the report
+          Circles/CircleMarkers above use — so a bubble never paints over a live report pin. */}
+      {showFloodProne && zoom >= ZONE_LABEL_MIN_ZOOM && (
+        <Pane name="bw-zone-bubbles" style={{ zIndex: 399 }}>
+          {zonesWithStatus(floodProneAreas, reports).map((z) => {
+            const level = LEVEL_STYLE[z.level] ?? LEVEL_STYLE.orange;
+            const icon = z.flooded
+              ? zoneBubbleIcon(`🔴 ${z.name}`, `Flooded now · ${z.worstDepthCm} cm`, '#EF4444', '#fff', true)
+              : zoneBubbleIcon(`⚠ ${z.name}`, 'Flood-prone', level.chip, '#fff', false);
+            return (
+              <Marker
+                key={`zone-bubble-${z.id}`}
+                position={[z.latitude, z.longitude]}
+                icon={icon}
+                eventHandlers={{ click: () => onSelectZone?.(z.id) }}
+              />
+            );
+          })}
+        </Pane>
+      )}
 
       {/* Flood reports. Affected area uses the planar inundation model (radius ≈ depth ÷ ground
           slope): a solid ring at the radius implied by the CURRENT depth (filled with the
