@@ -125,6 +125,30 @@ export function zonesWithStatus(zones: FloodProneArea[], reports: FloodReport[])
   });
 }
 
+/**
+ * Ids of reports whose center lies inside some flood-prone zone's advisory circle — the same
+ * containment rule as `zonesWithStatus` above, read report-first instead of zone-first, so the
+ * "Flood-prone" filter hides exactly the reports the drawn circles cover. Deliberately NOT
+ * `matchingProneZone`: that applies the ZONE_MATCH_MIN_M dedup floor, which is right for admin
+ * de-duplication and wrong here (it would hide pins visibly outside every circle).
+ *
+ * The zone list is nationwide (~400 rows) while reports cluster in one metro, so a latitude band
+ * check rejects almost every pair before the haversine runs.
+ */
+export function proneZoneReportIds(zones: FloodProneArea[], reports: FloodReport[]): Set<number> {
+  const ids = new Set<number>();
+  for (const r of reports) {
+    for (const z of zones) {
+      if (Math.abs(z.latitude - r.latitude) * 111_000 > z.radiusM) continue; // 1° lat ≈ 111 km
+      if (kmBetween({ lat: z.latitude, lng: z.longitude }, { lat: r.latitude, lng: r.longitude }) * 1000 <= z.radiusM) {
+        ids.add(r.id);
+        break;
+      }
+    }
+  }
+  return ids;
+}
+
 /** Floor on the match radius so a tight-radius zone still absorbs a pin dropped a block away. */
 export const ZONE_MATCH_MIN_M = 150;
 

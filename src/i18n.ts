@@ -109,6 +109,8 @@ const MESSAGES = {
   'sidebar.shelters': { en: 'Shelters', fil: 'Mga silungan' },
   'sidebar.floodedRoads': { en: 'Flooded roads', fil: 'Binahang kalsada' },
   'sidebar.floodProne': { en: 'Flood-prone', fil: 'Madalas bahain' },
+  'sidebar.floodProneOn':  { en: 'On · {n} included', fil: 'Naka-on · {n} kasama' },
+  'sidebar.floodProneOff': { en: 'Off · {n} hidden',  fil: 'Naka-off · {n} nakatago' },
   'sidebar.searchRoads': { en: 'Search roads by condition', fil: 'Maghanap ng kalsada ayon sa kondisyon' },
   'sidebar.nearby': { en: 'Nearby', fil: 'Malapit' },
   'sidebar.liveActivity': { en: 'Live activity', fil: 'Live na aktibidad' },
