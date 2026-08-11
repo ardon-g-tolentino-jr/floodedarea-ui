@@ -23,6 +23,7 @@ import {
   enrichReports,
   matchingProneZone,
   nearbyOwnActiveReport,
+  proneZoneReportIds,
   type EnrichedReport,
   type PossibleClosure,
   type RoadEntry,
@@ -87,6 +88,7 @@ const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
 const REPORT_MODE_STORAGE_KEY = 'baha_report_mode_v1';
 const GUEST_NUDGE_STORAGE_KEY = 'baha_guest_nudge_v1';
+const FLOOD_PRONE_STORAGE_KEY = 'baha_flood_prone_v1';
 
 /** Bundled GCash donation QR — lives in public/, served under the app's base path. */
 const GCASH_QR_SRC = `${import.meta.env.BASE_URL}gcash-qr.png`;
@@ -122,6 +124,15 @@ function loadGuestNudgeDismissed(): boolean {
     return localStorage.getItem(GUEST_NUDGE_STORAGE_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+/** Flood-prone filter — defaults ON, so only an explicit '0' turns it off. */
+function loadFloodPronePref(): boolean {
+  try {
+    return localStorage.getItem(FLOOD_PRONE_STORAGE_KEY) !== '0';
+  } catch {
+    return true;
   }
 }
 
@@ -213,9 +224,10 @@ const App: React.FC = () => {
   // Shelter markers start hidden — users opt in via the sidebar toggle.
   const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
-  // Flood-prone zone circles + map name bubbles — on by default so existing behavior is unchanged
-  // until someone actually reaches for the sidebar toggle.
-  const [showFloodProne, setShowFloodProne] = React.useState(true);
+  // Flood-prone zone circles + map name bubbles, AND (below, via `scoped`) a real filter on the
+  // list/feed/counts — defaults ON and persists across visits (loadFloodPronePref), so a report
+  // inside a known flood-prone zone is included unless the user has explicitly turned this off.
+  const [showFloodProne, setShowFloodProne] = React.useState(loadFloodPronePref);
   // Flips once the bundled road network finishes loading, so the road overlay re-derives with it.
   const [roadsReady, setRoadsReady] = React.useState(false);
   const [sosOpen, setSosOpen] = React.useState(false);
@@ -372,6 +384,11 @@ const App: React.FC = () => {
     try { localStorage.setItem(LIVE_STORAGE_KEY, liveStream ? '1' : '0'); } catch {/* ignore */}
   }, [liveStream]);
 
+  // Persist the flood-prone filter — it now decides what's in the list, not just the map layer.
+  React.useEffect(() => {
+    try { localStorage.setItem(FLOOD_PRONE_STORAGE_KEY, showFloodProne ? '1' : '0'); } catch {/* ignore */}
+  }, [showFloodProne]);
+
   // Persist the remembered report entry-point preference.
   React.useEffect(() => {
     try { localStorage.setItem(REPORT_MODE_STORAGE_KEY, reportPref); } catch {/* ignore */}
@@ -427,6 +444,31 @@ const App: React.FC = () => {
   // Only reports still within their severity-scaled freshness window count as "live" — expired
   // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
+
+  // Reports sitting inside a flood-prone zone's advisory circle. Keyed on the RAW lists rather than
+  // `enriched` because `enriched` deps on the 15 s `now` tick — keying it here means the ~400-zone
+  // scan only re-runs when the data actually changes, not four times a minute.
+  const proneReportIds = React.useMemo(
+    () => proneZoneReportIds(floodProneList, reportList),
+    [floodProneList, reportList]
+  );
+
+  // Everything list-facing derives from here. Unlike the severity/road chips (map + Nearby only),
+  // flood-prone is a SCOPE filter: off means "hide reports from places that always flood"
+  // everywhere — map, Nearby, Activity, Archive and the chip counts alike.
+  // Deliberately NOT applied to the safety banner (computeStatus), trip matching or the new-report
+  // notification effect: a display filter must never suppress a safety signal.
+  const scoped = React.useMemo(
+    () => (showFloodProne ? active : active.filter((r) => !proneReportIds.has(r.id))),
+    [active, showFloodProne, proneReportIds]
+  );
+
+  // Live reports inside a flood-prone zone — the number the promoted sidebar toggle reports as
+  // included or hidden.
+  const floodProneCount = React.useMemo(
+    () => active.filter((r) => proneReportIds.has(r.id)).length,
+    [active, proneReportIds]
+  );
 
   // Zones ZoneReportModal should treat as "already reported" — a fixed ~150 m dedup gate distinct
   // from zonesWithStatus's radius-based "is it currently flooded" signal (that one drives the map
@@ -488,8 +530,8 @@ const App: React.FC = () => {
   }, [active]);
 
   const visible = React.useMemo(
-    () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
-    [active, filters, roadFilters]
+    () => scoped.filter((r) => filters[r.severity] && roadFilters[r.road]),
+    [scoped, filters, roadFilters]
   );
   // Nearby must mean nearby — the safety banner already says "no flooding within 2.5 km" while this
   // list used to show every visible report sorted but never cut off, including ones tens of km
@@ -505,8 +547,8 @@ const App: React.FC = () => {
     [visible, monitorRadiusKm, selectedReportId]
   );
   const feed = React.useMemo(
-    () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    [active]
+    () => [...scoped].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [scoped]
   );
   // Expired reports linger here so others can see a report happened, even after it drops off the
   // live map/feed. We keep the 10 most recent (by createdAt) with no time limit: with no new activity
@@ -517,11 +559,12 @@ const App: React.FC = () => {
         .filter(
           (r) =>
             r.expired &&
-            r.status !== 'resolved' // resolved reports were closed on purpose — not archive
+            r.status !== 'resolved' && // resolved reports were closed on purpose — not archive
+            (showFloodProne || !proneReportIds.has(r.id))
         )
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, ARCHIVE_MAX),
-    [enriched]
+    [enriched, showFloodProne, proneReportIds]
   );
   const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
 
@@ -729,15 +772,15 @@ const App: React.FC = () => {
 
   const filterCounts = React.useMemo(() => {
     const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
-    for (const r of active) c[r.severity]++;
+    for (const r of scoped) c[r.severity]++;
     return c;
-  }, [active]);
+  }, [scoped]);
 
   const roadCounts = React.useMemo(() => {
     const c: Record<Road, number> = { passable: 0, risky: 0, impassable: 0 };
-    for (const r of active) c[r.road]++;
+    for (const r of scoped) c[r.road]++;
     return c;
-  }, [active]);
+  }, [scoped]);
 
   // Road segments shown on the map, gated by the per-status ROADS chips so toggling a
   // passability category hides both its road lines and its report dots (the dots are filtered
@@ -1696,7 +1739,7 @@ const App: React.FC = () => {
   }, [showToast, lang]);
 
   const highCount = filterCounts.high;
-  const totalCount = active.length;
+  const totalCount = scoped.length;
 
   // `isolation: isolate` gives the map area its own stacking context so Leaflet's internal
   // z-indexes (panes 200–700, controls up to 1000) stay contained instead of leaking into the
@@ -1922,6 +1965,7 @@ const App: React.FC = () => {
           onToggleRoads={() => setShowRoads((v) => !v)}
           showFloodProne={showFloodProne}
           onToggleFloodProne={() => setShowFloodProne((v) => !v)}
+          floodProneCount={floodProneCount}
           impassableRoadCount={impassableRoads.length}
           highCount={highCount}
           totalCount={totalCount}

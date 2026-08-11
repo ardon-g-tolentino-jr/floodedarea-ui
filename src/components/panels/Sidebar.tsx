@@ -44,9 +44,12 @@ interface SidebarProps {
   onToggleShelters: () => void;
   showRoads: boolean;
   onToggleRoads: () => void;
-  /** Layer toggle for the flood-prone zone circles + map name bubbles. */
+  /** Layer toggle for the flood-prone zone circles + map name bubbles — also the list/feed/counts
+   *  filter now (see `scoped` in App.tsx). */
   showFloodProne: boolean;
   onToggleFloodProne: () => void;
+  /** Active reports sitting inside a flood-prone zone — the number this filter admits or removes. */
+  floodProneCount: number;
   impassableRoadCount: number;
   highCount: number;
   totalCount: number;
@@ -114,7 +117,7 @@ const StripChip: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, showFloodProne, onToggleFloodProne, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot, tripActive, tripAlertCount, auth, guestNudgeDismissed, onDismissGuestNudge, onSignIn } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, showFloodProne, onToggleFloodProne, floodProneCount, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot, tripActive, tripAlertCount, auth, guestNudgeDismissed, onDismissGuestNudge, onSignIn } = props;
   const { lang, t } = useI18n();
   const tone = TONE[status.tone];
 
@@ -141,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   const filtersOff =
     (['high', 'medium', 'low'] as Severity[]).filter((k) => !filters[k]).length +
     ROAD_ORDER.filter((k) => !roadFilters[k]).length +
-    (showShelters ? 0 : 1) + (showRoads ? 0 : 1) + (showFloodProne ? 0 : 1);
+    (showShelters ? 0 : 1) + (showRoads ? 0 : 1);
 
   const sidebarStyle: React.CSSProperties = isMobile
     ? { flex: 'none', width: '100%', background: '#fff', display: 'flex', flexDirection: 'column', paddingBottom: 80 }
@@ -206,6 +209,29 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             />
           </div>
 
+          {/* FLOOD-PRONE — promoted out of the Filters accordion because it's the one control that changes
+              what the LIST means (reports inside a flood-prone zone in or out), not just a map layer. Full
+              width rather than a 4th strip chip: the strip chips are accordion openers (aria-expanded), and
+              a 4th chip can't hold this label at the 386px sidebar width. */}
+          <button
+            onClick={onToggleFloodProne}
+            aria-pressed={showFloodProne}
+            style={{
+              marginTop: 6, width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+              padding: '8px 12px', borderRadius: 999, cursor: 'pointer', textAlign: 'left',
+              border: `1.5px solid ${showFloodProne ? '#EAB308' : '#E2E8F0'}`,
+              background: showFloodProne ? 'rgba(234,179,8,.12)' : '#fff',
+              color: showFloodProne ? '#854D0E' : '#9AA8B4',
+              fontSize: 12.5, fontWeight: 700,
+            }}
+          >
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#EAB308', opacity: showFloodProne ? 1 : 0.4, flex: 'none' }} />
+            {t('sidebar.floodProne')}
+            <span style={{ marginLeft: 'auto', fontSize: 11.5, fontWeight: 800, opacity: 0.85 }}>
+              {tFormat(lang, showFloodProne ? 'sidebar.floodProneOn' : 'sidebar.floodProneOff', { n: floodProneCount })}
+            </span>
+          </button>
+
           {openPanel && (
             <div style={{ marginTop: 10, padding: '13px 14px', border: '1px solid var(--bw-line-soft)', borderRadius: 14, background: '#fff' }}>
               {openPanel === 'trip' && tripSlot}
@@ -241,13 +267,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                     >
                       <span style={{ width: 14, height: 4, borderRadius: 2, background: ROAD_META.impassable.color, opacity: showRoads ? 1 : 0.4, flex: 'none' }} />
                       {t('sidebar.floodedRoads')}
-                    </button>
-                    <button
-                      onClick={onToggleFloodProne}
-                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 999, border: `1.5px solid ${showFloodProne ? '#EAB308' : '#E2E8F0'}`, background: showFloodProne ? 'rgba(234,179,8,.12)' : '#fff', color: showFloodProne ? '#854D0E' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#EAB308', opacity: showFloodProne ? 1 : 0.4, flex: 'none' }} />
-                      {t('sidebar.floodProne')}
                     </button>
                   </div>
 
