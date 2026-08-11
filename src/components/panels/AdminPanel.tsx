@@ -18,6 +18,7 @@ import type {
   SocialPost,
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
+import { matchingProneZone } from '../../utils/viewModel';
 import { timeAgo } from '../../utils/format';
 import { FB_GLYPH_PATH } from '../../utils/share';
 import { reverseGeocode } from '../../api/geocode';
@@ -331,6 +332,26 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     if (FIELDS[tab].some((f) => f.type === 'place') && (editing.form.latitude === '' || editing.form.longitude === '')) {
       setError('Search and select a location.');
       return;
+    }
+    // Zones only: refuse to create a zone on top of an existing one's advisory circle — that place
+    // is already covered, so a second row would just split it across two records. Never PATCH the
+    // matched zone instead: its level/note/radius are admin-curated and must not be silently
+    // rewritten by what's meant to be a duplicate-prevention check.
+    //
+    // Deliberately scoped to a create, or an edit that MOVES the pin. A plain edit (rename, retune
+    // the radius, deactivate) must always go through, even when the zone overlaps another — the
+    // duplicates this guard was added to stop already exist in the data, and blocking their edit
+    // would leave delete as the only way to clean them up. `excludeId` still keeps a move from
+    // tripping over the row's own circle.
+    if (tab === 'zones') {
+      const loc = { lat: num(editing.form.latitude), lng: num(editing.form.longitude) };
+      const before = editing.id == null ? undefined : zones.find((z) => z.id === editing.id);
+      const moved = before != null && (before.latitude !== loc.lat || before.longitude !== loc.lng);
+      const dup = editing.id == null || moved ? matchingProneZone(zones, loc, editing.id ?? undefined) : undefined;
+      if (dup) {
+        setError(`That location is already covered by the flood-prone zone “${dup.name}”. Edit that zone instead of adding a duplicate.`);
+        return;
+      }
     }
     const payload = buildPayload(editing.form);
     setBusy(true);

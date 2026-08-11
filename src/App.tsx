@@ -21,6 +21,7 @@ import {
   buildRoadDirectory,
   computeStatus,
   enrichReports,
+  matchingProneZone,
   nearbyOwnActiveReport,
   type EnrichedReport,
   type PossibleClosure,
@@ -490,7 +491,19 @@ const App: React.FC = () => {
     () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
     [active, filters, roadFilters]
   );
-  const nearby = React.useMemo(() => [...visible].sort((a, b) => a.distKm - b.distKm), [visible]);
+  // Nearby must mean nearby — the safety banner already says "no flooding within 2.5 km" while this
+  // list used to show every visible report sorted but never cut off, including ones tens of km
+  // away. Cut to the "My area" monitoring radius. The selected report is kept regardless of
+  // distance so a deep link (?report=<id>) or a marker tap never selects a row that isn't in the
+  // list. Note: `visible` itself (below) is left unfiltered by radius — it still feeds the map,
+  // which must keep pinning every live report no matter how far.
+  const nearby = React.useMemo(
+    () =>
+      visible
+        .filter((r) => r.distKm <= monitorRadiusKm || r.id === selectedReportId)
+        .sort((a, b) => a.distKm - b.distKm),
+    [visible, monitorRadiusKm, selectedReportId]
+  );
   const feed = React.useMemo(
     () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     [active]
@@ -1407,12 +1420,20 @@ const App: React.FC = () => {
     await reports.refetch(true);
     let zoneNote = '';
     if (zone) {
-      try {
-        await mutations.createFloodProneArea(zone);
-        await floodProne.refetch(true);
-        zoneNote = ' Flood-prone zone added.';
-      } catch {
-        zoneNote = ' (Could not add the flood-prone zone — add it from Admin → Zones.)';
+      // Belt-and-braces re-check against the freshest zone list, behind the modal's own
+      // proneMatch guard: the modal's `zones` snapshot can be stale if another admin added the
+      // same zone while this modal was open, so skip the POST rather than trust the client alone.
+      const dup = matchingProneZone(floodProneList, { lat: zone.latitude, lng: zone.longitude });
+      if (dup) {
+        zoneNote = ` Already a flood-prone zone (${dup.name}).`;
+      } else {
+        try {
+          await mutations.createFloodProneArea(zone);
+          await floodProne.refetch(true);
+          zoneNote = ' Flood-prone zone added.';
+        } catch {
+          zoneNote = ' (Could not add the flood-prone zone — add it from Admin → Zones.)';
+        }
       }
     }
     // When the admin ticked at least one network, the server auto-posts it — reopening the
@@ -1933,15 +1954,19 @@ const App: React.FC = () => {
 
       {/* Mobile FAB — bottom-center. Tapping fans out the two ReportOptions directly above it,
           centered, with a tap-anywhere scrim that only dismisses the fan-out (never starts a
-          report). Lives outside the map area's isolated stacking context (a root-level sibling),
-          so it's unaffected by Leaflet's z-indexes or the sheet dimmer/zIndex bracket.
+          report). It's a root-level sibling of the map area, which is its own `isolation: isolate`
+          stacking context (mapAreaStyle) — so the FAB paints ABOVE that entire context, including
+          the detail sheet inside it at zIndex 1110, no matter what z-index the FAB itself carries.
+          A z-index bump can't fix that (it's a sibling-context problem, not an ordering problem),
+          so on mobile the FAB/trip-chip must be gated off whenever a detail card is open rather
+          than merely stacked below it — see the `!selectedReport && !selEvac` guard below.
           z-index: the fan-out card sits at the same bottom:84 band as ChatWidget's mobile bubble
           (right:16, bottom:84, zIndex:1100), and on narrow viewports the two can overlap
           horizontally. While open, the scrim/FAB/card are lifted to 1140–1150 (above the bubble's
           1100) so the card is never painted over and a tap on the bubble's area dismisses the
           fan-out via the scrim instead of opening chat — do not drop these back into the
           low-40s bracket used for the FAB's resting (closed) state. */}
-      {isMobile && mode === 'idle' && (
+      {isMobile && mode === 'idle' && !selectedReport && !selEvac && (
         <>
           {/* Admins post system reports via the incident modal, so the Detailed/Quick fan-out
               (citizen-only) never opens for them — skip rendering the scrim/card entirely. */}
@@ -1976,8 +2001,10 @@ const App: React.FC = () => {
 
       {/* Mobile floating trip chip — the sidebar's "MY TRIP" section is below a 52vh map and not
           glanceable mid-drive. Gated on mode === 'idle', same as the report FAB, so the two can
-          never coexist; sits left of the FAB (which is centered) so neither overlaps the other. */}
-      {isMobile && mode === 'idle' && trip.active && (
+          never coexist; sits left of the FAB (which is centered) so neither overlaps the other.
+          Also gated on !selectedReport/!selEvac, same reason as the FAB above: it sits in the same
+          bottom band the full-width mobile detail sheet covers. */}
+      {isMobile && mode === 'idle' && !selectedReport && !selEvac && trip.active && (
         <button
           onClick={() => setTripSheetOpen(true)}
           style={{ position: 'fixed', left: 12, bottom: 20, zIndex: 44, display: 'flex', alignItems: 'center', gap: 7, height: 44, padding: '0 15px', border: 0, borderRadius: 22, background: tripAlertStopIds.length > 0 ? '#F59E0B' : '#7C3AED', color: '#fff', fontSize: 12.5, fontWeight: 800, boxShadow: '0 8px 20px rgba(15,23,42,.3)', cursor: 'pointer' }}
@@ -2130,6 +2157,7 @@ const App: React.FC = () => {
       {incidentOpen && isAdmin && (
         <AdminReportIncidentModal
           isMobile={isMobile}
+          zones={floodProneList}
           onSubmit={onReportIncident}
           initialCenter={userLoc ?? DEFAULT_LOCATION}
           onClose={() => setIncidentOpen(false)}

@@ -125,6 +125,31 @@ export function zonesWithStatus(zones: FloodProneArea[], reports: FloodReport[])
   });
 }
 
+/** Floor on the match radius so a tight-radius zone still absorbs a pin dropped a block away. */
+export const ZONE_MATCH_MIN_M = 150;
+
+/**
+ * The existing zone a new pin at `loc` would duplicate — the nearest whose circle (or the
+ * ZONE_MATCH_MIN_M floor, whichever is larger) contains the pin — or undefined when `loc` is a
+ * genuinely new place. Pass `excludeId` when re-checking a zone against its own row on edit.
+ *
+ * Why: a place that already sits inside an advisory circle IS that advisory; minting a second row
+ * for it just splits one place across two records (two markers, two edit histories, two things an
+ * admin has to remember to keep in sync) with nothing gained. This is the create-time counterpart
+ * to `zonesWithStatus`'s live-flooded check above, applied to zone-vs-zone instead of zone-vs-report.
+ */
+export function matchingProneZone(
+  zones: FloodProneArea[],
+  loc: LatLng,
+  excludeId?: number
+): FloodProneArea | undefined {
+  return zones
+    .filter((z) => z.id !== excludeId)
+    .map((z) => ({ z, m: kmBetween({ lat: z.latitude, lng: z.longitude }, loc) * 1000 }))
+    .filter((x) => x.m <= Math.max(x.z.radiusM, ZONE_MATCH_MIN_M))
+    .sort((a, b) => a.m - b.m)[0]?.z;
+}
+
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
   distKm: number;

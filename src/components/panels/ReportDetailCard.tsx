@@ -207,7 +207,10 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
       </>
     );
   }
-  return <div style={{ position: 'fixed', left: 16, top: 132, width: 330, zIndex: 1110, animation: 'popIn .14s ease-out' }}>{card}</div>;
+  // maxHeight/overflowY: a tall card (long advice text, many trend/road cells) can otherwise run
+  // off the bottom of a short viewport with no way to scroll to its Confirm/Remove buttons.
+  // top: 132, so 100vh - 148px leaves a 16px gutter to match the card's own left/top margins.
+  return <div style={{ position: 'fixed', left: 16, top: 132, width: 330, maxHeight: 'calc(100vh - 148px)', overflowY: 'auto', zIndex: 1110, animation: 'popIn .14s ease-out' }}>{card}</div>;
 };
 
 const Cell: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (

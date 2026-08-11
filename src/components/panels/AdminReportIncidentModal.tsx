@@ -1,6 +1,8 @@
 import React from 'react';
-import type { AlertLevel, NewFloodProneArea, NewReport, Severity, SocialNetwork } from '../../types';
+import type { AlertLevel, FloodProneArea, NewFloodProneArea, NewReport, Severity, SocialNetwork } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META, TTL_OPTIONS } from '../../utils/floodMeta';
+import { matchingProneZone, REPORT_TTL_MIN } from '../../utils/viewModel';
+import { formatDuration } from '../../utils/format';
 import { reverseGeocode } from '../../api/geocode';
 import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
@@ -20,6 +22,10 @@ import DepthReference from './DepthReference';
  */
 interface Props {
   isMobile: boolean;
+  /** Existing flood-prone zones — used to detect when the pinned spot already sits inside one, so
+   *  the "mark as flood-prone" checkbox can be replaced with a read-only "already covered" chip
+   *  instead of quietly minting a duplicate zone (see `proneMatch` below). */
+  zones: FloodProneArea[];
   /** Post the report and, if `zone` is given, best-effort create a flood-prone area at the same
    *  spot. Throws on report failure so the modal keeps the form open and shows an error — a zone
    *  failure is the parent's problem to swallow non-fatally, not this modal's. */
@@ -69,7 +75,7 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' };
 
-const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initialCenter, onClose }) => {
+const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, initialCenter, onClose }) => {
   const [lat, setLat] = React.useState('');
   const [lng, setLng] = React.useState('');
   const [placeLabel, setPlaceLabel] = React.useState('');
@@ -208,12 +214,28 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initial
   };
 
   const hasCoords = lat !== '' && lng !== '';
-  const canPost = hasCoords && name.trim() !== '' && !busy && !photoBusy;
+
+  // The pin already sits inside an existing zone's advisory circle — see matchingProneZone's doc
+  // comment for why that place IS the advisory, and a second zone row for it is a duplicate.
+  const proneMatch = hasCoords ? matchingProneZone(zones, { lat: Number(lat), lng: Number(lng) }) : undefined;
+
+  // "Hours ago" and "Keep live for" are two halves of one countdown: the report's remaining life is
+  // TTL minus its backdated age (see enrichReports). Backdating past the window posts a report that
+  // is already expired — invisible on the map the moment it lands — so the two fields are validated
+  // against each other rather than independently.
+  const effectiveTtlMin = ttl ? Number(ttl) : REPORT_TTL_MIN[severity];
+  const maxHoursAgo = Math.max(0, Math.floor((effectiveTtlMin - 1) / 60));
+  const hoursAgoNum = Math.max(0, Number(reportedHoursAgo) || 0);
+  const liveForMin = effectiveTtlMin - hoursAgoNum * 60;
+  const bornExpired = liveForMin <= 0;
+
+  const canPost = hasCoords && name.trim() !== '' && !busy && !photoBusy && !bornExpired;
 
   const submit = async (): Promise<void> => {
     if (!canPost) {
       if (!hasCoords) setError('Search and select a location.');
       else if (name.trim() === '') setError('Give the incident a name.');
+      else if (bornExpired) setError('This report would already be expired — lower the hours or raise "Keep live for".');
       return;
     }
     const preset = SEVERITY_PRESET[severity];
@@ -241,7 +263,9 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initial
     };
     // Built from the same already-resolved fields as the report — the *plain* name (not the
     // note-suffixed report label), so a zone reads as a place, not a specific news blurb.
-    const zone: NewFloodProneArea | undefined = markProne
+    // `!proneMatch` guard: the pin already sits inside an existing zone (see `proneMatch` above,
+    // and the read-only chip shown in its place below) — never mint a duplicate.
+    const zone: NewFloodProneArea | undefined = markProne && !proneMatch
       ? {
           name: name.trim(),
           district: district.trim() || 'Unknown area',
@@ -485,18 +509,30 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initial
         </div>
 
         <div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-            <input type="checkbox" checked={markProne} onChange={(e) => setMarkProne(e.target.checked)} />
-            ⚠ Also mark this place as flood-prone
-          </label>
-          <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 3, marginLeft: 22 }}>
-            Adds a quiet zone on the map. It does not send a warning; do that from Admin → Zones when you want people alerted.
-          </div>
-          {markProne && (
-            <div style={{ marginTop: 8, marginLeft: 22, maxWidth: 160 }}>
-              <label style={labelStyle}>Radius (m)</label>
-              <input type="number" min={50} value={proneRadius} onChange={(e) => setProneRadius(e.target.value)} style={inputStyle} />
+          {proneMatch ? (
+            // The pin is already inside an existing zone's advisory circle — that place IS the
+            // advisory, so offer no checkbox to duplicate it. Styled like the other soft info
+            // chips in this modal (see the 'busy' intersection-outcome chip above).
+            <div style={{ background: '#FFFBEB', color: '#854D0E', border: '1px solid #FDE68A', borderRadius: 11, padding: '8px 10px' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 800 }}>✓ Already flood-prone: {proneMatch.name}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 600, marginTop: 2 }}>No new zone will be added — this spot is already covered.</div>
             </div>
+          ) : (
+            <>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                <input type="checkbox" checked={markProne} onChange={(e) => setMarkProne(e.target.checked)} />
+                ⚠ Also mark this place as flood-prone
+              </label>
+              <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 3, marginLeft: 22 }}>
+                Adds a quiet zone on the map. It does not send a warning; do that from Admin → Zones when you want people alerted.
+              </div>
+              {markProne && (
+                <div style={{ marginTop: 8, marginLeft: 22, maxWidth: 160 }}>
+                  <label style={labelStyle}>Radius (m)</label>
+                  <input type="number" min={50} value={proneRadius} onChange={(e) => setProneRadius(e.target.value)} style={inputStyle} />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -583,13 +619,27 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, onSubmit, initial
               <input
                 type="number"
                 min={0}
+                max={maxHoursAgo}
                 value={reportedHoursAgo}
-                onChange={(e) => setReportedHoursAgo(e.target.value)}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  // Keep '' typeable (so the field can be cleared mid-edit) and don't fight every
+                  // keystroke — only clamp once the parsed value actually exceeds the TTL window.
+                  const n = Number(raw);
+                  if (raw !== '' && Number.isFinite(n) && n > maxHoursAgo) setReportedHoursAgo(String(maxHoursAgo));
+                  else setReportedHoursAgo(raw);
+                }}
                 style={{ ...inputStyle, width: 80 }}
               />
               <span style={{ fontSize: 12.5, color: 'var(--bw-muted)', fontWeight: 600 }}>hours ago</span>
             </div>
-            <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>0 = just now. The countdown runs from here.</div>
+            {bornExpired ? (
+              <div style={{ fontSize: 10.5, color: '#B91C1C', fontWeight: 700, marginTop: 4 }}>
+                Older than the {formatDuration(effectiveTtlMin)} window — this would post already expired. Lower the hours or raise “Keep live for”.
+              </div>
+            ) : (
+              <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>0 = just now. Would stay live for {formatDuration(liveForMin)}.</div>
+            )}
           </div>
           <div style={{ flex: 1 }}>
             <label style={labelStyle}>Keep live for</label>
