@@ -14,7 +14,7 @@ import {
   MONITOR_RADIUS_STEP,
 } from '../../utils/viewModel';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
-import { useI18n, sevLabel, roadLabel, roadShort, trendLabel } from '../../i18n';
+import { useI18n, tFormat, sevLabel, roadLabel, roadShort, trendLabel } from '../../i18n';
 import ShelterIcon from './ShelterIcon';
 
 type Tab = 'nearby' | 'activity' | 'archive';
@@ -189,7 +189,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 : <span style={{ fontWeight: 800, color: '#16A34A' }}>✓</span>}
             />
             <StripChip
-              label={t('sidebar.panelFilters')}
+              label={filtersOff === 1 ? t('sidebar.panelFilterOne') : t('sidebar.panelFilters')}
               open={openPanel === 'filters'}
               onClick={() => togglePanel('filters')}
               badge={filtersOff > 0 ? <span style={{ fontWeight: 800, color: '#B45309' }}>{filtersOff}</span> : undefined}
@@ -458,7 +458,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           );
         })}
         {list.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>{tab === 'archive' ? t('sidebar.noArchive') : t('sidebar.noReports')}</div>
+          <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9AA8B4', fontSize: 13 }}>
+            {tab === 'archive'
+              ? t('sidebar.noArchive')
+              // Filters really are hiding rows — keep the generic message. Otherwise (Nearby tab,
+              // nothing filtered out) the radius is what emptied the list, so say so and point at
+              // the control that would fix it.
+              : tab === 'nearby' && filtersOff === 0
+                ? tFormat(lang, 'sidebar.noneInRadius', { km: fmtRadius(monitorRadiusKm) })
+                : t('sidebar.noReports')}
+          </div>
         )}
       </div>
 

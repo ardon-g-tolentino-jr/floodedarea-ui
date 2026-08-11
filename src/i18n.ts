@@ -98,6 +98,10 @@ const MESSAGES = {
   // ── Sidebar control strip (accordion chips above the report tabs) ──
   'sidebar.panelTrip': { en: 'Trip', fil: 'Biyahe' },
   'sidebar.panelFilters': { en: 'Filters', fil: 'Filter' },
+  // Singular form for when the badge beside the label reads "1" — the count badge carries the
+  // number, so the label alone has to agree with it. Filipino "Filter" is already invariant, so
+  // it's reused unchanged for both counts.
+  'sidebar.panelFilterOne': { en: 'Filter', fil: 'Filter' },
   'sidebar.panelArea': { en: 'My area', fil: 'Lugar ko' },
   'sidebar.showOnMap': { en: 'SHOW ON MAP', fil: 'IPAKITA SA MAPA' },
   'sidebar.roadCondition': { en: 'ROAD CONDITION', fil: 'KONDISYON NG KALSADA' },
@@ -120,6 +124,9 @@ const MESSAGES = {
   'sidebar.setUp': { en: 'Set up', fil: 'I-set up' },
   'sidebar.totalVisits': { en: 'total visits', fil: 'kabuuang bisita' },
   'sidebar.noReports': { en: 'No reports match the active filters.', fil: 'Walang ulat na tumutugma sa mga filter.' },
+  // Nearby-tab empty state when the "My area" radius is what emptied the list (filters are all on)
+  // — distinct from sidebar.noReports, which is for when filters are actually hiding rows.
+  'sidebar.noneInRadius': { en: 'No reports within {km}. Widen “My area” to see more.', fil: 'Walang ulat sa loob ng {km}. Palawakin ang “Lugar ko” para makakita pa.' },
   'sidebar.noArchive': { en: 'No past reports yet.', fil: 'Wala pang mga nakaraang ulat.' },
 
   // ── Sidebar descriptions / affected-area readout ──
