@@ -23,7 +23,6 @@ import {
   enrichReports,
   matchingProneZone,
   nearbyOwnActiveReport,
-  proneZoneReportIds,
   type EnrichedReport,
   type PossibleClosure,
   type RoadEntry,
@@ -77,6 +76,7 @@ import AdminPanel from './components/panels/AdminPanel';
 import AdminReportIncidentModal from './components/panels/AdminReportIncidentModal';
 import FloodDigestModal from './components/panels/FloodDigestModal';
 import AdminWarnZoneModal from './components/panels/AdminWarnZoneModal';
+import AdminScopedWarnModal from './components/panels/AdminScopedWarnModal';
 import ZoneReportModal, { type ZoneReportOptions } from './components/panels/ZoneReportModal';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
@@ -224,9 +224,10 @@ const App: React.FC = () => {
   // Shelter markers start hidden — users opt in via the sidebar toggle.
   const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
-  // Flood-prone zone circles + map name bubbles, AND (below, via `scoped`) a real filter on the
-  // list/feed/counts — defaults ON and persists across visits (loadFloodPronePref), so a report
-  // inside a known flood-prone zone is included unless the user has explicitly turned this off.
+  // Flood-prone zone circles + map name bubbles — a map-layer toggle only, defaults ON and
+  // persists across visits (loadFloodPronePref). It never hides a report from the list/feed/
+  // counts; those always show every live report regardless of whether it sits in a known
+  // flood-prone zone.
   const [showFloodProne, setShowFloodProne] = React.useState(loadFloodPronePref);
   // Flips once the bundled road network finishes loading, so the road overlay re-derives with it.
   const [roadsReady, setRoadsReady] = React.useState(false);
@@ -268,6 +269,9 @@ const App: React.FC = () => {
   // Admin "Warn this zone" modal target — the manual second action, never auto-triggered by
   // saving/editing a zone (see AdminWarnZoneModal's doc comment).
   const [zoneWarnTarget, setZoneWarnTarget] = React.useState<FloodProneArea | null>(null);
+  // Admin "Warn an area" modal (AdminScopedWarnModal) — the scoped/bulk counterpart to
+  // zoneWarnTarget above, cascading island/province/city/area down to a region of zones.
+  const [scopedWarnOpen, setScopedWarnOpen] = React.useState(false);
   // Admin "Report flooding on zones" modal (ZoneReportModal) — bulk from AdminPanel's zones tab,
   // or a single zone preselected from a row's "⚡ Report now" or a map bubble tap.
   const [zoneReportOpen, setZoneReportOpen] = React.useState(false);
@@ -384,7 +388,7 @@ const App: React.FC = () => {
     try { localStorage.setItem(LIVE_STORAGE_KEY, liveStream ? '1' : '0'); } catch {/* ignore */}
   }, [liveStream]);
 
-  // Persist the flood-prone filter — it now decides what's in the list, not just the map layer.
+  // Persist the flood-prone map-layer toggle across sessions.
   React.useEffect(() => {
     try { localStorage.setItem(FLOOD_PRONE_STORAGE_KEY, showFloodProne ? '1' : '0'); } catch {/* ignore */}
   }, [showFloodProne]);
@@ -445,31 +449,6 @@ const App: React.FC = () => {
   // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
 
-  // Reports sitting inside a flood-prone zone's advisory circle. Keyed on the RAW lists rather than
-  // `enriched` because `enriched` deps on the 15 s `now` tick — keying it here means the ~400-zone
-  // scan only re-runs when the data actually changes, not four times a minute.
-  const proneReportIds = React.useMemo(
-    () => proneZoneReportIds(floodProneList, reportList),
-    [floodProneList, reportList]
-  );
-
-  // Everything list-facing derives from here. Unlike the severity/road chips (map + Nearby only),
-  // flood-prone is a SCOPE filter: off means "hide reports from places that always flood"
-  // everywhere — map, Nearby, Activity, Archive and the chip counts alike.
-  // Deliberately NOT applied to the safety banner (computeStatus), trip matching or the new-report
-  // notification effect: a display filter must never suppress a safety signal.
-  const scoped = React.useMemo(
-    () => (showFloodProne ? active : active.filter((r) => !proneReportIds.has(r.id))),
-    [active, showFloodProne, proneReportIds]
-  );
-
-  // Live reports inside a flood-prone zone — the number the promoted sidebar toggle reports as
-  // included or hidden.
-  const floodProneCount = React.useMemo(
-    () => active.filter((r) => proneReportIds.has(r.id)).length,
-    [active, proneReportIds]
-  );
-
   // Zones ZoneReportModal should treat as "already reported" — a fixed ~150 m dedup gate distinct
   // from zonesWithStatus's radius-based "is it currently flooded" signal (that one drives the map
   // bubble color; this one just keeps the bulk-report checklist from posting an obvious duplicate).
@@ -495,6 +474,19 @@ const App: React.FC = () => {
     () => trip.stops.filter((s) => (tripStopStatus.get(s.id)?.length ?? 0) > 0).map((s) => s.id),
     [trip.stops, tripStopStatus]
   );
+
+  // Stop id → the flood-prone zone it sits in. Advisory ("this street floods in heavy rain"),
+  // deliberately distinct from tripStopMatches' live "water is there right now" signal. Gated on the
+  // flood-prone toggle, so hiding the layer hides its advisories too.
+  const tripStopZones = React.useMemo(() => {
+    const m = new Map<string, FloodProneArea>();
+    if (!showFloodProne) return m;
+    for (const s of trip.stops) {
+      const z = matchingProneZone(floodProneList, { lat: s.lat, lng: s.lng });
+      if (z) m.set(s.id, z);
+    }
+    return m;
+  }, [trip.stops, floodProneList, showFloodProne]);
 
   // Snap active reports to real roads (bundled OSM data) → one directory of affected roads with real
   // geometry, shared by the map overlay, the sidebar count, and the Road-conditions modal.
@@ -530,8 +522,8 @@ const App: React.FC = () => {
   }, [active]);
 
   const visible = React.useMemo(
-    () => scoped.filter((r) => filters[r.severity] && roadFilters[r.road]),
-    [scoped, filters, roadFilters]
+    () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
+    [active, filters, roadFilters]
   );
   // Nearby must mean nearby — the safety banner already says "no flooding within 2.5 km" while this
   // list used to show every visible report sorted but never cut off, including ones tens of km
@@ -547,8 +539,8 @@ const App: React.FC = () => {
     [visible, monitorRadiusKm, selectedReportId]
   );
   const feed = React.useMemo(
-    () => [...scoped].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    [scoped]
+    () => [...active].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [active]
   );
   // Expired reports linger here so others can see a report happened, even after it drops off the
   // live map/feed. We keep the 10 most recent (by createdAt) with no time limit: with no new activity
@@ -556,15 +548,10 @@ const App: React.FC = () => {
   const archived = React.useMemo(
     () =>
       enriched
-        .filter(
-          (r) =>
-            r.expired &&
-            r.status !== 'resolved' && // resolved reports were closed on purpose — not archive
-            (showFloodProne || !proneReportIds.has(r.id))
-        )
+        .filter((r) => r.expired && r.status !== 'resolved') // resolved reports were closed on purpose — not archive
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, ARCHIVE_MAX),
-    [enriched, showFloodProne, proneReportIds]
+    [enriched]
   );
   const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
 
@@ -772,15 +759,15 @@ const App: React.FC = () => {
 
   const filterCounts = React.useMemo(() => {
     const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
-    for (const r of scoped) c[r.severity]++;
+    for (const r of active) c[r.severity]++;
     return c;
-  }, [scoped]);
+  }, [active]);
 
   const roadCounts = React.useMemo(() => {
     const c: Record<Road, number> = { passable: 0, risky: 0, impassable: 0 };
-    for (const r of scoped) c[r.road]++;
+    for (const r of active) c[r.road]++;
     return c;
-  }, [scoped]);
+  }, [active]);
 
   // Road segments shown on the map, gated by the per-status ROADS chips so toggling a
   // passability category hides both its road lines and its report dots (the dots are filtered
@@ -1418,6 +1405,35 @@ const App: React.FC = () => {
     showToast('Warning broadcast.');
   };
 
+  // AdminScopedWarnModal: broadcast the same warning across every zone in the admin's picked
+  // region. ONE request to /flood-prone/warn-bulk, which writes every alert in a single
+  // transaction and emits a single `alert-created` SSE event. Looping the per-zone endpoint
+  // instead would fan out one broadcast per zone — a Luzon-wide warn is 271 zones, and every
+  // connected client refetches on every broadcast.
+  //
+  // The server skips ids it no longer has and returns them in `missingAreaIds` rather than failing
+  // the batch, so a zone deleted while this modal was open costs that one warning, not all 271.
+  const warnZonesInScope = async (picked: FloodProneArea[], b: WarnArea): Promise<{ ok: number; failed: string[] }> => {
+    const res = await mutations.warnFloodProneAreasBulk({ ...b, areaIds: picked.map((z) => z.id) });
+    await alerts.refetch(true);
+    await floodProne.refetch(true);
+    const missing = new Set(res.missingAreaIds);
+    const failed = picked.filter((z) => missing.has(z.id)).map((z) => z.name);
+    showToast(`Warned ${res.affected} of ${picked.length} area${picked.length === 1 ? '' : 's'}.`);
+    return { ok: res.affected, failed };
+  };
+
+  // AdminScopedWarnModal's "Clear warnings in scope" — the undo for the bulk warn. The server
+  // deactivates every active alert stamped from one of these zones in one transaction; a global
+  // (non-geo) alert has no areaId and so can never be caught in the sweep, the same fail-safe as
+  // alertsForUser's proximity gate.
+  const clearWarningsInScope = async (picked: FloodProneArea[]): Promise<{ ok: number; failed: string[] }> => {
+    const res = await mutations.clearFloodProneWarnings(picked.map((z) => z.id));
+    await alerts.refetch(true);
+    showToast(`Cleared ${res.affected} warning${res.affected === 1 ? '' : 's'}.`);
+    return { ok: res.affected, failed: [] };
+  };
+
   // Global (server-backed) community-chat visibility toggle, unlike the per-browser `liveStream` pref.
   const onToggleChat = async (on: boolean): Promise<void> => {
     try {
@@ -1739,7 +1755,7 @@ const App: React.FC = () => {
   }, [showToast, lang]);
 
   const highCount = filterCounts.high;
-  const totalCount = scoped.length;
+  const totalCount = active.length;
 
   // `isolation: isolate` gives the map area its own stacking context so Leaflet's internal
   // z-indexes (panes 200–700, controls up to 1000) stay contained instead of leaking into the
@@ -1965,7 +1981,7 @@ const App: React.FC = () => {
           onToggleRoads={() => setShowRoads((v) => !v)}
           showFloodProne={showFloodProne}
           onToggleFloodProne={() => setShowFloodProne((v) => !v)}
-          floodProneCount={floodProneCount}
+          zoneCount={floodProneList.length}
           impassableRoadCount={impassableRoads.length}
           highCount={highCount}
           totalCount={totalCount}
@@ -1982,6 +1998,7 @@ const App: React.FC = () => {
             <TripPanel
               trip={trip}
               matches={tripStopStatus}
+              stopZones={tripStopZones}
               notifyPermission={notifyPerm}
               onAddStop={() => setAddStopOpen(true)}
               onRemoveStop={removeStop}
@@ -2072,6 +2089,7 @@ const App: React.FC = () => {
               <TripPanel
                 trip={trip}
                 matches={tripStopStatus}
+                stopZones={tripStopZones}
                 notifyPermission={notifyPerm}
                 onAddStop={() => setAddStopOpen(true)}
                 onRemoveStop={removeStop}
@@ -2225,6 +2243,16 @@ const App: React.FC = () => {
           onClose={() => setZoneWarnTarget(null)}
         />
       )}
+      {scopedWarnOpen && isAdmin && (
+        <AdminScopedWarnModal
+          isMobile={isMobile}
+          zones={floodProneList.filter((z) => z.active)}
+          alerts={alertList}
+          onWarn={warnZonesInScope}
+          onClearWarnings={clearWarningsInScope}
+          onClose={() => setScopedWarnOpen(false)}
+        />
+      )}
       {zoneReportOpen && isAdmin && (
         <ZoneReportModal
           isMobile={isMobile}
@@ -2301,6 +2329,7 @@ const App: React.FC = () => {
           onDeleteZone={onDeleteZone}
           onWarnZone={(zone) => setZoneWarnTarget(zone)}
           onReportZones={(zone) => { setZoneReportPreselect(zone ? zone.id : null); setZoneReportOpen(true); }}
+          onScopedWarn={() => setScopedWarnOpen(true)}
           onCreateReport={onCreateReport}
           onUpdateReport={onUpdateReport}
           onDeleteReport={onDeleteReport}

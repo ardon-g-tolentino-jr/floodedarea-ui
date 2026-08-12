@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Severity, Trip, TripStop } from '../../types';
+import type { FloodProneArea, Severity, Trip, TripStop } from '../../types';
 import type { StopMatch } from '../../utils/tripWatch';
 import { MAX_STOPS, STOP_RADIUS_OPTIONS } from '../../utils/tripWatch';
 import { SEV_META, SEV_RANK } from '../../utils/floodMeta';
@@ -16,6 +16,9 @@ const worstSeverity = (matches: StopMatch[]): Severity | null => {
 export interface TripPanelProps {
   trip: Trip;
   matches: Map<string, StopMatch[]>;
+  /** Stop id → the flood-prone zone it sits in, when any (App's `tripStopZones`). An advisory
+   *  signal ("this street floods in heavy rain"), distinct from `matches`' live report hits. */
+  stopZones: Map<string, FloodProneArea>;
   notifyPermission: NotificationPermission | 'unsupported';
   onAddStop: () => void;
   onRemoveStop: (id: string) => void;
@@ -28,7 +31,7 @@ export interface TripPanelProps {
 }
 
 const TripPanel: React.FC<TripPanelProps> = ({
-  trip, matches, notifyPermission, onAddStop, onRemoveStop, onMoveStop, onChangeRadius, onFocusStop, onViewReport, onStartTrip, onEndTrip,
+  trip, matches, stopZones, notifyPermission, onAddStop, onRemoveStop, onMoveStop, onChangeRadius, onFocusStop, onViewReport, onStartTrip, onEndTrip,
 }) => {
   const { lang, t } = useI18n();
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
@@ -73,6 +76,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
             const badgeColor = worst ? SEV_META[worst].color : '#16A34A';
             const isExpanded = expandedId === s.id;
             const suffix = i === 0 ? t('trip.stopStart') : i === trip.stops.length - 1 ? t('trip.stopDestination') : null;
+            const zone = stopZones.get(s.id);
             return (
               <div key={s.id} style={{ border: '1px solid var(--bw-line-soft)', borderRadius: 12, overflow: 'hidden' }}>
                 <div
@@ -82,8 +86,18 @@ const TripPanel: React.FC<TripPanelProps> = ({
                   <span style={{ flex: 'none', width: 20, height: 20, borderRadius: 6, background: 'var(--bw-primary)', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {i + 1}
                   </span>
-                  <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {s.label}{suffix ? <span style={{ color: 'var(--bw-muted)', fontWeight: 600 }}> ({suffix})</span> : null}
+                  {/* Label stacks with the flood-prone advisory as a second line — the label itself
+                      keeps its single-line ellipsis, just moved one level down so the advisory can
+                      sit beneath it without breaking that truncation. */}
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.label}{suffix ? <span style={{ color: 'var(--bw-muted)', fontWeight: 600 }}> ({suffix})</span> : null}
+                    </span>
+                    {zone && (
+                      <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#854D0E', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        ⚠ {t('trip.floodProneStop')}
+                      </span>
+                    )}
                   </span>
                   {stopMatches.length > 0 ? (
                     <span
@@ -92,6 +106,10 @@ const TripPanel: React.FC<TripPanelProps> = ({
                     >
                       ⚠ {stopMatches.length === 1 ? t('trip.reportsOne') : tFormat(lang, 'trip.reportsMany', { n: stopMatches.length })}
                     </span>
+                  ) : zone ? (
+                    // No live report, but the stop sits in a known flood-prone zone — green would
+                    // read as "safe street", which isn't true here, so this stays a neutral grey.
+                    <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: '#64748B' }}>✓ {t('trip.clearButProne')}</span>
                   ) : (
                     <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: '#16A34A' }}>✓ {t('trip.clear')}</span>
                   )}

@@ -44,12 +44,13 @@ interface SidebarProps {
   onToggleShelters: () => void;
   showRoads: boolean;
   onToggleRoads: () => void;
-  /** Layer toggle for the flood-prone zone circles + map name bubbles — also the list/feed/counts
-   *  filter now (see `scoped` in App.tsx). */
+  /** Layer toggle for the flood-prone zone circles + map name bubbles. Purely a map layer — it
+   *  never hides a report from the list/feed/counts. */
   showFloodProne: boolean;
   onToggleFloodProne: () => void;
-  /** Active reports sitting inside a flood-prone zone — the number this filter admits or removes. */
-  floodProneCount: number;
+  /** Total active flood-prone zones — shown beside the toggle so the label describes the layer
+   *  (how many zone circles are drawn), not a filter outcome. */
+  zoneCount: number;
   impassableRoadCount: number;
   highCount: number;
   totalCount: number;
@@ -117,7 +118,7 @@ const StripChip: React.FC<{
 );
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, showFloodProne, onToggleFloodProne, floodProneCount, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot, tripActive, tripAlertCount, auth, guestNudgeDismissed, onDismissGuestNudge, onSignIn } = props;
+  const { isMobile, status, list, tab, onTab, filters, filterCounts, onToggleFilter, roadFilters, roadCounts, onToggleRoad, onOpenRoads, projectedRiseCm, onChangeRise, representativeDepthCm, monitorRadiusKm, onChangeMonitor, notifyOn, notifyRadiusKm, onOpenNotify, showShelters, onToggleShelters, showRoads, onToggleRoads, showFloodProne, onToggleFloodProne, zoneCount, impassableRoadCount, highCount, totalCount, selectedReportId, onSelectReport, visitCount, tripSlot, tripActive, tripAlertCount, auth, guestNudgeDismissed, onDismissGuestNudge, onSignIn } = props;
   const { lang, t } = useI18n();
   const tone = TONE[status.tone];
 
@@ -144,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   const filtersOff =
     (['high', 'medium', 'low'] as Severity[]).filter((k) => !filters[k]).length +
     ROAD_ORDER.filter((k) => !roadFilters[k]).length +
-    (showShelters ? 0 : 1) + (showRoads ? 0 : 1);
+    (showShelters ? 0 : 1) + (showRoads ? 0 : 1) + (showFloodProne ? 0 : 1);
 
   const sidebarStyle: React.CSSProperties = isMobile
     ? { flex: 'none', width: '100%', background: '#fff', display: 'flex', flexDirection: 'column', paddingBottom: 80 }
@@ -228,7 +229,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#EAB308', opacity: showFloodProne ? 1 : 0.4, flex: 'none' }} />
             {t('sidebar.floodProne')}
             <span style={{ marginLeft: 'auto', fontSize: 11.5, fontWeight: 800, opacity: 0.85 }}>
-              {tFormat(lang, showFloodProne ? 'sidebar.floodProneOn' : 'sidebar.floodProneOff', { n: floodProneCount })}
+              {showFloodProne ? tFormat(lang, 'sidebar.floodProneOn', { n: zoneCount }) : t('sidebar.floodProneOff')}
             </span>
           </button>
 

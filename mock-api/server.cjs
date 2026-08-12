@@ -475,6 +475,60 @@ server.delete('/flood-prone/:id', (req, res) => {
   res.status(200).json({});
 });
 
+// Bulk counterpart to the per-zone warn below: every alert written in one pass, then ONE
+// `alert-created` broadcast. Mirrors FloodProneAreaService.warnBulk — unknown ids are skipped and
+// returned in missingAreaIds rather than failing the batch. Declared BEFORE `/flood-prone/:id/warn`
+// and the json-server router so "warn-bulk" is never parsed as a resource id.
+server.post('/flood-prone/warn-bulk', (req, res) => {
+  const db = router.db;
+  const ids = [...new Set((req.body.areaIds || []).filter((n) => n != null))];
+  if (!ids.length) return res.status(400).json({ message: 'areaIds must not be empty.' });
+
+  const now = new Date().toISOString();
+  const existing = db.get('alerts').map('id').value();
+  let nextId = existing.length ? Math.max(...existing) + 1 : 1;
+  const missingAreaIds = [];
+  const created = [];
+
+  for (const id of ids) {
+    const area = db.get('floodProneAreas').find({ id }).value();
+    if (!area) { missingAreaIds.push(id); continue; }
+    created.push({
+      id: nextId++,
+      title: req.body.title || `Flood-prone area: ${area.name}`,
+      body: req.body.body || area.note || `Flooding is likely near ${area.name}, ${area.district}. Avoid the area and monitor conditions.`,
+      region: area.district,
+      level: req.body.level || area.level,
+      active: true,
+      latitude: area.latitude,
+      longitude: area.longitude,
+      radiusM: area.radiusM,
+      areaId: area.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    db.get('floodProneAreas').find({ id }).assign({ lastWarnedAt: now, updatedAt: now }).write();
+  }
+
+  created.forEach((a) => db.get('alerts').push(a).write());
+  if (created.length) broadcast('alert-created', { count: created.length });
+  res.status(201).json({ affected: created.length, missingAreaIds });
+});
+
+// The undo for warn-bulk: deactivate every active alert stamped from one of these zones. A global
+// alert has areaId null and so can never match — the same fail-safe as the backend.
+server.post('/flood-prone/clear-warnings', (req, res) => {
+  const db = router.db;
+  const ids = [...new Set((req.body.areaIds || []).filter((n) => n != null))];
+  if (!ids.length) return res.status(400).json({ message: 'areaIds must not be empty.' });
+
+  const now = new Date().toISOString();
+  const stale = db.get('alerts').filter((a) => a.active && a.areaId != null && ids.includes(a.areaId)).value();
+  stale.forEach((a) => db.get('alerts').find({ id: a.id }).assign({ active: false, updatedAt: now }).write());
+  if (stale.length) broadcast('alert-deactivated', { count: stale.length });
+  res.json({ affected: stale.length, missingAreaIds: [] });
+});
+
 // Manual warning trigger: stamp a new alert row with this zone's geometry, bump the zone's
 // lastWarnedAt, and broadcast `alert-created` — the SAME event the existing rainfall-alert path
 // uses, so useActivityStream's `event.startsWith('alert')` refetch picks it up with no changes.

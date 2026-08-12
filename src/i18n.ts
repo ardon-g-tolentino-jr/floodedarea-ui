@@ -109,8 +109,8 @@ const MESSAGES = {
   'sidebar.shelters': { en: 'Shelters', fil: 'Mga silungan' },
   'sidebar.floodedRoads': { en: 'Flooded roads', fil: 'Binahang kalsada' },
   'sidebar.floodProne': { en: 'Flood-prone', fil: 'Madalas bahain' },
-  'sidebar.floodProneOn':  { en: 'On · {n} included', fil: 'Naka-on · {n} kasama' },
-  'sidebar.floodProneOff': { en: 'Off · {n} hidden',  fil: 'Naka-off · {n} nakatago' },
+  'sidebar.floodProneOn':  { en: 'On · {n} zones', fil: 'Naka-on · {n} lugar' },
+  'sidebar.floodProneOff': { en: 'Off', fil: 'Naka-off' },
   'sidebar.searchRoads': { en: 'Search roads by condition', fil: 'Maghanap ng kalsada ayon sa kondisyon' },
   'sidebar.nearby': { en: 'Nearby', fil: 'Malapit' },
   'sidebar.liveActivity': { en: 'Live activity', fil: 'Live na aktibidad' },
@@ -417,6 +417,8 @@ const MESSAGES = {
   'trip.alertTitleMany': { en: '{n} new floods on your trip', fil: '{n} bagong baha sa iyong biyahe' },
   'trip.alertBodyOne': { en: '{sev} flooding reported near {stop} — {name}, about {depth} cm deep.', fil: '{sev} na baha ang naiulat malapit sa {stop} — {name}, humigit-kumulang {depth} cm ang lalim.' },
   'trip.alertBodyMany': { en: '{n} new floods reported near stops on your trip. The worst is {sev} at {name}.', fil: '{n} bagong baha ang naiulat malapit sa mga hinto ng iyong biyahe. Ang pinakamalala ay {sev} sa {name}.' },
+  'trip.floodProneStop': { en: 'Floods in heavy rain', fil: 'Binabaha kapag malakas ang ulan' },
+  'trip.clearButProne': { en: 'Clear now', fil: 'Malinaw ngayon' },
 
   // ── Flood-prone zones (admin-pinned advisory pins + manual warn) ──
   'zone.warnTitle': { en: 'Send a flood warning', fil: 'Magpadala ng babala sa baha' },
