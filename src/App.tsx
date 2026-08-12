@@ -17,6 +17,7 @@ import { SEVERITY_PRESET, SEV_RANK } from './utils/floodMeta';
 import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, buildFloodDigest, FB_PAGE_URL } from './utils/share';
 import {
   alertsForUser,
+  alertsInMonitorArea,
   buildPossibleClosures,
   buildRoadDirectory,
   computeStatus,
@@ -439,6 +440,16 @@ const App: React.FC = () => {
   // passes through unchanged; a geo-stamped warning (from a zone's "Warn" action) only applies to
   // people near it. See alertsForUser's doc comment for the fail-open reasoning.
   const visibleAlerts = React.useMemo(() => alertsForUser(alertList, userLoc), [alertList, userLoc]);
+
+  // Warnings issued anywhere inside the user's "My area" circle — surfaced as a label on the live
+  // ticker. Fed the RAW `alertList`, deliberately NOT `visibleAlerts`: that list is already cut to
+  // the tight "you are practically standing in it" gate (zone radius + 300 m), which would have
+  // discarded exactly the warnings this is meant to catch — the ones near you but not on top of
+  // you. Nearest first, so the ticker can lead with the closest.
+  const monitorAreaWarnings = React.useMemo(
+    () => alertsInMonitorArea(alertList, userLoc, monitorRadiusKm),
+    [alertList, userLoc, monitorRadiusKm]
+  );
 
   const enriched = React.useMemo(
     () => enrichReports(reportList, userLoc, auth?.userId ?? null, now),
@@ -1811,8 +1822,21 @@ const App: React.FC = () => {
 
       <ActivityTicker
         report={feed[0] ?? null}
+        warning={monitorAreaWarnings[0] ?? null}
+        warningCount={monitorAreaWarnings.length}
+        monitorRadiusKm={monitorRadiusKm}
         isLive={lastEventAt != null && now - lastEventAt < 90_000}
         isMobile={isMobile}
+        onWarningClick={() => {
+          const a = monitorAreaWarnings[0];
+          if (!a) return;
+          // Same modal the alarm path opens, so a warning reached from the ticker reads identically
+          // to one that interrupted you. `source` mirrors the alert effect's zone-vs-weather split.
+          setAlertModal({ alert: a, source: a.areaId != null ? 'zone' : 'weather' });
+          if (a.latitude != null && a.longitude != null) {
+            setMapFocus({ lat: Number(a.latitude), lng: Number(a.longitude), key: Date.now() });
+          }
+        }}
         onClick={() => {
           const r = feed[0];
           if (!r) return;

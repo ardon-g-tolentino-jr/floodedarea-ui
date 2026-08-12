@@ -364,6 +364,9 @@ const MESSAGES = {
   'ticker.live': { en: 'LIVE', fil: 'LIVE' },
   'ticker.newest': { en: 'Newest', fil: 'Pinakabago' },
   'ticker.floodIn': { en: '{sev} flood — {district}', fil: '{sev} na baha — {district}' },
+  'ticker.warnTag': { en: 'WARNING', fil: 'BABALA' },
+  'ticker.warnWithin': { en: 'issued within your {km} km area', fil: 'inilabas sa loob ng iyong {km} km na lugar' },
+  'ticker.warnMore': { en: '+{n} more nearby', fil: '+{n} pa sa malapit' },
 
   // ── Guest sign-in nudges ──
   'guest.nudgeBody': { en: 'Browsing as guest — your reports show as ⚠ unverified until others confirm them.', fil: 'Naka-browse bilang guest — lalabas ang mga ulat mo bilang ⚠ hindi beripikado hanggang sa kumpirmahin ito ng iba.' },

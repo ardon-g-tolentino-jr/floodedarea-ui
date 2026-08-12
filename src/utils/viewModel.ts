@@ -97,6 +97,39 @@ export function alertsForUser(alerts: FloodAlert[], userLoc: LatLng | null): Flo
   });
 }
 
+/**
+ * Active geo-stamped warnings whose warned circle **overlaps the user's "My area" circle** — two
+ * circles intersect when the distance between their centers is at most the sum of their radii.
+ *
+ * This is a deliberately WIDER net than `alertsForUser` above, and answers a different question.
+ * That one asks "does this warning apply to where I am standing?" (zone radius + a 300 m GPS
+ * margin) and drives the ribbon, the alarm and the OS notification. This one asks "has anything
+ * been warned inside the area I said I care about?", which is the whole point of the My-area
+ * slider. A 500 m zone 2 km away fails the first test and passes this one at the default 3 km
+ * radius — so callers must feed this the RAW alert list, never `alertsForUser`'s output, or the
+ * narrower gate would have already discarded exactly the warnings this is meant to surface.
+ *
+ * Unlike `alertsForUser` this fails CLOSED when `userLoc` is null: with no location there is no
+ * monitoring area, so "a warning was issued inside your area" would be a claim we cannot make.
+ * Nothing is lost by staying quiet — the ribbon's fail-open still surfaces every geo warning to a
+ * user whose location is unknown.
+ *
+ * Sorted nearest-first so the caller can lead with the closest one.
+ */
+export function alertsInMonitorArea(
+  alerts: FloodAlert[],
+  userLoc: LatLng | null,
+  monitorRadiusKm: number
+): FloodAlert[] {
+  if (!userLoc) return [];
+  return alerts
+    .filter((a) => a.active && a.latitude != null && a.longitude != null)
+    .map((a) => ({ a, km: kmBetween(userLoc, { lat: Number(a.latitude), lng: Number(a.longitude) }) }))
+    .filter(({ a, km }) => km <= (a.radiusM ?? 0) / 1000 + monitorRadiusKm)
+    .sort((x, y) => x.km - y.km)
+    .map(({ a }) => a);
+}
+
 /** A flood-prone zone augmented with its current live status, for the map's name-bubble labels. */
 export interface ZoneStatus extends FloodProneArea {
   /** Whether an active report's center currently lies within this zone's own radiusM. */
