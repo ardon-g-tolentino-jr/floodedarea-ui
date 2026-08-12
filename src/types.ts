@@ -117,6 +117,20 @@ export interface WarnArea {
   level?: AlertLevel;
 }
 
+/** Payload for `POST /flood-prone/warn-bulk` — the same optional overrides as `WarnArea`, applied
+ *  to every listed area (each still falls back to its own name/note/level when a field is unset). */
+export interface BulkWarnAreas extends WarnArea {
+  areaIds: number[];
+}
+
+/** Result of a bulk warn or clear. `affected` is alerts created (warn) or deactivated (clear);
+ *  `missingAreaIds` are ids the server no longer has — skipped rather than failing the batch, so a
+ *  slightly stale client zone list can't cost the whole operation. Always empty for a clear. */
+export interface BulkAlertResult {
+  affected: number;
+  missingAreaIds: number[];
+}
+
 export interface LatLng {
   lat: number;
   lng: number;

@@ -65,6 +65,9 @@ interface AdminPanelProps {
   /** Opens the (separately mounted) ZoneReportModal — omit the argument for the tab-level bulk
    *  button, pass a zone for a row's "⚡ Report now" action (preselects just that one). */
   onReportZones: (preselect?: FloodProneArea) => void;
+  /** Opens the (separately mounted) AdminScopedWarnModal — the cascading island/province/city/area
+   *  bulk-warn tool, distinct from onWarnZone's single-zone confirm modal. */
+  onScopedWarn: () => void;
   onCreateReport: (b: NewReport) => Promise<void>;
   onUpdateReport: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
   onDeleteReport: (id: number) => Promise<void>;
@@ -621,12 +624,20 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   vs. one-off zone bookkeeping. Opens ZoneReportModal (mounted in App) with every
                   active zone ticked. */}
               {tab === 'zones' && (
-                <button
-                  onClick={() => props.onReportZones()}
-                  style={{ width: '100%', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 8 }}
-                >
-                  ⚡ Report flooding on zones…
-                </button>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <button
+                    onClick={() => props.onReportZones()}
+                    style={{ flex: '1 1 200px', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                  >
+                    ⚡ Report flooding on zones…
+                  </button>
+                  <button
+                    onClick={() => props.onScopedWarn()}
+                    style={{ flex: '1 1 200px', border: '1px solid #FED7AA', background: '#FFF7ED', color: '#C2410C', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                  >
+                    ⚠ Warn an area…
+                  </button>
+                </div>
               )}
               <button onClick={startAdd} style={{ width: '100%', border: '1px dashed var(--bw-primary)', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 12 }}>
                 + Add {TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}

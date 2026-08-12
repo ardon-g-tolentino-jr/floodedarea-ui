@@ -22,6 +22,8 @@ import type {
   Severity,
   SocialPost,
   VisitStats,
+  BulkAlertResult,
+  BulkWarnAreas,
   WarnArea,
 } from '../types';
 
@@ -100,6 +102,14 @@ export const mutations = {
   deleteFloodProneArea: (id: number) => api.delete<void>(`/flood-prone/${id}`),
   /** Manual trigger: broadcasts a geo-stamped FloodAlert from this zone. Never fired automatically. */
   warnFloodProneArea: (id: number, body: WarnArea) => api.post<FloodAlert>(`/flood-prone/${id}/warn`, body),
+  /** Warn many zones in ONE request and one SSE broadcast — the scoped/bulk counterpart to
+   *  `warnFloodProneArea`. Looping the single-zone endpoint instead would fan out one broadcast per
+   *  zone, and every connected client refetches on each one. */
+  warnFloodProneAreasBulk: (body: BulkWarnAreas) => api.post<BulkAlertResult>('/flood-prone/warn-bulk', body),
+  /** Deactivate the standing warnings raised from these zones — the undo for the bulk warn.
+   *  Global alerts and warnings from zones outside the list are never touched. */
+  clearFloodProneWarnings: (areaIds: number[]) =>
+    api.post<BulkAlertResult>('/flood-prone/clear-warnings', { areaIds }),
 
   // ── Admin: social auto-post ──
   /** Reset attempts and republish one failed/pending row. */
