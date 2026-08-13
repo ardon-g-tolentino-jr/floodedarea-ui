@@ -191,6 +191,9 @@ const FloodMap: React.FC<FloodMapProps> = ({
 }) => {
   // Matches MapContainer's fixed initial zoom={13} below.
   const [zoom, setZoom] = React.useState(13);
+  // Whole-circle tap-to-report is admin-only (onSelectZone is undefined for citizens) and stands
+  // down while a report pin is being dropped (reportMode) — see the eventHandlers comment below.
+  const zoneClickable = !!onSelectZone && !reportMode;
   return (
     <MapContainer
       center={[userLoc.lat, userLoc.lng]}
@@ -255,23 +258,41 @@ const FloodMap: React.FC<FloodMapProps> = ({
 
       {/* Admin-pinned flood-prone areas — persistent advisory pins, drawn below the live report
           layers so an active report never reads as "under" a standing advisory. Dashed + low
-          fill so they read as "watch this place" rather than "water is here now" (that's a report). */}
-      {showFloodProne &&
-        floodProneAreas.map((a) => {
-          const color = (LEVEL_STYLE[a.level] ?? LEVEL_STYLE.orange).chip;
-          return (
-            <Circle
-              key={`zone-${a.id}`}
-              center={[a.latitude, a.longitude]}
-              radius={a.radiusM}
-              pathOptions={{ color, weight: 2, dashArray: '6 5', fill: true, fillColor: color, fillOpacity: 0.08 }}
-            >
-              <Tooltip direction="top" sticky opacity={1}>
-                <span style={{ fontWeight: 700 }}>⚠ {a.name}</span> · {a.district}
-              </Tooltip>
-            </Circle>
-          );
-        })}
+          fill so they read as "watch this place" rather than "water is here now" (that's a report).
+          Own pane at z-index 398 (under bw-zone-bubbles at 399 and the report layers' overlayPane
+          at 400): SVG hit-testing follows mount order, not JSX order, so without a pane toggling
+          showFloodProne off/on would re-append these ABOVE the report circles and let a zone steal
+          the click from a report pin sitting inside it. Sorted widest-first for the same reason —
+          a small zone nested in a big one must mount last to stay tappable. */}
+      {showFloodProne && (
+        <Pane name="bw-zone-areas" style={{ zIndex: 398 }}>
+          {[...floodProneAreas].sort((a, b) => b.radiusM - a.radiusM).map((a) => {
+            const color = (LEVEL_STYLE[a.level] ?? LEVEL_STYLE.orange).chip;
+            return (
+              <Circle
+                key={`zone-${a.id}`}
+                center={[a.latitude, a.longitude]}
+                radius={a.radiusM}
+                pathOptions={{ color, weight: 2, dashArray: '6 5', fill: true, fillColor: color, fillOpacity: 0.08 }}
+                // Leaflet fires a click on the layer AND on the map — Map.initialize registers the
+                // container as its own event target, so _findEventTargets returns [path, map] and
+                // ClickCatcher still sees this click. The guard is about intent, not propagation:
+                // in report mode a tap inside a zone must only drop a pin, where without it you'd
+                // get a pin AND ZoneReportModal. Never stopPropagation (nor bubblingMouseEvents:
+                // false) here — either would break pin-drop inside a zone. Leaving pathOptions
+                // alone is also deliberate: interactive:false would drop pointer-events and kill
+                // the citizen hover tooltip below.
+                eventHandlers={zoneClickable ? { click: () => onSelectZone?.(a.id) } : undefined}
+              >
+                <Tooltip direction="top" sticky opacity={1}>
+                  <span style={{ fontWeight: 700 }}>⚠ {a.name}</span> · {a.district}
+                  {zoneClickable ? ' · Tap to report' : ''}
+                </Tooltip>
+              </Circle>
+            );
+          })}
+        </Pane>
+      )}
 
       {/* Zone name-bubble labels — Google-Maps-style callouts, one per zone, only once zoomed in
           enough to read them (below ZONE_LABEL_MIN_ZOOM it's dashed circles only, see above). Kept
@@ -289,6 +310,8 @@ const FloodMap: React.FC<FloodMapProps> = ({
                 key={`zone-bubble-${z.id}`}
                 position={[z.latitude, z.longitude]}
                 icon={icon}
+                // Citizens would otherwise get a pointer cursor over a dead target.
+                interactive={zoneClickable}
                 eventHandlers={{ click: () => onSelectZone?.(z.id) }}
               />
             );
