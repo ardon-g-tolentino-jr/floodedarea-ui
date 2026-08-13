@@ -147,6 +147,15 @@ const TAB_LABEL: Record<Tab, string> = {
   requests: 'Requests',
 };
 
+const SEARCH_PLACEHOLDER: Record<Tab, string> = {
+  shelters: 'Search a shelter…',
+  hotlines: 'Search a hotline…',
+  alerts: 'Search an alert…',
+  zones: 'Search a zone or city…',
+  reports: 'Search a report or area…',
+  requests: 'Search a request title or sender…',
+};
+
 const STATUS_ORDER: Record<FeedbackStatus, number> = { pending: 0, accepted: 1, declined: 2 };
 const STATUS_PILL: Record<FeedbackStatus, { bg: string; fg: string }> = {
   pending:  { bg: 'var(--bw-bg-subtle)', fg: 'var(--bw-ink-soft)' },
@@ -163,6 +172,11 @@ const SOCIAL_STATUS_PILL: Record<SocialPost['status'], { bg: string; fg: string 
 const SOCIAL_NETWORK_LABEL: Record<SocialNetwork, string> = { facebook: 'Facebook', x: 'X' };
 
 const PAGE_SIZE = 10;
+
+/** One uniform row shape every tab's list (except requests, which has its own card layout) maps
+ *  into — explicit here because the per-tab `.map()` branches below would otherwise widen `rows`
+ *  to a union of five distinct array types, and unions of arrays don't have a `.filter` in common. */
+type AdminRow = { id: number; primary: string; secondary: string; rec: Record<string, unknown> };
 
 type FormValues = Record<string, string | boolean>;
 
@@ -217,6 +231,8 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [page, setPage] = React.useState(0);
+  const [query, setQuery] = React.useState('');
+  const q = query.trim().toLowerCase();
   const [actingId, setActingId] = React.useState<number | null>(null);
   // Abort an in-flight reverse-geocode when a newer pick supersedes it or the panel unmounts —
   // same AbortController-ref pattern as AdminReportIncidentModal.tsx.
@@ -232,12 +248,25 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     ),
     [props.feedback]
   );
+  // Requests tab has its own card layout (not the shared `rows` model), so it gets its own filter
+  // over the fields a request search plausibly means: title, details, sender, type, status.
+  const visibleFeedback = React.useMemo(
+    () => (q ? sortedFeedback.filter((f) =>
+      f.title.toLowerCase().includes(q) ||
+      (f.details ?? '').toLowerCase().includes(q) ||
+      (f.submitterName ?? '').toLowerCase().includes(q) ||
+      f.type.toLowerCase().includes(q) ||
+      f.status.toLowerCase().includes(q)
+    ) : sortedFeedback),
+    [sortedFeedback, q]
+  );
 
   const switchTab = (t: Tab): void => {
     setTab(t);
     setEditing(null);
     setError(null);
     setPage(0);
+    setQuery('');
   };
 
   const startAdd = (): void => {
@@ -391,7 +420,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   };
 
   // Per-tab row { id, primary, secondary, rec }
-  const rows = React.useMemo(() => {
+  const rows = React.useMemo<AdminRow[]>(() => {
     if (tab === 'requests') return [];
     if (tab === 'shelters') return centers.map((c) => ({ id: c.id, primary: c.name, secondary: c.contact, rec: c as unknown as Record<string, unknown> }));
     if (tab === 'hotlines') return [...hotlines].sort((a, b) => a.position - b.position).map((h) => ({ id: h.id, primary: h.name, secondary: h.phoneNumber, rec: h as unknown as Record<string, unknown> }));
@@ -402,13 +431,22 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
       .map((r) => ({ id: r.id, primary: r.name, secondary: `${SEV_META[r.severity].label} · ${r.depthCm} cm · ${r.district}`, rec: r as unknown as Record<string, unknown> }));
   }, [tab, centers, hotlines, alerts, zones, reports]);
 
-  // Paginate the list (10 per page). Clamp the page if the row count shrinks (e.g. after a delete).
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  // Search filters on primary (name) + secondary (detail line, e.g. a zone's "City, Province"
+  // district) — the same two fields every tab's row already surfaces, so one box covers all six.
+  const visibleRows = React.useMemo(
+    () => (q ? rows.filter((r) =>
+      r.primary.toLowerCase().includes(q) || r.secondary.toLowerCase().includes(q)) : rows),
+    [rows, q]
+  );
+
+  // Paginate the list (10 per page). Clamp the page if the row count shrinks (e.g. after a delete
+  // or a search that narrows the set).
+  const pageCount = Math.max(1, Math.ceil(visibleRows.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   React.useEffect(() => {
     if (page !== safePage) setPage(safePage);
   }, [page, safePage]);
-  const pagedRows = rows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const pagedRows = visibleRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const tabs: Tab[] = ['shelters', 'hotlines', 'alerts', 'zones', 'reports', 'requests'];
 
@@ -508,13 +546,47 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600, marginBottom: 11 }}>{error}</div>
           )}
 
+          {/* One search box above every tab's body (including Requests, which has its own card
+              layout below rather than the shared `rows` model) — hidden while a form is open since
+              there's nothing to filter underneath it then. */}
+          {!editing && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 13px', height: 40, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 11 }}>
+                <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
+                <input
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); setPage(0); }}
+                  placeholder={SEARCH_PLACEHOLDER[tab]}
+                  style={{ border: 0, background: 'transparent', outline: 'none', fontSize: 13.5, width: '100%', color: 'var(--bw-ink)' }}
+                />
+                {query && (
+                  <button
+                    type="button"
+                    aria-label="Clear search"
+                    onClick={() => setQuery('')}
+                    style={{ border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              {q && (
+                <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', marginTop: 5, padding: '0 2px' }}>
+                  {tab === 'requests' ? visibleFeedback.length : visibleRows.length} of {tab === 'requests' ? sortedFeedback.length : rows.length}
+                </div>
+              )}
+            </div>
+          )}
+
           {tab === 'requests' ? (
             <div>
-              {sortedFeedback.length === 0 && (
-                <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>No feedback yet.</div>
+              {visibleFeedback.length === 0 && (
+                <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>
+                  {sortedFeedback.length === 0 ? 'No feedback yet.' : `No matches for “${query.trim()}”.`}
+                </div>
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {sortedFeedback.map((f) => {
+                {visibleFeedback.map((f) => {
                   const acting = actingId === f.id;
                   const isFeature = f.type === 'feature';
                   const sc = STATUS_PILL[f.status];
@@ -643,7 +715,11 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 + Add {TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}
               </button>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {rows.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>No records yet.</div>}
+                {visibleRows.length === 0 && (
+                  <div style={{ fontSize: 12.5, color: 'var(--bw-muted)', textAlign: 'center', padding: 14 }}>
+                    {rows.length === 0 ? 'No records yet.' : `No matches for “${query.trim()}”.`}
+                  </div>
+                )}
                 {pagedRows.map((r) => {
                   const zoneRec = tab === 'zones' ? (r.rec as unknown as FloodProneArea) : null;
                   // Zone rows carry four actions (Report now / Warn / Edit / Delete) — one more
@@ -692,7 +768,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     ← Prev
                   </button>
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--bw-muted)' }}>
-                    Page {safePage + 1} of {pageCount} · {rows.length} total
+                    Page {safePage + 1} of {pageCount} · {visibleRows.length} total
                   </span>
                   <button
                     onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}

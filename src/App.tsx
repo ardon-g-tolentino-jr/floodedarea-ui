@@ -1879,9 +1879,17 @@ const App: React.FC = () => {
             onSelectStop={(id) => { setSelectedStopId(id); setSelectedReportId(null); setSelEvacId(null); }}
             floodProneAreas={floodProneList}
             showFloodProne={showFloodProne}
-            // Citizens get no-op — the bubble itself is already the information; only admins jump
-            // into ZoneReportModal from a tap.
-            onSelectZone={(id) => { if (isAdmin) { setZoneReportPreselect(id); setZoneReportOpen(true); } }}
+            // Passed only for admins (rather than a no-op guard inside the handler): FloodMap
+            // treats the presence of this callback as "zones are actionable", which is what makes
+            // the whole dashed circle tappable and keeps the citizen circle inert — for them the
+            // bubble is already the information.
+            onSelectZone={isAdmin ? (id) => {
+              // ZoneReportModal below is fed active zones only, so preselecting an inactive one
+              // would open an all-unticked modal that can't submit.
+              if (!floodProneList.some((z) => z.id === id && z.active)) return;
+              setZoneReportPreselect(id);
+              setZoneReportOpen(true);
+            } : undefined}
           />
 
           {!isMobile && <RoadLegend />}
