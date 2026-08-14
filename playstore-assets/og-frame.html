@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FloodedArea — social cover frame</title>
+<!--
+  Capture harness for the 1200x630 Open Graph / Twitter share cover (public/og-cover.jpg). Not part
+  of the app and never built: it is served straight off the Vite dev server at
+  /playstore-assets/og-frame.html. Sibling of frame.html, which does the same job for the Play
+  Store phone screenshots.
+
+  The background is the real app map, not a mockup — an iframe of the running app, promoted to
+  full-bleed and zoomed out to the whole archipelago. The alert card on top is drawn HERE, in the
+  harness, never in the app: it is share art, and it must not leak into the product.
+
+  See README.md ("Regenerating the social cover") for the full procedure.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Palette lifted from src/styles.css (--bw-danger) and the app's map chrome, so the cover and
+     the product agree on their reds and creams. */
+  :root {
+    --og-w: 1200px;
+    --og-h: 630px;
+    --og-red: #ff4d4d;      /* --bw-danger #ef4444, lifted for legibility over the dark wash */
+    --og-cream: #f5efe6;
+    --og-wash-a: rgba(30, 74, 99, .26);
+    --og-wash-b: rgba(19, 52, 74, .40);
+  }
+
+  html, body { margin: 0; padding: 0; background: #0b1a24; overflow: hidden; }
+
+  /* The art is composed at a true 1200x630 and then scaled down to whatever the capture window
+     actually offers, exactly as frame.html does — the screenshot is normalised back up by sips. */
+  #stage {
+    position: fixed; top: 0; left: 0;
+    width: var(--og-w); height: var(--og-h);
+    transform-origin: top left;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  #app { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* Softens the map into a background: blurred, desaturated, and washed toward the app's deep
+     teal so cream and red type sits on it at full contrast. */
+  /* Calibrated by eye against og/reference.png: enough blur that the map reads as texture rather
+     than a map you are meant to inspect, but not so much that the report dots stop registering —
+     they are the whole point of the image. A first pass at blur(4px) over a .40/.55/.66 wash lost
+     them entirely and flattened the country into a blue field; these are the values that keep the
+     clusters and the coastline reading. Saturation stays at/above 1 for the same reason. */
+  #wash {
+    position: absolute; inset: 0;
+    backdrop-filter: blur(2.5px) saturate(1.06) brightness(1.02);
+    -webkit-backdrop-filter: blur(2.5px) saturate(1.06) brightness(1.02);
+    background: linear-gradient(158deg, var(--og-wash-a), var(--og-wash-b) 60%, rgba(14, 42, 61, .5));
+  }
+
+  /* The map's own controls, redrawn crisply on top of the wash. They are inside the iframe and so
+     sit under the blur; re-stating them here keeps the "this is a live map" read intact. */
+  .chrome { position: absolute; }
+  /* Sized and placed to fully cover Leaflet's own control (26x52 at 10,10) — anything peeking out
+     from underneath would read as a blurred smudge. */
+  #zoomctl {
+    top: 8px; left: 8px;
+    width: 48px;
+    border-radius: 9px; overflow: hidden;
+    background: #fff;
+    border: 2px solid rgba(15, 32, 46, .22);
+    box-shadow: 0 2px 10px rgba(6, 22, 33, .28);
+  }
+  #zoomctl div {
+    height: 48px; line-height: 45px; text-align: center;
+    font-size: 27px; font-weight: 500; color: #2c3f4e;
+    font-family: system-ui, sans-serif;
+  }
+  #zoomctl div + div { border-top: 1px solid #dfe6ea; }
+  #locate {
+    right: 26px; bottom: 26px;
+    width: 62px; height: 62px; border-radius: 50%;
+    background: rgba(233, 242, 246, .92);
+    box-shadow: 0 3px 14px rgba(6, 22, 33, .3);
+    display: grid; place-items: center;
+  }
+  #locate svg { width: 30px; height: 30px; fill: none; stroke: #12506b; stroke-width: 2; }
+
+  /* Frosted alert card. */
+  /* Sits above centre: the seeded reports cluster over Mindanao in the lower third of this framing,
+     and the card riding high leaves them showing under it. */
+  #card {
+    position: absolute; left: 50%; top: 44%;
+    transform: translate(-50%, -50%);
+    width: 660px; padding: 34px 40px 38px;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .28);
+    backdrop-filter: blur(16px) saturate(1.05);
+    -webkit-backdrop-filter: blur(16px) saturate(1.05);
+    box-shadow: 0 18px 60px rgba(5, 20, 30, .3);
+  }
+  #warn { width: 62px; height: 56px; margin: 0 auto 10px; display: block; }
+  #warn path { fill: none; stroke: var(--og-red); stroke-width: 7; stroke-linejoin: round; }
+  #warn line, #warn circle { stroke: var(--og-red); stroke-width: 7; stroke-linecap: round; }
+  .word {
+    font-weight: 800; font-size: 92px; line-height: .96;
+    letter-spacing: .02em; margin: 0;
+  }
+  #flood { color: var(--og-cream); text-shadow: 0 3px 18px rgba(5, 20, 30, .35); }
+  #alert { color: var(--og-red); text-shadow: 0 3px 20px rgba(180, 20, 20, .35); }
+  #rule { width: 128px; height: 4px; margin: 20px auto 16px; background: var(--og-red); border-radius: 2px; }
+  #kicker {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 15px; font-weight: 500; letter-spacing: .30em;
+    color: rgba(255, 255, 255, .78);
+  }
+
+  #wordmark {
+    position: absolute; left: 0; right: 0; bottom: 30px;
+    text-align: center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 21px; font-weight: 700; letter-spacing: .26em;
+    color: var(--og-cream);
+    text-shadow: 0 2px 14px rgba(5, 20, 30, .45);
+  }
+  #wordmark span { color: var(--og-red); }
+
+  /* The background is OSM-derived map data, so it carries OSM's credit. Leaflet's own attribution
+     control is in there but sits under the blur, which is not attribution — this restates it
+     legibly. Small and low-contrast: present, not part of the composition. */
+  #osm {
+    position: absolute; left: 14px; bottom: 12px;
+    font-family: system-ui, sans-serif; font-size: 11px; letter-spacing: .01em;
+    color: rgba(255, 255, 255, .40);
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <iframe id="app" src="/" allow="geolocation *"></iframe>
+  <div id="wash"></div>
+
+  <div class="chrome" id="zoomctl"><div>+</div><div>&minus;</div></div>
+  <div class="chrome" id="locate">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7"></circle>
+      <circle cx="12" cy="12" r="2.4" fill="#12506b" stroke="none"></circle>
+      <line x1="12" y1="1.5" x2="12" y2="5"></line>
+      <line x1="12" y1="19" x2="12" y2="22.5"></line>
+      <line x1="1.5" y1="12" x2="5" y2="12"></line>
+      <line x1="19" y1="12" x2="22.5" y2="12"></line>
+    </svg>
+  </div>
+
+  <div id="card">
+    <svg id="warn" viewBox="0 0 64 58">
+      <path d="M32 5 L61 54 L3 54 Z"></path>
+      <line x1="32" y1="24" x2="32" y2="38"></line>
+      <line x1="32" y1="45" x2="32" y2="45"></line>
+    </svg>
+    <p class="word" id="flood">FLOOD</p>
+    <p class="word" id="alert">ALERT</p>
+    <div id="rule"></div>
+    <div id="kicker">LIVE &middot; COMMUNITY REPORTED</div>
+  </div>
+
+  <div id="wordmark">FLOODEDAREA<span>.COM</span></div>
+  <div id="osm">Map data &copy; OpenStreetMap contributors</div>
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+  const app = document.getElementById('app');
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Scale the 1200x630 stage to whatever the real capture window offers, and centre it.
+  //
+  // Centred, not anchored top-left, because of how the art gets cut back out of the screenshot:
+  // the capture covers the whole viewport, and `sips` — the only image tool this machine has — can
+  // only crop from the centre (`--cropOffset` is accepted and then ignored). A centred stage makes
+  // a centred crop the right crop; anchored top-left, it silently shaves one edge and leaves
+  // background on the other.
+  //
+  // The cap at 1 is deliberately absent: overshooting into a window bigger than 1200x630 is how
+  // the capture survives the tool's ~1.2MP downscale with more than 1200px of stage left to
+  // resample from.
+  const fit = () => {
+    const s = Math.min(window.innerWidth / 1200, window.innerHeight / 630);
+    stage.style.transform = `scale(${s})`;
+    stage.style.left = `${Math.round((window.innerWidth - 1200 * s) / 2)}px`;
+    stage.style.top = `${Math.round((window.innerHeight - 630 * s) / 2)}px`;
+    window.__stageScale = s;
+    window.__stageRect = { w: Math.round(1200 * s), h: Math.round(630 * s) };
+  };
+  fit();
+  window.addEventListener('resize', fit);
+
+  // Same geolocation override as frame.html, and for the same reason: the capture machine's real
+  // position must never reach a published image. Re-applied on a zero-delay poll because a fresh
+  // document gets a fresh navigator and this has to land before the app's bundle runs.
+  const DEMO_POS = { latitude: 14.6538, longitude: 121.0985, accuracy: 18 };
+  const fix = () => ({
+    coords: { ...DEMO_POS, altitude: null, altitudeAccuracy: null, heading: null, speed: null },
+    timestamp: Date.now(),
+  });
+  setInterval(() => {
+    const win = app.contentWindow;
+    if (!win || win.__geoPatched) return;
+    try {
+      Object.defineProperty(win.navigator, 'geolocation', {
+        configurable: true,
+        value: {
+          getCurrentPosition: (ok) => setTimeout(() => ok(fix()), 60),
+          watchPosition: (ok) => { setTimeout(() => ok(fix()), 60); return 1; },
+          clearWatch: () => {},
+        },
+      });
+      win.__geoPatched = true;
+    } catch { /* cross-origin during navigation — the next tick gets it */ }
+  }, 0);
+
+  // Promote the map to full-bleed. The app is styled inline throughout, so there are no stable
+  // class names for its topbar / ribbon / sidebar — but Leaflet's own `.leaflet-container` is
+  // stable, so pin THAT to the iframe viewport instead of naming any of them.
+  //
+  // A high z-index is not enough on its own: the map's wrapper sets `isolation: isolate`
+  // (App.tsx), which opens a stacking context the z-index cannot escape, and the topbar's z-40
+  // then paints over the map. Walking the real parent chain and neutralising it beats guessing at
+  // selectors.
+  window.__fullBleed = async () => {
+    const doc = app.contentDocument;
+    for (let i = 0; i < 80 && !doc.querySelector('.leaflet-container'); i++) await sleep(200);
+    const lc = doc.querySelector('.leaflet-container');
+    if (!lc) throw new Error('map never mounted — is the mock API up?');
+    if (!doc.getElementById('og-fullbleed')) {
+      const css = doc.createElement('style');
+      css.id = 'og-fullbleed';
+      css.textContent = `
+        .leaflet-container { position: fixed !important; inset: 0 !important;
+          width: 100vw !important; height: 100vh !important; z-index: 9000 !important; }
+        /* Leaflet's own credit sits under the blur, where it is not legible and so is not
+           attribution. #osm in the overlay restates it crisply instead. */
+        .leaflet-control-attribution { display: none !important; }
+        ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+      `;
+      doc.head.appendChild(css);
+    }
+    for (let p = lc.parentElement; p && p !== doc.documentElement; p = p.parentElement) {
+      for (const [k, v] of [['isolation', 'auto'], ['z-index', 'auto'], ['overflow', 'visible'],
+                            ['transform', 'none'], ['filter', 'none']]) {
+        p.style.setProperty(k, v, 'important');
+      }
+    }
+    await sleep(600);
+  };
+
+  // The Leaflet map instance, dug out of React's fiber tree.
+  //
+  // react-leaflet v4 keeps the map in MapContainer's own `useState` and hands it down through
+  // context, so it is reachable from neither the DOM nor a ref here. The DOM node carries its
+  // fiber (`__reactFiber$…`); walking up from it and scanning each fiber's hook chain for an
+  // object that quacks like a Map finds it two hops up.
+  //
+  // Worth the reach: the alternative is clicking `.leaflet-control-zoom-out` and reading the level
+  // back off tile URLs, and that is genuinely unreliable — Leaflet keeps the outgoing level's
+  // tiles through an animation, so the reading lags the map and the loop miscounts its clicks.
+  // With the instance in hand, framing is one exact, animation-free setView.
+  window.__findMap = () => {
+    if (window.__map) return window.__map;
+    const doc = app.contentDocument;
+    const lc = doc.querySelector('.leaflet-container');
+    const key = lc && Object.keys(lc).find((k) => k.startsWith('__reactFiber$'));
+    if (!key) throw new Error('no React fiber on the map container');
+    const isMap = (o) => o && typeof o === 'object'
+      && typeof o.setView === 'function' && typeof o.getZoom === 'function';
+    const probe = (o, depth) => {
+      if (!o || typeof o !== 'object' || depth > 3) return null;
+      if (isMap(o)) return o;
+      for (const k of Object.keys(o)) {
+        try { const v = o[k]; if (isMap(v)) return v; const r = probe(v, depth + 1); if (r) return r; } catch { /* getter threw */ }
+      }
+      return null;
+    };
+    for (let node = lc[key], hops = 0; node && hops < 60; node = node.return, hops++) {
+      for (let hook = node.memoizedState, i = 0; hook && i < 20; hook = hook.next, i++) {
+        const m = probe(hook.memoizedState, 0);
+        if (m) return (window.__map = m);
+      }
+      const m = node.memoizedProps && probe(node.memoizedProps, 1);
+      if (m) return (window.__map = m);
+    }
+    throw new Error('Leaflet map instance not found in the fiber tree');
+  };
+
+  // Frame the archipelago and settle the tiles.
+  //
+  // Zoom 6 is the level at which the country reads as itself in a 1200x630 window. The centre is
+  // not the country's: it is chosen so the card lands over the Sibuyan/Visayan sea while Luzon
+  // fills the top edge and the Mindanao clusters sit in the clear band below the card — with the
+  // bounding-box centre the whole landmass hides behind the card and the cover shows open ocean.
+  //
+  // Call this and await it before capturing. It takes ~15s, so drive it as a promise: the CDP
+  // evaluate behind a browser-automation tool times out long before it resolves.
+  window.__prepare = async ({ zoom = 6, centre = [11.2, 123.0] } = {}) => {
+    await window.__fullBleed();
+    const map = window.__findMap();
+    map.invalidateSize();
+    map.setView(centre, zoom, { animate: false });
+    app.contentDocument.activeElement?.blur?.();
+    await sleep(10000); // a half-painted tile layer is the usual bad capture
+    return {
+      zoom: map.getZoom(),
+      centre: map.getCenter(),
+      size: map.getSize(),
+      tiles: app.contentDocument.querySelectorAll('.leaflet-tile-loaded').length,
+      scale: window.__stageScale,
+      // The centred crop that cuts the stage back out of a full-viewport screenshot, as fractions
+      // of the returned image (which the capture tool downscales by an amount it picks itself, so
+      // absolute pixels are no use). Multiply by the screenshot's own dimensions:
+      //   sips -c $(h*hFrac) $(w*wFrac) shot.jpg --out crop.jpg
+      crop: {
+        wFrac: (1200 * window.__stageScale) / window.innerWidth,
+        hFrac: (630 * window.__stageScale) / window.innerHeight,
+      },
+    };
+  };
+</script>
+</body>
+</html>

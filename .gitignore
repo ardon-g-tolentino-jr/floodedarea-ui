@@ -6,6 +6,10 @@ node_modules
 .DS_Store
 *.tsbuildinfo
 
+# Social-cover capture scratch. The deliverable is public/og-cover.jpg; the raw grabs and the
+# design reference the wash was calibrated against stay local.
+playstore-assets/og/
+
 # Android / TWA signing — irreplaceable; never commit. See PLAYSTORE_PACKAGE.md.
 *.jks
 *.keystore

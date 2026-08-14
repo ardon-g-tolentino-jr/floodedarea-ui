@@ -10,6 +10,9 @@ interface FloodDigestModalProps {
   onFacebook: (text: string) => void;
   /** Opens X's intent/tweet prefilled with `body` — X accepts prefilled text, so this is one click. */
   onX: (body: string) => void;
+  /** Copies the X-sized variant (link inline) for pasting into X's composer by hand — the only
+   *  route that can carry an image attachment, which intent/tweet cannot. */
+  onCopyX: (text: string) => void;
   onCopy: (text: string) => void;
   onClose: () => void;
 }
@@ -20,7 +23,7 @@ interface FloodDigestModalProps {
  * before posting) and a read-only preview of the X-sized variant with a live char counter.
  * Structural template matches ShareModal.tsx: bottom sheet on mobile, centered card on desktop.
  */
-const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, onFacebook, onX, onCopy, onClose }) => {
+const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, onFacebook, onX, onCopyX, onCopy, onClose }) => {
   // Local, editable copy of the composed text — the callbacks send THIS, not digest.text, so an
   // admin's tweak actually ships.
   const [text, setText] = React.useState(digest.text);
@@ -90,10 +93,12 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' }}>
-                  X preview
+                  X post — 280 chars incl. link
                 </label>
                 <div style={{ padding: '9px 10px', background: '#F7FAFB', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
-                  <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>{digest.xBody}</div>
+                  {/* Shows the link-inline variant so the preview is literally what both X paths
+                      produce — the one-click intent appends the same link via its `url` param. */}
+                  <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>{digest.xCopyText}</div>
                   <div style={{ marginTop: 6, fontSize: 10.5, fontWeight: 700, color: overBudget ? 'var(--bw-danger)' : 'var(--bw-faint)' }}>
                     {digest.xCharCount}/{X_LIMIT} on X
                   </div>
@@ -115,6 +120,8 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
               Facebook doesn't accept prefilled text — the digest is copied for you to paste (⌘V / Ctrl+V) into the composer.
             </div>
 
+            {/* One-click path sends xBody (no URL) — intent/tweet appends the link itself via its
+                `url` param, so sending xCopyText here would post the link twice. */}
             <button
               onClick={() => onX(digest.xBody)}
               disabled={empty || overBudget}
@@ -122,6 +129,17 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
             >
               𝕏 Post to X
             </button>
+
+            <button
+              onClick={() => onCopyX(digest.xCopyText)}
+              disabled={empty || overBudget}
+              style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: 12, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty || overBudget ? 'not-allowed' : 'pointer', opacity: empty || overBudget ? 0.6 : 1 }}
+            >
+              Copy X post
+            </button>
+            <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', textAlign: 'center', marginTop: -4 }}>
+              Paste it into X's composer if you want to attach the flood alert image — the one-click post can't carry one.
+            </div>
 
             <button
               onClick={() => onCopy(text)}

@@ -18,6 +18,11 @@ export const X_LIMIT = 280;
  *  copyable share message so it travels with every share. */
 export const FB_PAGE_URL = 'https://www.facebook.com/share/1DLEBjCZDi/';
 
+/** The canonical public origin (matches index.html's `og:url`). Used where a link is baked into
+ *  text the user will paste somewhere public — `window.location.origin` is right for in-app share
+ *  intents but would hand out `http://localhost:5176` when composing from a dev build. */
+export const SITE_URL = 'https://floodedarea.com';
+
 /** Facebook brand glyph (24×24 fill path) — shared by every "Follow us on Facebook" affordance
  *  (ShareModal's network grid, SupportModal's follow row) so there's one copy of the SVG path. */
 export const FB_GLYPH_PATH =
@@ -251,6 +256,11 @@ export interface FloodDigest {
   text: string;
   /** Condensed variant sized for X (no URL — the caller passes it as intent's `url` param). */
   xBody: string;
+  /** The same variant WITH the link inline — for pasting into X's composer by hand, which is the
+   *  only way to attach an image (intent/tweet can't carry one). Costs exactly `xCharCount`: X
+   *  bills any URL at X_URL_COST regardless of its real length, which is the budget `xBody` was
+   *  already trimmed against — so this is guaranteed <= X_LIMIT too. */
+  xCopyText: string;
   /** What xBody will actually cost on X: xBody.length + 1 (newline) + X_URL_COST. Always <= X_LIMIT. */
   xCharCount: number;
   reportCount: number;
@@ -307,6 +317,7 @@ export function buildFloodDigest(reports: EnrichedReport[], now: Date, url: stri
     return {
       text: `${body}\n${url}${FB_FOLLOW}`,
       xBody,
+      xCopyText: `${xBody}\n${SITE_URL}`,
       xCharCount: xBody.length + 1 + X_URL_COST,
       reportCount: 0,
       cityCount: 0,
@@ -341,6 +352,7 @@ export function buildFloodDigest(reports: EnrichedReport[], now: Date, url: stri
   return {
     text: `${lines.join('\n')}\n${url}${FB_FOLLOW}`,
     xBody,
+    xCopyText: `${xBody}\n${SITE_URL}`,
     xCharCount,
     reportCount,
     cityCount,
