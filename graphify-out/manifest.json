@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/package.json": {
-    "mtime": 1783699849.3964138,
-    "ast_hash": "a7dbf3758a3b9c749cfd0ecb978a0d82",
+    "mtime": 1786719596.2368107,
+    "ast_hash": "1a6e5bfc4b097e7c388d3ab366b76a89",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/tsconfig.json": {
@@ -35,13 +35,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/mock-api/db.json": {
-    "mtime": 1783690622.1735845,
-    "ast_hash": "f8edc94bd57dd99f5daa66a8705993da",
+    "mtime": 1786719735.1173637,
+    "ast_hash": "6565081f08f68f1072126c86997041bd",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/App.tsx": {
-    "mtime": 1783699790.4937005,
-    "ast_hash": "35191c861337c41b7a0cae2c2da409af",
+    "mtime": 1786719359.2152176,
+    "ast_hash": "d40e95afdcf7247c45a7b61eca9df266",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/main.tsx": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/types.ts": {
-    "mtime": 1783677044.0888476,
-    "ast_hash": "ae403a7f4a126f1df068aabf9b3f6bd1",
+    "mtime": 1786719299.4955478,
+    "ast_hash": "ffd8c2fdb6e7f232cf0ad64edecc3891",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/vite-env.d.ts": {
@@ -65,18 +65,18 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/waterChart.ts": {
-    "mtime": 1782130579.1293538,
-    "ast_hash": "b2447b82925ad4d5f6e431bb9775310a",
+    "mtime": 1786719952.637907,
+    "ast_hash": "33b335130ca08b2a62767d5212d04c91",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/share.ts": {
-    "mtime": 1783686251.436181,
-    "ast_hash": "824519667e0e0b44bc08da457eae061e",
+    "mtime": 1786717157.0717463,
+    "ast_hash": "826cb8e2d07d90e759db5bcc096c510b",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/viewModel.ts": {
-    "mtime": 1783664814.3645518,
-    "ast_hash": "617ede3e2b0b426f0ef5a56898cf5eed",
+    "mtime": 1786719943.739255,
+    "ast_hash": "dbf235694f59d6e1654988023c5c71b5",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/format.ts": {
@@ -85,13 +85,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/floodMeta.ts": {
-    "mtime": 1783688076.567105,
-    "ast_hash": "0695db6d7929a842eec2d949a33d0855",
+    "mtime": 1786719920.8919442,
+    "ast_hash": "a33eb978f3b995f06b21c9f13880decc",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/geo.ts": {
-    "mtime": 1781978759.6830158,
-    "ast_hash": "8b69d3e09f78b42a0e46fa9bc253dd5c",
+    "mtime": 1785923267.9509895,
+    "ast_hash": "391d5f81494b1e1f22090a78744059ad",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AlertRibbon.tsx": {
@@ -100,13 +100,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/TopBar.tsx": {
-    "mtime": 1783686251.4336243,
-    "ast_hash": "a7d3e0ed67a3796ff3b66621e687a479",
+    "mtime": 1786351453.7312818,
+    "ast_hash": "87fdce0192a4f274da930e594dd203d9",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/EvacDetailCard.tsx": {
-    "mtime": 1781978853.8510375,
-    "ast_hash": "697eaad5b6b7015d7964b6955586b5f6",
+    "mtime": 1785923267.9478981,
+    "ast_hash": "8eabd4edaa59a5f52508877c03864c50",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/NotifyModal.tsx": {
@@ -125,13 +125,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/SearchBox.tsx": {
-    "mtime": 1782891463.95264,
-    "ast_hash": "b61a132e6df43f8063181ec712cce120",
+    "mtime": 1786419388.119319,
+    "ast_hash": "7ac10116e122e55e414f0c55ef419519",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AdminPanel.tsx": {
-    "mtime": 1783651855.541275,
-    "ast_hash": "69e0ffa029cb836c23e2122be2dd64a2",
+    "mtime": 1786719390.800912,
+    "ast_hash": "d52920cab1774ae687d0e2ba71bc62fc",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/RescueChartModal.tsx": {
@@ -140,13 +140,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/SeverityPicker.tsx": {
-    "mtime": 1783688076.5663145,
-    "ast_hash": "b81c5aec49a3303323a117d417ba6fb9",
+    "mtime": 1785859693.7182481,
+    "ast_hash": "666ebcfc309080ed369a008abbef7cb6",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/Sidebar.tsx": {
-    "mtime": 1783686251.4331706,
-    "ast_hash": "566ab804d69fa3b63bbc9c2f35ebf65a",
+    "mtime": 1786500503.2445579,
+    "ast_hash": "0589900f2db10d4d8e82c4d80221b1ba",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/Toast.tsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/WaterLevelModal.tsx": {
-    "mtime": 1782130708.6369772,
-    "ast_hash": "782625087e89818c948f6804a2369006",
+    "mtime": 1786719587.9925852,
+    "ast_hash": "e80ef7eff2dcddecba10b5fd61997aea",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/SosModal.tsx": {
@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/ReportDetailCard.tsx": {
-    "mtime": 1783688076.5659518,
-    "ast_hash": "efbddc8460bd6165cd4df6cee51b3ce2",
+    "mtime": 1786719807.4448109,
+    "ast_hash": "e58b8e28311c2a9f5e6f5907e874019b",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/map/RoadLegend.tsx": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/map/FloodMap.tsx": {
-    "mtime": 1782570344.784851,
-    "ast_hash": "76f022eb7cca99e6ba02ad14eb964c1c",
+    "mtime": 1786596109.118217,
+    "ast_hash": "6189743b798e52d11f8bd81a67aeab91",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useAuth.ts": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useDomainData.ts": {
-    "mtime": 1783677044.0874438,
-    "ast_hash": "d1d15823352e6dcc0a965bd190329493",
+    "mtime": 1786019776.6018877,
+    "ast_hash": "bbd90215693f24a2e8a60eae1b7ce71a",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useBreakpoint.ts": {
@@ -205,13 +205,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/api/queries.ts": {
-    "mtime": 1783677044.0835142,
-    "ast_hash": "c809a9d461ad7616757b215bd7cc8974",
+    "mtime": 1786500503.2416887,
+    "ast_hash": "401bdcd9fac9429508e5f96c29bbba83",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/api/geocode.ts": {
-    "mtime": 1782891426.8043535,
-    "ast_hash": "54864d4e0aba513ef007b47142363c4b",
+    "mtime": 1786419388.1126792,
+    "ast_hash": "df1bd840fc0083b50eda8db93dce5ead",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/api/client.ts": {
@@ -220,13 +220,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/views/LoginView.tsx": {
-    "mtime": 1782384115.3865607,
-    "ast_hash": "62e7db902d73617aa32e035432a1d3e7",
+    "mtime": 1785923267.9513807,
+    "ast_hash": "bc28e50c77188957ee1a17247883794d",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/index.html": {
-    "mtime": 1782792278.3976598,
-    "ast_hash": "0c968f8b345d40784b3275319d94a37b",
+    "mtime": 1786717157.028343,
+    "ast_hash": "7cfa8e7805c0bb37f16395c6220819ae",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/README.md": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AlertModal.tsx": {
-    "mtime": 1782126074.394228,
-    "ast_hash": "4724d84032b355006aa4fbfa72e9703b",
+    "mtime": 1785936604.089361,
+    "ast_hash": "fad78c819a9ef7cacde785cacc9164eb",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/alert.wav": {
@@ -275,8 +275,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/SupportModal.tsx": {
-    "mtime": 1782792278.3986437,
-    "ast_hash": "f3724235c0fe08a5870aeac400da7f97",
+    "mtime": 1783786948.0642724,
+    "ast_hash": "0c89c14f343c3b41f5a4fc1533da5a7e",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/gcash-qr.png": {
@@ -295,8 +295,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/FeaturesModal.tsx": {
-    "mtime": 1782652977.5803907,
-    "ast_hash": "3448e85e5ffd9d71916077cb540f849b",
+    "mtime": 1785923267.9485338,
+    "ast_hash": "e9b835c5f63f242b7d3631d68b343bad",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/roads.json": {
@@ -320,18 +320,18 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/ShareModal.tsx": {
-    "mtime": 1783686251.4324176,
-    "ast_hash": "fc76cf4f0bd49c0882e55c93e8d7c05d",
+    "mtime": 1783786948.0637934,
+    "ast_hash": "ceb032117a8e3783301084956779a9a0",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/og-cover.jpg": {
-    "mtime": 1782183315.4745305,
-    "ast_hash": "6d3568ed8986cae2cf3bd709015b744e",
+    "mtime": 1786717157.069111,
+    "ast_hash": "3f59c1ffe610f8fed400144321e85e21",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/PLAYSTORE_PACKAGE.md": {
-    "mtime": 1782790734.0439787,
-    "ast_hash": "84c9724500a2c79e2e63c080866c2c7d",
+    "mtime": 1786164505.351728,
+    "ast_hash": "34e05f47d5d0e3fa843f366cebaa670b",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/pwa-512x512.png": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/PublicDashboardModal.tsx": {
-    "mtime": 1782384040.353596,
-    "ast_hash": "1133c351b06b2a9df1c13079387f775a",
+    "mtime": 1786419388.1189234,
+    "ast_hash": "44cf0af963eeca85b69666e855bf7033",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useVisitCounter.ts": {
@@ -370,13 +370,13 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/i18n.ts": {
-    "mtime": 1783688076.5666661,
-    "ast_hash": "919944af8b18572e0470ad873c305f5e",
+    "mtime": 1786509154.140685,
+    "ast_hash": "2acc1d95db8c53a98828a67c728b53f8",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/geolocate.ts": {
-    "mtime": 1782643198.3052182,
-    "ast_hash": "8710a3bf93c364a97cc385fe9d5f21ad",
+    "mtime": 1785825264.7115455,
+    "ast_hash": "a9fd4b9314a5605e183ad6122251dd86",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/locationHelp.ts": {
@@ -415,18 +415,148 @@
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AdminReportIncidentModal.tsx": {
-    "mtime": 1783688076.565395,
-    "ast_hash": "e9c73f186d10b6c948b65364456718bf",
+    "mtime": 1786458039.974786,
+    "ast_hash": "b5cc7d51c4b0162b85c2b480340ae6cb",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/PlaceField.tsx": {
-    "mtime": 1783651855.5422914,
-    "ast_hash": "4a85cfbe281eea6a9562810391df6a52",
+    "mtime": 1786419388.1179109,
+    "ast_hash": "905d05147951764f5a31aa430f402dea",
     "semantic_hash": ""
   },
   "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/DepthReference.tsx": {
     "mtime": 1783688076.5656164,
     "ast_hash": "4b3f02bbd438ac58b2c2f6aac5388ae9",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/seed.mjs": {
+    "mtime": 1786717157.06851,
+    "ast_hash": "57152aa5314fcfe8cb1b92df570229dc",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/og-seed.mjs": {
+    "mtime": 1786717157.0315998,
+    "ast_hash": "d8554af5903e39625c7b5cf632a9ae71",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/compose.mjs": {
+    "mtime": 1786717157.0299947,
+    "ast_hash": "40b6a9eef6e75de0995d882b9d62037b",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/.well-known/assetlinks.json": {
+    "mtime": 1786164505.3565433,
+    "ast_hash": "4f319bcaeeb5b6ccb037c058fad89f44",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/tripWatch.ts": {
+    "mtime": 1785916606.776192,
+    "ast_hash": "7bbda7ae945edf975a9177cce645d9ad",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/voiceReport.ts": {
+    "mtime": 1785825264.7118752,
+    "ast_hash": "5cdd27186fb6f5038b59223ef5b72ee0",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/utils/phGeo.ts": {
+    "mtime": 1786500503.2464209,
+    "ast_hash": "330fa51edada163297ed9b7544c2d00c",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/ReportOptions.tsx": {
+    "mtime": 1785859693.7178514,
+    "ast_hash": "8ffa2449c3d5d98d6e5ce6ec34cb8d09",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/ZoneReportModal.tsx": {
+    "mtime": 1786419388.1205986,
+    "ast_hash": "e4a6fb0f0db7e364afe57938c5f7c5d8",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/MapPickField.tsx": {
+    "mtime": 1786419388.1173625,
+    "ast_hash": "025b9a5a37b81bc8ef1dc352bae222ea",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/PlaceSuggestion.tsx": {
+    "mtime": 1786419388.1183438,
+    "ast_hash": "d7327dadf40ce649522ebcc37a9546c9",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AdminWarnZoneModal.tsx": {
+    "mtime": 1786419388.116909,
+    "ast_hash": "358e96bcf507c6e4c9fd2561de8b8b3a",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/ActivityTicker.tsx": {
+    "mtime": 1786509154.1394372,
+    "ast_hash": "fa2644dee4bc78fbc6b10ca92038ed71",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AddStopSheet.tsx": {
+    "mtime": 1786419388.1151571,
+    "ast_hash": "6b8787ef7e2c72d9a2cc59bf959e8ead",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/AdminScopedWarnModal.tsx": {
+    "mtime": 1786500503.244141,
+    "ast_hash": "0654d1088bdc1481c3b59b9750ea477d",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/FloodDigestModal.tsx": {
+    "mtime": 1786717157.0709417,
+    "ast_hash": "692a435f6abdfe1d8461869e26ae55fc",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/TripPanel.tsx": {
+    "mtime": 1786500503.2450325,
+    "ast_hash": "07d07b454cdc5fc8f43149d814f2b4a6",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/components/panels/QuickReportSheet.tsx": {
+    "mtime": 1785859693.7175558,
+    "ast_hash": "9fa9ef1a307e1dfc43fea04e645c921d",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/hooks/useWakeLock.ts": {
+    "mtime": 1785916606.7746766,
+    "ast_hash": "f0c5843471b468577d08a62d421800dd",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/src/api/overpass.ts": {
+    "mtime": 1785981446.152543,
+    "ast_hash": "e6d714ad978fec5e19d49cedf0820443",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/PLAYSTORE_TODO.md": {
+    "mtime": 1786717157.024392,
+    "ast_hash": "c4a06e50f0223ffe742e9832d37fe817",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/frame.html": {
+    "mtime": 1786717157.0305243,
+    "ast_hash": "4c5cb2e83d11afe89a572949750566ef",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/og-frame.html": {
+    "mtime": 1786717157.0313103,
+    "ast_hash": "7d34642df3a7108dcd6de5b9385c51a0",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/README.md": {
+    "mtime": 1786717157.0295641,
+    "ast_hash": "3e183c911de0691a68dae667a94f0437",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/playstore-assets/listing.md": {
+    "mtime": 1786717157.030938,
+    "ast_hash": "cd76f6fbebbc26177e73815b2b36f20d",
+    "semantic_hash": ""
+  },
+  "/Users/ardontolentinojr./Documents/CLAUDE DEV/DEVELOPMENT/FREE APP/FLOOD/baha-ui/public/privacy.html": {
+    "mtime": 1786277441.5353045,
+    "ast_hash": "c195df7f7efabe261800d8071c0a8bd6",
     "semantic_hash": ""
   }
 }
