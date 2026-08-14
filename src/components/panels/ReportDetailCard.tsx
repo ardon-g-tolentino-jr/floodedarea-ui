@@ -1,6 +1,7 @@
 import React from 'react';
-import { affectedRiseRatio, type EnrichedReport } from '../../utils/viewModel';
-import { ADVICE, ROAD_META, TREND_META, sparkPaths, trendNote, waterSeries } from '../../utils/floodMeta';
+import type { NewReport, ReportStatus, Road } from '../../types';
+import { affectedRiseRatio, REPORT_TTL_MIN, type EnrichedReport } from '../../utils/viewModel';
+import { ADVICE, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
 import { formatDuration, timeAgo } from '../../utils/format';
 import { useI18n } from '../../i18n';
 import DepthReference from './DepthReference';
@@ -20,6 +21,14 @@ interface ReportDetailCardProps {
   onShareReport: () => void;
   projectedRiseCm: number;
   onClose: () => void;
+  /** Gates the admin override block (depth/road correction, +Extend 1 hour). */
+  isAdmin: boolean;
+  /** Global "rain is falling now" flag — flips the chart/note direction and surfaces a banner. */
+  rainActive: boolean;
+  /** The app's 15s clock tick — drives the chart's solid/dashed split without a dedicated timer. */
+  now: number;
+  /** Admin save — reuses App's onUpdateReport (adminAction → refetch → toast). */
+  onAdminUpdate: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
 }
 
 /** Neutral share glyph (24×24 fill path) — the share action isn't Facebook-specific: on mobile it
@@ -34,19 +43,54 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose, isAdmin, rainActive, now, onAdminUpdate }) => {
   const { t } = useI18n();
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
   const sev = report.sev;
   const tm = TREND_META[report.trend];
-  const rm = ROAD_META[report.road];
-  const advice = ADVICE[report.road];
-  const series = waterSeries(report.depthCm, report.trend, report.id);
-  const spark = sparkPaths(series);
-  const note = trendNote(report.depthCm, report.trend, series);
+  const ptm = TREND_META[report.projectedTrend]; // colors the note, which now describes the model's trajectory
+  // ROADS cell + advice track the current (possibly projected) condition, matching the map overlay
+  // and road directory — both already decay off projectedDepthCm, so this card must agree with them.
+  const rm = ROAD_META[report.projectedRoad];
+  const advice = ADVICE[report.projectedRoad];
+  // Observed anchor point + one hourly point per PROJECT_HOURS forward; nowIndex splits the chart
+  // into a solid observed segment and a dashed predictive tail (same model driving report.projectedDepthCm).
+  const { points, nowIndex } = projectedSeries(report, rainActive, now);
+  const series = points.map((p) => p.depthCm);
+  const spark = sparkPaths(series, nowIndex);
+  const note = trendNote(report.projectedDepthCm, report.projectedTrend, projectionRateCmPerHr(report, rainActive));
   const depthPct = Math.min(report.depthCm / 150, 1) * 100;
   const edgeLabel = report.edgeKm <= 0 ? 'you are inside this zone' : `${report.distKm.toFixed(1)} km away`;
+
+  // ── Admin override: depth/road correction + TTL extension ──────────────────────────────────
+  const [adminDepth, setAdminDepth] = React.useState(report.projectedDepthCm);
+  const [adminRoad, setAdminRoad] = React.useState<Road>(report.road);
+  const [savingOverride, setSavingOverride] = React.useState(false);
+  const [extending, setExtending] = React.useState(false);
+  // Reset the draft when a different report is opened — but not on every prop refresh of the SAME
+  // report, or the admin's in-progress edit would get clobbered by the next 15s tick's re-projection.
+  React.useEffect(() => {
+    setAdminDepth(report.projectedDepthCm);
+    setAdminRoad(report.road);
+  }, [report.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const effectiveTtlMin = report.ttlMinutes && report.ttlMinutes > 0 ? report.ttlMinutes : REPORT_TTL_MIN[report.severity];
+  const handleSaveOverride = async (): Promise<void> => {
+    setSavingOverride(true);
+    try {
+      await onAdminUpdate(report.id, { depthCm: adminDepth, road: adminRoad });
+    } finally {
+      setSavingOverride(false);
+    }
+  };
+  const handleExtend = async (): Promise<void> => {
+    setExtending(true);
+    try {
+      await onAdminUpdate(report.id, { ttlMinutes: effectiveTtlMin + 60 });
+    } finally {
+      setExtending(false);
+    }
+  };
 
   const card = (
     <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 14px 40px rgba(15,23,42,.3)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
@@ -103,6 +147,11 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
       )}
 
       <div style={{ padding: '13px 15px' }}>
+        {rainActive && (
+          <div style={{ marginBottom: 11, padding: '8px 11px', background: '#EFF6FF', color: '#1D4ED8', borderRadius: 10, fontSize: 11.5, fontWeight: 700, lineHeight: 1.4 }}>
+            🌧 Rain is falling — projected levels here are climbing, not receding.
+          </div>
+        )}
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 7 }}>WATER DEPTH</div>
         <div style={{ position: 'relative', height: 10, background: '#EEF2F5', borderRadius: 6, overflow: 'hidden', marginBottom: 4 }}>
           <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 6, width: `${depthPct}%`, background: sev.color }} />
@@ -124,17 +173,41 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
           </div>
         )}
 
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', margin: '2px 0 6px' }}>WATER LEVEL · LAST 6 HOURS</div>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', margin: '2px 0 4px' }}>WATER LEVEL · OBSERVED → PROJECTED</div>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-ink-soft)', marginBottom: 6 }}>
+          Reported {report.depthCm} cm ({report.ageMin < 1 ? 'just now' : `${formatDuration(report.ageMin)} ago`})
+          {report.predictive && (
+            <> · <span style={{ color: sev.color }}>Projected now {report.projectedDepthCm} cm · predictive</span></>
+          )}
+        </div>
         <div style={{ background: '#F7FAFB', borderRadius: 11, padding: '10px 10px 6px', marginBottom: 10 }}>
           <svg viewBox="0 0 100 36" preserveAspectRatio="none" style={{ width: '100%', height: 46, display: 'block' }}>
             <path d={spark.area} fill={sev.soft} />
+            {spark.dashedLine && (
+              <line
+                x1={(nowIndex / (series.length - 1)) * 100}
+                x2={(nowIndex / (series.length - 1)) * 100}
+                y1={0}
+                y2={36}
+                stroke="#CBD5E1"
+                strokeWidth={1}
+                strokeDasharray="2 2"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
             <path d={spark.line} fill="none" stroke={sev.color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+            {spark.dashedLine && (
+              <path d={spark.dashedLine} fill="none" stroke={sev.color} strokeWidth={2} strokeDasharray="4 3" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+            )}
           </svg>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#A4B0BB', fontWeight: 700, marginTop: 3 }}>
-            <span>−6h</span><span>−4h</span><span>−2h</span><span>now</span>
+            {[0, 2, 4, 6].map((i) => {
+              const offset = i - nowIndex;
+              return <span key={i}>{offset === 0 ? 'now' : offset < 0 ? `${offset}h` : `+${offset}h`}</span>;
+            })}
           </div>
         </div>
-        <div style={{ marginTop: 9, fontSize: 12, fontWeight: 700, color: tm.color, lineHeight: 1.4 }}>{note}</div>
+        <div style={{ marginTop: 9, fontSize: 12, fontWeight: 700, color: ptm.color, lineHeight: 1.4 }}>{note}</div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 11 }}>
           <Cell label="TREND"><span style={{ color: tm.color, fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 5 }}><span>{tm.sym}</span>{tm.label}</span></Cell>
@@ -194,6 +267,78 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               Remove my report
             </button>
           )
+        )}
+
+        {isAdmin && (
+          <div style={{ marginTop: 14, padding: '11px 12px', background: '#F8FAFC', border: '1px dashed var(--bw-line)', borderRadius: 11 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.08em', color: 'var(--bw-faint)', marginBottom: 9 }}>ADMIN OVERRIDE</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--bw-ink-soft)' }}>Depth</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  onClick={() => setAdminDepth((d) => Math.max(0, d - 5))}
+                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: '#fff', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
+                >
+                  −
+                </button>
+                <span style={{ fontSize: 13, fontWeight: 800, minWidth: 48, textAlign: 'center' }}>{adminDepth} cm</span>
+                <button
+                  onClick={() => setAdminDepth((d) => Math.min(PROJECT_MAX_CM, d + 5))}
+                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: '#fff', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+              {ROAD_ORDER.map((rd) => {
+                const meta = ROAD_META[rd];
+                const selected = adminRoad === rd;
+                return (
+                  <button
+                    key={rd}
+                    onClick={() => setAdminRoad(rd)}
+                    style={{
+                      flex: 1,
+                      border: `1.5px solid ${selected ? meta.color : 'var(--bw-line)'}`,
+                      background: selected ? meta.soft : '#fff',
+                      color: selected ? meta.color : 'var(--bw-muted)',
+                      borderRadius: 8,
+                      padding: '6px 4px',
+                      fontSize: 11,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {meta.glyph} {meta.short}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 9 }}>
+              <button
+                onClick={() => void handleExtend()}
+                disabled={extending}
+                style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '7px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: extending ? 'wait' : 'pointer', opacity: extending ? 0.7 : 1 }}
+              >
+                + Extend 1 hour
+              </button>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)' }}>
+                Expires in {report.expired ? '—' : formatDuration(report.expiresInMin)}
+              </span>
+            </div>
+
+            <button
+              onClick={() => void handleSaveOverride()}
+              disabled={savingOverride}
+              style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
+            >
+              {savingOverride ? 'Saving…' : 'Save depth & road override'}
+            </button>
+          </div>
         )}
       </div>
     </div>

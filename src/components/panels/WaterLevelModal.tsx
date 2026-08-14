@@ -1,5 +1,5 @@
 import React from 'react';
-import type { LatLng } from '../../types';
+import type { FloodReport, LatLng } from '../../types';
 import { DEPTH_TICKS, SEV_META } from '../../utils/floodMeta';
 import { buildDailyWaterBars } from '../../utils/waterChart';
 import { localDateKey } from '../../utils/viewModel';
@@ -10,6 +10,10 @@ interface WaterLevelModalProps {
   userLoc: LatLng;
   isMobile: boolean;
   onClose: () => void;
+  /** Currently-active reports — feeds the projected (dashed) bars for hours after "now" on today. */
+  activeReports: FloodReport[];
+  rainActive: boolean;
+  now: number;
 }
 
 // SVG plot geometry (viewBox units). Margins leave room for tick + axis-title labels.
@@ -35,7 +39,7 @@ function hourLabel(h: number): string {
   return `${h12}${ap}`;
 }
 
-const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, onClose }) => {
+const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, onClose, activeReports, rainActive, now }) => {
   const today = React.useMemo(() => localDateKey(new Date()), []);
   const [selectedDate, setSelectedDate] = React.useState(today);
   // Free-text search across a report's name (street/barangay) and district. Empty = all areas.
@@ -71,9 +75,17 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
   }, [nearestDistrict, query]);
 
   const q = query.trim().toLowerCase();
+  // Only today gets a predictive tail — a past day's remaining hours already happened, nothing to project.
+  const isToday = selectedDate === today;
   const { bars, depthMax } = React.useMemo(
-    () => buildDailyWaterBars(dayReports, selectedDate, (r) => q === '' || `${r.name} ${r.district}`.toLowerCase().includes(q)),
-    [dayReports, selectedDate, q]
+    () =>
+      buildDailyWaterBars(
+        dayReports,
+        selectedDate,
+        (r) => q === '' || `${r.name} ${r.district}`.toLowerCase().includes(q),
+        isToday ? { now, rainActive, activeReports } : undefined
+      ),
+    [dayReports, selectedDate, q, isToday, now, rainActive, activeReports]
   );
   const hasData = bars.some((b) => b.depthCm > 0);
 
@@ -126,9 +138,15 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
           return (
             <g key={b.hour}>
               {b.depthCm > 0 && (
-                <rect x={cx - barW / 2} y={top} width={barW} height={Math.max(0, h)} rx={2} fill={color}>
-                  <title>{`${hourLabel(b.hour)} · ${b.depthCm} cm`}</title>
-                </rect>
+                b.projected ? (
+                  <rect x={cx - barW / 2} y={top} width={barW} height={Math.max(0, h)} rx={2} fill="none" stroke={color} strokeWidth={1.5} strokeDasharray="3 2">
+                    <title>{`${hourLabel(b.hour)} · ${b.depthCm} cm · predictive`}</title>
+                  </rect>
+                ) : (
+                  <rect x={cx - barW / 2} y={top} width={barW} height={Math.max(0, h)} rx={2} fill={color}>
+                    <title>{`${hourLabel(b.hour)} · ${b.depthCm} cm`}</title>
+                  </rect>
+                )
               )}
               {b.hour % 3 === 0 && (
                 <text x={cx} y={M.top + PLOT_H + 14} textAnchor="middle" fontSize={9} fontWeight={700} fill="#A4B0BB">

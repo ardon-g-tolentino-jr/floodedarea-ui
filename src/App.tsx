@@ -194,6 +194,14 @@ const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, []);
 
+  // Global settings (including the rain toggle) have no SSE event of their own, so one admin
+  // flipping rain wouldn't reach other clients until they reload. Poll every 5 min — ample, since
+  // the predictive model only steps hourly anyway.
+  React.useEffect(() => {
+    const id = window.setInterval(() => void settings.refetch(true), 300000);
+    return () => window.clearInterval(id);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Timestamp of the most recent SSE activity event — drives the ActivityTicker's pulsing "LIVE"
   // dot (pulsing within ~90s of an event, static otherwise). `now` above already re-renders every
   // 15s, which is enough resolution to flip the dot off without a dedicated timer.
@@ -451,9 +459,13 @@ const App: React.FC = () => {
     [alertList, userLoc, monitorRadiusKm]
   );
 
+  // Default OFF (unlike the other three settings flags, which default on) — a fetch failure or a
+  // settings row that predates this feature must never make every report look like it's worsening.
+  const rainActive = settings.data?.rainActive === true;
+
   const enriched = React.useMemo(
-    () => enrichReports(reportList, userLoc, auth?.userId ?? null, now),
-    [reportList, userLoc, auth?.userId, now]
+    () => enrichReports(reportList, userLoc, auth?.userId ?? null, now, rainActive),
+    [reportList, userLoc, auth?.userId, now, rainActive]
   );
 
   // Only reports still within their severity-scaled freshness window count as "live" — expired
@@ -1465,6 +1477,17 @@ const App: React.FC = () => {
     }
   };
 
+  // Global (server-backed) "rain is falling now" flag — flips the predictive water-level model
+  // from receding to rising for every report. Same pattern as onToggleChat.
+  const onToggleRain = async (on: boolean): Promise<void> => {
+    try {
+      await mutations.updateSettings({ rainActive: on });
+      await settings.refetch(true);
+    } catch {
+      showToast('Could not update the rain setting. Please try again.');
+    }
+  };
+
   // Admin: retry one failed/pending social-post row from the AdminPanel list.
   const onRetrySocialPost = async (id: number): Promise<void> => {
     try {
@@ -1820,6 +1843,15 @@ const App: React.FC = () => {
         <AlertRibbon alert={activeAlert} onClose={() => setDismissedAlerts((s) => new Set(s).add(activeAlert.id))} />
       )}
 
+      {/* Admin-flipped global flag — every projected water level on the map is currently climbing
+          instead of receding. Not dismissible: it should stay visible for as long as it's true. */}
+      {rainActive && (
+        <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 9, padding: '8px 16px', background: '#EFF6FF', borderBottom: '1px solid #BFDBFE', fontSize: 12, fontWeight: 700, color: '#1D4ED8', zIndex: 34 }}>
+          <span>🌧</span>
+          <span>Rain is falling — water levels are projected to keep rising instead of receding. Predictive, not measured.</span>
+        </div>
+      )}
+
       <ActivityTicker
         report={feed[0] ?? null}
         warning={monitorAreaWarnings[0] ?? null}
@@ -1948,6 +1980,10 @@ const App: React.FC = () => {
               onShareReport={() => setShareReportTarget(selectedReport)}
               projectedRiseCm={projectedRiseCm}
               onClose={() => setSelectedReportId(null)}
+              isAdmin={!!isAdmin}
+              rainActive={rainActive}
+              now={now}
+              onAdminUpdate={onUpdateReport}
             />
           )}
 
@@ -2176,7 +2212,14 @@ const App: React.FC = () => {
       )}
 
       {waterChartOpen && (
-        <WaterLevelModal userLoc={userLoc} isMobile={isMobile} onClose={() => setWaterChartOpen(false)} />
+        <WaterLevelModal
+          userLoc={userLoc}
+          isMobile={isMobile}
+          onClose={() => setWaterChartOpen(false)}
+          activeReports={active}
+          rainActive={rainActive}
+          now={now}
+        />
       )}
 
       {roadsModalOpen && (
@@ -2346,6 +2389,8 @@ const App: React.FC = () => {
           socialAutopostFacebook={settings.data?.socialAutopostFacebook !== false}
           socialAutopostX={settings.data?.socialAutopostX !== false}
           onToggleSocialAutopost={(network, on) => void onToggleSocialAutopost(network, on)}
+          rainActive={rainActive}
+          onToggleRain={(on) => void onToggleRain(on)}
           socialPosts={socialPosts.data ?? []}
           onRetrySocialPost={(id) => void onRetrySocialPost(id)}
           onCreateCenter={onCreateCenter}

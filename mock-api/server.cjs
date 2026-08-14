@@ -153,6 +153,32 @@ server.post('/reports/:id/confirm', (req, res) => {
   res.json(db.get('reports').find({ id }).value());
 });
 
+// Admin report edits (status, and — since 077 — depth/road/severity/trend/ttlMinutes corrections
+// and TTL extension). json-server's default PATCH would merge the body but never touch
+// updatedAt/reportedAt, so the predictive model's anchor would silently go stale; this custom
+// route (declared before `server.use(router)`, so it wins) mirrors baha-api's service: bump
+// updatedAt on every patch, and when depthCm changes on a 'system' report also bump reportedAt —
+// same reasoning as the fresh-report anchor, so a corrected system report re-anchors its projection.
+server.patch('/reports/:id', (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id, 10);
+  const report = db.get('reports').find({ id }).value();
+  if (!report) return res.status(404).json({ message: 'Report not found' });
+  const now = new Date().toISOString();
+  const patch = { updatedAt: now };
+  if (typeof req.body.status === 'string') patch.status = req.body.status;
+  if (typeof req.body.depthCm === 'number') {
+    patch.depthCm = req.body.depthCm;
+    if (report.reporterTrust === 'system') patch.reportedAt = now;
+  }
+  if (typeof req.body.road === 'string') patch.road = req.body.road;
+  if (typeof req.body.severity === 'string') patch.severity = req.body.severity;
+  if (typeof req.body.trend === 'string') patch.trend = req.body.trend;
+  if (typeof req.body.ttlMinutes === 'number') patch.ttlMinutes = req.body.ttlMinutes;
+  const updated = db.get('reports').find({ id }).assign(patch).write();
+  res.json(stripPhoto(updated));
+});
+
 // ── Report history — reports created in [from, to) regardless of status (powers the water-level
 // chart's date browsing). Must be declared before the json-server router so it wins over /reports. ──
 server.get('/reports/history', (req, res) => {
@@ -393,6 +419,9 @@ function publicSettings(s) {
     chatEnabled: s.chatEnabled !== false,
     socialAutopostFacebook: s.socialAutopostFacebook !== false,
     socialAutopostX: s.socialAutopostX !== false,
+    // Default OFF, unlike the flags above — a missing/older settings row must never make every
+    // report look like it's worsening.
+    rainActive: s.rainActive === true,
   };
 }
 server.get('/settings', (_req, res) => {
@@ -405,6 +434,7 @@ server.patch('/settings', (req, res) => {
   if (typeof req.body.chatEnabled === 'boolean') next.chatEnabled = req.body.chatEnabled;
   if (typeof req.body.socialAutopostFacebook === 'boolean') next.socialAutopostFacebook = req.body.socialAutopostFacebook;
   if (typeof req.body.socialAutopostX === 'boolean') next.socialAutopostX = req.body.socialAutopostX;
+  if (typeof req.body.rainActive === 'boolean') next.rainActive = req.body.rainActive;
   db.set('settings', next).write();
   res.json(publicSettings(next));
 });

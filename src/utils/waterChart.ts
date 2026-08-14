@@ -7,7 +7,7 @@
 // Keep this layer side-effect-free.
 
 import type { FloodReport, Severity, Trend } from '../types';
-import { waterSeries } from './floodMeta';
+import { observationAnchorMs, projectDepth, waterSeries } from './floodMeta';
 import { localDateKey } from './viewModel';
 
 export interface TimedDepth {
@@ -110,8 +110,11 @@ export function buildWaterChart(
 
 export interface HourBucket {
   hour: number; // 0–23 (local)
-  depthCm: number; // peak depth observed that hour (0 if no reports)
+  depthCm: number; // peak depth observed (or projected) that hour (0 if no reports)
   severity: Severity | null; // severity of the peak report (drives bar color)
+  /** true when this bar comes from the predictive model (an hour later today with no report yet
+   *  of its own), rather than an actually-reported depth. Rendered dashed, never solid. */
+  projected: boolean;
 }
 
 export interface DailyWaterBars {
@@ -119,20 +122,56 @@ export interface DailyWaterBars {
   depthMax: number; // Y scale (cm), padded
 }
 
+/** Only supplied when the browsed day is today — projects the hours after "now" forward from each
+ *  currently-active report, so the chart's remaining-today bars aren't just empty. */
+export interface FutureProjection {
+  now: number;
+  rainActive: boolean;
+  activeReports: FloodReport[];
+}
+
 /**
  * Bucket reports for one local day (`ymd`, YYYY-MM-DD) into 24 hourly bars, keeping only those
  * the `keep` predicate accepts (e.g. matching a searched street or district). Each bar's height is
- * the peak depth reported that hour; its color follows that report's severity. Pure — no side effects.
+ * the peak depth reported that hour; its color follows that report's severity.
+ *
+ * When `future` is given (the browsed day is today), hours after the current one have no real
+ * report yet — instead of leaving them empty, project every matching active report forward to that
+ * hour via the predictive water-level model and take the peak, marking the bar `projected`. Past
+ * days never get projected bars (the caller simply omits `future`). Pure — no side effects.
  */
-export function buildDailyWaterBars(reports: FloodReport[], ymd: string, keep: (r: FloodReport) => boolean): DailyWaterBars {
-  const bars: HourBucket[] = Array.from({ length: 24 }, (_, hour) => ({ hour, depthCm: 0, severity: null }));
+export function buildDailyWaterBars(
+  reports: FloodReport[],
+  ymd: string,
+  keep: (r: FloodReport) => boolean,
+  future?: FutureProjection
+): DailyWaterBars {
+  const bars: HourBucket[] = Array.from({ length: 24 }, (_, hour) => ({ hour, depthCm: 0, severity: null, projected: false }));
 
   for (const r of reports) {
     if (!keep(r)) continue;
     if (localDateKey(r.createdAt) !== ymd) continue;
     const hour = new Date(r.createdAt).getHours();
     if (r.depthCm > bars[hour].depthCm) {
-      bars[hour] = { hour, depthCm: r.depthCm, severity: r.severity };
+      bars[hour] = { hour, depthCm: r.depthCm, severity: r.severity, projected: false };
+    }
+  }
+
+  if (future && localDateKey(new Date(future.now)) === ymd) {
+    const dayStart = new Date(future.now);
+    dayStart.setHours(0, 0, 0, 0);
+    const currentHour = new Date(future.now).getHours();
+    for (const r of future.activeReports) {
+      if (!keep(r)) continue;
+      const anchor = observationAnchorMs(r);
+      for (let hour = currentHour + 1; hour < 24; hour++) {
+        const bucketMs = dayStart.getTime() + hour * 3_600_000;
+        const hoursSinceAnchor = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((bucketMs - anchor) / 3_600_000));
+        const depthCm = projectDepth(r, future.rainActive, hoursSinceAnchor);
+        if (depthCm > bars[hour].depthCm) {
+          bars[hour] = { hour, depthCm, severity: r.severity, projected: true };
+        }
+      }
     }
   }
 
