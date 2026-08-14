@@ -1,12 +1,14 @@
 # FloodedArea — Play Store: what's left
 
-**Snapshot: 2026-08-09.** Companion to [`PLAYSTORE_PACKAGE.md`](./PLAYSTORE_PACKAGE.md) (the full
+**Snapshot: 2026-08-14.** Companion to [`PLAYSTORE_PACKAGE.md`](./PLAYSTORE_PACKAGE.md) (the full
 runbook). That file explains *how*; this file is only *what remains*, in the order it should be
 done. Owner is marked **[you]** (needs a password, a Google account, or server access) or
 **[claude]** (can be automated).
 
-> **Steps 1 and 2 are done** — the `.aab` is signed and the privacy policy is live. The next
-> action is **step 3 (Play Console)**, then **step 4 (closed test)** the same day you upload.
+> **Steps 1 and 2 are done** — the `.aab` is signed and the privacy policy is live. The store
+> listing assets (screenshots, icon, feature graphic, all three description fields) are now done
+> too and sitting in [`playstore-assets/`](./playstore-assets/README.md). The next action is
+> **step 3 (Play Console)**, then **step 4 (closed test)** the same day you upload.
 > Read step 5 before uploading: it is a submission risk that has no work started on it.
 
 ---
@@ -57,11 +59,14 @@ All manual, account-owner only. Do not automate; do not store Console credential
 
 - [ ] Create the app. **Application ID `com.floodedarea.app` is permanent and unchangeable** —
       confirm it at creation.
-- [ ] Store listing:
-      - Title (max 30 chars): **`FloodedArea: PH Flood Watch`** (27) — "FloodedArea" alone is a
-        coined word with no organic search volume; the suffix carries the ASO terms.
-      - Short description (80), full description (4000).
-      - Screenshots (min 2, phone), 512×512 icon, 1024×500 feature graphic.
+- [ ] Store listing — **the assets are ready, this is now copy-paste + upload**. Everything is in
+      `playstore-assets/` (see its README):
+      - Title, short description and full description: `playstore-assets/listing.md`, all within
+        Google's character limits.
+      - Screenshots: `playstore-assets/out/screenshots/phone/` — 6 × 1080×1920, captured from the
+        citizen (signed-out) UI against curated demo data.
+      - Icon `out/icon/app-icon-512.png` (512×512, no alpha) and feature graphic
+        `out/feature-graphic/feature-graphic-1024x500.jpg` — both verified against spec.
 - [ ] **Privacy policy URL:** `https://floodedarea.com/privacy.html` (see step 2).
 - [ ] Data safety form — must match the disclosures in step 2.
 - [ ] Content rating questionnaire.

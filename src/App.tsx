@@ -2263,6 +2263,7 @@ const App: React.FC = () => {
           isMobile={isMobile}
           onFacebook={(text) => void postDigestFacebook(text)}
           onX={postDigestX}
+          onCopyX={(text) => void copyShare(text, 'X post copied — paste it into X.')}
           onCopy={(text) => void copyShare(text, 'Digest copied.')}
           onClose={() => setDigestOpen(false)}
         />

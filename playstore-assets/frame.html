@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FloodedArea — screenshot frame</title>
+<!--
+  Capture harness for the Play Store phone screenshots. Not part of the app and never built:
+  it is served straight off the Vite dev server at /playstore-assets/frame.html.
+
+  Why an iframe: the capture machine's browser viewport is shorter than a 9:16 phone, so the app
+  cannot simply be resized. The iframe is laid out at a true 540x960 (so the app takes its mobile
+  branch) and then scaled down to fit the real viewport; the screenshot is upscaled back to
+  1080x1920 afterwards. Same-origin, so the capture script can reach into the app document.
+
+  See playstore-assets/README.md for the full procedure.
+-->
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
+  #stage {
+    position: fixed; top: 0; left: 0;
+    width: 540px; height: 960px;
+    transform-origin: top left;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<iframe id="stage" src="/" allow="geolocation *"></iframe>
+<script>
+  // Scale the 540x960 stage down to whatever vertical room the real viewport has.
+  const stage = document.getElementById('stage');
+  const fit = () => {
+    const s = Math.min(window.innerHeight / 960, window.innerWidth / 540, 1);
+    stage.style.transform = `scale(${s})`;
+    window.__stageScale = s;
+    window.__stageRect = { w: Math.round(540 * s), h: Math.round(960 * s) };
+  };
+  fit();
+  window.addEventListener('resize', fit);
+
+  // Pin the demo location to Concepcion Uno, Marikina — inside the seeded flood cluster, so the
+  // app's own distance/status logic has something real to compute. The capture machine's actual
+  // position is wherever it happens to be, which would make the screenshots non-reproducible.
+  //
+  // The override has to be in place before the app's bundle runs, and a fresh document gets a
+  // fresh navigator, so it is re-applied on a zero-delay poll: the new document commits, this
+  // timer fires within a couple of milliseconds, and the app's module graph is still being
+  // fetched. `__geoPatched` makes it idempotent per document.
+  const DEMO_POS = { latitude: 14.6538, longitude: 121.0985, accuracy: 18 };
+  const fix = () => ({
+    coords: { ...DEMO_POS, altitude: null, altitudeAccuracy: null, heading: null, speed: null },
+    timestamp: Date.now(),
+  });
+  setInterval(() => {
+    const win = stage.contentWindow;
+    if (!win || win.__geoPatched) return;
+    try {
+      Object.defineProperty(win.navigator, 'geolocation', {
+        configurable: true,
+        value: {
+          getCurrentPosition: (ok) => setTimeout(() => ok(fix()), 60),
+          watchPosition: (ok) => { setTimeout(() => ok(fix()), 60); return 1; },
+          clearWatch: () => {},
+        },
+      });
+      win.__geoPatched = true;
+    } catch { /* cross-origin during navigation — the next tick gets it */ }
+  }, 0);
+
+  // The override above races the app's boot and does not always win, so the app may still be
+  // holding one real fix. Pressing the app's own locate control re-runs the lookup against the
+  // override, which is deterministic.
+  //
+  // `zoom` is an absolute level, not a number of steps: whether locating flies the map to street
+  // level or leaves it at the default view depends on whether the override won the boot race, so
+  // counting clicks gives a different framing run to run.
+  //
+  // It is read off the tile URLs, and the tile layer runs a zoom offset, so these are not the
+  // numbers Leaflet reports internally — calibrate by eye. 13 frames the Marikina cluster with the
+  // zone labels legible; 14+ is street level.
+  //
+  // Call this and await it before capturing anything.
+  window.__prepare = async ({ zoom = 13, centre = true } = {}) => {
+    const doc = stage.contentDocument;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    for (let i = 0; i < 60 && !doc.querySelector('.leaflet-control-zoom-out'); i++) await sleep(200);
+
+    const locate = doc.querySelector('button[aria-label="Show my location"]');
+    if (!locate) throw new Error('locate control not found');
+    locate.click();
+    await sleep(2500); // the fix resolves in ~60ms, but the map's flyTo animation needs the rest
+
+    // Refuse to hand back a frame that is still showing the capture machine's real position —
+    // these screenshots get published. The app's own toast reports the accuracy of the fix it
+    // took, and DEMO_POS is the only source that reports exactly 18 m.
+    if (!new RegExp(`±\\s*${DEMO_POS.accuracy}\\b`).test(doc.body.innerText)) {
+      throw new Error('demo location not in effect — the real position would be captured');
+    }
+
+    await window.__setZoom(zoom);
+    if (centre) await window.__centreOnYou();
+    doc.activeElement?.blur?.();
+    await sleep(6000); // let the tile layer settle — a half-painted map is the usual bad capture
+    return doc.body.innerText.split('\n').filter(Boolean).slice(0, 6).join(' | ');
+  };
+
+  // React-leaflet keeps the map instance to itself, but every loaded tile carries the zoom level
+  // in its URL (…/{z}/{x}/{y}.png), so the current zoom is readable straight off the DOM. Step
+  // the zoom controls until it matches the target.
+  // Leaflet keeps the outgoing level's tiles in the DOM through a zoom animation, so a single
+  // tile is not a reliable reading — take the level most of the loaded tiles agree on.
+  window.__mapZoom = () => {
+    const tally = new Map();
+    for (const tile of stage.contentDocument.querySelectorAll('.leaflet-tile-loaded')) {
+      const m = /\/(\d+)\/\d+\/\d+(\.\w+)?(\?|$)/.exec(tile.getAttribute('src') || '');
+      if (m) tally.set(Number(m[1]), (tally.get(Number(m[1])) || 0) + 1);
+    }
+    if (!tally.size) return null;
+    return [...tally].sort((a, b) => b[1] - a[1])[0][0];
+  };
+
+  window.__setZoom = async (target) => {
+    const doc = stage.contentDocument;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    for (let i = 0; i < 20; i++) {
+      await sleep(1200); // let the previous step's tiles land before believing the reading
+      const z = window.__mapZoom();
+      if (z === target) break;
+      if (z === null) continue; // mid-flight, nothing loaded yet — keep waiting, do not give up
+      doc.querySelector(z < target ? '.leaflet-control-zoom-in' : '.leaflet-control-zoom-out').click();
+    }
+    return window.__mapZoom();
+  };
+
+  // Drag the map by a precise pixel offset. Leaflet has no reachable map instance here (react-leaflet
+  // keeps it in a ref), so this synthesises the pointer sequence it listens for. The pause before
+  // mouseup matters: Leaflet's inertia carries on from the velocity of the last few moves, and a
+  // still pointer means it lands exactly where it was put.
+  window.__panBy = async (dx, dy) => {
+    const doc = stage.contentDocument;
+    const map = doc.querySelector('.leaflet-container');
+    const box = map.getBoundingClientRect();
+    const x0 = box.left + box.width / 2;
+    const y0 = box.top + box.height / 2;
+    const send = (type, x, y) =>
+      map.dispatchEvent(new stage.contentWindow.MouseEvent(type, {
+        clientX: x, clientY: y, bubbles: true, cancelable: true, view: stage.contentWindow, button: 0,
+      }));
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    send('mousedown', x0, y0);
+    for (let i = 1; i <= 8; i++) {
+      send('mousemove', x0 + (dx * i) / 8, y0 + (dy * i) / 8);
+      await sleep(30);
+    }
+    await sleep(250); // pointer at rest — kills the inertial fling
+    send('mouseup', x0 + dx, y0 + dy);
+    await sleep(2500);
+  };
+
+  // Put the "You" marker back in the middle of the map. Zoom steps anchor on the map centre, so a
+  // couple of them is enough to walk the marker toward an edge.
+  window.__centreOnYou = async () => {
+    const doc = stage.contentDocument;
+    const marker = [...doc.querySelectorAll('.leaflet-marker-icon')]
+      .find((el) => (el.innerText || '').trim() === 'You' || el.querySelector('*')?.textContent?.trim() === 'You');
+    if (!marker) throw new Error('"You" marker not found');
+    const box = doc.querySelector('.leaflet-container').getBoundingClientRect();
+    const m = marker.getBoundingClientRect();
+    await window.__panBy(
+      box.left + box.width / 2 - (m.left + m.width / 2),
+      box.top + box.height / 2 - (m.top + m.height / 2)
+    );
+  };
+
+  // Desktop Chrome paints a scrollbar track down the app's scroll container; a phone would not.
+  // Injected into the app document (same-origin) purely for the capture.
+  stage.addEventListener('load', () => {
+    const doc = stage.contentDocument;
+    const css = doc.createElement('style');
+    css.textContent = '::-webkit-scrollbar { width: 0 !important; height: 0 !important; }';
+    doc.head.appendChild(css);
+  });
+</script>
+</body>
+</html>
