@@ -1,6 +1,6 @@
 // Severity / trend / road metadata and water-level math, ported from the FloodedArea design.
 
-import type { RescueStatus, Road, Severity, Trend } from '../types';
+import type { FloodReport, RescueStatus, Road, Severity, Trend } from '../types';
 
 export interface SevMeta {
   label: string;
@@ -62,6 +62,66 @@ export function roadFromDepth(depthCm: number): Road {
   if (depthCm >= ROAD_IMPASSABLE_CM) return 'impassable';
   if (depthCm >= ROAD_RISKY_CM) return 'risky';
   return 'passable';
+}
+
+/** Recession while NO rain is falling — cm/hr, by severity. Deeper floods sit in low-lying catch
+ *  basins with more head, so they shed more cm/hr in absolute terms yet still take longer overall
+ *  to clear (108 cm ≈ 4.3 h, 46 cm ≈ 2.6 h, 8 cm ≈ 0.8 h). Mirrors REPORT_TTL_MIN's rationale. */
+export const DRAIN_CM_PER_HR: Record<Severity, number> = { low: 10, medium: 18, high: 25 };
+
+/** Change while rain IS falling — cm/hr, by the report's observed trend. Rain doesn't stop
+ *  drainage, it outpaces it: a rising flood keeps climbing, a steady one creeps up, and a
+ *  receding one still recedes, only slower. */
+export const RAIN_CM_PER_HR: Record<Trend, number> = { rising: 12, steady: 3, receding: -6 };
+
+export const PROJECT_MAX_CM = 250;      // absolute ceiling
+export const PROJECT_MAX_FACTOR = 2;    // never model past 2× the observed depth
+export const DRAINED_CM = 2;            // at/below this the flood is treated as gone
+export const PROJECT_HOURS = 6;         // how far forward the predictive curve runs
+
+export function projectDepth(r: FloodReport, rainActive: boolean, hours: number): number {
+  const rate = rainActive ? RAIN_CM_PER_HR[r.trend] : -DRAIN_CM_PER_HR[r.severity];
+  const cap = Math.min(PROJECT_MAX_CM, r.depthCm * PROJECT_MAX_FACTOR);
+  return Math.max(0, Math.min(cap, Math.round(r.depthCm + rate * hours)));
+}
+
+/** The signed cm/hr rate `projectDepth` is applying right now — the same formula, exposed
+ *  separately so copy (trendNote's ETA) can quote the real number instead of re-deriving it. */
+export function projectionRateCmPerHr(r: FloodReport, rainActive: boolean): number {
+  return rainActive ? RAIN_CM_PER_HR[r.trend] : -DRAIN_CM_PER_HR[r.severity];
+}
+
+/** When this report's depthCm was last actually observed — the moment both the TTL countdown and
+ *  the predictive curve anchor on. System reports carry the source's observation time in
+ *  `reportedAt` (possibly hours before an admin logged it); for everyone else the last activity IS
+ *  the last sighting — a confirm or an admin depth override bumps `updatedAt` and correctly
+ *  re-anchors both. Lives here rather than in viewModel because the projection math below needs it
+ *  and floodMeta is the lower layer (viewModel imports from floodMeta, never the reverse). */
+export function observationAnchorMs(r: FloodReport): number {
+  const src = r.reporterTrust === 'system' ? (r.reportedAt ?? r.createdAt) : (r.updatedAt ?? r.createdAt);
+  const ms = new Date(src).getTime();
+  return Number.isNaN(ms) ? new Date(r.createdAt).getTime() : ms;
+}
+
+/**
+ * The observed point plus one projected point per hour through PROJECT_HOURS, for the detail
+ * card's "observed → projected" chart. `nowIndex` is which point in the array is "now" — the
+ * split between the solid observed segment and the dashed predictive tail. Clamped to the last
+ * point when more than PROJECT_HOURS have already elapsed (the curve simply has no further tail).
+ */
+export function projectedSeries(
+  report: FloodReport,
+  rainActive: boolean,
+  now: number
+): { points: { t: number; depthCm: number }[]; nowIndex: number } {
+  const anchor = observationAnchorMs(report);
+  const points: { t: number; depthCm: number }[] = [{ t: anchor, depthCm: report.depthCm }];
+  for (let h = 1; h <= PROJECT_HOURS; h++) {
+    points.push({ t: anchor + h * 3_600_000, depthCm: projectDepth(report, rainActive, h) });
+  }
+  const elapsedHours = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((now - anchor) / 3_600_000));
+  const nowIndex = Math.min(PROJECT_HOURS, elapsedHours);
+  return { points, nowIndex };
 }
 
 /** Categorical line colors for the per-district water-level chart, assigned by district index. */
@@ -155,25 +215,33 @@ export function waterSeries(depth: number, trend: Trend, seed: number): number[]
   return out;
 }
 
-/** SVG path strings (line + filled area) for the sparkline, on a 100×36 viewBox. */
-export function sparkPaths(series: number[]): { line: string; area: string } {
+/**
+ * SVG path strings (line + filled area) for the sparkline, on a 100×36 viewBox. `splitIndex`
+ * (default: the last point, i.e. no split) marks where the solid observed segment ends and the
+ * dashed predictive tail begins; both share the same x/y scale so they align as one continuous
+ * line. `line` covers points [0, splitIndex]; `dashedLine` covers [splitIndex, end] and is '' when
+ * there's nothing beyond the split.
+ */
+export function sparkPaths(series: number[], splitIndex: number = series.length - 1): { line: string; area: string; dashedLine: string } {
   const mx = Math.max(...series) * 1.12 || 1;
   const n = series.length;
   const pts = series.map((v, i) => ({ x: (i / (n - 1)) * 100, y: 34 - (v / mx) * 30 }));
-  const line = pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+  const path = (slice: typeof pts): string => slice.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+  const line = path(pts.slice(0, splitIndex + 1));
+  const dashedLine = splitIndex < n - 1 ? path(pts.slice(splitIndex)) : '';
   const area = 'M0 36 ' + pts.map((p) => 'L' + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ') + ' L100 36 Z';
-  return { line, area };
+  return { line, area, dashedLine };
 }
 
-/** Human-readable trend note with a rough rate / ETA, from the design. */
-export function trendNote(depthCm: number, trend: Trend, series: number[]): string {
-  const n = series.length;
-  const rate = (series[n - 1] - series[0]) / 6;
+/** Human-readable trend note with a rough rate / ETA. `rateCmPerHr` is the real signed model rate
+ *  (from projectionRateCmPerHr) rather than a synthetic series — so this copy always agrees with
+ *  the chart it sits under. */
+export function trendNote(depthCm: number, trend: Trend, rateCmPerHr: number): string {
   if (trend === 'rising') {
-    const r = Math.max(1, Math.round(rate));
+    const r = Math.max(1, Math.round(rateCmPerHr));
     let eta: string;
     if (depthCm < 100) {
-      const h = (100 - depthCm) / Math.max(1, rate);
+      const h = (100 - depthCm) / Math.max(1, r);
       eta = ` — could reach waist depth (~100 cm) in about ${h < 1 ? '<1' : Math.round(h)} hr`;
     } else {
       eta = ' — already above waist level';
@@ -181,10 +249,10 @@ export function trendNote(depthCm: number, trend: Trend, series: number[]): stri
     return `▲ Rising ~${r} cm/hr${eta}.`;
   }
   if (trend === 'receding') {
-    const r = Math.max(1, Math.round(-rate));
+    const r = Math.max(1, Math.round(-rateCmPerHr));
     let eta = '';
     if (depthCm > 20) {
-      const h = (depthCm - 20) / Math.max(1, -rate);
+      const h = (depthCm - 20) / Math.max(1, r);
       eta = ` — roads may clear in ~${h < 1 ? '<1' : Math.round(h)} hr`;
     }
     return `▼ Receding ~${r} cm/hr${eta}.`;

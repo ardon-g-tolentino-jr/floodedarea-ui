@@ -3,7 +3,7 @@
 
 import type { FloodAlert, FloodProneArea, FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
 import { kmBetween } from './geo';
-import { RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
+import { DRAINED_CM, observationAnchorMs, projectDepth, projectionRateCmPerHr, RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
 import { timeAgo } from './format';
 import { roadsWithinRadius, snapToRoad } from './roadSnap';
 import { translate, tFormat, sevLabel, getLang, type Lang } from '../i18n';
@@ -197,6 +197,12 @@ export interface EnrichedReport extends FloodReport {
   ageMin: number;
   expiresInMin: number;
   expired: boolean;
+  projectedDepthCm: number;   // where the model says the water is now
+  projectedRoad: Road;        // roadFromDepth(projectedDepthCm)
+  projectedTrend: Trend;
+  projectedHours: number;     // whole hours since the observation; 0 ⇒ still the reported value
+  predictive: boolean;        // projectedHours > 0 — gates the "predictive" label
+  drained: boolean;           // projectedDepthCm <= DRAINED_CM
 }
 
 export interface SafetyStatus {
@@ -212,24 +218,32 @@ export function enrichReports(
   reports: FloodReport[],
   userLoc: LatLng,
   authUserId: number | null,
-  now: number = Date.now()
+  now: number = Date.now(),
+  rainActive: boolean = false
 ): EnrichedReport[] {
   return reports.map((r) => {
     const distKm = kmBetween(userLoc, { lat: r.latitude, lng: r.longitude });
     // Affected radius scales with this report's depth (not a uniform slider).
     const affectedKm = affectedRadiusKm(r.depthCm);
-    // Anchor the TTL on when the flood was reported. Admin "system" reports carry a `reportedAt`
-    // (the source's report time, possibly hours ago) — that anchors the countdown so stale external
-    // reports drop off correctly. Citizen reports have no reportedAt, so they anchor on the last
-    // activity (confirm/re-report bumps `updatedAt`, resetting the timer). Fall back to createdAt if
-    // the chosen anchor is missing/unparseable.
-    const anchorSource = r.reportedAt ?? r.updatedAt ?? r.createdAt;
-    const anchorMs = new Date(anchorSource).getTime();
-    const anchor = Number.isNaN(anchorMs) ? new Date(r.createdAt).getTime() : anchorMs;
+    // Both the TTL countdown and the predictive water-level model anchor on the same moment: when
+    // depthCm was last actually true (see observationAnchorMs). A confirm or an admin depth
+    // override bumps updatedAt, which correctly resets the countdown AND re-anchors the curve.
+    const anchor = observationAnchorMs(r);
     const ageMin = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((now - anchor) / 60000));
     // A per-report TTL override (admin-defined, minutes) wins over the severity-scaled default.
     const ttlMin = r.ttlMinutes && r.ttlMinutes > 0 ? r.ttlMinutes : (REPORT_TTL_MIN[r.severity] ?? REPORT_TTL_DEFAULT_MIN);
     const expiresInMin = Math.max(0, ttlMin - ageMin);
+
+    // Predictive water level: step the model hourly from the observation anchor. `projectedHours`
+    // only advances on whole-hour boundaries so the figure never jitters between the 15s `now`
+    // ticks in App.tsx — see PROJECT_HOURS/projectDepth in floodMeta.ts for the model itself.
+    const projectedHours = Number.isNaN(anchor) ? 0 : Math.max(0, Math.floor((now - anchor) / 3_600_000));
+    const projectedDepthCm = projectDepth(r, rainActive, projectedHours);
+    const projectedRoad = roadFromDepth(projectedDepthCm);
+    const rate = projectionRateCmPerHr(r, rainActive);
+    const projectedTrend: Trend = rate > 0 ? 'rising' : rate < 0 ? 'receding' : 'steady';
+    const drained = projectedDepthCm <= DRAINED_CM;
+
     return {
       ...r,
       sev: SEV_META[r.severity],
@@ -242,7 +256,15 @@ export function enrichReports(
       system: r.reporterTrust === 'system',
       ageMin,
       expiresInMin,
-      expired: r.status === 'resolved' || expiresInMin <= 0,
+      // The projection only ever SHORTENS a report's life, never extends it — TTL remains
+      // authoritative. A drained flood leaves the map even if its TTL still has time left.
+      expired: r.status === 'resolved' || expiresInMin <= 0 || drained,
+      projectedDepthCm,
+      projectedRoad,
+      projectedTrend,
+      projectedHours,
+      predictive: projectedHours > 0,
+      drained,
     };
   });
 }
@@ -269,9 +291,10 @@ export interface RoadEntry {
   key: string;
   name: string;
   district: string;
-  road: Road;            // inferred from the deepest report's water depth (roadFromDepth)
+  road: Road;            // inferred from the deepest report's (projected, when available) water depth
   severity: Severity;    // severity of the representative (deepest) report
-  depthCm: number;       // depth of the representative (deepest) report
+  depthCm: number;       // depth of the representative (deepest) report — projected when the input
+                          // carries projectedDepthCm (enriched/active reports), else the raw reported depth
   reportCount: number;   // how many reports contributed
   confirmed: boolean;    // corroborated by ≥2 reports/confirmations (else provisional)
   latitude: number;
@@ -292,10 +315,14 @@ export interface DistrictRoads {
  * Each report is snapped to the real road it sits on (bundled OSM data via `snapToRoad`); reports
  * on the same road collapse into one entry with that road's canonical name + real geometry. Reports
  * that don't snap (no road within range, or the dataset hasn't loaded) fall back to grouping by
- * district + name. Condition is inferred from the deepest report's water depth; the representative
- * is the worst report (ties broken by most recent). Roads sort worst-first; districts alphabetically.
+ * district + name. Condition is inferred from the deepest report's water depth — the PROJECTED
+ * depth when the input carries `projectedDepthCm` (i.e. it's already-enriched/active reports), so
+ * the directory decays over time along with the map overlay and possible-closure estimates; the
+ * representative is the worst report (ties broken by most recent). Roads sort worst-first;
+ * districts alphabetically.
  */
-export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
+export function buildRoadDirectory(reports: (FloodReport & { projectedDepthCm?: number })[]): DistrictRoads[] {
+  const depthOf = (r: FloodReport & { projectedDepthCm?: number }): number => r.projectedDepthCm ?? r.depthCm;
   const snaps = new Map<number, ReturnType<typeof snapToRoad>>();
   const groups = new Map<string, FloodReport[]>();
   for (const r of reports) {
@@ -315,7 +342,7 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
     // recently updated. Passability is inferred from depth, not the reporter's manual pick.
     const rep = [...rs].sort(
       (a, b) =>
-        b.depthCm - a.depthCm ||
+        depthOf(b) - depthOf(a) ||
         SEV_RANK[b.severity] - SEV_RANK[a.severity] ||
         new Date(b.updatedAt ?? b.createdAt).getTime() - new Date(a.updatedAt ?? a.createdAt).getTime()
     )[0];
@@ -335,9 +362,9 @@ export function buildRoadDirectory(reports: FloodReport[]): DistrictRoads[] {
       key,
       name: repSnap?.name ?? rep.name,
       district: rep.district,
-      road: roadFromDepth(rep.depthCm),
+      road: roadFromDepth(depthOf(rep)),
       severity: rep.severity,
-      depthCm: rep.depthCm,
+      depthCm: depthOf(rep),
       reportCount: rs.length,
       confirmed: hasVerified ? rs.length >= 2 || totalReports >= 2 : rs.length >= 3,
       latitude: rep.latitude,
@@ -380,9 +407,11 @@ export interface PossibleClosure {
  * passability. Each report reaches out to where modeled depth hits the risky threshold; every road in
  * range is graded via roadFromDepth and the worst (deepest) estimate wins across overlapping floods.
  * A report's own directly-snapped road is dropped — that's the high-confidence "reported" overlay,
- * not an inference.
+ * not an inference. Reach and estimate both use the PROJECTED depth when the input carries
+ * `projectedDepthCm` (already-enriched/active reports), so closures decay together with everything else.
  */
-export function buildPossibleClosures(reports: FloodReport[]): PossibleClosure[] {
+export function buildPossibleClosures(reports: (FloodReport & { projectedDepthCm?: number })[]): PossibleClosure[] {
+  const depthOf = (r: FloodReport & { projectedDepthCm?: number }): number => r.projectedDepthCm ?? r.depthCm;
   const reported = new Set<number>();
   for (const r of reports) {
     const snap = snapToRoad(r.latitude, r.longitude);
@@ -390,11 +419,12 @@ export function buildPossibleClosures(reports: FloodReport[]): PossibleClosure[]
   }
   const worst = new Map<number, PossibleClosure>();
   for (const r of reports) {
-    const rMaxM = (r.depthCm - ROAD_RISKY_CM) / (FLOODPLAIN_SLOPE * 100); // reach out to risky-depth
+    const depthCm = depthOf(r);
+    const rMaxM = (depthCm - ROAD_RISKY_CM) / (FLOODPLAIN_SLOPE * 100); // reach out to risky-depth
     if (rMaxM <= 0) continue;
     for (const nr of roadsWithinRadius(r.latitude, r.longitude, rMaxM / 1000)) {
       if (reported.has(nr.roadId)) continue;
-      const estDepthCm = r.depthCm - nr.nearestM * FLOODPLAIN_SLOPE * 100;
+      const estDepthCm = depthCm - nr.nearestM * FLOODPLAIN_SLOPE * 100;
       const status = roadFromDepth(estDepthCm);
       if (status === 'passable') continue;
       const prev = worst.get(nr.roadId);

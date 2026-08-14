@@ -465,7 +465,8 @@
   "settings": {
     "chatEnabled": true,
     "socialAutopostFacebook": true,
-    "socialAutopostX": true
+    "socialAutopostX": true,
+    "rainActive": false
   },
   "socialPosts": []
 }

@@ -273,6 +273,10 @@ export interface AppSettings {
   socialAutopostFacebook: boolean;
   /** Kill switch: whether system reports are ever auto-posted to X. Default true. */
   socialAutopostX: boolean;
+  /** Global "rain is falling now" flag that flips the predictive water-level model from receding
+   *  to rising. Default **false** — deliberately the opposite of the other flags' default-on
+   *  idiom, since defaulting this on would make every report look like it's worsening. */
+  rainActive: boolean;
 }
 
 /** A social network a system report can be auto-posted to. */

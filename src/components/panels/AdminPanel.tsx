@@ -44,6 +44,10 @@ interface AdminPanelProps {
   socialAutopostFacebook: boolean;
   socialAutopostX: boolean;
   onToggleSocialAutopost: (network: SocialNetwork, on: boolean) => void;
+  /** Global "rain is falling now" flag — flips the predictive water-level model from receding to
+   *  rising for every report. Default false, unlike the toggles above. */
+  rainActive: boolean;
+  onToggleRain: (on: boolean) => void;
   /** Recent auto-post attempts, newest first — surfaced in the Reports tab. */
   socialPosts: SocialPost[];
   onRetrySocialPost: (id: number) => void;
@@ -224,7 +228,8 @@ const inputStyle: React.CSSProperties = {
 const AdminPanel: React.FC<AdminPanelProps> = (props) => {
   const {
     centers, hotlines, alerts, zones, reports, liveStream, onToggleLive, chatEnabled, onToggleChat,
-    socialAutopostFacebook, socialAutopostX, onToggleSocialAutopost, socialPosts, onRetrySocialPost, onClose,
+    socialAutopostFacebook, socialAutopostX, onToggleSocialAutopost, rainActive, onToggleRain,
+    socialPosts, onRetrySocialPost, onClose,
   } = props;
   const [tab, setTab] = React.useState<Tab>('shelters');
   const [editing, setEditing] = React.useState<{ id: number | null; form: FormValues } | null>(null);
@@ -524,6 +529,22 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostX ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
           >
             <span style={{ position: 'absolute', top: 3, left: socialAutopostX ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+          </button>
+        </div>
+
+        {/* Rain toggle — flips the predictive water-level model on every report from receding to
+            rising. Default off; see AppSettings.rainActive. */}
+        <div style={{ padding: '13px 20px', borderBottom: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Rain is falling now</div>
+            <div style={{ fontSize: 11.5, color: 'var(--bw-muted)' }}>Water levels are projected to keep rising instead of receding. Predictive — not measured.</div>
+          </div>
+          <button
+            onClick={() => onToggleRain(!rainActive)}
+            aria-pressed={rainActive}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: rainActive ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+          >
+            <span style={{ position: 'absolute', top: 3, left: rainActive ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 
