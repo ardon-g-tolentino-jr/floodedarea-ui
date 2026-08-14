@@ -2,7 +2,9 @@
 // Run with `npm run mock` (port 3001) and point the UI at it:
 //   VITE_API_URL=http://localhost:3001 npm run dev   (or just `npm run dev:mock`)
 //
-// Reads/writes for /reports, /centers, /hotlines, /alerts, /rescue come from db.json.
+// Reads/writes for /reports, /centers, /hotlines, /alerts, /rescue come from db.json, or from
+// $MOCK_DB when set — the Play-Store screenshot capture points that at its own curated seed
+// (see playstore-assets/README.md) so it never mutates the dev seed.
 // Auth + confirm + SSE are stubbed so the full UI flow works without a backend.
 // /road-status is a static stub too: it synthesizes a short road segment through each non-passable
 // report rather than doing real map-matching (which baha-api performs in production).
@@ -11,7 +13,7 @@ const jsonServer = require('json-server');
 const path = require('path');
 
 const server = jsonServer.create();
-const router = jsonServer.router(path.join(__dirname, 'db.json'));
+const router = jsonServer.router(process.env.MOCK_DB || path.join(__dirname, 'db.json'));
 const middlewares = jsonServer.defaults({ logger: false });
 
 server.use(middlewares);
