@@ -30,7 +30,7 @@ Owner:   CN=Ardon Tolentino, OU=NA, O=NA, L=NA, ST=NA, C=PH
 SHA-256: FD:5F:…:C4:41:1E    ← matches live assetlinks.json
 ```
 
-### 2. ~~Publish a privacy policy~~ — ✅ done 2026-08-09
+### 2. ~~Publish a privacy policy~~ — ✅ done 2026-08-09, resynced 2026-08-15
 
 Live at **`https://floodedarea.com/privacy.html`** — use exactly this URL in Play Console. Source
 is `public/privacy.html`: a self-contained static file with no fonts, scripts, or external
@@ -43,6 +43,14 @@ continuous tracking via `watchPosition`), account email/name/picture, report pay
 photo, SOS coordinates plus free-text note, a persistent guest device UUID, and nine third parties
 (OSM tiles, Nominatim, Overpass, Google Sign-In, Cloudflare Turnstile, Statcounter, Google Fonts,
 tlk.io, share targets).
+
+**Resynced 2026-08-15 (v1.64.1)** against everything shipped since v1.55.0. Three drifts were
+corrected: the effective date, the on-device preference list (flood-prone filter, guest nudge,
+admin auto-post target), and — the one that mattered — a new **section 5** covering the admin
+Facebook/X incident post and flood digest (branches 066/076). The old policy described Facebook
+and X as share-targets only, which was no longer true. Verified the digest carries place and
+severity but **no reporter display name, account details, or photo**, so no new personal-data
+sharing had to be declared. Sections renumbered 5→13 as a result.
 
 Two follow-ups:
 
