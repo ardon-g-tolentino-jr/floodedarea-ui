@@ -3,10 +3,13 @@
 // project's "no global store" convention) so any component can call useTheme() without threading
 // props through App.tsx (which already passes ~20 callbacks into TopBar alone).
 //
-// Three modes: 'system' (default — follows the OS/browser's prefers-color-scheme), 'light', 'dark'.
+// Three modes: 'light' (the default for a first-time visitor), 'dark', and 'system' — an explicit
+// opt-in to follow the OS/browser's prefers-color-scheme. Note the default is Light, NOT system:
+// a visitor who has never chosen gets the light palette even on a dark-set device, so the app looks
+// the same to everyone until they say otherwise.
 // `choice` is what the user picked; `resolved` is what we actually render (system resolves to
-// light/dark live). localStorage — not sessionStorage — is deliberate: it's not auth-bound and
-// survives across visits for guests too, exactly like baha_lang_v1.
+// light/dark live). Once a choice is made it persists in localStorage — not sessionStorage — which
+// is deliberate: it's not auth-bound and survives across visits for guests too, like baha_lang_v1.
 //
 // index.html has a small inline script that duplicates the storage-read + resolve logic below so
 // the theme can be stamped on <html> before the first paint (a module import can't run that early).
@@ -31,9 +34,12 @@ function systemPrefersDark(): boolean {
 function loadChoice(): ThemeChoice {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw === 'light' || raw === 'dark' ? raw : 'system';
+    // 'system' must be matched explicitly, not left to the fallback: it's a real stored choice, and
+    // folding it in with "nothing stored" would silently downgrade an explicit System pick to Light
+    // on the next reload. Anything else (absent, or a stale/garbage value) defaults to Light.
+    return raw === 'light' || raw === 'dark' || raw === 'system' ? raw : 'light';
   } catch {
-    return 'system';
+    return 'light';
   }
 }
 
