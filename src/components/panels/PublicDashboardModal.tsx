@@ -6,6 +6,7 @@ import { ROAD_META, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocode';
 import { useI18n, roadShort, trendLabel } from '../../i18n';
 import PlaceSuggestion from './PlaceSuggestion';
+import { formatDepth } from '../../utils/format';
 
 interface PublicDashboardModalProps {
   /** Raw reports — the table windows these to the last 12 h itself (not the short-TTL active set). */
@@ -144,7 +145,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
       <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8 }}>{t('dash.closuresNear')}</div>
       <div style={{ position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 13px', height: 42, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 11 }}>
-          <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
+          <span style={{ fontSize: 14, color: 'var(--bw-faint)', flex: 'none' }}>⌕</span>
           <input
             autoFocus={!isMobile}
             value={query}
@@ -158,14 +159,14 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
               type="button"
               aria-label="Clear search"
               onMouseDown={(e) => { e.preventDefault(); setQuery(''); setResults([]); setOpen(false); setPlace(null); }}
-              style={{ border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
+              style={{ border: 0, background: 'transparent', color: 'var(--bw-faint)', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
             >
               ×
             </button>
           )}
         </div>
         {open && (searching || results.length > 0) && (
-          <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 30, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 11, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
+          <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 30, background: 'var(--bw-surface)', border: '1px solid var(--bw-line)', borderRadius: 11, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
             {searching && results.length === 0 ? (
               <div style={{ padding: '12px 14px', fontSize: 12.5, color: 'var(--bw-muted)' }}>{t('dash.searching')}</div>
             ) : (
@@ -174,7 +175,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                   key={r.id}
                   type="button"
                   onMouseDown={(e) => { e.preventDefault(); choosePlace(r); }}
-                  style={{ display: 'flex', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
+                  style={{ display: 'flex', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: 'var(--bw-surface)', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
                 >
                   <PlaceSuggestion primary={r.primary} context={r.context} />
                 </button>
@@ -195,7 +196,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
               padding: '5px 11px',
               borderRadius: 999,
               border: `1px solid ${radiusKm === km ? 'var(--bw-primary)' : 'var(--bw-line)'}`,
-              background: radiusKm === km ? '#EFF8FF' : '#fff',
+              background: radiusKm === km ? 'var(--bw-tint-info)' : 'var(--bw-surface)',
               color: radiusKm === km ? 'var(--bw-primary)' : 'var(--bw-ink-soft)',
               fontSize: 12,
               fontWeight: 800,
@@ -229,13 +230,13 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                   <button
                     key={c.key}
                     onClick={() => flyTo({ lat: c.latitude, lng: c.longitude })}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '10px 12px', border: '1px solid var(--bw-line-soft)', borderLeft: `3px ${c.inferred ? 'dashed' : 'solid'} ${rm.color}`, borderRadius: 11, background: c.inferred ? 'var(--bw-bg-subtle)' : '#fff', cursor: 'pointer' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '10px 12px', border: '1px solid var(--bw-line-soft)', borderLeft: `3px ${c.inferred ? 'dashed' : 'solid'} ${rm.color}`, borderRadius: 11, background: c.inferred ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)', cursor: 'pointer' }}
                   >
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ display: 'block', fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
                       <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
-                        {c.distanceKm.toFixed(1)} km {t('dash.away')} · ~{c.depthCm} cm{c.inferred ? ` ${t('dash.est')}` : c.reportCount ? ` · ${c.reportCount} ${c.reportCount === 1 ? t('dash.report') : t('dash.reports')}` : ''}
-                        {c.inferred && <span style={{ color: '#B45309', fontWeight: 700 }}> · {t('dash.inferred')}</span>}
+                        {c.distanceKm.toFixed(1)} km {t('dash.away')} · ~{formatDepth(c.depthCm)}{c.inferred ? ` ${t('dash.est')}` : c.reportCount ? ` · ${c.reportCount} ${c.reportCount === 1 ? t('dash.report') : t('dash.reports')}` : ''}
+                        {c.inferred && <span style={{ color: 'var(--bw-on-tint-warn)', fontWeight: 700 }}> · {t('dash.inferred')}</span>}
                       </span>
                     </span>
                     <ConditionPill status={c.status} />
@@ -296,7 +297,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                         </td>
                         <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
-                            <span style={{ fontWeight: 800, color: sev.color }}>{r.depthCm} cm</span>
+                            <span style={{ fontWeight: 800, color: sev.color }}>{formatDepth(r.depthCm)} cm</span>
                             <span title={trendLabel(lang, r.trend)} style={{ color: tm.color, fontSize: 11 }}>{tm.sym}</span>
                           </span>
                         </td>
@@ -319,7 +320,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-                  style={{ border: '1px solid var(--bw-line)', borderRadius: 8, padding: '4px 6px', fontSize: 12, fontWeight: 700, color: 'var(--bw-ink)', background: '#fff', cursor: 'pointer' }}
+                  style={{ border: '1px solid var(--bw-line)', borderRadius: 8, padding: '4px 6px', fontSize: 12, fontWeight: 700, color: 'var(--bw-ink)', background: 'var(--bw-surface)', cursor: 'pointer' }}
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
@@ -329,7 +330,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
               <button
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
-                style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: '#fff', fontSize: 12.5, fontWeight: 700, color: page === 0 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page === 0 ? 'default' : 'pointer' }}
+                style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', fontSize: 12.5, fontWeight: 700, color: page === 0 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page === 0 ? 'default' : 'pointer' }}
               >
                 {t('common.prev')}
               </button>
@@ -337,7 +338,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
               <button
                 onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                 disabled={page >= pageCount - 1}
-                style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: '#fff', fontSize: 12.5, fontWeight: 700, color: page >= pageCount - 1 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
+                style={{ padding: '6px 12px', borderRadius: 9, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', fontSize: 12.5, fontWeight: 700, color: page >= pageCount - 1 ? 'var(--bw-faint)' : 'var(--bw-ink)', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
               >
                 {t('common.next')}
               </button>
@@ -349,7 +350,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
   );
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: isMobile ? '18px 18px 0 0' : 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)', display: 'flex', flexDirection: 'column', maxHeight: isMobile ? '92vh' : '88vh' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: isMobile ? '18px 18px 0 0' : 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)', display: 'flex', flexDirection: 'column', maxHeight: isMobile ? '92vh' : '88vh' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '16px 18px 12px', borderBottom: '1px solid var(--bw-line-soft)', flex: 'none' }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>{t('dash.title')}</div>
@@ -358,7 +359,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
         <button
           onClick={onClose}
           aria-label="Close"
-          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
+          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
         >
           ×
         </button>

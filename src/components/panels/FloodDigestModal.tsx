@@ -56,12 +56,12 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
         onClick={(e) => e.stopPropagation()}
         style={
           isMobile
-            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-            : { width: 460, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+            : { width: 460, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
         }
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>📣</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Post flood digest</div>
@@ -69,7 +69,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
               {empty ? 'No active flood reports right now.' : `${digest.reportCount} active report${digest.reportCount === 1 ? '' : 's'} across ${digest.cityCount} ${digest.cityCount === 1 ? 'city' : 'cities'}`}
             </div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
 
         <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -87,7 +87,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
                   value={text}
                   onChange={(e) => { edited.current = true; setText(e.target.value); }}
                   rows={10}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--bw-line)', borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, color: 'var(--bw-ink)', background: '#fff', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--bw-line)', borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, color: 'var(--bw-ink)', background: 'var(--bw-surface)', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}
                 />
               </div>
 
@@ -95,7 +95,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
                 <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' }}>
                   X post — 280 chars incl. link
                 </label>
-                <div style={{ padding: '9px 10px', background: '#F7FAFB', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
+                <div style={{ padding: '9px 10px', background: 'var(--bw-surface-sunken)', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
                   {/* Shows the link-inline variant so the preview is literally what both X paths
                       produce — the one-click intent appends the same link via its `url` param. */}
                   <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>{digest.xCopyText}</div>
@@ -111,9 +111,9 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
             <button
               onClick={() => onFacebook(text)}
               disabled={empty}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: empty ? '#94A3B8' : '#1877F2', color: '#fff', padding: 13, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty ? 'not-allowed' : 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: empty ? 'var(--bw-faint)' : '#1877F2', color: 'var(--bw-on-accent)', padding: 13, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty ? 'not-allowed' : 'pointer' }}
             >
-              <svg viewBox="0 0 24 24" width={16} height={16} fill="#fff"><path d={FB_GLYPH_PATH} /></svg>
+              <svg viewBox="0 0 24 24" width={16} height={16} fill='#fff'><path d={FB_GLYPH_PATH} /></svg>
               Copy &amp; open Facebook
             </button>
             <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', textAlign: 'center', marginTop: -4 }}>
@@ -125,7 +125,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
             <button
               onClick={() => onX(digest.xBody)}
               disabled={empty || overBudget}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: empty || overBudget ? '#94A3B8' : '#000', color: '#fff', padding: 13, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty || overBudget ? 'not-allowed' : 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: empty || overBudget ? 'var(--bw-faint)' : '#000', color: 'var(--bw-on-accent)', padding: 13, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty || overBudget ? 'not-allowed' : 'pointer' }}
             >
               𝕏 Post to X
             </button>
@@ -133,7 +133,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
             <button
               onClick={() => onCopyX(digest.xCopyText)}
               disabled={empty || overBudget}
-              style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: 12, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty || overBudget ? 'not-allowed' : 'pointer', opacity: empty || overBudget ? 0.6 : 1 }}
+              style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: 12, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty || overBudget ? 'not-allowed' : 'pointer', opacity: empty || overBudget ? 0.6 : 1 }}
             >
               Copy X post
             </button>
@@ -144,7 +144,7 @@ const FloodDigestModal: React.FC<FloodDigestModalProps> = ({ digest, isMobile, o
             <button
               onClick={() => onCopy(text)}
               disabled={empty}
-              style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: 12, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty ? 'not-allowed' : 'pointer', opacity: empty ? 0.6 : 1 }}
+              style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: 12, borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: empty ? 'not-allowed' : 'pointer', opacity: empty ? 0.6 : 1 }}
             >
               Copy text
             </button>

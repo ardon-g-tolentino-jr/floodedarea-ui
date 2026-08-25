@@ -9,9 +9,38 @@
       content="Live crowd-sourced flood map for the Philippines: real-time reports, evacuation centers, road conditions, rainfall alerts and SOS rescue."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- PWA / installable-app chrome (drives the TWA shell — see PLAYSTORE_PACKAGE.md). -->
+    <!-- PWA / installable-app chrome (drives the TWA shell — see PLAYSTORE_PACKAGE.md). Deliberately
+         ONE tag rather than a media-scoped light/dark pair: the browser uses the first theme-color
+         tag whose media matches, so a runtime override can never win against an earlier matching
+         one — and "the user explicitly picked Dark" isn't expressible as a media query anyway. The
+         bootstrap below sets this to the resolved value before first paint; applyTheme() in
+         theme.ts keeps it in sync from then on. -->
     <meta name="theme-color" content="#0ea5e9" />
+    <!-- Lets native scrollbars, form controls and the overscroll gutter follow the theme for free. -->
+    <meta name="color-scheme" content="light dark" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+
+    <!-- Pre-paint theme bootstrap. src/theme.ts can't run before the module graph loads, and
+         <body> below is just #root with no splash screen — without this, a dark-mode visitor sees
+         a full white flash before React mounts. This intentionally DUPLICATES theme.ts's
+         load-choice + resolve logic (a module import can't run this early); keep the storage key
+         ('baha_theme_v1') and the resolve rule ("system" → matchMedia, else the stored choice) in
+         sync with theme.ts if either changes. -->
+    <script>
+      (function () {
+        try {
+          var choice = localStorage.getItem('baha_theme_v1');
+          var dark = choice === 'dark' || (choice !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) {
+            document.documentElement.dataset.theme = 'dark';
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', '#0b1017');
+          }
+        } catch (e) {
+          /* storage/matchMedia blocked — falls through to light (the default :root palette) */
+        }
+      })();
+    </script>
 
     <!-- Social-share preview (Open Graph + Twitter card). The image is a real snapshot of the
          app's own map — the whole archipelago with live reports on it — under a FLOOD ALERT
@@ -46,8 +75,8 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/assets/index-CDLn09h-.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BS_8hN02.css">
+    <script type="module" crossorigin src="/assets/index-yc3TxTdd.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DnC_LG2F.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
   <body>
     <div id="root"></div>

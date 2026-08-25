@@ -43,11 +43,11 @@ const DepthReference: React.FC<Props> = ({ depthCm, color, compact }) => {
         </defs>
         {/* Dry body (gray) then the water fill rising from the feet, both clipped to the silhouette. */}
         <g clipPath={`url(#${clipId})`}>
-          <rect x="0" y="0" width="24" height="60" fill="#E2E8F0" />
+          <rect x="0" y="0" width="24" height="60" fill="var(--bw-line)" />
           <rect x="0" y={waterY} width="24" height={60 - waterY} fill={color} opacity={0.85} />
         </g>
         {/* Thin outline so the figure reads clearly at small size. */}
-        <g fill="none" stroke="#94A3B8" strokeWidth={0.9}>
+        <g fill="none" stroke="var(--bw-faint)" strokeWidth={0.9}>
           {head}
           {body}
         </g>

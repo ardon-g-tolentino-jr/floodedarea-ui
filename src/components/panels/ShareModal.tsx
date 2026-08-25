@@ -83,18 +83,18 @@ const ShareModal: React.FC<ShareModalProps> = ({
         onClick={(e) => e.stopPropagation()}
         style={
           isMobile
-            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-            : { width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+            : { width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
         }
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>📣</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>{t('share.title')}</div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>{t('share.subtitle')}</div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
 
         <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
@@ -103,12 +103,12 @@ const ShareModal: React.FC<ShareModalProps> = ({
             {t('share.intro')}
           </p>
 
-          <div style={{ marginTop: 14, padding: '13px 14px', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 12 }}>
+          <div style={{ marginTop: 14, padding: '13px 14px', background: 'var(--bw-tint-ok)', border: '1px solid var(--bw-tint-ok-border)', borderRadius: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <span style={{ fontSize: 15 }}>🌊</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>{t('share.clearerMap')}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--bw-on-tint-ok)' }}>{t('share.clearerMap')}</span>
             </div>
-            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: '#047857' }}>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: 'var(--bw-on-tint-ok)' }}>
               {activeCount > 0
                 ? tFormat(lang, activeCount === 1 ? 'share.liveReportsOne' : 'share.liveReportsMany', { n: activeCount })
                 : ''}
@@ -120,7 +120,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
           {canNativeShare && (
             <button
               onClick={onNativeShare}
-              style={{ width: '100%', marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
+              style={{ width: '100%', marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
             >
               <Glyph d={SHARE_GLYPH} size={19} /> {t('share.viaApps')}
             </button>
@@ -153,7 +153,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             href={fbPageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid #C9DCFB', background: '#F0F5FF', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
+            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
           >
             <Glyph d={NET_GLYPH.facebook} size={18} color="#1877F2" />
             {t('share.followFb')}
@@ -163,14 +163,14 @@ const ShareModal: React.FC<ShareModalProps> = ({
           <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
             <button
               onClick={() => onCopy(url, t('share.linkCopied'))}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="var(--bw-muted)" aria-hidden="true"><path d={LINK_GLYPH} /></svg>
               {t('share.copyLink')}
             </button>
             <button
               onClick={() => onCopy(text, t('share.messageCopied'))}
-              style={{ flex: 1, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+              style={{ flex: 1, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '12px 10px', borderRadius: 12, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
             >
               {t('share.copyMessage')}
             </button>

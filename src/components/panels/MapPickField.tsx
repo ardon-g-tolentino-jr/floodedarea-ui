@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
 function pinIcon(): L.DivIcon {
-  const html = `<div style="width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:#4338CA;border:3px solid #fff;box-shadow:0 4px 12px rgba(15,23,42,.4)"></div>`;
+  const html = `<div style="width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:var(--bw-accent-indigo);border:3px solid #fff;box-shadow:0 4px 12px rgba(15,23,42,.4)"></div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [22, 22], iconAnchor: [11, 22] });
 }
 
@@ -74,7 +74,7 @@ const MapPickField: React.FC<MapPickFieldProps> = ({ lat, lng, onPick, pinned = 
         )}
       </MapContainer>
       {!pinned && (
-        <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none', zIndex: 900, background: 'rgba(15,23,42,.72)', color: '#fff', padding: '7px 12px', borderRadius: 9, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(15,23,42,.3)' }}>
+        <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none', zIndex: 900, background: 'rgba(15,23,42,.72)', color: 'var(--bw-on-accent)', padding: '7px 12px', borderRadius: 9, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(15,23,42,.3)' }}>
           Tap the map to drop the pin
         </div>
       )}

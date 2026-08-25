@@ -10,7 +10,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface)',
   boxSizing: 'border-box',
 };
 
@@ -112,24 +112,24 @@ const PlaceField: React.FC<{
           onClick={useCurrentLocation}
           disabled={locating}
           title="Use my current location"
-          style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '0 12px', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: locating ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}
+          style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '0 12px', border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: 'var(--bw-primary)', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: locating ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}
         >
           ◎ {locating ? 'Locating…' : (currentLabel ?? 'Current')}
         </button>
       </div>
       {geoError && (
-        <div style={{ fontSize: 11, color: '#B91C1C', marginTop: 5 }}>{geoError}</div>
+        <div style={{ fontSize: 11, color: 'var(--bw-on-tint-danger)', marginTop: 5 }}>{geoError}</div>
       )}
       {(placeLabel || hasCoords) && (
         <div style={{ fontSize: 11, color: 'var(--bw-muted)', marginTop: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: '#9AA8B4' }}>⚲</span>
+          <span style={{ color: 'var(--bw-faint)' }}>⚲</span>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {placeLabel || `Pinned at ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`}
           </span>
         </div>
       )}
       {showList && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 1400, background: '#fff', border: '1px solid var(--bw-line)', borderRadius: 11, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', maxHeight: 240, overflowY: 'auto' }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 1400, background: 'var(--bw-surface)', border: '1px solid var(--bw-line)', borderRadius: 11, boxShadow: '0 12px 34px rgba(15,23,42,.18)', overflow: 'hidden', maxHeight: 240, overflowY: 'auto' }}>
           {loading && results.length === 0 ? (
             <div style={{ padding: '11px 13px', fontSize: 12.5, color: 'var(--bw-muted)' }}>Searching…</div>
           ) : (
@@ -138,7 +138,7 @@ const PlaceField: React.FC<{
                 key={r.id}
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); choose(r); }}
-                style={{ display: 'flex', alignItems: 'center', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: '#fff', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
+                style={{ display: 'flex', alignItems: 'center', width: '100%', textAlign: 'left', padding: '10px 13px', border: 0, borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)', background: 'var(--bw-surface)', cursor: 'pointer', fontSize: 13, color: 'var(--bw-ink)', lineHeight: 1.35 }}
               >
                 <PlaceSuggestion primary={r.primary} context={r.context} />
               </button>

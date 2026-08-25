@@ -2,7 +2,7 @@ import React from 'react';
 import type { NewReport, ReportStatus, Road } from '../../types';
 import { affectedRiseRatio, REPORT_TTL_MIN, type EnrichedReport } from '../../utils/viewModel';
 import { ADVICE, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
-import { formatDuration, timeAgo } from '../../utils/format';
+import { formatDepth, formatDuration, timeAgo } from '../../utils/format';
 import { useI18n } from '../../i18n';
 import DepthReference from './DepthReference';
 
@@ -93,7 +93,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
   };
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 14px 40px rgba(15,23,42,.3)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 16, boxShadow: '0 14px 40px rgba(15,23,42,.3)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       <div style={{ padding: '14px 15px 12px', borderBottom: '1px solid var(--bw-line-soft)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
           <span style={{ width: 14, height: 14, borderRadius: '50%', marginTop: 3, flex: 'none', background: sev.color }} />
@@ -101,22 +101,22 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.15 }}>{report.name}</div>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{report.district} · {edgeLabel}</div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 26, height: 26, borderRadius: 7, fontSize: 15, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 26, height: 26, borderRadius: 7, fontSize: 15, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 7, marginTop: 10 }}>
           <span style={{ background: sev.soft, color: sev.color, fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}>
-            {sev.label} flooding · {report.depthCm} cm · <DepthReference depthCm={report.depthCm} color={sev.color} compact />
+            {sev.label} flooding · {formatDepth(report.depthCm)} · <DepthReference depthCm={report.depthCm} color={sev.color} compact />
           </span>
           <span
             title="Reports stay live for a freshness window (longer for more severe floods, or a custom window for system reports), then drop off the map."
-            style={{ background: report.expired ? '#F1F5F9' : '#FFF7ED', color: report.expired ? '#94A3B8' : '#C2620B', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
+            style={{ background: report.expired ? 'var(--bw-bg-subtle)' : 'var(--bw-tint-warn)', color: report.expired ? 'var(--bw-faint)' : 'var(--bw-on-tint-warn)', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
           >
             ⏳ {report.expired ? 'Expired' : `Expires in ${formatDuration(report.expiresInMin)}`}
           </span>
           {report.guest && (
             <span
               title="Posted by a guest (no account). Treat as unverified until others confirm it."
-              style={{ background: '#FFF7ED', color: '#B45309', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
+              style={{ background: 'var(--bw-tint-warn)', color: 'var(--bw-on-tint-warn)', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
             >
               ⚠ Unverified
             </span>
@@ -124,7 +124,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
           {report.system && (
             <span
               title="Logged by a FloodedArea admin from news or other sources."
-              style={{ background: '#EEF2FF', color: '#4338CA', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
+              style={{ background: 'var(--bw-tint-info)', color: 'var(--bw-accent-indigo)', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8 }}
             >
               🛈 System report
             </span>
@@ -148,18 +148,18 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 
       <div style={{ padding: '13px 15px' }}>
         {rainActive && (
-          <div style={{ marginBottom: 11, padding: '8px 11px', background: '#EFF6FF', color: '#1D4ED8', borderRadius: 10, fontSize: 11.5, fontWeight: 700, lineHeight: 1.4 }}>
+          <div style={{ marginBottom: 11, padding: '8px 11px', background: 'var(--bw-tint-info)', color: 'var(--bw-on-tint-info)', borderRadius: 10, fontSize: 11.5, fontWeight: 700, lineHeight: 1.4 }}>
             🌧 Rain is falling — projected levels here are climbing, not receding.
           </div>
         )}
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', marginBottom: 7 }}>WATER DEPTH</div>
-        <div style={{ position: 'relative', height: 10, background: '#EEF2F5', borderRadius: 6, overflow: 'hidden', marginBottom: 4 }}>
+        <div style={{ position: 'relative', height: 10, background: 'var(--bw-bg-subtle)', borderRadius: 6, overflow: 'hidden', marginBottom: 4 }}>
           <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 6, width: `${depthPct}%`, background: sev.color }} />
         </div>
         <div style={{ position: 'relative', height: 26, marginBottom: 10 }}>
           {DEPTH_TICKS.map((t) => (
             <div key={t.l} style={{ position: 'absolute', transform: 'translateX(-50%)', textAlign: 'center', left: `${Math.min(t.cm / 150, 1) * 100}%` }}>
-              <div style={{ width: 1, height: 5, background: '#C3CDD6', margin: '0 auto' }} />
+              <div style={{ width: 1, height: 5, background: 'var(--bw-line-strong)', margin: '0 auto' }} />
               <div style={{ fontSize: 9, color: 'var(--bw-faint)', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.l}</div>
             </div>
           ))}
@@ -175,12 +175,12 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)', margin: '2px 0 4px' }}>WATER LEVEL · OBSERVED → PROJECTED</div>
         <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-ink-soft)', marginBottom: 6 }}>
-          Reported {report.depthCm} cm ({report.ageMin < 1 ? 'just now' : `${formatDuration(report.ageMin)} ago`})
+          Reported {formatDepth(report.depthCm)} ({report.ageMin < 1 ? 'just now' : `${formatDuration(report.ageMin)} ago`})
           {report.predictive && (
             <> · <span style={{ color: sev.color }}>Projected now {report.projectedDepthCm} cm · predictive</span></>
           )}
         </div>
-        <div style={{ background: '#F7FAFB', borderRadius: 11, padding: '10px 10px 6px', marginBottom: 10 }}>
+        <div style={{ background: 'var(--bw-surface-sunken)', borderRadius: 11, padding: '10px 10px 6px', marginBottom: 10 }}>
           <svg viewBox="0 0 100 36" preserveAspectRatio="none" style={{ width: '100%', height: 46, display: 'block' }}>
             <path d={spark.area} fill={sev.soft} />
             {spark.dashedLine && (
@@ -189,7 +189,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
                 x2={(nowIndex / (series.length - 1)) * 100}
                 y1={0}
                 y2={36}
-                stroke="#CBD5E1"
+                stroke="var(--bw-line-strong)"
                 strokeWidth={1}
                 strokeDasharray="2 2"
                 vectorEffect="non-scaling-stroke"
@@ -200,7 +200,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               <path d={spark.dashedLine} fill="none" stroke={sev.color} strokeWidth={2} strokeDasharray="4 3" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
             )}
           </svg>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#A4B0BB', fontWeight: 700, marginTop: 3 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: 'var(--bw-faint)', fontWeight: 700, marginTop: 3 }}>
             {[0, 2, 4, 6].map((i) => {
               const offset = i - nowIndex;
               return <span key={i}>{offset === 0 ? 'now' : offset < 0 ? `${offset}h` : `+${offset}h`}</span>;
@@ -220,7 +220,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 
         <button
           onClick={onShareReport}
-          style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+          style={{ marginTop: 11, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
         >
           <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
             <path d={SHARE_GLYPH} />
@@ -232,7 +232,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
           <button
             onClick={onConfirm}
             disabled={confirming}
-            style={{ marginTop: 11, width: '100%', border: '1.5px solid var(--bw-primary)', background: '#fff', color: 'var(--bw-primary-deep)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: confirming ? 'wait' : 'pointer', opacity: confirming ? 0.7 : 1 }}
+            style={{ marginTop: 11, width: '100%', border: '1.5px solid var(--bw-primary)', background: 'var(--bw-surface)', color: 'var(--bw-primary-deep)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: confirming ? 'wait' : 'pointer', opacity: confirming ? 0.7 : 1 }}
           >
             {confirming ? t('report.confirming') : t('report.confirmCta')}
           </button>
@@ -240,20 +240,20 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 
         {canRemove && (
           confirmRemove ? (
-            <div style={{ marginTop: 11, padding: '11px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 11 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#B91C1C', lineHeight: 1.4 }}>Remove this report? It will disappear from the map for everyone.</div>
+            <div style={{ marginTop: 11, padding: '11px 12px', background: 'var(--bw-tint-danger)', border: '1px solid var(--bw-tint-danger-border)', borderRadius: 11 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--bw-on-tint-danger)', lineHeight: 1.4 }}>Remove this report? It will disappear from the map for everyone.</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
                 <button
                   onClick={onRemove}
                   disabled={removing}
-                  style={{ flex: 1, border: 0, background: 'var(--bw-danger)', color: '#fff', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: removing ? 'wait' : 'pointer', opacity: removing ? 0.7 : 1 }}
+                  style={{ flex: 1, border: 0, background: 'var(--bw-danger)', color: 'var(--bw-on-accent)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: removing ? 'wait' : 'pointer', opacity: removing ? 0.7 : 1 }}
                 >
                   {removing ? 'Removing…' : 'Remove'}
                 </button>
                 <button
                   onClick={() => setConfirmRemove(false)}
                   disabled={removing}
-                  style={{ flex: 1, border: '1.5px solid var(--bw-line)', background: '#fff', color: '#475563', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                  style={{ flex: 1, border: '1.5px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
                 >
                   Cancel
                 </button>
@@ -262,7 +262,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
           ) : (
             <button
               onClick={() => setConfirmRemove(true)}
-              style={{ marginTop: 11, width: '100%', border: '1.5px solid #FCA5A5', background: '#fff', color: '#B91C1C', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+              style={{ marginTop: 11, width: '100%', border: '1.5px solid var(--bw-tint-danger-border)', background: 'var(--bw-surface)', color: 'var(--bw-on-tint-danger)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
             >
               Remove my report
             </button>
@@ -270,7 +270,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         )}
 
         {isAdmin && (
-          <div style={{ marginTop: 14, padding: '11px 12px', background: '#F8FAFC', border: '1px dashed var(--bw-line)', borderRadius: 11 }}>
+          <div style={{ marginTop: 14, padding: '11px 12px', background: 'var(--bw-surface-sunken)', border: '1px dashed var(--bw-line)', borderRadius: 11 }}>
             <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.08em', color: 'var(--bw-faint)', marginBottom: 9 }}>ADMIN OVERRIDE</div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
@@ -278,14 +278,14 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button
                   onClick={() => setAdminDepth((d) => Math.max(0, d - 5))}
-                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: '#fff', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
+                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
                 >
                   −
                 </button>
-                <span style={{ fontSize: 13, fontWeight: 800, minWidth: 48, textAlign: 'center' }}>{adminDepth} cm</span>
+                <span style={{ fontSize: 13, fontWeight: 800, minWidth: 48, textAlign: 'center' }}>{formatDepth(adminDepth)}</span>
                 <button
                   onClick={() => setAdminDepth((d) => Math.min(PROJECT_MAX_CM, d + 5))}
-                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: '#fff', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
+                  style={{ width: 26, height: 26, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', borderRadius: 7, fontSize: 15, fontWeight: 800, color: 'var(--bw-ink)', cursor: 'pointer' }}
                 >
                   +
                 </button>
@@ -303,7 +303,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
                     style={{
                       flex: 1,
                       border: `1.5px solid ${selected ? meta.color : 'var(--bw-line)'}`,
-                      background: selected ? meta.soft : '#fff',
+                      background: selected ? meta.soft : 'var(--bw-surface)',
                       color: selected ? meta.color : 'var(--bw-muted)',
                       borderRadius: 8,
                       padding: '6px 4px',
@@ -322,7 +322,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               <button
                 onClick={() => void handleExtend()}
                 disabled={extending}
-                style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '7px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: extending ? 'wait' : 'pointer', opacity: extending ? 0.7 : 1 }}
+                style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '7px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: extending ? 'wait' : 'pointer', opacity: extending ? 0.7 : 1 }}
               >
                 + Extend 1 hour
               </button>
@@ -334,7 +334,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
             <button
               onClick={() => void handleSaveOverride()}
               disabled={savingOverride}
-              style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
+              style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
             >
               {savingOverride ? 'Saving…' : 'Save depth & road override'}
             </button>
@@ -359,7 +359,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
 };
 
 const Cell: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div style={{ background: '#F7FAFB', borderRadius: 11, padding: '9px 11px' }}>
+  <div style={{ background: 'var(--bw-surface-sunken)', borderRadius: 11, padding: '9px 11px' }}>
     <div style={{ fontSize: 10, color: 'var(--bw-faint)', fontWeight: 700, marginBottom: 3 }}>{label}</div>
     {children}
   </div>

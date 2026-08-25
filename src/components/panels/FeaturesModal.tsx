@@ -67,18 +67,18 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, onShowFeedback,
       onClick={(e) => e.stopPropagation()}
       style={
         isMobile
-          ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-          : { width: 460, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+          ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+          : { width: 460, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
       }
     >
       {/* Header */}
-      <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>✨</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>What’s inside FloodedArea</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>Everything you can do here · {BUILD_LABEL}</div>
         </div>
-        <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+        <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
       <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
@@ -112,7 +112,7 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, onShowFeedback,
         </div>
         <button
           onClick={onShowFeedback}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: 11, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}
         >
           💬 Community feedback — suggest &amp; vote
         </button>
@@ -124,7 +124,7 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({ isMobile, onShowFeedback,
 
         <button
           onClick={onClose}
-          style={{ width: '100%', marginTop: 18, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
+          style={{ width: '100%', marginTop: 18, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
         >
           Got it
         </button>

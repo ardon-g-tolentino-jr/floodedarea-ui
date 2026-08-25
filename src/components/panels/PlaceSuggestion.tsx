@@ -9,7 +9,7 @@ import React from 'react';
  */
 const PlaceSuggestion: React.FC<{ primary: string; context: string }> = ({ primary, context }) => (
   <span style={{ display: 'flex', alignItems: 'flex-start', gap: 9, minWidth: 0 }}>
-    <span style={{ fontSize: 13, color: '#9AA8B4', flex: 'none', marginTop: 1 }}>⚲</span>
+    <span style={{ fontSize: 13, color: 'var(--bw-faint)', flex: 'none', marginTop: 1 }}>⚲</span>
     <span style={{ minWidth: 0, overflow: 'hidden', flex: 1 }}>
       <span style={{ display: 'block', fontWeight: 700, color: 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {primary}

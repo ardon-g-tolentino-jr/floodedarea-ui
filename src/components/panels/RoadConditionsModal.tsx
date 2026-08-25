@@ -1,6 +1,7 @@
 import React from 'react';
 import { ROAD_META, ROAD_RANK } from '../../utils/floodMeta';
 import type { DistrictRoads, PossibleClosure, RoadEntry } from '../../utils/viewModel';
+import { formatDepth } from '../../utils/format';
 
 interface RoadConditionsModalProps {
   directory: DistrictRoads[];
@@ -45,11 +46,11 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
   const hasMatch = filtered.length > 0 || filteredClosures.length > 0;
 
   const list = !hasAny ? (
-    <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
+    <div style={{ textAlign: 'center', padding: '40px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
       No road conditions reported yet.
     </div>
   ) : !hasMatch ? (
-    <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
+    <div style={{ textAlign: 'center', padding: '40px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
       No roads match “{query.trim()}”.
     </div>
   ) : (
@@ -76,7 +77,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
                     border: '1px solid var(--bw-line-soft)',
                     borderLeft: `3px solid ${rm.color}`,
                     borderRadius: 11,
-                    background: '#fff',
+                    background: 'var(--bw-surface)',
                     cursor: 'pointer',
                   }}
                 >
@@ -85,9 +86,9 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
                       {r.name}
                     </span>
                     <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
-                      {r.depthCm} cm · {r.reportCount === 1 ? '1 report' : `${r.reportCount} reports`} · {r.time}
+                      {formatDepth(r.depthCm)} · {r.reportCount === 1 ? '1 report' : `${r.reportCount} reports`} · {r.time}
                       {!r.confirmed && (
-                        <span style={{ color: '#B45309', fontWeight: 700 }}> · unconfirmed</span>
+                        <span style={{ color: 'var(--bw-on-tint-warn)', fontWeight: 700 }}> · unconfirmed</span>
                       )}
                     </span>
                   </span>
@@ -179,7 +180,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
   );
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)', display: 'flex', flexDirection: 'column', maxHeight: isMobile ? '90vh' : '80vh' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)', display: 'flex', flexDirection: 'column', maxHeight: isMobile ? '90vh' : '80vh' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '16px 18px 12px', borderBottom: '1px solid var(--bw-line-soft)', flex: 'none' }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>Road conditions</div>
@@ -188,7 +189,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
         <button
           onClick={onClose}
           aria-label="Close"
-          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
+          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
         >
           ×
         </button>
@@ -197,7 +198,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
       {/* Search */}
       <div style={{ padding: '12px 18px', flex: 'none' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 13px', height: 40, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 11 }}>
-          <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
+          <span style={{ fontSize: 14, color: 'var(--bw-faint)', flex: 'none' }}>⌕</span>
           <input
             autoFocus={!isMobile}
             value={query}
@@ -210,7 +211,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
               type="button"
               aria-label="Clear search"
               onClick={() => setQuery('')}
-              style={{ border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
+              style={{ border: 0, background: 'transparent', color: 'var(--bw-faint)', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
             >
               ×
             </button>

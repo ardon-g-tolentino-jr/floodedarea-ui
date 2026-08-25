@@ -14,9 +14,9 @@ interface Option {
 }
 
 const OPTIONS: Option[] = [
-  { sev: 'high', label: 'High', hint: 'Chest-deep or more · impassable', dot: '#EF4444', border: '#FBD2D2', bg: '#FEF4F4' },
-  { sev: 'medium', label: 'Medium', hint: 'Knee to waist · risky to cross', dot: '#F59E0B', border: '#F8E2BB', bg: '#FFFAF0' },
-  { sev: 'low', label: 'Low', hint: 'Ankle-deep · passable with care', dot: '#16A34A', border: '#BFE8CC', bg: '#F2FCF5' },
+  { sev: 'high', label: 'High', hint: 'Chest-deep or more · impassable', dot: 'var(--bw-danger)', border: 'var(--bw-tint-danger-border)', bg: 'var(--bw-tint-danger)' },
+  { sev: 'medium', label: 'Medium', hint: 'Knee to waist · risky to cross', dot: 'var(--bw-warn)', border: 'var(--bw-tint-warn-border)', bg: 'var(--bw-tint-warn)' },
+  { sev: 'low', label: 'Low', hint: 'Ankle-deep · passable with care', dot: 'var(--bw-ok)', border: 'var(--bw-tint-ok-border)', bg: 'var(--bw-tint-ok)' },
 ];
 
 const VOICE_SPOKEN_KEY: Record<Severity, 'quick.voiceSpokenHigh' | 'quick.voiceSpokenMedium' | 'quick.voiceSpokenLow'> = {
@@ -122,10 +122,10 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
   const accSuffix = accuracyM != null ? ` · ±${Math.round(accuracyM)} m` : '';
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
-      <div style={{ display: 'flex', gap: 9, padding: '11px 15px', background: '#FFF7ED', borderBottom: '1px solid #FED7AA' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+      <div style={{ display: 'flex', gap: 9, padding: '11px 15px', background: 'var(--bw-tint-warn)', borderBottom: '1px solid var(--bw-tint-warn-border)' }}>
         <span style={{ fontSize: 14, flex: 'none', lineHeight: 1.3 }}>⚠️</span>
-        <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.45, color: '#7C2D12', fontWeight: 600 }}>{t('quick.safety')}</p>
+        <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.45, color: 'var(--bw-on-tint-warn)', fontWeight: 600 }}>{t('quick.safety')}</p>
       </div>
 
       <div style={{ padding: '11px 15px 4px', fontSize: 12, fontWeight: 700, color: 'var(--bw-ink-soft)', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -163,9 +163,9 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
                 transition: 'background .15s, border-color .15s',
               }}
             >
-              <span style={{ width: 16, height: 16, borderRadius: '50%', background: posted ? '#fff' : o.dot, flex: 'none' }} />
+              <span style={{ width: 16, height: 16, borderRadius: '50%', background: posted ? 'var(--bw-surface)' : o.dot, flex: 'none' }} />
               <span>
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: posted ? '#fff' : 'var(--bw-ink)', display: 'block' }}>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: posted ? 'var(--bw-on-accent)' : 'var(--bw-ink)', display: 'block' }}>
                   {posted ? '✓ ' + t('quick.reported') : o.label}
                 </span>
                 {!posted && <span style={{ fontSize: 11, color: 'var(--bw-muted)' }}>{o.hint}</span>}
@@ -211,8 +211,8 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
           padding: '0 20px 0 16px',
           border: 0,
           borderRadius: 27,
-          background: listening ? 'linear-gradient(150deg,#EF4444,#B91C1C)' : 'linear-gradient(150deg,#0EA5E9,#0369A1)',
-          color: '#fff',
+          background: listening ? 'linear-gradient(150deg,var(--bw-danger),var(--bw-on-tint-danger))' : 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))',
+          color: 'var(--bw-on-accent)',
           fontSize: 14,
           fontWeight: 800,
           cursor: busy ? 'wait' : 'pointer',
@@ -225,7 +225,7 @@ const QuickReportSheet: React.FC<QuickReportSheetProps> = ({ isMobile, busy, det
         {listening ? t('quick.voiceListening') : t('quick.voiceTap')}
       </button>
       {voiceMsg && (
-        <div style={{ maxWidth: 220, background: '#0F172A', color: '#fff', fontSize: 10.5, fontWeight: 600, padding: '6px 10px', borderRadius: 9, textAlign: 'right', boxShadow: '0 6px 18px rgba(15,23,42,.3)' }}>
+        <div style={{ maxWidth: 220, background: 'var(--bw-surface-inverse)', color: 'var(--bw-on-accent)', fontSize: 10.5, fontWeight: 600, padding: '6px 10px', borderRadius: 9, textAlign: 'right', boxShadow: '0 6px 18px rgba(15,23,42,.3)' }}>
           {voiceMsg}
         </div>
       )}

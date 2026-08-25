@@ -40,29 +40,29 @@ const NotifyModal: React.FC<NotifyModalProps> = ({ prefs, permission, onEnable, 
       onClick={onClose}
       style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}
     >
-      <div onClick={(e) => e.stopPropagation()} style={{ width: 400, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: 400, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}>
         {/* Header */}
         <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flex: 'none' }}>🔔</div>
+          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flex: 'none' }}>🔔</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16.5, fontWeight: 800 }}>{t('sidebar.floodAlerts')}</div>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('notify.subtitle')}</div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
         </div>
 
         <div style={{ padding: 22 }}>
           {/* Master toggle */}
-          <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', border: '1px solid var(--bw-line)', borderRadius: 12, cursor: 'pointer', background: prefs.enabled ? '#EFF8FF' : '#fff', borderColor: prefs.enabled ? '#BAE2FB' : 'var(--bw-line)' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', border: '1px solid var(--bw-line)', borderRadius: 12, cursor: 'pointer', background: prefs.enabled ? 'var(--bw-tint-info)' : 'var(--bw-surface)', borderColor: prefs.enabled ? 'var(--bw-tint-info-border)' : 'var(--bw-line)' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13.5, fontWeight: 800 }}>{t('notify.master')}</div>
               <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', marginTop: 2 }}>{t('notify.criteria')}</div>
             </div>
             <span
               onClick={(e) => { e.preventDefault(); onEnable(!prefs.enabled); }}
-              style={{ width: 44, height: 26, borderRadius: 999, background: prefs.enabled ? 'var(--bw-primary)' : '#CBD5E1', position: 'relative', flex: 'none', transition: 'background .15s' }}
+              style={{ width: 44, height: 26, borderRadius: 999, background: prefs.enabled ? 'var(--bw-primary)' : 'var(--bw-line-strong)', position: 'relative', flex: 'none', transition: 'background .15s' }}
             >
-              <span style={{ position: 'absolute', top: 3, left: prefs.enabled ? 21 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 3px rgba(15,23,42,.3)', transition: 'left .15s' }} />
+              <span style={{ position: 'absolute', top: 3, left: prefs.enabled ? 21 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', boxShadow: '0 1px 3px rgba(15,23,42,.3)', transition: 'left .15s' }} />
             </span>
           </label>
 
@@ -101,7 +101,7 @@ const NotifyModal: React.FC<NotifyModalProps> = ({ prefs, permission, onEnable, 
                     <button
                       key={s}
                       onClick={() => setSeverity(s)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 13px', borderRadius: 999, border: `1.5px solid ${active ? sm.color : '#E2E8F0'}`, background: active ? sm.soft : '#fff', color: active ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 13px', borderRadius: 999, border: `1.5px solid ${active ? sm.color : 'var(--bw-line)'}`, background: active ? sm.soft : 'var(--bw-surface)', color: active ? 'var(--bw-ink)' : 'var(--bw-faint)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
                     >
                       <span style={{ width: 9, height: 9, borderRadius: '50%', background: sm.color, opacity: active ? 1 : 0.4 }} />
                       {sevLabel(lang, s)}
@@ -124,12 +124,12 @@ const PermissionNote: React.FC<{ permission: NotificationPermission | 'unsupport
   const { t } = useI18n();
   const note: { bg: string; border: string; col: string; key: MsgKey } =
     permission === 'granted'
-      ? { bg: '#F0FDF4', border: '#BBF7D0', col: '#15803D', key: 'notify.permGranted' }
+      ? { bg: 'var(--bw-tint-ok)', border: 'var(--bw-tint-ok-border)', col: 'var(--bw-on-tint-ok)', key: 'notify.permGranted' }
       : permission === 'denied'
-        ? { bg: '#FEF2F2', border: '#FECACA', col: '#B91C1C', key: 'notify.permDenied' }
+        ? { bg: 'var(--bw-tint-danger)', border: 'var(--bw-tint-danger-border)', col: 'var(--bw-on-tint-danger)', key: 'notify.permDenied' }
         : permission === 'unsupported'
           ? { bg: 'var(--bw-bg-subtle)', border: 'var(--bw-line)', col: 'var(--bw-muted)', key: 'notify.permUnsupported' }
-          : { bg: '#EFF6FF', border: '#BFDBFE', col: '#1D4ED8', key: 'notify.permDefault' };
+          : { bg: 'var(--bw-tint-info)', border: 'var(--bw-tint-info-border)', col: 'var(--bw-on-tint-info)', key: 'notify.permDefault' };
   return (
     <div style={{ marginTop: 18, padding: '10px 13px', background: note.bg, border: `1px solid ${note.border}`, borderRadius: 9, fontSize: 12, color: note.col, lineHeight: 1.5 }}>
       {t(note.key)}

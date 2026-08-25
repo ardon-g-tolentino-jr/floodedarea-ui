@@ -44,16 +44,16 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
 
   const body =
     error && rescues.length === 0 ? (
-      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#B91C1C', fontSize: 13, lineHeight: 1.5 }}>
+      <div style={{ textAlign: 'center', padding: '40px 10px', color: 'var(--bw-on-tint-danger)', fontSize: 13, lineHeight: 1.5 }}>
         {headline}
-        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>{subtext}</div>
+        <div style={{ color: 'var(--bw-faint)', fontSize: 12, marginTop: 4 }}>{subtext}</div>
       </div>
     ) : loading && rescues.length === 0 ? (
-      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '40px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
         Loading rescue requests…
       </div>
     ) : count === 0 ? (
-      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#9AA8B4', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '40px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
         No rescue requests on {dateLabel(selectedDate, today)}.
       </div>
     ) : (
@@ -111,7 +111,7 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
     );
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '16px 18px 12px', borderBottom: '1px solid var(--bw-line-soft)' }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>Rescue requests</div>
@@ -122,7 +122,7 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
         <button
           onClick={onClose}
           aria-label="Close"
-          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
+          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
         >
           ×
         </button>
@@ -135,7 +135,7 @@ const RescueChartModal: React.FC<RescueChartModalProps> = ({ rescues, loading, e
           value={selectedDate}
           max={today}
           onChange={(e) => setSelectedDate(e.target.value || today)}
-          style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 10px', background: '#fff' }}
+          style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 10px', background: 'var(--bw-surface)' }}
         />
         {selectedDate !== today && (
           <button

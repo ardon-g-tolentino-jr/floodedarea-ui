@@ -18,8 +18,8 @@ const Toast: React.FC<{ toast: ToastData }> = ({ toast }) => (
       alignItems: 'center',
       gap: 14,
       padding: '12px 18px',
-      background: '#0F172A',
-      color: '#fff',
+      background: 'var(--bw-surface-inverse)',
+      color: 'var(--bw-on-accent)',
       borderRadius: 13,
       boxShadow: '0 12px 34px rgba(15,23,42,.4)',
       fontSize: 13.5,
@@ -35,7 +35,7 @@ const Toast: React.FC<{ toast: ToastData }> = ({ toast }) => (
     {toast.actionLabel && toast.onAction && (
       <button
         onClick={toast.onAction}
-        style={{ border: 0, background: 'rgba(255,255,255,.16)', color: '#fff', padding: '6px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 800, cursor: 'pointer', flex: 'none' }}
+        style={{ border: 0, background: 'rgba(255,255,255,.16)', color: 'var(--bw-on-accent)', padding: '6px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 800, cursor: 'pointer', flex: 'none' }}
       >
         {toast.actionLabel}
       </button>

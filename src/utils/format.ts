@@ -14,6 +14,27 @@ export function timeAgo(iso: string): string {
   return `${h} hr${h > 1 ? 's' : ''} ago`;
 }
 
+/** Centimetres → whole inches (1 in = 2.54 cm), rounded. */
+export function cmToIn(cm: number): number {
+  return Math.round(cm / 2.54);
+}
+
+/** Water depth in both units — "65 cm (26 in)".
+ *
+ *  The app stores, projects and compares depth in centimetres everywhere (baha-api returns cm,
+ *  and every threshold in floodMeta.ts is cm), so inches are strictly a presentation layer for
+ *  readers who think in imperial. Never feed the inch value back into any calculation — round-trip
+ *  through it and the cm thresholds stop lining up.
+ */
+export function formatDepth(cm: number): string {
+  return `${cm} cm (${cmToIn(cm)} in)`;
+}
+
+/** Tight variant for badges and list rows where the parenthesised form is too wide: `65 cm · 26"`. */
+export function formatDepthShort(cm: number): string {
+  return `${cm} cm · ${cmToIn(cm)}"`;
+}
+
 /** Compact elapsed duration from whole minutes: "just now" / "45m" / "2h 5m". */
 export function formatDuration(min: number): string {
   if (min < 1) return 'just now';

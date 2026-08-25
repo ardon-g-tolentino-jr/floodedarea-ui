@@ -29,7 +29,7 @@ const ReportOptions: React.FC<ReportOptionsProps> = ({ preferred, onChoose }) =>
         display: 'flex',
         flexDirection: 'column',
         width: 240,
-        background: '#fff',
+        background: 'var(--bw-surface-raised)',
         borderRadius: 15,
         boxShadow: '0 12px 36px rgba(15,23,42,.28)',
         border: '1px solid var(--bw-line)',
@@ -50,7 +50,7 @@ const ReportOptions: React.FC<ReportOptionsProps> = ({ preferred, onChoose }) =>
               padding: '12px 15px',
               border: 0,
               borderBottom: i === 0 ? '1px solid var(--bw-line)' : 'none',
-              background: primary ? 'rgba(14,165,233,.07)' : '#fff',
+              background: primary ? 'var(--bw-tint-info)' : 'var(--bw-surface-raised)',
               cursor: 'pointer',
               textAlign: 'left',
             }}

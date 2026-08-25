@@ -37,17 +37,17 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
       onClick={onClose}
       style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}
     >
-      <div onClick={(e) => e.stopPropagation()} style={{ width: 400, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: 400, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}>
         {/* Header */}
         <div style={{ padding: '22px 24px 0', display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-            <div style={{ width: 13, height: 13, background: '#fff', borderRadius: '50% 50% 50% 0', transform: 'rotate(45deg)' }} />
+          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
+            <div style={{ width: 13, height: 13, background: 'var(--bw-surface)', borderRadius: '50% 50% 50% 0', transform: 'rotate(45deg)' }} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 17, fontWeight: 800 }}>FloodedArea</div>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('login.subtitle')}</div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
         </div>
 
         <div style={{ padding: 24 }}>
@@ -62,7 +62,7 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
-                  style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, border: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: lang === l ? '#0F172A' : '#94A3B8', background: lang === l ? '#fff' : 'transparent', boxShadow: lang === l ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
+                  style={{ flex: 1, textAlign: 'center', padding: '8px 0', borderRadius: 9, border: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: lang === l ? 'var(--bw-ink)' : 'var(--bw-faint)', background: lang === l ? 'var(--bw-surface)' : 'transparent', boxShadow: lang === l ? '0 1px 3px rgba(15,23,42,.12)' : 'none' }}
                 >
                   {t(l === 'en' ? 'lang.en' : 'lang.fil')}
                 </button>
@@ -72,7 +72,7 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
           </div>
 
           {reason && (
-            <div style={{ marginBottom: 16, padding: '10px 13px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, fontSize: 12.5, color: '#1D4ED8', lineHeight: 1.5 }}>
+            <div style={{ marginBottom: 16, padding: '10px 13px', background: 'var(--bw-tint-info)', border: '1px solid var(--bw-tint-info-border)', borderRadius: 8, fontSize: 12.5, color: 'var(--bw-on-tint-info)', lineHeight: 1.5 }}>
               {reason}
             </div>
           )}
@@ -116,7 +116,7 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
 };
 
 const ErrorBox: React.FC<{ msg: string }> = ({ msg }) => (
-  <div style={{ padding: '10px 13px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, fontSize: 12.5, color: '#B91C1C', lineHeight: 1.5 }}>{msg}</div>
+  <div style={{ padding: '10px 13px', background: 'var(--bw-tint-danger)', border: '1px solid var(--bw-tint-danger-border)', borderRadius: 8, fontSize: 12.5, color: 'var(--bw-on-tint-danger)', lineHeight: 1.5 }}>{msg}</div>
 );
 
 export default LoginView;

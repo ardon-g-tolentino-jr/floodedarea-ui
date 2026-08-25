@@ -33,28 +33,28 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ width: 420, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}
+      style={{ width: 420, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }}
     >
-      <div style={{ background: 'linear-gradient(135deg,#EF4444,#DC2626)', padding: '18px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'linear-gradient(135deg,var(--bw-danger),var(--bw-on-tint-danger))', padding: '18px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, flex: 'none' }}>!</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>{t('sos.title')}</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>{t('topbar.region')}</div>
         </div>
-        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
+        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
       </div>
 
       <div style={{ padding: '16px 20px' }}>
         {/* Usage disclaimer — the rescue queue is only monitored once an LGU activates it. */}
-        <div style={{ display: 'flex', gap: 9, padding: '11px 13px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 9, padding: '11px 13px', background: 'var(--bw-tint-warn)', border: '1px solid var(--bw-tint-warn-border)', borderRadius: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 15, flex: 'none', lineHeight: 1.3 }}>⚠️</span>
-          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: '#7C2D12' }}>
-            <strong style={{ color: '#9A3412' }}>{t('sos.disclaimerBold')}</strong> {t('sos.disclaimer')}
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: 'var(--bw-on-tint-warn)' }}>
+            <strong style={{ color: 'var(--bw-on-tint-warn)' }}>{t('sos.disclaimerBold')}</strong> {t('sos.disclaimer')}
           </p>
         </div>
 
         {/* Acknowledgment gate — the Send button is disabled until this is checked. */}
-        <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', padding: '10px 12px', border: `1px solid ${acknowledged ? '#FCA5A5' : 'var(--bw-line)'}`, background: acknowledged ? '#FEF2F2' : '#fff', borderRadius: 12, marginBottom: 14, cursor: 'pointer' }}>
+        <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', padding: '10px 12px', border: `1px solid ${acknowledged ? 'var(--bw-tint-danger-border)' : 'var(--bw-line)'}`, background: acknowledged ? 'var(--bw-tint-danger)' : 'var(--bw-surface)', borderRadius: 12, marginBottom: 14, cursor: 'pointer' }}>
           <input
             type="checkbox"
             checked={acknowledged}
@@ -67,7 +67,7 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
         <button
           onClick={onSendRescue}
           disabled={!canSend}
-          style={{ width: '100%', border: 0, background: 'var(--bw-danger)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: !canSend ? 'not-allowed' : 'pointer', marginBottom: 14, boxShadow: canSend ? '0 6px 16px rgba(239,68,68,.3)' : 'none', opacity: canSend ? 1 : 0.5 }}
+          style={{ width: '100%', border: 0, background: 'var(--bw-danger)', color: 'var(--bw-on-accent)', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: !canSend ? 'not-allowed' : 'pointer', marginBottom: 14, boxShadow: canSend ? '0 6px 16px rgba(239,68,68,.3)' : 'none', opacity: canSend ? 1 : 0.5 }}
         >
           {sending ? t('sos.sending') : t('sos.send')}
         </button>
@@ -78,7 +78,7 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
             <a
               key={h.id}
               href={`tel:${h.phoneNumber.replace(/[^0-9+]/g, '')}`}
-              style={{ display: 'flex', alignItems: 'center', padding: '11px 13px', background: '#F7FAFB', borderRadius: 12, textDecoration: 'none', color: 'inherit' }}
+              style={{ display: 'flex', alignItems: 'center', padding: '11px 13px', background: 'var(--bw-surface-sunken)', borderRadius: 12, textDecoration: 'none', color: 'inherit' }}
             >
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 800 }}>{h.name}</div>
@@ -88,7 +88,7 @@ const SosModal: React.FC<SosModalProps> = ({ hotlines, sending, onSendRescue, on
             </a>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: '#9AA8B4', marginTop: 13, textAlign: 'center', lineHeight: 1.4 }}>
+        <div style={{ fontSize: 11, color: 'var(--bw-faint)', marginTop: 13, textAlign: 'center', lineHeight: 1.4 }}>
           {t('sos.danger911')}
         </div>
       </div>

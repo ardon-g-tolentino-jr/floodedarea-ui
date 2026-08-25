@@ -38,7 +38,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface)',
   boxSizing: 'border-box',
 };
 
@@ -98,21 +98,21 @@ const ZoneReportModal: React.FC<Props> = ({ isMobile, zones, alreadyReportedIds,
   const card = (
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ width: 460, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
+      style={{ width: 460, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
     >
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#0EA5E9,#0369A1)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'linear-gradient(135deg,var(--bw-primary),var(--bw-primary-deep))', padding: '16px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800 }}>⚡ Report flooding on zones</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>Turn flood-prone zones into live system reports.</div>
         </div>
-        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
+        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
       {/* Body */}
       <div style={{ padding: '15px 20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {error && (
-          <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
+          <div style={{ background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
         )}
 
         <div>
@@ -133,7 +133,7 @@ const ZoneReportModal: React.FC<Props> = ({ isMobile, zones, alreadyReportedIds,
               return (
                 <label
                   key={z.id}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '9px 10px', borderRadius: 10, border: `1px solid ${isChecked ? '#BAE2FB' : 'var(--bw-line-soft)'}`, background: already ? 'var(--bw-bg-subtle)' : isChecked ? '#EFF8FF' : '#fff', opacity: already ? 0.6 : 1, cursor: already ? 'default' : 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '9px 10px', borderRadius: 10, border: `1px solid ${isChecked ? 'var(--bw-tint-info-border)' : 'var(--bw-line-soft)'}`, background: already ? 'var(--bw-bg-subtle)' : isChecked ? 'var(--bw-tint-info)' : 'var(--bw-surface)', opacity: already ? 0.6 : 1, cursor: already ? 'default' : 'pointer' }}
                 >
                   <input type="checkbox" checked={isChecked} disabled={already} onChange={() => toggle(z.id)} style={{ marginTop: 2, flex: 'none' }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
@@ -158,7 +158,7 @@ const ZoneReportModal: React.FC<Props> = ({ isMobile, zones, alreadyReportedIds,
                   key={s}
                   type="button"
                   onClick={() => chooseSeverity(s)}
-                  style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${active ? m.color : '#E2E8F0'}`, background: active ? m.soft : '#fff', color: active ? m.color : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                  style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${active ? m.color : 'var(--bw-line)'}`, background: active ? m.soft : 'var(--bw-surface)', color: active ? m.color : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                 >
                   <span style={{ width: 9, height: 9, borderRadius: '50%', background: m.color, flex: 'none' }} />
                   {m.label}
@@ -211,7 +211,7 @@ const ZoneReportModal: React.FC<Props> = ({ isMobile, zones, alreadyReportedIds,
         <button
           onClick={() => void submit()}
           disabled={!canPost}
-          style={{ width: '100%', border: 0, background: '#0369A1', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: canPost ? 'pointer' : 'not-allowed', opacity: canPost ? 1 : 0.6 }}
+          style={{ width: '100%', border: 0, background: 'var(--bw-primary-deep)', color: 'var(--bw-on-accent)', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: canPost ? 'pointer' : 'not-allowed', opacity: canPost ? 1 : 0.6 }}
         >
           {busy ? 'Posting…' : `Post ${picked.length} report${picked.length === 1 ? '' : 's'}`}
         </button>

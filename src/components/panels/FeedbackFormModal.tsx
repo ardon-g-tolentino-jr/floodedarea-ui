@@ -39,18 +39,18 @@ const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending
         onClick={(e) => e.stopPropagation()}
         style={
           isMobile
-            ? { width: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-            : { width: 440, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+            ? { width: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+            : { width: 440, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
         }
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>💡</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Share feedback</div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>Report a bug or request a feature</div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
 
         <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
@@ -62,7 +62,7 @@ const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending
                 <button
                   key={t.value}
                   onClick={() => setType(t.value)}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '10px 8px', borderRadius: 11, fontSize: 13, fontWeight: 800, cursor: 'pointer', border: `1px solid ${on ? '#BAE2FB' : 'var(--bw-line)'}`, background: on ? '#EFF8FF' : '#fff', color: on ? 'var(--bw-primary)' : 'var(--bw-ink-soft)' }}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '10px 8px', borderRadius: 11, fontSize: 13, fontWeight: 800, cursor: 'pointer', border: `1px solid ${on ? 'var(--bw-tint-info-border)' : 'var(--bw-line)'}`, background: on ? 'var(--bw-tint-info)' : 'var(--bw-surface)', color: on ? 'var(--bw-primary)' : 'var(--bw-ink-soft)' }}
                 >
                   <span>{t.icon}</span> {t.label}
                 </button>
@@ -98,7 +98,7 @@ const FeedbackFormModal: React.FC<FeedbackFormModalProps> = ({ isMobile, sending
           <button
             onClick={submit}
             disabled={!canSubmit}
-            style={{ width: '100%', marginTop: 16, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: canSubmit ? 'pointer' : 'not-allowed', opacity: canSubmit ? 1 : 0.6, boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
+            style={{ width: '100%', marginTop: 16, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: canSubmit ? 'pointer' : 'not-allowed', opacity: canSubmit ? 1 : 0.6, boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
           >
             {sending ? 'Sending…' : 'Submit'}
           </button>

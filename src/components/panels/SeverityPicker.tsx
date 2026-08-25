@@ -5,6 +5,7 @@ import { DEPTH_RANGE, SEVERITY_PRESET } from '../../utils/floodMeta';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import DepthReference from './DepthReference';
 import TurnstileWidget from '../TurnstileWidget';
+import { cmToIn } from '../../utils/format';
 
 interface Option {
   sev: Severity;
@@ -16,9 +17,9 @@ interface Option {
 }
 
 const OPTIONS: Option[] = [
-  { sev: 'high', label: 'High', hint: 'Chest-deep or more · impassable', dot: '#EF4444', border: '#FBD2D2', bg: '#FEF4F4' },
-  { sev: 'medium', label: 'Medium', hint: 'Knee to waist · risky to cross', dot: '#F59E0B', border: '#F8E2BB', bg: '#FFFAF0' },
-  { sev: 'low', label: 'Low', hint: 'Ankle-deep · passable with care', dot: '#16A34A', border: '#BFE8CC', bg: '#F2FCF5' },
+  { sev: 'high', label: 'High', hint: 'Chest-deep or more · impassable', dot: 'var(--bw-danger)', border: 'var(--bw-tint-danger-border)', bg: 'var(--bw-tint-danger)' },
+  { sev: 'medium', label: 'Medium', hint: 'Knee to waist · risky to cross', dot: 'var(--bw-warn)', border: 'var(--bw-tint-warn-border)', bg: 'var(--bw-tint-warn)' },
+  { sev: 'low', label: 'Low', hint: 'Ankle-deep · passable with care', dot: 'var(--bw-ok)', border: 'var(--bw-tint-ok-border)', bg: 'var(--bw-tint-ok)' },
 ];
 
 interface SeverityPickerProps {
@@ -102,13 +103,13 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
         style={{ display: 'none' }}
       />
       {photo ? (
-        <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #E2E8F0' }}>
+        <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1.5px solid var(--bw-line)' }}>
           <img src={photo} alt="Flood photo preview" style={{ width: '100%', maxHeight: 150, objectFit: 'cover', display: 'block' }} />
           <button
             type="button"
             disabled={busy}
             onClick={() => { setPhoto(null); setPhotoError(null); }}
-            style={{ position: 'absolute', top: 6, right: 6, border: 0, background: 'rgba(15,23,42,.62)', color: '#fff', borderRadius: 8, padding: '4px 9px', fontSize: 11, fontWeight: 800, cursor: busy ? 'wait' : 'pointer' }}
+            style={{ position: 'absolute', top: 6, right: 6, border: 0, background: 'rgba(15,23,42,.62)', color: 'var(--bw-on-accent)', borderRadius: 8, padding: '4px 9px', fontSize: 11, fontWeight: 800, cursor: busy ? 'wait' : 'pointer' }}
           >
             Remove
           </button>
@@ -118,7 +119,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
           type="button"
           disabled={busy || photoBusy}
           onClick={() => fileInputRef.current?.click()}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px', border: '1.5px dashed #CBD5E1', borderRadius: 10, background: '#F8FAFC', color: 'var(--bw-ink-soft)', fontSize: 12.5, fontWeight: 800, cursor: busy || photoBusy ? 'wait' : 'pointer' }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px', border: '1.5px dashed var(--bw-line-strong)', borderRadius: 10, background: 'var(--bw-surface-sunken)', color: 'var(--bw-ink-soft)', fontSize: 12.5, fontWeight: 800, cursor: busy || photoBusy ? 'wait' : 'pointer' }}
         >
           {photoBusy ? 'Processing photo…' : '📷 Add a photo'}
         </button>
@@ -139,7 +140,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
         disabled={busy}
         onChange={(e) => { roadEdited.current = true; setRoad(e.target.value); }}
         placeholder={detecting ? 'Detecting street…' : 'e.g. Lilac Street'}
-        style={{ width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', outline: 'none', background: busy ? '#F8FAFC' : '#fff' }}
+        style={{ width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: '1.5px solid var(--bw-line)', borderRadius: 10, fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', outline: 'none', background: busy ? 'var(--bw-surface-sunken)' : 'var(--bw-surface)' }}
       />
       <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 4 }}>
         {detecting ? 'Finding the street from your pin…' : 'Auto-detected from the pin — edit if it’s wrong.'}
@@ -229,6 +230,9 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginBottom: 8 }}>
             <span style={{ fontSize: 26, fontWeight: 800, color: 'var(--bw-ink)', letterSpacing: '-.02em' }}>{depth}</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--bw-muted)' }}>cm</span>
+            {/* Live imperial equivalent — the slider and every threshold stay in cm; this is a
+                read-only convenience for people who picture depth in inches. */}
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--bw-faint)' }}>· {cmToIn(depth)} in</span>
             <span style={{ fontSize: 11.5, color: o.dot, fontWeight: 700, marginLeft: 'auto' }}><DepthReference depthCm={depth} color={o.dot} compact /></span>
           </div>
           <input
@@ -263,7 +267,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
                   key={String(opt.on)}
                   disabled={busy}
                   onClick={() => setIdentify(opt.on)}
-                  style={{ flex: 1, minWidth: 0, textAlign: 'left', padding: '9px 11px', borderRadius: 10, cursor: busy ? 'wait' : 'pointer', border: `1.5px solid ${active ? 'var(--bw-primary)' : '#E2E8F0'}`, background: active ? 'rgba(14,165,233,.08)' : '#fff' }}
+                  style={{ flex: 1, minWidth: 0, textAlign: 'left', padding: '9px 11px', borderRadius: 10, cursor: busy ? 'wait' : 'pointer', border: `1.5px solid ${active ? 'var(--bw-primary)' : 'var(--bw-line)'}`, background: active ? 'rgba(14,165,233,.08)' : 'var(--bw-surface)' }}
                 >
                   <span style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: active ? 'var(--bw-primary-deep)' : 'var(--bw-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.label}</span>
                   <span style={{ display: 'block', fontSize: 10.5, color: 'var(--bw-muted)', marginTop: 1 }}>{opt.sub}</span>
@@ -279,7 +283,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
           <button
             disabled={busy || photoBusy || captchaBlocked}
             onClick={() => onPick(sev, depth, identify, road.trim(), captchaToken ?? undefined, photo ?? undefined)}
-            style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: '#fff', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy || photoBusy || captchaBlocked ? 'not-allowed' : 'pointer', opacity: busy || photoBusy || captchaBlocked ? 0.6 : 1 }}
+            style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: '12px', borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy || photoBusy || captchaBlocked ? 'not-allowed' : 'pointer', opacity: busy || photoBusy || captchaBlocked ? 0.6 : 1 }}
           >
             {busy ? 'Posting…' : photoBusy ? 'Processing photo…' : 'Post flood report'}
           </button>
@@ -289,7 +293,7 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
   })();
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 15, boxShadow: '0 12px 36px rgba(15,23,42,.28)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       {locationLine}
       <div style={{ padding: '9px 15px 10px', fontSize: 13.5, fontWeight: 800 }}>{t('quick.howBad')}</div>
       {severityTiles}

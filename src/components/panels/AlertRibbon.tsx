@@ -2,9 +2,9 @@ import React from 'react';
 import type { FloodAlert } from '../../types';
 
 export const LEVEL_STYLE: Record<FloodAlert['level'], { bg: string; border: string; chip: string; text: string; close: string }> = {
-  yellow: { bg: '#FEFCE8', border: '#FDE68A', chip: '#EAB308', text: '#854D0E', close: '#A16207' },
-  orange: { bg: '#FFF4E0', border: '#F6E2BC', chip: '#F59E0B', text: '#92600B', close: '#B07D1C' },
-  red: { bg: '#FEF2F2', border: '#FECACA', chip: '#EF4444', text: '#991B1B', close: '#B91C1C' },
+  yellow: { bg: 'var(--bw-tint-warn)', border: 'var(--bw-tint-warn-border)', chip: 'var(--bw-warn)', text: 'var(--bw-on-tint-warn)', close: 'var(--bw-on-tint-warn)' },
+  orange: { bg: 'var(--bw-tint-warn)', border: 'var(--bw-tint-warn-border)', chip: 'var(--bw-warn)', text: 'var(--bw-on-tint-warn)', close: 'var(--bw-on-tint-warn)' },
+  red: { bg: 'var(--bw-tint-danger)', border: 'var(--bw-tint-danger-border)', chip: 'var(--bw-danger)', text: 'var(--bw-on-tint-danger)', close: 'var(--bw-on-tint-danger)' },
 };
 
 interface AlertRibbonProps {
@@ -38,7 +38,7 @@ const AlertRibbon: React.FC<AlertRibbonProps> = ({ alert, onClose }) => {
           width: 18,
           height: 18,
           background: s.chip,
-          color: '#fff',
+          color: 'var(--bw-on-accent)',
           borderRadius: 6,
           fontSize: 12,
           fontWeight: 800,

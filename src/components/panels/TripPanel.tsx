@@ -49,8 +49,8 @@ const TripPanel: React.FC<TripPanelProps> = ({
           disabled={!trip.active && trip.stops.length === 0}
           style={{
             flex: 'none', padding: '8px 13px', borderRadius: 10, border: 0, cursor: trip.stops.length === 0 && !trip.active ? 'default' : 'pointer',
-            fontSize: 12.5, fontWeight: 800, color: '#fff',
-            background: trip.active ? '#EF4444' : trip.stops.length === 0 ? '#CBD5E1' : 'var(--bw-primary)',
+            fontSize: 12.5, fontWeight: 800, color: 'var(--bw-on-accent)',
+            background: trip.active ? 'var(--bw-danger)' : trip.stops.length === 0 ? 'var(--bw-line-strong)' : 'var(--bw-primary)',
           }}
         >
           {trip.active ? t('trip.end') : t('trip.start')}
@@ -58,7 +58,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
       </div>
 
       {trip.active && notifyPermission === 'denied' && (
-        <div style={{ marginBottom: 10, padding: '8px 11px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 9, fontSize: 11.5, color: '#B91C1C', lineHeight: 1.4 }}>
+        <div style={{ marginBottom: 10, padding: '8px 11px', background: 'var(--bw-tint-danger)', border: '1px solid var(--bw-tint-danger-border)', borderRadius: 9, fontSize: 11.5, color: 'var(--bw-on-tint-danger)', lineHeight: 1.4 }}>
           {t('notify.permDenied')}
         </div>
       )}
@@ -73,7 +73,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
           {trip.stops.map((s, i) => {
             const stopMatches = matches.get(s.id) ?? [];
             const worst = worstSeverity(stopMatches);
-            const badgeColor = worst ? SEV_META[worst].color : '#16A34A';
+            const badgeColor = worst ? SEV_META[worst].color : 'var(--bw-ok)';
             const isExpanded = expandedId === s.id;
             const suffix = i === 0 ? t('trip.stopStart') : i === trip.stops.length - 1 ? t('trip.stopDestination') : null;
             const zone = stopZones.get(s.id);
@@ -83,7 +83,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
                   onClick={() => { setExpandedId(isExpanded ? null : s.id); onFocusStop(s); }}
                   style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 11px', cursor: 'pointer' }}
                 >
-                  <span style={{ flex: 'none', width: 20, height: 20, borderRadius: 6, background: 'var(--bw-primary)', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ flex: 'none', width: 20, height: 20, borderRadius: 6, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {i + 1}
                   </span>
                   {/* Label stacks with the flood-prone advisory as a second line — the label itself
@@ -94,7 +94,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
                       {s.label}{suffix ? <span style={{ color: 'var(--bw-muted)', fontWeight: 600 }}> ({suffix})</span> : null}
                     </span>
                     {zone && (
-                      <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#854D0E', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--bw-on-tint-warn)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         ⚠ {t('trip.floodProneStop')}
                       </span>
                     )}
@@ -109,9 +109,9 @@ const TripPanel: React.FC<TripPanelProps> = ({
                   ) : zone ? (
                     // No live report, but the stop sits in a known flood-prone zone — green would
                     // read as "safe street", which isn't true here, so this stays a neutral grey.
-                    <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: '#64748B' }}>✓ {t('trip.clearButProne')}</span>
+                    <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: 'var(--bw-muted)' }}>✓ {t('trip.clearButProne')}</span>
                   ) : (
-                    <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: '#16A34A' }}>✓ {t('trip.clear')}</span>
+                    <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, color: 'var(--bw-ok)' }}>✓ {t('trip.clear')}</span>
                   )}
                 </div>
                 {isExpanded && (
@@ -125,7 +125,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
                         <button
                           key={km}
                           onClick={() => onChangeRadius(s.id, km)}
-                          style={{ padding: '5px 10px', borderRadius: 999, border: `1.5px solid ${s.radiusKm === km ? 'var(--bw-primary)' : '#E2E8F0'}`, background: s.radiusKm === km ? 'var(--bw-bg-subtle)' : '#fff', color: s.radiusKm === km ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
+                          style={{ padding: '5px 10px', borderRadius: 999, border: `1.5px solid ${s.radiusKm === km ? 'var(--bw-primary)' : 'var(--bw-line)'}`, background: s.radiusKm === km ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)', color: s.radiusKm === km ? 'var(--bw-ink)' : 'var(--bw-faint)', fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
                         >
                           {fmtRadius(km)}
                         </button>
@@ -141,17 +141,17 @@ const TripPanel: React.FC<TripPanelProps> = ({
                         onClick={() => onMoveStop(s.id, -1)}
                         disabled={i === 0}
                         aria-label={t('trip.moveUp')}
-                        style={{ flex: 'none', width: 30, height: 30, borderRadius: 8, border: '1px solid var(--bw-line)', background: '#fff', color: i === 0 ? '#CBD5E1' : 'var(--bw-ink-soft)', cursor: i === 0 ? 'default' : 'pointer' }}
+                        style={{ flex: 'none', width: 30, height: 30, borderRadius: 8, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: i === 0 ? 'var(--bw-line-strong)' : 'var(--bw-ink-soft)', cursor: i === 0 ? 'default' : 'pointer' }}
                       >▲</button>
                       <button
                         onClick={() => onMoveStop(s.id, 1)}
                         disabled={i === trip.stops.length - 1}
                         aria-label={t('trip.moveDown')}
-                        style={{ flex: 'none', width: 30, height: 30, borderRadius: 8, border: '1px solid var(--bw-line)', background: '#fff', color: i === trip.stops.length - 1 ? '#CBD5E1' : 'var(--bw-ink-soft)', cursor: i === trip.stops.length - 1 ? 'default' : 'pointer' }}
+                        style={{ flex: 'none', width: 30, height: 30, borderRadius: 8, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: i === trip.stops.length - 1 ? 'var(--bw-line-strong)' : 'var(--bw-ink-soft)', cursor: i === trip.stops.length - 1 ? 'default' : 'pointer' }}
                       >▼</button>
                       <button
                         onClick={() => onRemoveStop(s.id)}
-                        style={{ flex: 1, borderRadius: 8, border: '1px solid #FECACA', background: '#FEF2F2', color: '#B91C1C', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                        style={{ flex: 1, borderRadius: 8, border: '1px solid var(--bw-tint-danger-border)', background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
                       >{t('trip.remove')}</button>
                     </div>
                   </div>
@@ -165,7 +165,7 @@ const TripPanel: React.FC<TripPanelProps> = ({
       <button
         onClick={onAddStop}
         disabled={trip.stops.length >= MAX_STOPS}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 12px', borderRadius: 11, border: '1px solid var(--bw-line)', background: trip.stops.length >= MAX_STOPS ? 'var(--bw-bg-subtle)' : '#fff', color: trip.stops.length >= MAX_STOPS ? 'var(--bw-muted)' : 'var(--bw-primary-deep)', fontSize: 12.5, fontWeight: 800, cursor: trip.stops.length >= MAX_STOPS ? 'default' : 'pointer' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 12px', borderRadius: 11, border: '1px solid var(--bw-line)', background: trip.stops.length >= MAX_STOPS ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)', color: trip.stops.length >= MAX_STOPS ? 'var(--bw-muted)' : 'var(--bw-primary-deep)', fontSize: 12.5, fontWeight: 800, cursor: trip.stops.length >= MAX_STOPS ? 'default' : 'pointer' }}
       >
         {trip.stops.length >= MAX_STOPS ? tFormat(lang, 'trip.maxReached', { n: MAX_STOPS }) : t('trip.addStop')}
       </button>
