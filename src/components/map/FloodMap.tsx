@@ -4,7 +4,8 @@ import { Circle, CircleMarker, MapContainer, Marker, Pane, Polyline, TileLayer, 
 import type { EvacuationCenter, FloodProneArea, LatLng, RoadSegment, TripStop } from '../../types';
 import { RESCUE_STATUS_META, ROAD_META, ZONE_LABEL_MIN_ZOOM } from '../../utils/floodMeta';
 import { affectedRadiusKm, zonesWithStatus, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
-import { formatDuration } from '../../utils/format';
+import { formatDepthShort, formatDuration } from '../../utils/format';
+import { useTheme } from '../../theme';
 import { LEVEL_STYLE } from '../panels/AlertRibbon';
 
 export interface MapFocus extends LatLng {
@@ -59,41 +60,48 @@ interface FloodMapProps {
   onSelectZone?: (id: number) => void;
 }
 
+// Colors below are pulled from the global --bw-* custom properties (see styles.css :root) rather
+// than hardcoded — a Leaflet divIcon's HTML is a plain string, not a React style object, so it
+// can't take inline var()-free JS values, but CSS custom properties resolve fine inside it since
+// the markup still lands in the live DOM and inherits the normal CSS cascade. Brand/accent hues
+// here are unchanged across themes (see styles.css's dark-mode principles); the #fff halos/fills
+// route through --bw-on-accent — same value in both themes, kept as a token for consistency with
+// the "background/border is a surface, color-on-accent stays white" rule applied everywhere else.
 const shelterIconHtml = (color: string): string =>
-  `<div style="width:26px;height:26px;border-radius:8px;background:${color};border:2px solid #fff;box-shadow:0 2px 7px rgba(15,23,42,.4);display:flex;align-items:center;justify-content:center">
-     <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="#fff"/></svg>
+  `<div style="width:26px;height:26px;border-radius:8px;background:${color};border:2px solid var(--bw-on-accent);box-shadow:0 2px 7px rgba(15,23,42,.4);display:flex;align-items:center;justify-content:center">
+     <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M12 3 L21 11 H18 V20 H14 V14 H10 V20 H6 V11 H3 Z" fill="var(--bw-on-accent)"/></svg>
    </div>`;
 
 function shelterIcon(): L.DivIcon {
-  return L.divIcon({ html: shelterIconHtml('#0E7490'), className: 'bw-divicon', iconSize: [26, 26], iconAnchor: [13, 13] });
+  return L.divIcon({ html: shelterIconHtml('var(--bw-shelter)'), className: 'bw-divicon', iconSize: [26, 26], iconAnchor: [13, 13] });
 }
 
 function youIcon(): L.DivIcon {
   const html = `
     <div style="position:relative;width:40px;height:40px">
       <div style="position:absolute;inset:0;border-radius:50%;background:rgba(14,165,233,.35);animation:youPulse 2.6s ease-out infinite"></div>
-      <div style="position:absolute;left:13px;top:13px;width:14px;height:14px;border-radius:50%;background:#0EA5E9;border:3px solid #fff;box-shadow:0 2px 7px rgba(14,165,233,.6)"></div>
-      <div style="position:absolute;left:34px;top:11px;padding:2px 7px;background:#0EA5E9;color:#fff;font-size:10px;font-weight:800;border-radius:7px;white-space:nowrap;box-shadow:0 2px 6px rgba(14,165,233,.4)">You</div>
+      <div style="position:absolute;left:13px;top:13px;width:14px;height:14px;border-radius:50%;background:var(--bw-primary);border:3px solid var(--bw-on-accent);box-shadow:0 2px 7px rgba(14,165,233,.6)"></div>
+      <div style="position:absolute;left:34px;top:11px;padding:2px 7px;background:var(--bw-primary);color:var(--bw-on-accent);font-size:10px;font-weight:800;border-radius:7px;white-space:nowrap;box-shadow:0 2px 6px rgba(14,165,233,.4)">You</div>
     </div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [40, 40], iconAnchor: [20, 20] });
 }
 
 function pendingIcon(): L.DivIcon {
-  const html = `<div style="width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:#0EA5E9;border:3px solid #fff;box-shadow:0 4px 12px rgba(15,23,42,.4)"></div>`;
+  const html = `<div style="width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:var(--bw-primary);border:3px solid var(--bw-on-accent);box-shadow:0 4px 12px rgba(15,23,42,.4)"></div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [22, 22], iconAnchor: [11, 22] });
 }
 
 function stopIcon(n: number, alerted: boolean): L.DivIcon {
-  const bg = alerted ? '#F59E0B' : '#7C3AED';
-  const html = `<div style="width:26px;height:26px;border-radius:9px;background:${bg};border:2.5px solid #fff;box-shadow:0 3px 10px rgba(15,23,42,.42);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;font-weight:800;line-height:1">${n}</div>`;
+  const bg = alerted ? 'var(--bw-warn)' : 'var(--bw-accent-violet)';
+  const html = `<div style="width:26px;height:26px;border-radius:9px;background:${bg};border:2.5px solid var(--bw-on-accent);box-shadow:0 3px 10px rgba(15,23,42,.42);display:flex;align-items:center;justify-content:center;color:var(--bw-on-accent);font-size:12.5px;font-weight:800;line-height:1">${n}</div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [26, 26], iconAnchor: [13, 13] });
 }
 
 function searchIcon(): L.DivIcon {
   // Indigo teardrop pin — distinct from the blue "you"/pending pins.
   const html = `<div style="position:relative;width:24px;height:24px">
-      <div style="width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:#6366F1;border:3px solid #fff;box-shadow:0 4px 12px rgba(79,70,229,.45)"></div>
-      <div style="position:absolute;left:8px;top:8px;width:8px;height:8px;border-radius:50%;background:#fff"></div>
+      <div style="width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(45deg);background:var(--bw-accent-search);border:3px solid var(--bw-on-accent);box-shadow:0 4px 12px rgba(79,70,229,.45)"></div>
+      <div style="position:absolute;left:8px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--bw-on-accent)"></div>
     </div>`;
   return L.divIcon({ html, className: 'bw-divicon', iconSize: [24, 24], iconAnchor: [12, 24] });
 }
@@ -194,6 +202,8 @@ const FloodMap: React.FC<FloodMapProps> = ({
   // Whole-circle tap-to-report is admin-only (onSelectZone is undefined for citizens) and stands
   // down while a report pin is being dropped (reportMode) — see the eventHandlers comment below.
   const zoneClickable = !!onSelectZone && !reportMode;
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
   return (
     <MapContainer
       center={[userLoc.lat, userLoc.lng]}
@@ -202,10 +212,43 @@ const FloodMap: React.FC<FloodMapProps> = ({
       className={reportMode ? 'bw-report' : undefined}
       style={{ width: '100%', height: '100%' }}
     >
+      {/* key={resolved} forces React to remount the layer on a theme switch rather than diff the
+          URL template in place — Leaflet's GridLayer doesn't re-render existing tiles on a url
+          change, so without the remount a switch would leave stale light/dark tiles mixed in. */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        key={resolved}
+        attribution={
+          isDark
+            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }
+        url={
+          isDark
+            ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        }
+        subdomains={isDark ? 'abcd' : 'abc'}
       />
+
+      {/* Dark basemap labels, deliberately split off the base tiles (dark_nolabels above) into
+          their own layer — the same trick Google's dark map uses. Two reasons:
+            1. dark_all bakes low-contrast grey labels into the same image as the roads, so the
+               only way to make place names readable is to brighten the whole map into grey mush.
+               Split out, the labels alone get a brightness/contrast boost (see styles.css) while
+               the roads stay properly dark.
+            2. z-index 450 puts labels ABOVE the report/zone polygons in overlayPane (400) so a
+               barangay name stays readable through a translucent flood ring, but BELOW markerPane
+               (600) so pins still sit on top of the text.
+          The pane is pointer-events:none in CSS — without that it would swallow map clicks and
+          break pin-drop in report mode. */}
+      {isDark && (
+        <Pane name="bw-map-labels" className="bw-map-labels" style={{ zIndex: 450 }}>
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
+            subdomains="abcd"
+          />
+        </Pane>
+      )}
 
       <ClickCatcher onMapClick={onMapClick} />
       <FlyTo focus={focus} />
@@ -216,7 +259,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
         <Circle
           center={[userLoc.lat, userLoc.lng]}
           radius={monitorRadiusKm * 1000}
-          pathOptions={{ color: '#0EA5E9', weight: 2, dashArray: '6 8', fillColor: '#0EA5E9', fillOpacity: 0.04 }}
+          pathOptions={{ color: 'var(--bw-primary)', weight: 2, dashArray: '6 8', fillColor: 'var(--bw-primary)', fillOpacity: 0.04 }}
         />
       )}
 
@@ -245,7 +288,10 @@ const FloodMap: React.FC<FloodMapProps> = ({
           if (positions.length < 2) return null;
           return (
             <React.Fragment key={`road-${seg.id}`}>
-              <Polyline positions={positions} pathOptions={{ color: '#fff', weight: 8, opacity: 0.9 }} />
+              {/* Casing separates the road colour from the basemap under it. Unlike the marker
+                  halos, this one FLIPS: white at 14.49:1 against dark land drowned out the very
+                  colour it frames, so dark mode uses a near-black outline instead. */}
+              <Polyline positions={positions} pathOptions={{ color: 'var(--bw-road-casing)', weight: 8, opacity: 0.9 }} />
               <Polyline positions={positions} pathOptions={{ color: rm.color, weight: 5 }}>
                 <Tooltip direction="top" sticky opacity={1}>
                   <span style={{ fontWeight: 700 }}>{seg.name ?? 'Road'}</span> · {rm.label}
@@ -303,7 +349,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
           {zonesWithStatus(floodProneAreas, reports).map((z) => {
             const level = LEVEL_STYLE[z.level] ?? LEVEL_STYLE.orange;
             const icon = z.flooded
-              ? zoneBubbleIcon(`🔴 ${z.name}`, `Flooded now · ${z.worstDepthCm} cm`, '#EF4444', '#fff', true)
+              ? zoneBubbleIcon(`🔴 ${z.name}`, `Flooded now · ${z.worstDepthCm == null ? '—' : formatDepthShort(z.worstDepthCm)}`, 'var(--bw-danger)', '#fff', true)
               : zoneBubbleIcon(`⚠ ${z.name}`, 'Flood-prone', level.chip, '#fff', false);
             return (
               <Marker
@@ -377,7 +423,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
               key={`sel-${c.id}`}
               center={[c.latitude, c.longitude]}
               radius={18}
-              pathOptions={{ color: '#0E7490', weight: 3, fill: false }}
+              pathOptions={{ color: 'var(--bw-shelter)', weight: 3, fill: false }}
             />
           ))}
 
@@ -397,7 +443,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
             <CircleMarker
               center={[r.latitude, r.longitude]}
               radius={sel ? 10 : 8}
-              pathOptions={{ color: '#fff', weight: 2.5, fillColor: meta.color, fillOpacity: 1 }}
+              pathOptions={{ color: 'var(--bw-on-accent)', weight: 2.5, fillColor: meta.color, fillOpacity: 1 }}
               eventHandlers={{ click: () => onSelectRescue?.(r.id) }}
             >
               <Tooltip direction="top" offset={[0, -4]} opacity={1}>
@@ -414,12 +460,12 @@ const FloodMap: React.FC<FloodMapProps> = ({
       {tripStops && tripStops.length > 1 && (
         <Polyline
           positions={tripStops.map((s) => [s.lat, s.lng] as [number, number])}
-          pathOptions={{ color: '#7C3AED', weight: 3, opacity: 0.45, dashArray: '2 9' }}
+          pathOptions={{ color: 'var(--bw-accent-violet)', weight: 3, opacity: 0.45, dashArray: '2 9' }}
         />
       )}
       {tripStops?.map((s, i) => {
         const alerted = affectedStopIds?.includes(s.id) ?? false;
-        const c = alerted ? '#F59E0B' : '#7C3AED';
+        const c = alerted ? 'var(--bw-warn)' : 'var(--bw-accent-violet)';
         return (
           <React.Fragment key={`stop-${s.id}`}>
             <Circle
@@ -453,7 +499,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
         <Circle
           center={[userLoc.lat, userLoc.lng]}
           radius={userAccuracyM}
-          pathOptions={{ color: '#0EA5E9', weight: 1, opacity: 0.35, fillColor: '#0EA5E9', fillOpacity: 0.08 }}
+          pathOptions={{ color: 'var(--bw-primary)', weight: 1, opacity: 0.35, fillColor: 'var(--bw-primary)', fillOpacity: 0.08 }}
         />
       )}
 

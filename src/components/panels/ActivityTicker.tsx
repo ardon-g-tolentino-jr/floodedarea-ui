@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FloodAlert } from '../../types';
 import type { EnrichedReport } from '../../utils/viewModel';
-import { timeAgo } from '../../utils/format';
+import { formatDepth, timeAgo } from '../../utils/format';
 import { useI18n, tFormat } from '../../i18n';
 import { LEVEL_STYLE } from './AlertRibbon';
 
@@ -42,7 +42,7 @@ const ActivityTicker: React.FC<ActivityTickerProps> = ({
   if (!showReport && !showWarning) return null;
 
   const line = report ? tFormat(lang, 'ticker.floodIn', { sev: report.sev.label, district: report.district }) : '';
-  const detail = report ? `${report.name} · ${report.depthCm} cm · ${timeAgo(report.createdAt)}` : '';
+  const detail = report ? `${report.name} · ${formatDepth(report.depthCm)} · ${timeAgo(report.createdAt)}` : '';
   const ws = warning ? (LEVEL_STYLE[warning.level] ?? LEVEL_STYLE.orange) : LEVEL_STYLE.orange;
 
   return (
@@ -60,7 +60,7 @@ const ActivityTicker: React.FC<ActivityTickerProps> = ({
             fontSize: 12.5, fontWeight: 600, color: ws.text, zIndex: 36,
           }}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flex: 'none', fontSize: 10, fontWeight: 800, letterSpacing: '.08em', color: '#fff', background: ws.chip, padding: '2px 7px', borderRadius: 999 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flex: 'none', fontSize: 10, fontWeight: 800, letterSpacing: '.08em', color: 'var(--bw-on-accent)', background: ws.chip, padding: '2px 7px', borderRadius: 999 }}>
             ⚠ {t('ticker.warnTag')}
           </span>
           <button
@@ -96,7 +96,7 @@ const ActivityTicker: React.FC<ActivityTickerProps> = ({
         alignItems: 'center',
         gap: 11,
         padding: '9px 16px',
-        background: '#fff',
+        background: 'var(--bw-surface)',
         borderBottom: '1px solid var(--bw-line-soft)',
         fontSize: 12.5,
         fontWeight: 600,
@@ -121,7 +121,7 @@ const ActivityTicker: React.FC<ActivityTickerProps> = ({
             width: 7,
             height: 7,
             borderRadius: '50%',
-            background: isLive ? 'var(--bw-danger)' : '#94A3B8',
+            background: isLive ? 'var(--bw-danger)' : 'var(--bw-faint)',
             animation: isLive ? 'floodPulse 1.4s ease-in-out infinite' : 'none',
           }}
         />

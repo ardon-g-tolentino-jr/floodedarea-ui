@@ -16,7 +16,7 @@ const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobi
   const distKm = kmBetween(userLoc, { lat: center.latitude, lng: center.longitude });
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 14px 40px rgba(15,23,42,.3)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+    <div style={{ background: 'var(--bw-surface-raised)', borderRadius: 16, boxShadow: '0 14px 40px rgba(15,23,42,.3)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       <div style={{ padding: '14px 15px 12px', borderBottom: '1px solid var(--bw-line-soft)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: 9, background: 'var(--bw-shelter)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
@@ -28,7 +28,7 @@ const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobi
               {t('evac.center')} · {distKm.toFixed(1)} {t('evac.kmAway')} · ~{walkMinutes(distKm)} {t('evac.minWalk')}
             </div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 26, height: 26, borderRadius: 7, fontSize: 15, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 26, height: 26, borderRadius: 7, fontSize: 15, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
       </div>
 
@@ -38,13 +38,13 @@ const EvacDetailCard: React.FC<EvacDetailCardProps> = ({ center, userLoc, isMobi
             href={directionsUrl(center.latitude, center.longitude)}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-primary)', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
           >
             {t('evac.directions')}
           </a>
           <a
             href={`tel:${center.contact.replace(/[^0-9+]/g, '')}`}
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-shelter)', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--bw-shelter)', color: 'var(--bw-on-accent)', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800 }}
           >
             {t('evac.call')}
           </a>

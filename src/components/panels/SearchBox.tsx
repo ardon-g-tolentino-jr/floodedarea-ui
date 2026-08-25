@@ -122,7 +122,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
         left: 0,
         right: 0,
         zIndex: 1400,
-        background: '#fff',
+        background: 'var(--bw-surface)',
         border: '1px solid var(--bw-line)',
         borderRadius: 11,
         boxShadow: '0 12px 34px rgba(15,23,42,.18)',
@@ -150,7 +150,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
               padding: '10px 13px',
               border: 0,
               borderTop: i === 0 ? 'none' : '1px solid var(--bw-line)',
-              background: i === activeIndex ? 'var(--bw-bg-subtle)' : '#fff',
+              background: i === activeIndex ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)',
               cursor: 'pointer',
               fontSize: 13,
               color: 'var(--bw-ink)',
@@ -181,7 +181,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
           background: 'var(--bw-bg-subtle)',
           borderRadius: 11,
           fontSize: 16,
-          color: '#9AA8B4',
+          color: 'var(--bw-faint)',
           cursor: 'pointer',
         }}
       >
@@ -211,7 +211,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
           borderRadius: 11,
         }}
       >
-        <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
+        <span style={{ fontSize: 14, color: 'var(--bw-faint)', flex: 'none' }}>⌕</span>
         <input
           ref={inputRef}
           value={query}
@@ -226,7 +226,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
             type="button"
             aria-label="Clear search"
             onMouseDown={(e) => { e.preventDefault(); setQuery(''); setResults([]); setOpen(false); inputRef.current?.focus(); }}
-            style={{ border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
+            style={{ border: 0, background: 'transparent', color: 'var(--bw-faint)', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
           >
             ×
           </button>

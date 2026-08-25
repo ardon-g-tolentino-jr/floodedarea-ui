@@ -90,6 +90,12 @@ const MESSAGES = {
   'topbar.floodDigest': { en: 'Flood digest', fil: 'Buod ng baha' },
   'topbar.nearbyAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
 
+  // ── Appearance (theme) control ──
+  'theme.appearance': { en: 'Appearance', fil: 'Itsura' },
+  'theme.system': { en: 'System', fil: 'Awtomatiko' },
+  'theme.light': { en: 'Light', fil: 'Maliwanag' },
+  'theme.dark': { en: 'Dark', fil: 'Madilim' },
+
   // ── Sidebar ──
   'sidebar.updatedLive': { en: 'Updated live', fil: 'Live na update' },
   'sidebar.affectedArea': { en: 'AFFECTED AREA', fil: 'APEKTADONG LUGAR' },
@@ -142,7 +148,7 @@ const MESSAGES = {
   // ── Safety status banner ──
   'status.inFloodZone': { en: 'IN FLOOD ZONE', fil: 'NASA LUGAR NG BAHA' },
   'status.inFloodZoneTitle': { en: 'You are in a flood-affected area', fil: 'Nasa apektadong lugar ka ng baha' },
-  'status.inFloodZoneLine': { en: '{sev} flooding at {name} — about {depth} cm.', fil: '{sev} na baha sa {name} — humigit-kumulang {depth} cm.' },
+  'status.inFloodZoneLine': { en: '{sev} flooding at {name} — about {depth}.', fil: '{sev} na baha sa {name} — humigit-kumulang {depth}.' },
   'status.inFloodZoneSub': { en: 'Move to higher ground and never wade through fast-moving water.', fil: 'Lumipat sa mas mataas na lugar at huwag kailanman tatawid sa mabilis na agos ng tubig.' },
   'status.stayAlert': { en: 'STAY ALERT', fil: 'MAG-INGAT' },
   'status.stayAlertTitle': { en: 'Flooding is close by', fil: 'Malapit na ang baha' },
@@ -418,7 +424,7 @@ const MESSAGES = {
   'trip.saveStop': { en: 'Add stop', fil: 'Idagdag ang hinto' },
   'trip.alertTitleOne': { en: 'Flooding on your trip', fil: 'May baha sa iyong biyahe' },
   'trip.alertTitleMany': { en: '{n} new floods on your trip', fil: '{n} bagong baha sa iyong biyahe' },
-  'trip.alertBodyOne': { en: '{sev} flooding reported near {stop} — {name}, about {depth} cm deep.', fil: '{sev} na baha ang naiulat malapit sa {stop} — {name}, humigit-kumulang {depth} cm ang lalim.' },
+  'trip.alertBodyOne': { en: '{sev} flooding reported near {stop} — {name}, about {depth} deep.', fil: '{sev} na baha ang naiulat malapit sa {stop} — {name}, humigit-kumulang {depth} ang lalim.' },
   'trip.alertBodyMany': { en: '{n} new floods reported near stops on your trip. The worst is {sev} at {name}.', fil: '{n} bagong baha ang naiulat malapit sa mga hinto ng iyong biyahe. Ang pinakamalala ay {sev} sa {name}.' },
   'trip.floodProneStop': { en: 'Floods in heavy rain', fil: 'Binabaha kapag malakas ang ulan' },
   'trip.clearButProne': { en: 'Clear now', fil: 'Malinaw ngayon' },

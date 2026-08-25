@@ -11,21 +11,21 @@ export interface SevMeta {
 }
 
 export const SEV_META: Record<Severity, SevMeta> = {
-  high: { label: 'High', color: '#EF4444', soft: 'rgba(239,68,68,0.16)', soft2: 'rgba(239,68,68,0.34)', depthLabel: 'chest-deep+' },
-  medium: { label: 'Medium', color: '#F59E0B', soft: 'rgba(245,158,11,0.16)', soft2: 'rgba(245,158,11,0.34)', depthLabel: 'knee–waist' },
-  low: { label: 'Low', color: '#16A34A', soft: 'rgba(22,163,74,0.15)', soft2: 'rgba(22,163,74,0.32)', depthLabel: 'ankle-deep' },
+  high: { label: 'High', color: 'var(--bw-danger)', soft: 'rgba(239,68,68,0.16)', soft2: 'rgba(239,68,68,0.34)', depthLabel: 'chest-deep+' },
+  medium: { label: 'Medium', color: 'var(--bw-warn)', soft: 'rgba(245,158,11,0.16)', soft2: 'rgba(245,158,11,0.34)', depthLabel: 'knee–waist' },
+  low: { label: 'Low', color: 'var(--bw-ok)', soft: 'rgba(22,163,74,0.15)', soft2: 'rgba(22,163,74,0.32)', depthLabel: 'ankle-deep' },
 };
 
 export const TREND_META: Record<Trend, { label: string; sym: string; color: string }> = {
-  rising: { label: 'Rising', sym: '▲', color: '#EF4444' },
-  receding: { label: 'Receding', sym: '▼', color: '#16A34A' },
-  steady: { label: 'Steady', sym: '■', color: '#64748B' },
+  rising: { label: 'Rising', sym: '▲', color: 'var(--bw-danger)' },
+  receding: { label: 'Receding', sym: '▼', color: 'var(--bw-ok)' },
+  steady: { label: 'Steady', sym: '■', color: 'var(--bw-muted)' },
 };
 
 export const ROAD_META: Record<Road, { label: string; short: string; glyph: string; color: string; soft: string }> = {
-  impassable: { label: 'Impassable', short: 'Impassable', glyph: '✕', color: '#EF4444', soft: 'rgba(239,68,68,0.12)' },
-  risky: { label: 'Risky for cars', short: 'Risky', glyph: '△', color: '#F59E0B', soft: 'rgba(245,158,11,0.12)' },
-  passable: { label: 'Passable', short: 'Passable', glyph: '✓', color: '#16A34A', soft: 'rgba(22,163,74,0.12)' },
+  impassable: { label: 'Impassable', short: 'Impassable', glyph: '✕', color: 'var(--bw-road-impassable)', soft: 'rgba(239,68,68,0.12)' },
+  risky: { label: 'Risky for cars', short: 'Risky', glyph: '△', color: 'var(--bw-road-risky)', soft: 'rgba(245,158,11,0.12)' },
+  passable: { label: 'Passable', short: 'Passable', glyph: '✓', color: 'var(--bw-road-passable)', soft: 'rgba(22,163,74,0.12)' },
 };
 
 /** Display order for road filters/legend: best → worst. */
@@ -39,9 +39,9 @@ export const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 }
  * layer and the rescue chart.
  */
 export const RESCUE_STATUS_META: Record<RescueStatus, { label: string; color: string; bg: string; fg: string }> = {
-  pending: { label: 'Pending', color: '#F59E0B', bg: '#FEF3C7', fg: '#B45309' },
-  dispatched: { label: 'Dispatched', color: '#3B82F6', bg: '#DBEAFE', fg: '#1D4ED8' },
-  resolved: { label: 'Resolved', color: '#16A34A', bg: '#DCFCE7', fg: '#15803D' },
+  pending: { label: 'Pending', color: 'var(--bw-warn)', bg: 'var(--bw-tint-warn)', fg: 'var(--bw-on-tint-warn)' },
+  dispatched: { label: 'Dispatched', color: '#3B82F6', bg: 'var(--bw-tint-info)', fg: 'var(--bw-on-tint-info)' },
+  resolved: { label: 'Resolved', color: 'var(--bw-ok)', bg: 'var(--bw-tint-ok)', fg: 'var(--bw-on-tint-ok)' },
 };
 
 /** Triage rank for rescue statuses (open work floats to the top): pending → dispatched → resolved. */
@@ -163,9 +163,9 @@ export function depthReference(cm: number): { band: DepthBand; fill: number; veh
 }
 
 export const ADVICE: Record<Road, { txt: string; bg: string; col: string }> = {
-  impassable: { txt: 'Do not attempt to cross — water is too deep for vehicles and pedestrians.', bg: '#FEF2F2', col: '#B91C1C' },
-  risky: { txt: 'Cross only if necessary and on foot with caution. Avoid low cars and motorbikes.', bg: '#FFFBEB', col: '#B45309' },
-  passable: { txt: 'Generally passable with care. Watch for hidden debris and slippery surfaces.', bg: '#F0FDF4', col: '#15803D' },
+  impassable: { txt: 'Do not attempt to cross — water is too deep for vehicles and pedestrians.', bg: 'var(--bw-tint-danger)', col: 'var(--bw-on-tint-danger)' },
+  risky: { txt: 'Cross only if necessary and on foot with caution. Avoid low cars and motorbikes.', bg: 'var(--bw-tint-warn)', col: 'var(--bw-on-tint-warn)' },
+  passable: { txt: 'Generally passable with care. Watch for hidden debris and slippery surfaces.', bg: 'var(--bw-tint-ok)', col: 'var(--bw-on-tint-ok)' },
 };
 
 /** Defaults the report-flood quick-pick uses for each severity. */

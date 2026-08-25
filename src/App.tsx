@@ -84,6 +84,7 @@ import ChatWidget from './components/panels/ChatWidget';
 import TripPanel from './components/panels/TripPanel';
 import AddStopSheet from './components/panels/AddStopSheet';
 import LoginView from './views/LoginView';
+import { formatDepth } from './utils/format';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
@@ -652,7 +653,7 @@ const App: React.FC = () => {
           const stop = trip.stops.find((s) => s.id === m.stopId);
           try {
             new Notification(t('trip.alertTitleOne'), {
-              body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: m.report.depthCm }),
+              body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: formatDepth(m.report.depthCm) }),
             });
           } catch {/* ignore */}
         }
@@ -685,7 +686,7 @@ const App: React.FC = () => {
           alert: {
             id: -m.report.id,
             title: stopReports.length > 1 ? tFormat(lang, 'trip.alertTitleMany', { n: stopReports.length }) : t('trip.alertTitleOne'),
-            body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: m.report.depthCm })
+            body: tFormat(lang, 'trip.alertBodyOne', { sev: m.report.sev.label, stop: stop?.label ?? '', name: m.report.name, depth: formatDepth(m.report.depthCm) })
               + (stopsForReport > 1 ? ` (+${stopsForReport - 1})` : ''),
             region: m.report.name ?? null,
             level: SEV_TO_LEVEL[m.report.severity],
@@ -723,7 +724,7 @@ const App: React.FC = () => {
       for (const r of matches.slice(0, 3)) {
         try {
           new Notification(t('notify.alertTitleOne'), {
-            body: `${r.sev.label} flooding ~${r.distKm.toFixed(1)} km away at ${r.name} (${r.depthCm} cm).`,
+            body: `${r.sev.label} flooding ~${r.distKm.toFixed(1)} km away at ${r.name} (${formatDepth(r.depthCm)}).`,
           });
         } catch {/* ignore */}
       }
@@ -735,7 +736,7 @@ const App: React.FC = () => {
         alert: {
           id: -r.id, // synthetic id (negative) so it never collides with rainfall alerts
           title: t('notify.alertTitleOne'),
-          body: `${r.sev.label} flooding reported ~${r.distKm.toFixed(1)} km away at ${r.name} — about ${r.depthCm} cm deep.`,
+          body: `${r.sev.label} flooding reported ~${r.distKm.toFixed(1)} km away at ${r.name} — about ${formatDepth(r.depthCm)} deep.`,
           region: r.name ?? null,
           level: SEV_TO_LEVEL[r.severity],
           active: true,
@@ -1846,7 +1847,7 @@ const App: React.FC = () => {
       {/* Admin-flipped global flag — every projected water level on the map is currently climbing
           instead of receding. Not dismissible: it should stay visible for as long as it's true. */}
       {rainActive && (
-        <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 9, padding: '8px 16px', background: '#EFF6FF', borderBottom: '1px solid #BFDBFE', fontSize: 12, fontWeight: 700, color: '#1D4ED8', zIndex: 34 }}>
+        <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 9, padding: '8px 16px', background: 'var(--bw-tint-info)', borderBottom: '1px solid var(--bw-tint-info-border)', fontSize: 12, fontWeight: 700, color: 'var(--bw-on-tint-info)', zIndex: 34 }}>
           <span>🌧</span>
           <span>Rain is falling — water levels are projected to keep rising instead of receding. Predictive, not measured.</span>
         </div>
@@ -1949,13 +1950,13 @@ const App: React.FC = () => {
             // Amber dot flags a location problem the user can act on; blue = all good.
             const attention = noFix || weak;
             return (
-            <div style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: '#0F172A', color: '#fff', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', flex: 'none', background: attention ? '#F59E0B' : '#0EA5E9', boxShadow: attention ? '0 0 0 4px rgba(245,158,11,.3)' : '0 0 0 4px rgba(14,165,233,.3)' }} />
+            <div style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 500, display: 'flex', alignItems: 'center', gap: 9, maxWidth: '94%', padding: '10px 13px', background: 'var(--bw-surface-inverse)', color: 'var(--bw-on-accent)', borderRadius: 13, boxShadow: '0 8px 24px rgba(15,23,42,.35)', fontSize: 12.5, fontWeight: 700 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', flex: 'none', background: attention ? 'var(--bw-warn)' : 'var(--bw-primary)', boxShadow: attention ? '0 0 0 4px rgba(245,158,11,.3)' : '0 0 0 4px rgba(14,165,233,.3)' }} />
               <span style={{ lineHeight: 1.3 }}>{hint}</span>
               {noFix && (
-                <button onClick={() => setLocHelpOpen(true)} style={{ border: 0, background: 'rgba(255,255,255,.92)', color: '#0F172A', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', flex: 'none' }}>{t('report.enableLoc')}</button>
+                <button onClick={() => setLocHelpOpen(true)} style={{ border: 0, background: 'rgba(255,255,255,.92)', color: 'var(--bw-ink)', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', flex: 'none' }}>{t('report.enableLoc')}</button>
               )}
-              <button onClick={cancelReport} style={{ border: 0, background: 'rgba(255,255,255,.14)', color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>Cancel</button>
+              <button onClick={cancelReport} style={{ border: 0, background: 'rgba(255,255,255,.14)', color: 'var(--bw-on-accent)', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>Cancel</button>
             </div>
             );
           })()}
@@ -2121,7 +2122,7 @@ const App: React.FC = () => {
             onClick={() => (isAdmin ? setIncidentOpen(true) : setFanOpen((o) => !o))}
             aria-expanded={isAdmin ? undefined : fanOpen}
             aria-label={isAdmin ? t('topbar.report') : t('report.chooseHow')}
-            style={{ position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: fanOpen ? 1145 : 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: '#fff', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
+            style={{ position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: fanOpen ? 1145 : 45, display: 'flex', alignItems: 'center', gap: 8, height: 52, padding: '0 22px', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', borderRadius: 26, fontSize: 15, fontWeight: 800, boxShadow: '0 8px 22px rgba(14,165,233,.45)', cursor: 'pointer' }}
           >
             <span style={{ fontSize: 20, fontWeight: 700, display: 'inline-block', transition: 'transform .15s', transform: !isAdmin && fanOpen ? 'rotate(45deg)' : 'none' }}>+</span> {t('topbar.report')}
           </button>
@@ -2136,7 +2137,7 @@ const App: React.FC = () => {
       {isMobile && mode === 'idle' && !selectedReport && !selEvac && trip.active && (
         <button
           onClick={() => setTripSheetOpen(true)}
-          style={{ position: 'fixed', left: 12, bottom: 20, zIndex: 44, display: 'flex', alignItems: 'center', gap: 7, height: 44, padding: '0 15px', border: 0, borderRadius: 22, background: tripAlertStopIds.length > 0 ? '#F59E0B' : '#7C3AED', color: '#fff', fontSize: 12.5, fontWeight: 800, boxShadow: '0 8px 20px rgba(15,23,42,.3)', cursor: 'pointer' }}
+          style={{ position: 'fixed', left: 12, bottom: 20, zIndex: 44, display: 'flex', alignItems: 'center', gap: 7, height: 44, padding: '0 15px', border: 0, borderRadius: 22, background: tripAlertStopIds.length > 0 ? 'var(--bw-warn)' : 'var(--bw-accent-violet)', color: 'var(--bw-on-accent)', fontSize: 12.5, fontWeight: 800, boxShadow: '0 8px 20px rgba(15,23,42,.3)', cursor: 'pointer' }}
         >
           🚗 {trip.stops.length}
           {tripAlertStopIds.length > 0 && <span>· ⚠ {tripAlertStopIds.length}</span>}
@@ -2146,9 +2147,9 @@ const App: React.FC = () => {
       {isMobile && tripSheetOpen && (
         <>
           <div onClick={() => setTripSheetOpen(false)} aria-hidden="true" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.45)', zIndex: 1100 }} />
-          <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1110, maxHeight: '82vh', overflowY: 'auto', background: '#fff', borderRadius: '18px 18px 0 0', boxShadow: '0 -8px 30px rgba(15,23,42,.3)', animation: 'sheetUp .22s ease-out', padding: '6px 0 10px' }}>
+          <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1110, maxHeight: '82vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '18px 18px 0 0', boxShadow: '0 -8px 30px rgba(15,23,42,.3)', animation: 'sheetUp .22s ease-out', padding: '6px 0 10px' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 14px 0' }}>
-              <button onClick={() => setTripSheetOpen(false)} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
+              <button onClick={() => setTripSheetOpen(false)} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
             </div>
             {/* TripPanel renders its body only — the sidebar's control strip supplies the heading
                 and padding there, so this sheet supplies its own. */}

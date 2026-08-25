@@ -36,18 +36,18 @@ const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
         onClick={(e) => e.stopPropagation()}
         style={
           isMobile
-            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-            : { width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+            ? { width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+            : { width: 430, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
         }
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>💙</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Salamat — thank you for being here</div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>FloodedArea · Philippines</div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
 
         <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px) clamp(18px, 5vw, 22px)' }}>
@@ -59,12 +59,12 @@ const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
           </p>
 
           {/* Truthful info — lives depend on it */}
-          <div style={{ marginTop: 16, padding: '13px 14px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12 }}>
+          <div style={{ marginTop: 16, padding: '13px 14px', background: 'var(--bw-tint-warn)', border: '1px solid var(--bw-tint-warn-border)', borderRadius: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <span style={{ fontSize: 15 }}>⚠️</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#9A3412' }}>Please report only the truth</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--bw-on-tint-warn)' }}>Please report only the truth</span>
             </div>
-            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: '#7C2D12' }}>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: 'var(--bw-on-tint-warn)' }}>
               People decide whether to evacuate, which roads to avoid, and where to send rescuers
               based on what you post. Honest, accurate reports save lives — false ones can cost them.
             </p>
@@ -76,7 +76,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
             href={FB_PAGE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid #C9DCFB', background: '#F0F5FF', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
+            style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, textDecoration: 'none', border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: '#1877F2', padding: '11px 12px', borderRadius: 12, fontSize: 13.5, fontWeight: 800 }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true"><path d={FB_GLYPH_PATH} /></svg>
             {t('share.followFb')}
@@ -125,7 +125,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isMobile, onClose }) => {
 
           <button
             onClick={onClose}
-            style={{ width: '100%', marginTop: 18, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
+            style={{ width: '100%', marginTop: 18, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 14, borderRadius: 13, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
           >
             Continue to the map
           </button>

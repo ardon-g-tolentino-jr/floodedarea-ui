@@ -25,24 +25,24 @@ const CommunityFeedbackModal: React.FC<CommunityFeedbackModalProps> = ({ isMobil
       onClick={(e) => e.stopPropagation()}
       style={
         isMobile
-          ? { width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
-          : { width: 460, maxWidth: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
+          ? { width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: '20px 20px 0 0', boxShadow: '0 -10px 40px rgba(15,23,42,.35)', animation: 'sheetUp .22s ease-out' }
+          : { width: 460, maxWidth: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', animation: 'popIn .16s ease-out' }
       }
     >
       {/* Header */}
-      <div style={{ background: 'linear-gradient(150deg,#0EA5E9,#0369A1)', padding: '20px 22px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12, flex: 'none' }}>
+      <div style={{ background: 'linear-gradient(150deg,var(--bw-primary),var(--bw-primary-deep))', padding: '20px 22px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12, flex: 'none' }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flex: 'none' }}>💬</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 'clamp(16px, 4.5vw, 18px)', fontWeight: 800, lineHeight: 1.25 }}>Community feedback</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>Ideas and fixes the community wants most</div>
         </div>
-        <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+        <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
       <div style={{ padding: 'clamp(16px, 4vw, 18px) clamp(16px, 5vw, 22px)', overflowY: 'auto', flex: 1 }}>
         <button
           onClick={onSuggest}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 13, borderRadius: 13, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 13, borderRadius: 13, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 16px rgba(14,165,233,.3)' }}
         >
           💡 Suggest a feature / report a bug
         </button>
@@ -63,7 +63,7 @@ const CommunityFeedbackModal: React.FC<CommunityFeedbackModalProps> = ({ isMobil
               const isFeature = f.type === 'feature';
               const voted = f.upvotedByMe;
               return (
-                <div key={f.id} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '11px 12px', background: '#F7FAFB', border: '1px solid var(--bw-line-soft)', borderRadius: 12 }}>
+                <div key={f.id} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '11px 12px', background: 'var(--bw-surface-sunken)', border: '1px solid var(--bw-line-soft)', borderRadius: 12 }}>
                   {/* Upvote pill */}
                   <button
                     onClick={() => onUpvote(f.id)}
@@ -72,8 +72,8 @@ const CommunityFeedbackModal: React.FC<CommunityFeedbackModalProps> = ({ isMobil
                     style={{
                       flex: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1,
                       width: 46, padding: '7px 0', borderRadius: 11, cursor: 'pointer',
-                      border: `1px solid ${voted ? '#BAE2FB' : 'var(--bw-line)'}`,
-                      background: voted ? '#EFF8FF' : '#fff',
+                      border: `1px solid ${voted ? 'var(--bw-tint-info-border)' : 'var(--bw-line)'}`,
+                      background: voted ? 'var(--bw-tint-info)' : 'var(--bw-surface)',
                       color: voted ? 'var(--bw-primary)' : 'var(--bw-ink-soft)',
                     }}
                   >
@@ -82,7 +82,7 @@ const CommunityFeedbackModal: React.FC<CommunityFeedbackModalProps> = ({ isMobil
                   </button>
 
                   <div style={{ minWidth: 0, flex: 1 }}>
-                    <span style={{ display: 'inline-block', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, marginBottom: 4, background: isFeature ? '#EFF8FF' : '#FEF2F2', color: isFeature ? 'var(--bw-primary)' : '#DC2626' }}>
+                    <span style={{ display: 'inline-block', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, marginBottom: 4, background: isFeature ? 'var(--bw-tint-info)' : 'var(--bw-tint-danger)', color: isFeature ? 'var(--bw-primary)' : 'var(--bw-on-tint-danger)' }}>
                       {isFeature ? '💡 Feature' : '🐞 Bug'}
                     </span>
                     <div style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)' }}>{f.title}</div>

@@ -29,7 +29,7 @@ const LocateButton: React.FC<LocateButtonProps> = ({ onClick, locating }) => (
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#fff',
+      background: 'var(--bw-surface)',
       border: '1px solid var(--bw-line)',
       boxShadow: '0 4px 14px rgba(15,23,42,.18)',
       color: 'var(--bw-primary)',

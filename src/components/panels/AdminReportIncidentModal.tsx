@@ -69,7 +69,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface)',
   boxSizing: 'border-box',
 };
 
@@ -310,21 +310,21 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
   const card = (
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ width: 460, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
+      style={{ width: 460, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
     >
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#4F46E5,#4338CA)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'linear-gradient(135deg,#4F46E5,var(--bw-accent-indigo))', padding: '16px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800 }}>🗞 Report a flood incident</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>Log a flood from news or other sources — posts as a system report.</div>
         </div>
-        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
+        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
       {/* Body */}
       <div style={{ padding: '15px 20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {error && (
-          <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
+          <div style={{ background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
         )}
 
         <div>
@@ -341,9 +341,9 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
                   padding: '7px 8px',
                   borderRadius: 9,
                   cursor: 'pointer',
-                  border: `1.5px solid ${locTab === tKey ? '#4338CA' : '#E2E8F0'}`,
-                  background: locTab === tKey ? '#EEF2FF' : '#fff',
-                  color: locTab === tKey ? '#4338CA' : 'var(--bw-ink)',
+                  border: `1.5px solid ${locTab === tKey ? 'var(--bw-accent-indigo)' : 'var(--bw-line)'}`,
+                  background: locTab === tKey ? 'var(--bw-tint-info)' : 'var(--bw-surface)',
+                  color: locTab === tKey ? 'var(--bw-accent-indigo)' : 'var(--bw-ink)',
                   fontSize: 12,
                   fontWeight: 800,
                 }}
@@ -364,8 +364,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
                 onClick={() => void findIntersectionPoints()}
                 style={{
                   border: 0,
-                  background: '#4338CA',
-                  color: '#fff',
+                  background: 'var(--bw-accent-indigo)',
+                  color: 'var(--bw-on-accent)',
                   padding: '9px',
                   borderRadius: 9,
                   fontSize: 12.5,
@@ -384,20 +384,20 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
                   to fix. 'busy' is Overpass's fault (observed failing 5/6 attempts with a 504) and
                   gets a Retry + a one-click escape to the map tab instead of "check the spelling". */}
               {interOutcome?.status === 'busy' && (
-                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 9, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  <div style={{ fontSize: 11.5, color: '#92400E', fontWeight: 600 }}>OpenStreetMap's lookup service is busy right now. Try again, or use "Pick on map".</div>
+                <div style={{ background: 'var(--bw-tint-warn)', border: '1px solid var(--bw-tint-warn-border)', borderRadius: 9, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  <div style={{ fontSize: 11.5, color: 'var(--bw-on-tint-warn)', fontWeight: 600 }}>OpenStreetMap's lookup service is busy right now. Try again, or use "Pick on map".</div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
                       type="button"
                       onClick={() => void findIntersectionPoints()}
-                      style={{ border: 0, background: '#4338CA', color: '#fff', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
+                      style={{ border: 0, background: 'var(--bw-accent-indigo)', color: 'var(--bw-on-accent)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
                     >
                       Retry
                     </button>
                     <button
                       type="button"
                       onClick={() => setLocTab('map')}
-                      style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
+                      style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
                     >
                       Pick on map
                     </button>
@@ -423,8 +423,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
                           textAlign: 'left',
                           padding: '8px 10px',
                           borderRadius: 9,
-                          border: `1.5px solid ${chosen ? '#4338CA' : '#E2E8F0'}`,
-                          background: chosen ? '#EEF2FF' : '#fff',
+                          border: `1.5px solid ${chosen ? 'var(--bw-accent-indigo)' : 'var(--bw-line)'}`,
+                          background: chosen ? 'var(--bw-tint-info)' : 'var(--bw-surface)',
                           fontSize: 12,
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -438,7 +438,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
               )}
               {hasCoords && (
                 <div style={{ fontSize: 11, color: 'var(--bw-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ color: '#9AA8B4' }}>⚲</span>
+                  <span style={{ color: 'var(--bw-faint)' }}>⚲</span>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {placeLabel || `Pinned at ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`}
                   </span>
@@ -498,7 +498,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
                   key={s}
                   type="button"
                   onClick={() => chooseSeverity(s)}
-                  style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${active ? m.color : '#E2E8F0'}`, background: active ? m.soft : '#fff', color: active ? m.color : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                  style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${active ? m.color : 'var(--bw-line)'}`, background: active ? m.soft : 'var(--bw-surface)', color: active ? m.color : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                 >
                   <span style={{ width: 9, height: 9, borderRadius: '50%', background: m.color, flex: 'none' }} />
                   {m.label}
@@ -513,7 +513,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
             // The pin is already inside an existing zone's advisory circle — that place IS the
             // advisory, so offer no checkbox to duplicate it. Styled like the other soft info
             // chips in this modal (see the 'busy' intersection-outcome chip above).
-            <div style={{ background: '#FFFBEB', color: '#854D0E', border: '1px solid #FDE68A', borderRadius: 11, padding: '8px 10px' }}>
+            <div style={{ background: 'var(--bw-tint-warn)', color: 'var(--bw-on-tint-warn)', border: '1px solid var(--bw-tint-warn-border)', borderRadius: 11, padding: '8px 10px' }}>
               <div style={{ fontSize: 12.5, fontWeight: 800 }}>✓ Already flood-prone: {proneMatch.name}</div>
               <div style={{ fontSize: 10.5, fontWeight: 600, marginTop: 2 }}>No new zone will be added — this spot is already covered.</div>
             </div>
@@ -562,10 +562,10 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
           {photo ? (
             <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
               <img src={photo} alt="Incident screenshot preview" style={{ width: '100%', maxHeight: 160, objectFit: 'cover', display: 'block' }} />
-              <button type="button" onClick={() => { setPhoto(null); setPhotoError(null); }} style={{ position: 'absolute', top: 6, right: 6, border: 0, background: 'rgba(15,23,42,.62)', color: '#fff', borderRadius: 8, padding: '4px 9px', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>Remove</button>
+              <button type="button" onClick={() => { setPhoto(null); setPhotoError(null); }} style={{ position: 'absolute', top: 6, right: 6, border: 0, background: 'rgba(15,23,42,.62)', color: 'var(--bw-on-accent)', borderRadius: 8, padding: '4px 9px', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>Remove</button>
             </div>
           ) : (
-            <button type="button" disabled={photoBusy} onClick={() => fileInputRef.current?.click()} style={{ width: '100%', padding: 11, border: '1.5px dashed #CBD5E1', borderRadius: 10, background: '#F8FAFC', color: 'var(--bw-ink-soft)', fontSize: 12.5, fontWeight: 800, cursor: photoBusy ? 'wait' : 'pointer' }}>
+            <button type="button" disabled={photoBusy} onClick={() => fileInputRef.current?.click()} style={{ width: '100%', padding: 11, border: '1.5px dashed var(--bw-line-strong)', borderRadius: 10, background: 'var(--bw-surface-sunken)', color: 'var(--bw-ink-soft)', fontSize: 12.5, fontWeight: 800, cursor: photoBusy ? 'wait' : 'pointer' }}>
               {photoBusy ? 'Processing screenshot…' : '📷 Attach a screenshot'}
             </button>
           )}
@@ -590,18 +590,18 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
         <div>
           <label style={labelStyle}>Auto-post</label>
           <div style={{ display: 'flex', gap: 7 }}>
-            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postFacebook ? '#4338CA' : '#E2E8F0'}`, background: postFacebook ? '#EEF2FF' : '#fff', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postFacebook ? 'var(--bw-accent-indigo)' : 'var(--bw-line)'}`, background: postFacebook ? 'var(--bw-tint-info)' : 'var(--bw-surface)', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
               <input type="checkbox" checked={postFacebook} onChange={(e) => setPostFacebook(e.target.checked)} />
               <svg viewBox="0 0 24 24" width={13} height={13} fill="#1877F2" style={{ flex: 'none' }}><path d={FB_GLYPH_PATH} /></svg>
               Facebook
             </label>
-            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postX ? '#4338CA' : '#E2E8F0'}`, background: postX ? '#EEF2FF' : '#fff', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+            <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', border: `1.5px solid ${postX ? 'var(--bw-accent-indigo)' : 'var(--bw-line)'}`, background: postX ? 'var(--bw-tint-info)' : 'var(--bw-surface)', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
               <input type="checkbox" checked={postX} onChange={(e) => setPostX(e.target.checked)} />
               𝕏 X
             </label>
           </div>
           {(postFacebook || postX) && (
-            <div style={{ marginTop: 8, padding: '9px 10px', background: '#F7FAFB', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
+            <div style={{ marginTop: 8, padding: '9px 10px', background: 'var(--bw-surface-sunken)', border: '1px solid var(--bw-line-soft)', borderRadius: 9 }}>
               <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>{captionBody}</div>
               {postX && (
                 <div style={{ marginTop: 6, fontSize: 10.5, fontWeight: 700, color: xOverBudget ? 'var(--bw-danger)' : 'var(--bw-faint)' }}>
@@ -634,7 +634,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
               <span style={{ fontSize: 12.5, color: 'var(--bw-muted)', fontWeight: 600 }}>hours ago</span>
             </div>
             {bornExpired ? (
-              <div style={{ fontSize: 10.5, color: '#B91C1C', fontWeight: 700, marginTop: 4 }}>
+              <div style={{ fontSize: 10.5, color: 'var(--bw-on-tint-danger)', fontWeight: 700, marginTop: 4 }}>
                 Older than the {formatDuration(effectiveTtlMin)} window — this would post already expired. Lower the hours or raise “Keep live for”.
               </div>
             ) : (
@@ -655,7 +655,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
         <button
           onClick={() => void submit()}
           disabled={!canPost}
-          style={{ width: '100%', border: 0, background: '#4338CA', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: canPost ? 'pointer' : 'not-allowed', opacity: canPost ? 1 : 0.6 }}
+          style={{ width: '100%', border: 0, background: 'var(--bw-accent-indigo)', color: 'var(--bw-on-accent)', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: canPost ? 'pointer' : 'not-allowed', opacity: canPost ? 1 : 0.6 }}
         >
           {busy ? 'Posting…' : photoBusy ? 'Processing screenshot…' : 'Post system report'}
         </button>

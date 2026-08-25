@@ -10,7 +10,7 @@ const RoadLegend: React.FC = () => (
       left: 16,
       zIndex: 500,
       padding: '11px 13px',
-      background: 'rgba(255,255,255,.96)',
+      background: 'var(--bw-surface-glass)',
       backdropFilter: 'blur(4px)',
       border: '1px solid var(--bw-line)',
       borderRadius: 12,
@@ -23,7 +23,7 @@ const RoadLegend: React.FC = () => (
         const rm = ROAD_META[k];
         return (
           <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 11, height: 11, borderRadius: '50%', background: rm.color, border: '2px solid #fff', boxShadow: `0 0 0 1px ${rm.color}`, flex: 'none' }} />
+            <span style={{ width: 11, height: 11, borderRadius: '50%', background: rm.color, border: '2px solid var(--bw-surface)', boxShadow: `0 0 0 1px ${rm.color}`, flex: 'none' }} />
             <span style={{ fontSize: 12, fontWeight: 700 }}>{rm.label}</span>
           </div>
         );

@@ -29,7 +29,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface)',
   boxSizing: 'border-box',
 };
 
@@ -59,25 +59,25 @@ const AdminWarnZoneModal: React.FC<Props> = ({ isMobile, zone, onSubmit, onClose
   const card = (
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ width: 440, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
+      style={{ width: 440, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: isMobile ? '20px 20px 0 0' : 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out' }}
     >
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#F59E0B,#B45309)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'linear-gradient(135deg,var(--bw-warn),var(--bw-on-tint-warn))', padding: '16px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800 }}>⚠ {t('zone.warnTitle')}</div>
           <div style={{ fontSize: 12, opacity: 0.9 }}>{zone.name} · {zone.district}</div>
         </div>
-        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
+        <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}>×</button>
       </div>
 
       {/* Body */}
       <div style={{ padding: '15px 20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ padding: '10px 12px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, fontSize: 12, color: '#92600B', fontWeight: 600, lineHeight: 1.5 }}>
+        <div style={{ padding: '10px 12px', background: 'var(--bw-tint-warn)', border: '1px solid var(--bw-tint-warn-border)', borderRadius: 10, fontSize: 12, color: 'var(--bw-on-tint-warn)', fontWeight: 600, lineHeight: 1.5 }}>
           {t('zone.warnBody')} {t('zone.advisory')}
         </div>
 
         {error && (
-          <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
+          <div style={{ background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600 }}>{error}</div>
         )}
 
         <div>
@@ -98,7 +98,7 @@ const AdminWarnZoneModal: React.FC<Props> = ({ isMobile, zone, onSubmit, onClose
                 key={o.value}
                 type="button"
                 onClick={() => setLevel(o.value)}
-                style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${level === o.value ? '#B45309' : '#E2E8F0'}`, background: level === o.value ? '#FFFBEB' : '#fff', color: level === o.value ? '#B45309' : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800 }}
+                style={{ flex: 1, padding: '9px 8px', borderRadius: 10, cursor: 'pointer', border: `1.5px solid ${level === o.value ? 'var(--bw-on-tint-warn)' : 'var(--bw-line)'}`, background: level === o.value ? 'var(--bw-tint-warn)' : 'var(--bw-surface)', color: level === o.value ? 'var(--bw-on-tint-warn)' : 'var(--bw-ink)', fontSize: 12.5, fontWeight: 800 }}
               >
                 {o.label}
               </button>
@@ -116,7 +116,7 @@ const AdminWarnZoneModal: React.FC<Props> = ({ isMobile, zone, onSubmit, onClose
         <button
           onClick={() => void submit()}
           disabled={busy}
-          style={{ width: '100%', border: 0, background: '#B45309', color: '#fff', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}
+          style={{ width: '100%', border: 0, background: 'var(--bw-on-tint-warn)', color: 'var(--bw-on-accent)', padding: 12, borderRadius: 11, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}
         >
           {busy ? 'Sending…' : `⚠ ${t('zone.sendWarning')}`}
         </button>

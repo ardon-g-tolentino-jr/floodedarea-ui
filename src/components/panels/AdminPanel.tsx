@@ -19,7 +19,7 @@ import type {
 } from '../../types';
 import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
 import { matchingProneZone } from '../../utils/viewModel';
-import { timeAgo } from '../../utils/format';
+import { formatDepth, timeAgo } from '../../utils/format';
 import { FB_GLYPH_PATH } from '../../utils/share';
 import { reverseGeocode } from '../../api/geocode';
 import PlaceField from './PlaceField';
@@ -163,15 +163,15 @@ const SEARCH_PLACEHOLDER: Record<Tab, string> = {
 const STATUS_ORDER: Record<FeedbackStatus, number> = { pending: 0, accepted: 1, declined: 2 };
 const STATUS_PILL: Record<FeedbackStatus, { bg: string; fg: string }> = {
   pending:  { bg: 'var(--bw-bg-subtle)', fg: 'var(--bw-ink-soft)' },
-  accepted: { bg: '#F0FDF4', fg: '#15803D' },
-  declined: { bg: '#FEF2F2', fg: '#B91C1C' },
+  accepted: { bg: 'var(--bw-tint-ok)', fg: 'var(--bw-on-tint-ok)' },
+  declined: { bg: 'var(--bw-tint-danger)', fg: 'var(--bw-on-tint-danger)' },
 };
 
 const SOCIAL_STATUS_PILL: Record<SocialPost['status'], { bg: string; fg: string }> = {
   pending: { bg: 'var(--bw-bg-subtle)', fg: 'var(--bw-ink-soft)' },
-  sent:    { bg: '#F0FDF4', fg: '#15803D' },
-  failed:  { bg: '#FEF2F2', fg: '#B91C1C' },
-  skipped: { bg: '#FFFBEB', fg: '#92400E' },
+  sent:    { bg: 'var(--bw-tint-ok)', fg: 'var(--bw-on-tint-ok)' },
+  failed:  { bg: 'var(--bw-tint-danger)', fg: 'var(--bw-on-tint-danger)' },
+  skipped: { bg: 'var(--bw-tint-warn)', fg: 'var(--bw-on-tint-warn)' },
 };
 const SOCIAL_NETWORK_LABEL: Record<SocialNetwork, string> = { facebook: 'Facebook', x: 'X' };
 
@@ -220,7 +220,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface-sunken)',
   boxSizing: 'border-box',
 };
 
@@ -433,7 +433,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     if (tab === 'zones') return zones.map((z) => ({ id: z.id, primary: z.name, secondary: `${z.district} · ${z.radiusM} m · ${z.level.toUpperCase()}${z.active ? '' : ' · inactive'}`, rec: z as unknown as Record<string, unknown> }));
     return [...reports]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .map((r) => ({ id: r.id, primary: r.name, secondary: `${SEV_META[r.severity].label} · ${r.depthCm} cm · ${r.district}`, rec: r as unknown as Record<string, unknown> }));
+      .map((r) => ({ id: r.id, primary: r.name, secondary: `${SEV_META[r.severity].label} · ${formatDepth(r.depthCm)} · ${r.district}`, rec: r as unknown as Record<string, unknown> }));
   }, [tab, centers, hotlines, alerts, zones, reports]);
 
   // Search filters on primary (name) + secondary (detail line, e.g. a zone's "City, Province"
@@ -462,15 +462,15 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width: 560, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: 'popIn .16s ease-out' }}
+        style={{ width: 560, maxWidth: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface-raised)', borderRadius: 20, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden', animation: 'popIn .16s ease-out' }}
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg,#0EA5E9,#0369A1)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'linear-gradient(135deg,var(--bw-primary),var(--bw-primary-deep))', padding: '16px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 800 }}>Admin console</div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>Manage shelters, hotlines, alerts, reports &amp; requests</div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer' }}>×</button>
         </div>
 
         {/* Live-stream toggle */}
@@ -482,9 +482,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           <button
             onClick={() => onToggleLive(!liveStream)}
             aria-pressed={liveStream}
-            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: liveStream ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: liveStream ? 'var(--bw-primary)' : 'var(--bw-line-strong)', transition: 'background .15s', flex: 'none' }}
           >
-            <span style={{ position: 'absolute', top: 3, left: liveStream ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+            <span style={{ position: 'absolute', top: 3, left: liveStream ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 
@@ -497,9 +497,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           <button
             onClick={() => onToggleChat(!chatEnabled)}
             aria-pressed={chatEnabled}
-            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: chatEnabled ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: chatEnabled ? 'var(--bw-primary)' : 'var(--bw-line-strong)', transition: 'background .15s', flex: 'none' }}
           >
-            <span style={{ position: 'absolute', top: 3, left: chatEnabled ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+            <span style={{ position: 'absolute', top: 3, left: chatEnabled ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 
@@ -513,9 +513,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           <button
             onClick={() => onToggleSocialAutopost('facebook', !socialAutopostFacebook)}
             aria-pressed={socialAutopostFacebook}
-            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostFacebook ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostFacebook ? 'var(--bw-primary)' : 'var(--bw-line-strong)', transition: 'background .15s', flex: 'none' }}
           >
-            <span style={{ position: 'absolute', top: 3, left: socialAutopostFacebook ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+            <span style={{ position: 'absolute', top: 3, left: socialAutopostFacebook ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
         <div style={{ padding: '13px 20px', borderBottom: '1px solid var(--bw-line-soft)', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -526,9 +526,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           <button
             onClick={() => onToggleSocialAutopost('x', !socialAutopostX)}
             aria-pressed={socialAutopostX}
-            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostX ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: socialAutopostX ? 'var(--bw-primary)' : 'var(--bw-line-strong)', transition: 'background .15s', flex: 'none' }}
           >
-            <span style={{ position: 'absolute', top: 3, left: socialAutopostX ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+            <span style={{ position: 'absolute', top: 3, left: socialAutopostX ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 
@@ -542,9 +542,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           <button
             onClick={() => onToggleRain(!rainActive)}
             aria-pressed={rainActive}
-            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: rainActive ? 'var(--bw-primary)' : '#CBD5E1', transition: 'background .15s', flex: 'none' }}
+            style={{ position: 'relative', width: 46, height: 26, borderRadius: 13, border: 0, cursor: 'pointer', background: rainActive ? 'var(--bw-primary)' : 'var(--bw-line-strong)', transition: 'background .15s', flex: 'none' }}
           >
-            <span style={{ position: 'absolute', top: 3, left: rainActive ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
+            <span style={{ position: 'absolute', top: 3, left: rainActive ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: 'var(--bw-surface)', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.3)' }} />
           </button>
         </div>
 
@@ -564,7 +564,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         {/* Body */}
         <div style={{ padding: '14px 20px', overflowY: 'auto', flex: 1 }}>
           {error && (
-            <div style={{ background: '#FEF2F2', color: '#B91C1C', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600, marginBottom: 11 }}>{error}</div>
+            <div style={{ background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '8px 11px', borderRadius: 9, fontSize: 12.5, fontWeight: 600, marginBottom: 11 }}>{error}</div>
           )}
 
           {/* One search box above every tab's body (including Requests, which has its own card
@@ -573,7 +573,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           {!editing && (
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 13px', height: 40, background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 11 }}>
-                <span style={{ fontSize: 14, color: '#9AA8B4', flex: 'none' }}>⌕</span>
+                <span style={{ fontSize: 14, color: 'var(--bw-faint)', flex: 'none' }}>⌕</span>
                 <input
                   value={query}
                   onChange={(e) => { setQuery(e.target.value); setPage(0); }}
@@ -585,7 +585,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     type="button"
                     aria-label="Clear search"
                     onClick={() => setQuery('')}
-                    style={{ border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
+                    style={{ border: 0, background: 'transparent', color: 'var(--bw-faint)', fontSize: 15, cursor: 'pointer', flex: 'none', padding: 0, lineHeight: 1 }}
                   >
                     ×
                   </button>
@@ -612,23 +612,23 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   const isFeature = f.type === 'feature';
                   const sc = STATUS_PILL[f.status];
                   return (
-                    <div key={f.id} style={{ padding: '11px 12px', background: '#F7FAFB', borderRadius: 11, border: '1px solid var(--bw-line-soft)' }}>
+                    <div key={f.id} style={{ padding: '11px 12px', background: 'var(--bw-surface-sunken)', borderRadius: 11, border: '1px solid var(--bw-line-soft)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: isFeature ? '#EFF8FF' : '#FEF2F2', color: isFeature ? 'var(--bw-primary)' : '#DC2626' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: isFeature ? 'var(--bw-tint-info)' : 'var(--bw-tint-danger)', color: isFeature ? 'var(--bw-primary)' : 'var(--bw-on-tint-danger)' }}>
                           {isFeature ? '💡 Feature' : '🐞 Bug'}
                         </span>
                         <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: sc.bg, color: sc.fg, textTransform: 'capitalize' }}>{f.status}</span>
-                        <span title={`${f.upvotes} upvote${f.upvotes === 1 ? '' : 's'}`} style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: '#EFF8FF', color: 'var(--bw-primary)' }}>▲ {f.upvotes}</span>
+                        <span title={`${f.upvotes} upvote${f.upvotes === 1 ? '' : 's'}`} style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: 'var(--bw-tint-info)', color: 'var(--bw-primary)' }}>▲ {f.upvotes}</span>
                         <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--bw-faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40%' }}>{f.submitterName ?? 'Someone'}</span>
                       </div>
                       <div style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--bw-ink)' }}>{f.title}</div>
                       {f.details && <div style={{ fontSize: 12, color: 'var(--bw-muted)', lineHeight: 1.45, marginTop: 2 }}>{f.details}</div>}
                       <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
                         {f.status !== 'accepted' && (
-                          <button onClick={() => void moderate(f.id, 'accepted')} disabled={acting} style={{ border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#15803D', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Accept</button>
+                          <button onClick={() => void moderate(f.id, 'accepted')} disabled={acting} style={{ border: '1px solid var(--bw-tint-ok-border)', background: 'var(--bw-tint-ok)', color: 'var(--bw-on-tint-ok)', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Accept</button>
                         )}
                         {f.status !== 'declined' && (
-                          <button onClick={() => void moderate(f.id, 'declined')} disabled={acting} style={{ border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Decline</button>
+                          <button onClick={() => void moderate(f.id, 'declined')} disabled={acting} style={{ border: '1px solid var(--bw-tint-danger-border)', background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '6px 13px', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: acting ? 'wait' : 'pointer' }}>Decline</button>
                         )}
                       </div>
                     </div>
@@ -675,7 +675,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                               <button
                                 type="button"
                                 onClick={() => pickLocation(Number(editing.form.latitude), Number(editing.form.longitude), String(editing.form._place ?? ''), true)}
-                                style={{ marginTop: 6, border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
+                                style={{ marginTop: 6, border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
                               >
                                 Resolve name from pin
                               </button>
@@ -702,10 +702,10 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 })}
               </div>
               <div style={{ display: 'flex', gap: 9, marginTop: 16 }}>
-                <button onClick={() => void submit()} disabled={busy} style={{ flex: 1, border: 0, background: 'var(--bw-primary)', color: '#fff', padding: 11, borderRadius: 10, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}>
+                <button onClick={() => void submit()} disabled={busy} style={{ flex: 1, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 11, borderRadius: 10, fontSize: 13.5, fontWeight: 800, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}>
                   {busy ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setEditing(null)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '11px 16px', borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => setEditing(null)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '11px 16px', borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}>
                   Cancel
                 </button>
               </div>
@@ -720,19 +720,19 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
                   <button
                     onClick={() => props.onReportZones()}
-                    style={{ flex: '1 1 200px', border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                    style={{ flex: '1 1 200px', border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
                   >
                     ⚡ Report flooding on zones…
                   </button>
                   <button
                     onClick={() => props.onScopedWarn()}
-                    style={{ flex: '1 1 200px', border: '1px solid #FED7AA', background: '#FFF7ED', color: '#C2410C', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                    style={{ flex: '1 1 200px', border: '1px solid var(--bw-tint-warn-border)', background: 'var(--bw-tint-warn)', color: 'var(--bw-on-tint-warn)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
                   >
                     ⚠ Warn an area…
                   </button>
                 </div>
               )}
-              <button onClick={startAdd} style={{ width: '100%', border: '1px dashed var(--bw-primary)', background: '#EFF8FF', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 12 }}>
+              <button onClick={startAdd} style={{ width: '100%', border: '1px dashed var(--bw-primary)', background: 'var(--bw-tint-info)', color: 'var(--bw-primary)', padding: 10, borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 12 }}>
                 + Add {TAB_LABEL[tab].toLowerCase().replace(/s$/, '')}
               </button>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
@@ -748,7 +748,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   // They alone wrap: the name/district block takes the full first line and the
                   // button strip drops to a second. Other tabs keep the original single row.
                   return (
-                  <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FAFB', borderRadius: 11, ...(zoneRec ? { flexWrap: 'wrap' as const } : null) }}>
+                  <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bw-surface-sunken)', borderRadius: 11, ...(zoneRec ? { flexWrap: 'wrap' as const } : null) }}>
                     <div style={{ flex: 1, minWidth: 0, ...(zoneRec ? { flexBasis: '100%' } : null) }}>
                       <div style={{ fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.primary}</div>
                       <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.secondary}</div>
@@ -759,19 +759,19 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                       )}
                     </div>
                     {zoneRec && (
-                      <button onClick={() => props.onReportZones(zoneRec)} disabled={busy} title="Report flooding for this zone now" style={{ border: '1px solid #BAE2FB', background: '#EFF8FF', color: 'var(--bw-primary)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                      <button onClick={() => props.onReportZones(zoneRec)} disabled={busy} title="Report flooding for this zone now" style={{ border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: 'var(--bw-primary)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                         ⚡ Report now
                       </button>
                     )}
                     {zoneRec && (
-                      <button onClick={() => props.onWarnZone(zoneRec)} disabled={busy} title="Send a flood warning for this zone" style={{ border: '1px solid #FED7AA', background: '#FFF7ED', color: '#C2410C', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                      <button onClick={() => props.onWarnZone(zoneRec)} disabled={busy} title="Send a flood warning for this zone" style={{ border: '1px solid var(--bw-tint-warn-border)', background: 'var(--bw-tint-warn)', color: 'var(--bw-on-tint-warn)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                         ⚠ Warn
                       </button>
                     )}
-                    <button onClick={() => startEdit(r.id, r.rec)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                    <button onClick={() => startEdit(r.id, r.rec)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                       Edit
                     </button>
-                    <button onClick={() => void remove(r.id)} disabled={busy} style={{ border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                    <button onClick={() => void remove(r.id)} disabled={busy} style={{ border: '1px solid var(--bw-tint-danger-border)', background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                       Delete
                     </button>
                   </div>
@@ -784,7 +784,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   <button
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
                     disabled={safePage === 0}
-                    style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '7px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: safePage === 0 ? 'default' : 'pointer', opacity: safePage === 0 ? 0.45 : 1 }}
+                    style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '7px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: safePage === 0 ? 'default' : 'pointer', opacity: safePage === 0 ? 0.45 : 1 }}
                   >
                     ← Prev
                   </button>
@@ -794,7 +794,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                   <button
                     onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                     disabled={safePage >= pageCount - 1}
-                    style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '7px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: safePage >= pageCount - 1 ? 'default' : 'pointer', opacity: safePage >= pageCount - 1 ? 0.45 : 1 }}
+                    style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '7px 13px', borderRadius: 9, fontSize: 12.5, fontWeight: 700, cursor: safePage >= pageCount - 1 ? 'default' : 'pointer', opacity: safePage >= pageCount - 1 ? 0.45 : 1 }}
                   >
                     Next →
                   </button>
@@ -812,7 +812,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                       const reportName = reports.find((r) => r.id === sp.reportId)?.name ?? `Report #${sp.reportId}`;
                       const pill = SOCIAL_STATUS_PILL[sp.status];
                       return (
-                        <div key={sp.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', background: '#F7FAFB', borderRadius: 10 }}>
+                        <div key={sp.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', background: 'var(--bw-surface-sunken)', borderRadius: 10 }}>
                           {sp.network === 'facebook' ? (
                             <svg viewBox="0 0 24 24" width={13} height={13} fill="#1877F2" style={{ flex: 'none' }}><path d={FB_GLYPH_PATH} /></svg>
                           ) : (
@@ -827,14 +827,14 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                           <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: pill.bg, color: pill.fg, textTransform: 'capitalize', flex: 'none' }}>{sp.status}</span>
                           {/* The payoff of a sent row: open the real post on the network. */}
                           {sp.externalUrl && (
-                            <a href={sp.externalUrl} target="_blank" rel="noopener noreferrer" style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, textDecoration: 'none', flex: 'none' }}>
+                            <a href={sp.externalUrl} target="_blank" rel="noopener noreferrer" style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, textDecoration: 'none', flex: 'none' }}>
                               View
                             </a>
                           )}
                           {/* Skipped rows are retryable too — that's how a dry-run or
                               kill-switched post gets published once the blocker is cleared. */}
                           {(sp.status === 'failed' || sp.status === 'skipped') && (
-                            <button onClick={() => onRetrySocialPost(sp.id)} style={{ border: '1px solid var(--bw-line)', background: '#fff', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
+                            <button onClick={() => onRetrySocialPost(sp.id)} style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                               Retry
                             </button>
                           )}

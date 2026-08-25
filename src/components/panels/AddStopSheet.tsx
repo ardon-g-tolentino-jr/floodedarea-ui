@@ -12,7 +12,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 13,
   color: 'var(--bw-ink)',
-  background: '#fff',
+  background: 'var(--bw-surface)',
   boxSizing: 'border-box',
 };
 
@@ -70,18 +70,18 @@ const AddStopSheet: React.FC<AddStopSheetProps> = ({ isMobile, near, defaultRadi
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: isMobile ? '100%' : 420, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#fff',
+          width: isMobile ? '100%' : 420, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bw-surface)',
           borderRadius: isMobile ? '18px 18px 0 0' : 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)',
           animation: isMobile ? 'sheetUp .22s ease-out' : 'popIn .16s ease-out',
         }}
       >
         <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,#7C3AED,#5B21B6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flex: 'none' }}>📍</div>
+          <div style={{ width: 36, height: 36, borderRadius: 11, background: 'linear-gradient(150deg,var(--bw-accent-violet),#5B21B6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flex: 'none' }}>📍</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16.5, fontWeight: 800 }}>{t('trip.addTitle')}</div>
             <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600 }}>{t('trip.addSubtitle')}</div>
           </div>
-          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer' }}>×</button>
         </div>
 
         <div style={{ padding: 22 }}>
@@ -116,7 +116,7 @@ const AddStopSheet: React.FC<AddStopSheetProps> = ({ isMobile, near, defaultRadi
                     <button
                       key={km}
                       onClick={() => setRadiusKm(km)}
-                      style={{ padding: '7px 13px', borderRadius: 999, border: `1.5px solid ${radiusKm === km ? '#7C3AED' : '#E2E8F0'}`, background: radiusKm === km ? 'rgba(124,58,237,.08)' : '#fff', color: radiusKm === km ? 'var(--bw-ink)' : '#9AA8B4', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+                      style={{ padding: '7px 13px', borderRadius: 999, border: `1.5px solid ${radiusKm === km ? 'var(--bw-accent-violet)' : 'var(--bw-line)'}`, background: radiusKm === km ? 'rgba(124,58,237,.08)' : 'var(--bw-surface)', color: radiusKm === km ? 'var(--bw-ink)' : 'var(--bw-faint)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
                     >
                       {fmtRadius(km)}
                     </button>
@@ -129,7 +129,7 @@ const AddStopSheet: React.FC<AddStopSheetProps> = ({ isMobile, near, defaultRadi
           <button
             onClick={save}
             disabled={!canSave || busy}
-            style={{ width: '100%', marginTop: 18, padding: '12px 14px', borderRadius: 12, border: 0, background: canSave && !busy ? '#7C3AED' : '#CBD5E1', color: '#fff', fontSize: 13.5, fontWeight: 800, cursor: canSave && !busy ? 'pointer' : 'default' }}
+            style={{ width: '100%', marginTop: 18, padding: '12px 14px', borderRadius: 12, border: 0, background: canSave && !busy ? 'var(--bw-accent-violet)' : 'var(--bw-line-strong)', color: 'var(--bw-on-accent)', fontSize: 13.5, fontWeight: 800, cursor: canSave && !busy ? 'pointer' : 'default' }}
           >
             {t('trip.saveStop')}
           </button>

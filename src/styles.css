@@ -1,11 +1,29 @@
 :root {
-  /* FloodedArea design tokens (from the original BahaWatch.dc design comp) */
+  /* FloodedArea design tokens (from the original BahaWatch.dc design comp). Light values here are
+     set to the exact literals already in use across the app, so light mode stays pixel-identical —
+     see the dark override block below for the only place values actually change. */
   --bw-primary: #0ea5e9;
   --bw-primary-deep: #0369a1;
   --bw-shelter: #0e7490;
   --bw-danger: #ef4444;
   --bw-warn: #f59e0b;
   --bw-ok: #16a34a;
+  /* Fixed brand/decorative accents (admin "system report" badge/pin, trip-stop markers, the map
+     search pin). Not surfaces and not severity colors, so — like the hues above — they don't flip
+     in dark mode. Three different, deliberately distinct shades already in use; not collapsed
+     onto one token since that would change today's rendered colors. */
+  /* Road-condition lines on the map. Deliberately separate from --bw-danger/warn/ok: those
+     also fill panel badges and tint text, where the light values are correct in both themes.
+     A thin line on a dark basemap is a different problem — it needs a brighter tier to survive.
+     Light values here are byte-identical to what the map drew before these tokens existed. */
+  --bw-road-impassable: #ef4444;
+  --bw-road-risky: #f59e0b;
+  --bw-road-passable: #16a34a;
+  /* Casing = the outline under each road line, separating it from the basemap. */
+  --bw-road-casing: #fff;
+  --bw-accent-indigo: #4338ca;
+  --bw-accent-violet: #7c3aed;
+  --bw-accent-search: #6366f1;
 
   --bw-ink: #16202e;
   --bw-ink-soft: #3a4856;
@@ -14,9 +32,108 @@
 
   --bw-line: #e6ebf0;
   --bw-line-soft: #edf1f4;
+  --bw-line-strong: #cbd5e1;
   --bw-bg: #f4f7f9;
   --bw-bg-subtle: #f1f5f8;
   --bw-map-bg: #e7ecef;
+
+  /* Surface tokens — there was no dedicated "surface" concept before dark mode; every card/panel/
+     input background was just a raw #fff. Three levels, climbing in the dark palette rather than
+     inverting: base card surface, a raised level for popovers/sheets/modals, and a sunken level
+     for wells/inputs recessed into a card. */
+  --bw-surface: #fff;
+  --bw-surface-raised: #fff;
+  --bw-surface-sunken: #f7fafb;
+  /* White text/icons sitting on a saturated accent fill (SOS button, severity pills, rescue
+     badges). This is NOT a surface — it must stay #fff in both themes, unlike --bw-surface. */
+  --bw-on-accent: #fff;
+
+  /* Pale bg + dark fg tint pairs (status chips, banners, badges). In dark mode these flip from
+     pastel washes to low-alpha veils of the same hue — see the dark block. */
+  --bw-tint-danger: #fef2f2;
+  --bw-on-tint-danger: #b91c1c;
+  --bw-tint-warn: #fffbeb;
+  --bw-on-tint-warn: #b45309;
+  --bw-tint-ok: #f0fdf4;
+  --bw-on-tint-ok: #15803d;
+  --bw-tint-info: #eff8ff;
+  --bw-on-tint-info: #0369a1;
+  --bw-tint-info-border: #bae2fb;
+  /* Frosted overlay card on the map (RoadLegend) — translucent so the basemap
+     shows through the backdrop-filter blur, unlike the opaque --bw-surface. */
+  --bw-surface-glass: rgba(255, 255, 255, .96);
+  /* Deliberately inverted pills (toast, map tooltips): a dark chip carrying white
+     text. In dark mode it must go LIGHTER than the page rather than flipping to
+     --bw-ink, which would put white text on a near-white pill. */
+  --bw-surface-inverse: #16202e;
+  --bw-on-tint-shelter: #0e5063;
+  --bw-tint-danger-border: #fecaca;
+  --bw-tint-warn-border: #fde68a;
+  --bw-tint-ok-border: #bbf7d0;
+  /* Rose tint — TopBar's Response console badge. Same bg/fg/border shape as the tints above; not
+     in the original survey's table (which covered danger/warn/ok/info) but TopBar needs it too. */
+  --bw-tint-rose: #fdf2f8;
+  --bw-on-tint-rose: #be185d;
+  --bw-tint-rose-border: #fbcfe8;
+
+  --bw-overlay: rgba(15, 23, 42, .45);
+  --bw-shadow: rgba(15, 23, 42, .28);
+  --bw-scrollbar: #cfd8df;
+}
+
+/* Dark mode — stamped on <html> by theme.ts (applyTheme) / index.html's pre-paint bootstrap
+   script. Not a mechanical inversion: surfaces climb (page darkest, raised lightest) rather than
+   flip, and brand/severity hues are left untouched — they carry meaning and already read well on
+   dark. Only their pale *tints* change, from pastel washes to low-alpha veils of the same hue. */
+:root[data-theme="dark"] {
+  --bw-ink: #eef2f6;
+  --bw-ink-soft: #b7c3d1;
+  --bw-muted: #90a0b3;
+  --bw-faint: #66768a;
+
+  --bw-line: #232f3d;
+  --bw-line-soft: #1a2430;
+  --bw-line-strong: #3a4a5e;
+  --bw-bg: #0b1017;
+  --bw-bg-subtle: #0e1520;
+  --bw-map-bg: #0c121a;
+
+  --bw-surface: #131a24;
+  --bw-surface-raised: #1b2431;
+  --bw-surface-sunken: #0f151e;
+
+  --bw-tint-danger: rgba(239, 68, 68, .16);
+  --bw-on-tint-danger: #f87171;
+  --bw-tint-warn: rgba(245, 158, 11, .16);
+  --bw-on-tint-warn: #fbbf24;
+  --bw-tint-ok: rgba(22, 163, 74, .16);
+  --bw-on-tint-ok: #4ade80;
+  --bw-tint-info: rgba(14, 165, 233, .16);
+  --bw-on-tint-info: #7dd3fc;
+  --bw-tint-info-border: rgba(14, 165, 233, .35);
+  /* One tier brighter (same hue family) so condition still reads at a glance on dark tiles:
+     measured vs the lifted dark land, green goes 4.40:1 -> 8.32:1 and red 3.85:1 -> 5.24:1.
+     The casing INVERTS to near-black: as white it scored 14.49:1 against dark land and simply
+     out-shouted the colour it was meant to frame — roads read as white stripes with a dim core.
+     At 1.33:1 it recedes into an edge, which is all a casing should ever be. */
+  --bw-road-impassable: #f87171;
+  --bw-road-risky: #fbbf24;
+  --bw-road-passable: #4ade80;
+  --bw-road-casing: #0b0f14;
+  --bw-surface-glass: rgba(19, 26, 36, .96);
+  --bw-surface-inverse: #2f3a48;
+  --bw-on-tint-shelter: #67e8f9;
+  --bw-tint-danger-border: rgba(239, 68, 68, .35);
+  --bw-tint-warn-border: rgba(245, 158, 11, .35);
+  --bw-tint-ok-border: rgba(22, 163, 74, .35);
+  --bw-tint-rose: rgba(236, 72, 153, .16);
+  --bw-on-tint-rose: #f9a8d4;
+  --bw-tint-rose-border: rgba(236, 72, 153, .35);
+
+  /* A dark shadow color barely reads on an already-dark surface — pure black at higher opacity
+     keeps panels feeling lifted instead of flattening into the page. */
+  --bw-shadow: rgba(0, 0, 0, .45);
+  --bw-scrollbar: #2a3441;
 }
 
 * {
@@ -56,7 +173,7 @@ button {
   height: 9px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cfd8df;
+  background: var(--bw-scrollbar);
   border-radius: 9px;
 }
 ::-webkit-scrollbar-track {
@@ -107,6 +224,69 @@ button {
 .bw-report .leaflet-interactive {
   cursor: crosshair !important;
 }
+
+/* Leaflet's own stylesheet draws popups, the zoom control and the attribution strip as opaque
+   white — with no override they'd sit as bright rectangles on the dark basemap. <Tooltip> in
+   particular is used throughout FloodMap.tsx. Only dark-mode rules are needed here; Leaflet's
+   defaults already match the light theme. */
+/* Dark base tiles. CARTO's dark_nolabels renders road geometry only a hair lighter than the land,
+   which reads as a near-black void at street zoom. Lifting brightness separates roads from land
+   the way Google's dark map does (land ~#212121, roads ~#383838) without going grey. This targets
+   .leaflet-tile-pane only — the label layer lives in its own sibling pane and is boosted harder
+   below, which is the entire point of splitting them. */
+:root[data-theme="dark"] .leaflet-tile-pane img.leaflet-tile {
+  filter: brightness(1.85) contrast(1.06);
+}
+
+/* Dark basemap labels (FloodMap's bw-map-labels pane). CARTO ships place names in a muted grey
+   that all but disappears on the dark canvas — this is the whole reason the labels are a separate
+   tile layer from dark_nolabels. Brightening just this layer lifts the text toward white the way
+   Google's dark map does, while the roads underneath stay dark. */
+.leaflet-pane.bw-map-labels {
+  /* Without this the label pane sits above overlayPane and eats map clicks, which would break
+     pin-drop in report mode. Labels are decoration; they must never be a hit target. */
+  pointer-events: none;
+}
+.leaflet-pane.bw-map-labels img.leaflet-tile {
+  filter: brightness(1.75) contrast(1.15) saturate(0.9);
+}
+
+:root[data-theme="dark"] .leaflet-container a {
+  /* --bw-shelter's teal is too dim against the dark attribution strip — a lighter sky tone instead. */
+  color: #7dd3fc;
+}
+:root[data-theme="dark"] .leaflet-popup-content-wrapper,
+:root[data-theme="dark"] .leaflet-popup-tip {
+  background: var(--bw-surface-raised);
+  color: var(--bw-ink);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .5);
+}
+:root[data-theme="dark"] .leaflet-popup-close-button {
+  color: var(--bw-muted);
+}
+:root[data-theme="dark"] .leaflet-control-zoom a,
+:root[data-theme="dark"] .leaflet-bar a {
+  background: var(--bw-surface-raised);
+  color: var(--bw-ink);
+  border-bottom-color: var(--bw-line);
+}
+:root[data-theme="dark"] .leaflet-bar a:hover {
+  background: var(--bw-surface);
+}
+:root[data-theme="dark"] .leaflet-control-attribution {
+  background: rgba(19, 26, 36, .82);
+  color: var(--bw-muted);
+}
+:root[data-theme="dark"] .leaflet-tooltip {
+  background: var(--bw-surface-raised);
+  color: var(--bw-ink);
+  border-color: var(--bw-line);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+}
+:root[data-theme="dark"] .leaflet-tooltip-top::before { border-top-color: var(--bw-surface-raised); }
+:root[data-theme="dark"] .leaflet-tooltip-bottom::before { border-bottom-color: var(--bw-surface-raised); }
+:root[data-theme="dark"] .leaflet-tooltip-left::before { border-left-color: var(--bw-surface-raised); }
+:root[data-theme="dark"] .leaflet-tooltip-right::before { border-right-color: var(--bw-surface-raised); }
 
 /* Flood-prone zone name bubble (FloodMap.tsx's zoneBubbleIcon) — a Leaflet divIcon's HTML can't
    take a React style object, so this follows the .bw-divicon convention above: the icon box itself

@@ -11,7 +11,7 @@ import {
   type EnrichedReport,
   type EnrichedRescue,
 } from '../../utils/viewModel';
-import { formatDuration } from '../../utils/format';
+import { formatDepth, formatDuration } from '../../utils/format';
 import FloodMap, { type MapFocus } from '../map/FloodMap';
 
 interface ResponseConsoleProps {
@@ -34,11 +34,11 @@ const ALERT_RANK: Record<AlertLevel, number> = { red: 3, orange: 2, yellow: 1 };
 
 // KPI chip tones, drawn from the app's palette.
 const TONE = {
-  red: { fg: '#B91C1C', bg: '#FEF2F2' },
-  amber: { fg: '#B45309', bg: '#FFFBEB' },
-  blue: { fg: '#1D4ED8', bg: '#EFF6FF' },
-  green: { fg: '#15803D', bg: '#F0FDF4' },
-  slate: { fg: '#334155', bg: '#F1F5F9' },
+  red: { fg: 'var(--bw-on-tint-danger)', bg: 'var(--bw-tint-danger)' },
+  amber: { fg: 'var(--bw-on-tint-warn)', bg: 'var(--bw-tint-warn)' },
+  blue: { fg: 'var(--bw-on-tint-info)', bg: 'var(--bw-tint-info)' },
+  green: { fg: 'var(--bw-on-tint-ok)', bg: 'var(--bw-tint-ok)' },
+  slate: { fg: 'var(--bw-ink-soft)', bg: 'var(--bw-bg-subtle)' },
 } as const;
 type Tone = keyof typeof TONE;
 
@@ -53,7 +53,7 @@ const Kpi: React.FC<{ label: string; value: React.ReactNode; tone?: Tone; emphas
 };
 
 const Section: React.FC<{ title: string; sub?: string; children: React.ReactNode }> = ({ title, sub, children }) => (
-  <div style={{ border: '1px solid var(--bw-line)', borderRadius: 14, overflow: 'hidden', background: '#fff' }}>
+  <div style={{ border: '1px solid var(--bw-line)', borderRadius: 14, overflow: 'hidden', background: 'var(--bw-surface)' }}>
     <div style={{ padding: '11px 13px', borderBottom: '1px solid var(--bw-line-soft)' }}>
       <div style={{ fontSize: 13.5, fontWeight: 800 }}>{title}</div>
       {sub && <div style={{ fontSize: 11, color: 'var(--bw-muted)', marginTop: 1 }}>{sub}</div>}
@@ -145,10 +145,10 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
   const actionBtn = (label: string, onClick: () => void, kind: 'dispatch' | 'resolve' | 'ghost', busy: boolean): React.ReactNode => {
     const s =
       kind === 'dispatch'
-        ? { bg: RESCUE_STATUS_META.dispatched.color, fg: '#fff', bd: RESCUE_STATUS_META.dispatched.color }
+        ? { bg: RESCUE_STATUS_META.dispatched.color, fg: 'var(--bw-on-accent)', bd: RESCUE_STATUS_META.dispatched.color }
         : kind === 'resolve'
-          ? { bg: RESCUE_STATUS_META.resolved.color, fg: '#fff', bd: RESCUE_STATUS_META.resolved.color }
-          : { bg: '#fff', fg: 'var(--bw-ink-soft)', bd: 'var(--bw-line)' };
+          ? { bg: RESCUE_STATUS_META.resolved.color, fg: 'var(--bw-on-accent)', bd: RESCUE_STATUS_META.resolved.color }
+          : { bg: 'var(--bw-surface)', fg: 'var(--bw-ink-soft)', bd: 'var(--bw-line)' };
     return (
       <button
         disabled={busy}
@@ -164,9 +164,9 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
   const status = error instanceof ApiError ? error.status : undefined;
   const queueBody =
     error && enriched.length === 0 ? (
-      <div style={{ textAlign: 'center', padding: '28px 10px', color: '#B91C1C', fontSize: 13, lineHeight: 1.5 }}>
+      <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--bw-on-tint-danger)', fontSize: 13, lineHeight: 1.5 }}>
         {status === 401 ? 'Sign in to view rescue requests.' : status === 403 ? 'You don’t have access to rescue requests.' : 'Couldn’t load rescue requests.'}
-        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>
+        <div style={{ color: 'var(--bw-faint)', fontSize: 12, marginTop: 4 }}>
           {status === 401 ? 'Your session may have expired — sign in again.' : status === 403 ? 'This view isn’t available for your account.' : 'Check the backend is running, then reopen.'}
         </div>
       </div>
@@ -185,7 +185,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
             <div
               key={r.id}
               onClick={() => focus(r)}
-              style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 11px', borderRadius: 12, background: sel ? '#EFF8FF' : 'var(--bw-bg-subtle)', border: `1px solid ${sel ? '#BAE2FB' : 'transparent'}`, cursor: 'pointer' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 11px', borderRadius: 12, background: sel ? 'var(--bw-tint-info)' : 'var(--bw-bg-subtle)', border: `1px solid ${sel ? 'var(--bw-tint-info-border)' : 'transparent'}`, cursor: 'pointer' }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -194,7 +194,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', marginTop: 2, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                     <span>⏱ waiting {formatDuration(r.waitMin)}</span>
-                    {r.reRequested && <span style={{ color: '#B45309', fontWeight: 800 }}>· asked again</span>}
+                    {r.reRequested && <span style={{ color: 'var(--bw-on-tint-warn)', fontWeight: 800 }}>· asked again</span>}
                   </div>
                   {r.note && <div style={{ fontSize: 11.5, color: 'var(--bw-ink-soft)', marginTop: 3 }}>“{r.note}”</div>}
                 </div>
@@ -222,7 +222,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              style={{ border: `1px solid ${on ? 'var(--bw-primary)' : 'var(--bw-line)'}`, background: on ? '#EFF8FF' : '#fff', color: on ? 'var(--bw-primary)' : 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
+              style={{ border: `1px solid ${on ? 'var(--bw-primary)' : 'var(--bw-line)'}`, background: on ? 'var(--bw-tint-info)' : 'var(--bw-surface)', color: on ? 'var(--bw-primary)' : 'var(--bw-ink-soft)', padding: '5px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}
             >
               {label}
             </button>
@@ -233,7 +233,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
         <select
           value={districtFilter}
           onChange={(e) => setDistrictFilter(e.target.value)}
-          style={{ width: '100%', padding: '7px 9px', border: '1px solid var(--bw-line)', borderRadius: 9, fontSize: 12.5, color: 'var(--bw-ink)', background: '#fff', marginBottom: 11 }}
+          style={{ width: '100%', padding: '7px 9px', border: '1px solid var(--bw-line)', borderRadius: 9, fontSize: 12.5, color: 'var(--bw-ink)', background: 'var(--bw-surface)', marginBottom: 11 }}
         >
           <option value="all">All districts</option>
           {districts.map((d) => (
@@ -281,7 +281,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
         <Muted>No active hotspots.</Muted>
       ) : (
         hotspots.slice(0, 6).map((h, i) => {
-          const sevColor = h.worstSeverity ? SEV_META[h.worstSeverity].color : '#94A3B8';
+          const sevColor = h.worstSeverity ? SEV_META[h.worstSeverity].color : 'var(--bw-faint)';
           const pct = Math.max(8, (h.score / (hotspots[0].score || 1)) * 100);
           return (
             <div key={h.district} style={{ marginBottom: i === Math.min(5, hotspots.length - 1) ? 0 : 11 }}>
@@ -307,18 +307,18 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
     <Section title="Activity (last 12 h)" sub="Reports & rescue requests per hour">
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 9, fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 2, background: '#F59E0B' }} /> Rescues
+          <span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--bw-warn)' }} /> Rescues
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 2, background: '#0EA5E9' }} /> Reports
+          <span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--bw-primary)' }} /> Reports
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 84 }}>
         {surge.map((b, i) => (
           <div key={b.start} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%' }}>
             <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 2 }}>
-              <div title={`${b.rescues} rescue${b.rescues === 1 ? '' : 's'}`} style={{ width: 5, height: `${(b.rescues / surgeMax) * 100}%`, minHeight: b.rescues ? 2 : 0, background: '#F59E0B', borderRadius: 2 }} />
-              <div title={`${b.reports} report${b.reports === 1 ? '' : 's'}`} style={{ width: 5, height: `${(b.reports / surgeMax) * 100}%`, minHeight: b.reports ? 2 : 0, background: '#0EA5E9', borderRadius: 2 }} />
+              <div title={`${b.rescues} rescue${b.rescues === 1 ? '' : 's'}`} style={{ width: 5, height: `${(b.rescues / surgeMax) * 100}%`, minHeight: b.rescues ? 2 : 0, background: 'var(--bw-warn)', borderRadius: 2 }} />
+              <div title={`${b.reports} report${b.reports === 1 ? '' : 's'}`} style={{ width: 5, height: `${(b.reports / surgeMax) * 100}%`, minHeight: b.reports ? 2 : 0, background: 'var(--bw-primary)', borderRadius: 2 }} />
             </div>
             <div style={{ fontSize: 8.5, color: 'var(--bw-faint)', fontWeight: 700, height: 11 }}>{i % 3 === 0 ? b.label : ''}</div>
           </div>
@@ -342,7 +342,7 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12.5, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rd.name}</div>
               <div style={{ fontSize: 11, color: 'var(--bw-muted)' }}>
-                {rd.district} · {rd.depthCm} cm{rd.confirmed ? '' : ' · unconfirmed'}
+                {rd.district} · {formatDepth(rd.depthCm)}{rd.confirmed ? '' : ' · unconfirmed'}
               </div>
             </div>
           </div>
@@ -358,10 +358,10 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width: isMobile ? '100%' : 'min(1180px, 96vw)', height: isMobile ? '100%' : '92vh', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: isMobile ? 0 : 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden' }}
+        style={{ width: isMobile ? '100%' : 'min(1180px, 96vw)', height: isMobile ? '100%' : '92vh', display: 'flex', flexDirection: 'column', background: 'var(--bw-surface)', borderRadius: isMobile ? 0 : 18, boxShadow: '0 24px 70px rgba(15,23,42,.4)', overflow: 'hidden' }}
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg,#0EA5E9,#0369A1)', padding: '15px 20px', color: '#fff', display: 'flex', alignItems: 'center', gap: 12, flex: 'none' }}>
+        <div style={{ background: 'linear-gradient(135deg,var(--bw-primary),var(--bw-primary-deep))', padding: '15px 20px', color: 'var(--bw-on-accent)', display: 'flex', alignItems: 'center', gap: 12, flex: 'none' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 9 }}>
               Response console
@@ -371,11 +371,11 @@ const ResponseConsole: React.FC<ResponseConsoleProps> = ({
             </div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>Triage &amp; dispatch rescue requests across the flood zone</div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: '#fff', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
+          <button onClick={onClose} aria-label="Close" style={{ border: 0, background: 'rgba(255,255,255,.18)', color: 'var(--bw-on-accent)', width: 28, height: 28, borderRadius: 8, fontSize: 17, cursor: 'pointer', flex: 'none' }}>×</button>
         </div>
 
         {/* KPI strip */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '12px 16px', borderBottom: '1px solid var(--bw-line-soft)', flex: 'none', background: '#FBFDFE' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '12px 16px', borderBottom: '1px solid var(--bw-line-soft)', flex: 'none', background: 'var(--bw-tint-info)' }}>
           <Kpi label="Pending" value={counts.pending} tone={counts.pending > 0 ? 'red' : 'slate'} emphasize />
           <Kpi label="Dispatched" value={counts.dispatched} tone="blue" />
           <Kpi label="Resolved" value={counts.resolved} tone="green" />

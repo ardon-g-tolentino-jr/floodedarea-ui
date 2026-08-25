@@ -4,7 +4,7 @@
 import type { FloodAlert, FloodProneArea, FloodReport, LatLng, RescueRequest, Road, Severity, Trend } from '../types';
 import { kmBetween } from './geo';
 import { DRAINED_CM, observationAnchorMs, projectDepth, projectionRateCmPerHr, RESCUE_STATUS_RANK, ROAD_RANK, roadFromDepth, ROAD_RISKY_CM, SEV_META, SEV_RANK, type SevMeta } from './floodMeta';
-import { timeAgo } from './format';
+import { formatDepth, timeAgo } from './format';
 import { roadsWithinRadius, snapToRoad } from './roadSnap';
 import { translate, tFormat, sevLabel, getLang, type Lang } from '../i18n';
 
@@ -735,7 +735,7 @@ export function computeStatus(enriched: EnrichedReport[], lang: Lang = getLang()
       tone: 'danger',
       badge: translate(lang, 'status.inFloodZone'),
       title: translate(lang, 'status.inFloodZoneTitle'),
-      line: tFormat(lang, 'status.inFloodZoneLine', { sev: sevLabel(lang, w.severity), name: w.name, depth: w.depthCm }),
+      line: tFormat(lang, 'status.inFloodZoneLine', { sev: sevLabel(lang, w.severity), name: w.name, depth: formatDepth(w.depthCm) }),
       sub: translate(lang, 'status.inFloodZoneSub'),
       eta: null,
     };

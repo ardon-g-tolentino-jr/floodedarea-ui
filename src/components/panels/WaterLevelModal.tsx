@@ -5,6 +5,7 @@ import { buildDailyWaterBars } from '../../utils/waterChart';
 import { localDateKey } from '../../utils/viewModel';
 import { kmBetween } from '../../utils/geo';
 import { useReportHistory } from '../../hooks/useDomainData';
+import { formatDepth } from '../../utils/format';
 
 interface WaterLevelModalProps {
   userLoc: LatLng;
@@ -23,7 +24,7 @@ const M = { top: 14, right: 16, bottom: 50, left: 54 };
 const PLOT_W = VB_W - M.left - M.right;
 const PLOT_H = VB_H - M.top - M.bottom;
 
-const ACCENT = '#0EA5E9'; // fallback bar color when a bucket has no severity
+const ACCENT = 'var(--bw-primary)'; // fallback bar color when a bucket has no severity
 
 /** "Today · Mon, Jun 22" or just "Mon, Jun 22". */
 function dateLabel(ymd: string, today: string): string {
@@ -96,16 +97,16 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
 
   const chartBody =
     history.loading && dayReports.length === 0 ? (
-      <div style={{ textAlign: 'center', padding: '46px 10px', color: '#9AA8B4', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '46px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
         Loading water levels…
       </div>
     ) : history.error ? (
-      <div style={{ textAlign: 'center', padding: '46px 10px', color: '#B91C1C', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '46px 10px', color: 'var(--bw-on-tint-danger)', fontSize: 13 }}>
         Couldn’t load water levels.
-        <div style={{ color: '#9AA8B4', fontSize: 12, marginTop: 4 }}>Check the backend is running, then reopen.</div>
+        <div style={{ color: 'var(--bw-faint)', fontSize: 12, marginTop: 4 }}>Check the backend is running, then reopen.</div>
       </div>
     ) : !hasData ? (
-      <div style={{ textAlign: 'center', padding: '46px 10px', color: '#9AA8B4', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '46px 10px', color: 'var(--bw-faint)', fontSize: 13 }}>
         No water-level reports for “{query.trim() || 'any area'}” on {dateLabel(selectedDate, today)}.
       </div>
     ) : (
@@ -118,17 +119,17 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
               x2={VB_W - M.right}
               y1={y(b.cm)}
               y2={y(b.cm)}
-              stroke="#E2E8F0"
+              stroke="var(--bw-line)"
               strokeWidth={1}
               strokeDasharray={b.cm >= 100 ? '4 4' : undefined}
             />
-            <text x={M.left - 6} y={y(b.cm) + 3} textAnchor="end" fontSize={9} fontWeight={700} fill="#94A3B8">
+            <text x={M.left - 6} y={y(b.cm) + 3} textAnchor="end" fontSize={9} fontWeight={700} fill="var(--bw-faint)">
               {b.cm}
             </text>
           </g>
         ))}
         {/* Baseline */}
-        <line x1={M.left} x2={VB_W - M.right} y1={M.top + PLOT_H} y2={M.top + PLOT_H} stroke="#CBD5E1" strokeWidth={1} />
+        <line x1={M.left} x2={VB_W - M.right} y1={M.top + PLOT_H} y2={M.top + PLOT_H} stroke="var(--bw-line-strong)" strokeWidth={1} />
         {/* Bars + every-3h X labels */}
         {bars.map((b) => {
           const cx = M.left + (b.hour + 0.5) * slotW;
@@ -140,16 +141,16 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
               {b.depthCm > 0 && (
                 b.projected ? (
                   <rect x={cx - barW / 2} y={top} width={barW} height={Math.max(0, h)} rx={2} fill="none" stroke={color} strokeWidth={1.5} strokeDasharray="3 2">
-                    <title>{`${hourLabel(b.hour)} · ${b.depthCm} cm · predictive`}</title>
+                    <title>{`${hourLabel(b.hour)} · ${formatDepth(b.depthCm)} · predictive`}</title>
                   </rect>
                 ) : (
                   <rect x={cx - barW / 2} y={top} width={barW} height={Math.max(0, h)} rx={2} fill={color}>
-                    <title>{`${hourLabel(b.hour)} · ${b.depthCm} cm`}</title>
+                    <title>{`${hourLabel(b.hour)} · ${formatDepth(b.depthCm)}`}</title>
                   </rect>
                 )
               )}
               {b.hour % 3 === 0 && (
-                <text x={cx} y={M.top + PLOT_H + 14} textAnchor="middle" fontSize={9} fontWeight={700} fill="#A4B0BB">
+                <text x={cx} y={M.top + PLOT_H + 14} textAnchor="middle" fontSize={9} fontWeight={700} fill="var(--bw-faint)">
                   {hourLabel(b.hour)}
                 </text>
               )}
@@ -157,7 +158,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
           );
         })}
         {/* Axis titles */}
-        <text x={M.left + PLOT_W / 2} y={M.top + PLOT_H + 34} textAnchor="middle" fontSize={10.5} fontWeight={800} fill="#64748B">
+        <text x={M.left + PLOT_W / 2} y={M.top + PLOT_H + 34} textAnchor="middle" fontSize={10.5} fontWeight={800} fill="var(--bw-muted)">
           Time of day
         </text>
         <text
@@ -166,7 +167,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
           textAnchor="middle"
           fontSize={10.5}
           fontWeight={800}
-          fill="#64748B"
+          fill="var(--bw-muted)"
           transform={`rotate(-90 14 ${M.top + PLOT_H / 2})`}
         >
           Water depth (cm)
@@ -175,7 +176,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
     );
 
   const card = (
-    <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
+    <div style={{ background: 'var(--bw-surface)', borderRadius: 18, boxShadow: '0 18px 50px rgba(15,23,42,.32)', overflow: 'hidden', border: '1px solid var(--bw-line)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '16px 18px 12px', borderBottom: '1px solid var(--bw-line-soft)' }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>Water level over time</div>
@@ -186,7 +187,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
         <button
           onClick={onClose}
           aria-label="Close"
-          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: '#7C8B98', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
+          style={{ border: 0, background: 'var(--bw-bg-subtle)', color: 'var(--bw-muted)', width: 28, height: 28, borderRadius: 8, fontSize: 16, cursor: 'pointer', flex: 'none' }}
         >
           ×
         </button>
@@ -195,7 +196,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
       {/* Controls: search (street / district) + date */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 18px', borderBottom: '1px solid var(--bw-line-soft)', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 200px', position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <span style={{ position: 'absolute', left: 10, fontSize: 13, color: '#9AA8B4', pointerEvents: 'none' }}>⌕</span>
+          <span style={{ position: 'absolute', left: 10, fontSize: 13, color: 'var(--bw-faint)', pointerEvents: 'none' }}>⌕</span>
           <input
             list="bw-water-areas"
             value={query}
@@ -203,13 +204,13 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
             disabled={dayReports.length === 0}
             placeholder={dayReports.length === 0 ? 'No reports this day' : 'Search a street or district…'}
             aria-label="Search water levels by street or district"
-            style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 28px', background: '#fff' }}
+            style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, fontWeight: 700, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 28px', background: 'var(--bw-surface)' }}
           />
           {query && (
             <button
               onClick={() => { queryTouched.current = true; setQuery(''); }}
               aria-label="Clear search"
-              style={{ position: 'absolute', right: 6, border: 0, background: 'transparent', color: '#9AA8B4', fontSize: 16, cursor: 'pointer', padding: 2, lineHeight: 1 }}
+              style={{ position: 'absolute', right: 6, border: 0, background: 'transparent', color: 'var(--bw-faint)', fontSize: 16, cursor: 'pointer', padding: 2, lineHeight: 1 }}
             >
               ×
             </button>
@@ -225,7 +226,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
           value={selectedDate}
           max={today}
           onChange={(e) => setSelectedDate(e.target.value || today)}
-          style={{ flex: '1 1 150px', fontSize: 13, fontWeight: 600, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 10px', background: '#fff' }}
+          style={{ flex: '1 1 150px', fontSize: 13, fontWeight: 600, color: 'var(--bw-ink)', border: '1px solid var(--bw-line)', borderRadius: 9, padding: '8px 10px', background: 'var(--bw-surface)' }}
         />
         {selectedDate !== today && (
           <button
