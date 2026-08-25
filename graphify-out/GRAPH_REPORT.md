@@ -1,7 +1,7 @@
 # Graph Report - baha-ui  (2026-08-25)
 
 ## Corpus Check
-- 97 files · ~210,525 words
+- 97 files · ~210,667 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `179b0745`
+- Built from commit: `0e389b22`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -190,12 +190,12 @@ Cohesion: 0.19
 Nodes (11): ALL, Choice, inputStyle, labelStyle, LEVEL_OPTIONS, cityOf(), ISLAND_GROUPS, IslandGroup (+3 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.14
-Nodes (21): PAGE_SIZE_OPTIONS, PublicDashboardModalProps, RADIUS_OPTIONS, RoadConditionsModalProps, Road, ROAD_RANK, TREND_META, alertsForUser() (+13 more)
+Cohesion: 0.13
+Nodes (24): PAGE_SIZE_OPTIONS, PublicDashboardModalProps, RADIUS_OPTIONS, RoadConditionsModalProps, WaterLevelModalProps, FloodReport, Road, ROAD_RANK (+16 more)
 
 ### Community 30 - "Community 30"
-Cohesion: 0.21
-Nodes (13): FloodReport, observationAnchorMs(), projectDepth(), projectedSeries(), waterSeries(), localDateKey(), buildDailyWaterBars(), buildWaterChart() (+5 more)
+Cohesion: 0.15
+Nodes (16): dateLabel(), M, WaterLevelModal(), DEPTH_TICKS, observationAnchorMs(), projectDepth(), projectedSeries(), SEV_META (+8 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.27
@@ -234,8 +234,8 @@ Cohesion: 0.32
 Nodes (6): LocationHelpModalProps, MsgKey, detectHelpBucket(), HelpBucket, locationHelpSteps(), STEPS
 
 ### Community 40 - "Community 40"
-Cohesion: 0.17
-Nodes (16): EvacDetailCard(), EvacDetailCardProps, dateLabel(), M, WaterLevelModal(), WaterLevelModalProps, LatLng, DEPTH_TICKS (+8 more)
+Cohesion: 0.30
+Nodes (10): EvacDetailCard(), EvacDetailCardProps, LatLng, directionsUrl(), kmBetween(), toRad(), walkMinutes(), NearbyRoad (+2 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.25
