@@ -64,6 +64,19 @@ export function roadFromDepth(depthCm: number): Road {
   return 'passable';
 }
 
+/**
+ * The severity band a raw water depth falls in — the inverse of SEVERITY_PRESET's depthCm, and the
+ * companion to `roadFromDepth` above. Thresholds are DEPTH_RANGE's own boundaries (low tops out at
+ * 30, medium at 90), so a depth dialled in on any severity's slider classifies back to that same
+ * severity. Used wherever depth is the input and severity has to follow it rather than the other
+ * way round — the bulk hotspot report, where every row carries its own depth.
+ */
+export function severityFromDepth(depthCm: number): Severity {
+  if (depthCm >= DEPTH_RANGE.high.min) return 'high';
+  if (depthCm >= DEPTH_RANGE.medium.min) return 'medium';
+  return 'low';
+}
+
 /** Recession while NO rain is falling — cm/hr, by severity. Deeper floods sit in low-lying catch
  *  basins with more head, so they shed more cm/hr in absolute terms yet still take longer overall
  *  to clear (108 cm ≈ 4.3 h, 46 cm ≈ 2.6 h, 8 cm ≈ 0.8 h). Mirrors REPORT_TTL_MIN's rationale. */

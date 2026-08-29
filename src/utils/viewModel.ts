@@ -183,6 +183,33 @@ export function matchingProneZone(
     .sort((a, b) => a.m - b.m)[0]?.z;
 }
 
+/**
+ * How close a live report has to be for a point to count as "already reported". Deliberately a flat
+ * distance, not a radius test like `zonesWithStatus` above: this one only exists to stop a bulk
+ * report tool from posting a second pin on top of one that is already standing, so it asks "is
+ * there already a pin here?", not "is this place currently flooded?".
+ */
+export const ALREADY_REPORTED_M = 150;
+
+/**
+ * Which of `points` already carry a live report within ALREADY_REPORTED_M — returned as a Set of
+ * whatever key the caller supplied, so both the flood-prone zone checklist (keyed by zone id) and
+ * the hotspot Quick report page (keyed by slug) share one rule instead of each rolling its own.
+ */
+export function alreadyReportedKeys<K>(
+  reports: Pick<FloodReport, 'latitude' | 'longitude'>[],
+  points: { key: K; lat: number; lng: number }[]
+): Set<K> {
+  const hit = new Set<K>();
+  for (const p of points) {
+    const near = reports.some(
+      (r) => kmBetween({ lat: p.lat, lng: p.lng }, { lat: r.latitude, lng: r.longitude }) * 1000 <= ALREADY_REPORTED_M
+    );
+    if (near) hit.add(p.key);
+  }
+  return hit;
+}
+
 export interface EnrichedReport extends FloodReport {
   sev: SevMeta;
   distKm: number;
