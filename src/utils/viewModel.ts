@@ -285,6 +285,11 @@ export function enrichReports(
       expiresInMin,
       // The projection only ever SHORTENS a report's life, never extends it — TTL remains
       // authoritative. A drained flood leaves the map even if its TTL still has time left.
+      // Reopening an expired report (ADMIN OVERRIDE in ReportDetailCard) therefore can't just
+      // bump `ttlMinutes` — that only raises `expiresInMin` and leaves `drained` (and thus
+      // `expired`) true. The PATCH must also carry `depthCm`: that's what re-anchors
+      // observationAnchorMs server-side, zeroing both `ageMin` and `projectedHours` so
+      // `projectedDepthCm` snaps back to the observed value and clears `drained`.
       expired: r.status === 'resolved' || expiresInMin <= 0 || drained,
       projectedDepthCm,
       projectedRoad,

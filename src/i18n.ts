@@ -300,6 +300,7 @@ const MESSAGES = {
   'report.system': { en: 'System report', fil: 'Ulat ng sistema' },
   'report.left': { en: 'left', fil: 'natitira' },
   'report.expired': { en: 'expired', fil: 'tapos na' },
+  'report.reopen': { en: 'Reopen', fil: 'Buksang muli' },
   'report.confirmCta': { en: "I'm seeing this too — confirm", fil: 'Nakikita ko rin ito — kumpirmahin' },
   'report.confirming': { en: 'Confirming…', fil: 'Kinukumpirma…' },
 

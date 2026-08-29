@@ -5,7 +5,6 @@ import type {
   FeedbackStatus,
   FloodAlert,
   FloodProneArea,
-  FloodReport,
   Hotline,
   LatLng,
   NewAlert,
@@ -17,8 +16,8 @@ import type {
   SocialNetwork,
   SocialPost,
 } from '../../types';
-import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META } from '../../utils/floodMeta';
-import { matchingProneZone } from '../../utils/viewModel';
+import { ROAD_META, ROAD_ORDER, SEV_META, TREND_META, drainMinutes } from '../../utils/floodMeta';
+import { type EnrichedReport, matchingProneZone } from '../../utils/viewModel';
 import { formatDepth, timeAgo } from '../../utils/format';
 import { FB_GLYPH_PATH } from '../../utils/share';
 import { reverseGeocode } from '../../api/geocode';
@@ -34,7 +33,10 @@ interface AdminPanelProps {
   hotlines: Hotline[];
   alerts: FloodAlert[];
   zones: FloodProneArea[];
-  reports: FloodReport[];
+  /** Enriched, not raw — gives the Reports tab `r.expired` for the row's Reopen button without
+   *  duplicating the expiry math. `buildPayload` still picks fields by name, so no derived field
+   *  (expired, projectedDepthCm, …) can leak into a PATCH body. */
+  reports: EnrichedReport[];
   liveStream: boolean;
   onToggleLive: (on: boolean) => void;
   /** Global (server-backed) toggle for the floating community-chat bubble. */
@@ -138,6 +140,7 @@ const FIELDS: Record<Tab, Field[]> = {
     { key: 'trend', label: 'Trend', type: 'select', options: trendOptions },
     { key: 'road', label: 'Road', type: 'select', options: roadOptions },
     { key: 'status', label: 'Status', type: 'select', options: statusOptions },
+    { key: 'ttlMinutes', label: 'Keep live for (min)', type: 'number' },
   ],
   requests: [],
 };
@@ -359,6 +362,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
           trend: str(form.trend) as NewReport['trend'],
           road: str(form.road) as NewReport['road'],
           status: str(form.status) as ReportStatus,
+          // Blank ⇒ omit the key so the save leaves the column unchanged rather than clearing the
+          // TTL back to the severity default — same "null/absent = unchanged" rule the DTO documents.
+          ttlMinutes: num(form.ttlMinutes) || undefined,
         };
     }
   };
@@ -743,6 +749,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 )}
                 {pagedRows.map((r) => {
                   const zoneRec = tab === 'zones' ? (r.rec as unknown as FloodProneArea) : null;
+                  const reportRec = tab === 'reports' ? (r.rec as unknown as EnrichedReport) : null;
                   // Zone rows carry four actions (Report now / Warn / Edit / Delete) — one more
                   // than every other tab — which squeezed the name column down to an ellipsis.
                   // They alone wrap: the name/district block takes the full first line and the
@@ -766,6 +773,24 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     {zoneRec && (
                       <button onClick={() => props.onWarnZone(zoneRec)} disabled={busy} title="Send a flood warning for this zone" style={{ border: '1px solid var(--bw-tint-warn-border)', background: 'var(--bw-tint-warn)', color: 'var(--bw-on-tint-warn)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
                         ⚠ Warn
+                      </button>
+                    )}
+                    {reportRec?.expired && reportRec.status !== 'resolved' && (
+                      // Only for reports that aged out (TTL/drained) — never for one an admin
+                      // resolved on purpose, matching the Archive tab's rule in App.tsx. A resolved
+                      // report stays expired through `status` alone, so this shortcut could not
+                      // revive it anyway; flipping Status back to active is a deliberate Edit.
+                      // Pre-seeds the form's `ttlMinutes` with an estimate from the report's own
+                      // observed depth — the same drainMinutes model the ADMIN OVERRIDE reopen
+                      // control in ReportDetailCard uses. buildPayload always emits depthCm, so
+                      // saving this form re-anchors observationAnchorMs and the report goes live.
+                      <button
+                        onClick={() => startEdit(r.id, { ...r.rec, ttlMinutes: drainMinutes(reportRec.depthCm, rainActive) })}
+                        disabled={busy}
+                        title="Reopen this expired report"
+                        style={{ border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-tint-info)', color: 'var(--bw-primary)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}
+                      >
+                        ↻ Reopen
                       </button>
                     )}
                     <button onClick={() => startEdit(r.id, r.rec)} disabled={busy} style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', padding: '6px 11px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flex: 'none' }}>
