@@ -195,6 +195,43 @@ export const DEPTH_RANGE: Record<Severity, { min: number; max: number; step: num
   low: { min: 5, max: 30, step: 1 },
 };
 
+/** Bounds for a severity-agnostic depth slider. `DEPTH_RANGE` above is per-severity and so can't
+ *  span them; where depth is the input that DERIVES severity (the admin Quick report page) the
+ *  slider needs one continuous track across every band. */
+export const DEPTH_SLIDER_MIN_CM = DEPTH_RANGE.low.min;
+export const DEPTH_SLIDER_MAX_CM = DEPTH_RANGE.high.max;
+
+/**
+ * Durations a TTL slider can land on, in minutes. Deliberately not a linear track: real floods
+ * clear in the 1–6 hour band, which a linear 30 min–48 h slider would squeeze into its first
+ * eighth. Dense through that band, coarse above it.
+ */
+export const TTL_STOPS_MIN: number[] = [30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600, 720, 1080, 1440, 2160, 2880];
+
+/** The TTL_STOPS_MIN entry closest to `min` — keeps a slider's thumb and its label in agreement. */
+export function nearestTtlStop(min: number): number {
+  return TTL_STOPS_MIN.reduce((best, s) => (Math.abs(s - min) < Math.abs(best - min) ? s : best), TTL_STOPS_MIN[0]);
+}
+
+/** Flat allowance added to a drain estimate while rain is still falling. Drainage can't begin until
+ *  the rain stops and the app carries no forecast, so this is an honest constant rather than a
+ *  precise-looking number derived from data we don't have. */
+export const RAIN_HOLD_MIN = 120;
+
+/**
+ * How long water this deep should stay on the map, in minutes — the observed depth run down to
+ * `DRAINED_CM` at this severity's `DRAIN_CM_PER_HR`, which is the same recession model the
+ * predictive water-level curve uses, integrated instead of stepped. Snapped to a TTL_STOPS_MIN
+ * entry so the estimate is always a value the slider can actually show.
+ *
+ * This is why a batch of hotspots gets DIFFERENT lifetimes without the admin setting each one:
+ * 23 cm of gutter water on an arterial drains in ~2 h, 152 cm in a riverside barangay sits for ~6 h.
+ */
+export function drainMinutes(depthCm: number, rainActive: boolean): number {
+  const hours = Math.max(0, depthCm - DRAINED_CM) / DRAIN_CM_PER_HR[severityFromDepth(depthCm)];
+  return nearestTtlStop(Math.round(hours * 60) + (rainActive ? RAIN_HOLD_MIN : 0));
+}
+
 /** How long an admin-authored system report stays live. '' = fall back to the severity-scaled
  *  default; else minutes. Shared by AdminReportIncidentModal (single incident) and
  *  ZoneReportModal (bulk/per-zone) so both "Keep live for" selects offer the same choices. */
