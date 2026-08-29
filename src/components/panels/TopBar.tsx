@@ -211,6 +211,20 @@ const TopBar: React.FC<TopBarProps> = ({
     </button>
   ) : null;
 
+  // Quick flood report — admin-only bulk hotspot reporter. Amber-tinted to read as the "act now
+  // during an event" affordance, distinct from the blue Admin console and rose Response console.
+  // Must exist here AND in the mobile overflow menu below: the menu only renders under isMobile,
+  // so a menu-only entry is invisible on desktop.
+  const quickReportBtn = isAdmin ? (
+    <button
+      onClick={onQuickReport}
+      title="Quick flood report — post known hotspots in one pass"
+      style={{ display: 'flex', alignItems: 'center', flex: 'none', gap: 6, height: 40, padding: '0 14px', border: '1px solid var(--bw-tint-warn-border)', background: 'var(--bw-tint-warn)', borderRadius: 11, fontSize: 13, fontWeight: 800, color: 'var(--bw-on-tint-warn)', cursor: 'pointer' }}
+    >
+      ⚡ {!isMobile && t('topbar.quick')}
+    </button>
+  ) : null;
+
   // Flood digest — admin-only, one-click consolidated post covering every active report. Sky-tinted
   // to read as a social/sharing affordance (matches the Share button family), distinct from the
   // blue Admin console and rose Response console.
@@ -502,6 +516,7 @@ const TopBar: React.FC<TopBarProps> = ({
               )}
             </div>
 
+            {quickReportBtn}
             {responseBtn}
             {digestBtn}
             {adminBtn}

@@ -1,7 +1,7 @@
 # Graph Report - baha-ui  (2026-08-29)
 
 ## Corpus Check
-- 100 files · ~216,920 words
+- 100 files · ~217,058 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `54c0af2c`
+- Built from commit: `db75e9e0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

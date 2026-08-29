@@ -87,6 +87,8 @@ const MESSAGES = {
   'topbar.adminConsole': { en: 'Admin console', fil: 'Admin console' },
   'topbar.response': { en: 'Response', fil: 'Tugon' },
   'topbar.quickReport': { en: 'Quick flood report', fil: 'Mabilisang ulat ng baha' },
+  // Short form for the inline desktop button, like topbar.admin / topbar.response above.
+  'topbar.quick': { en: 'Quick report', fil: 'Mabilisang ulat' },
   'topbar.responseConsole': { en: 'Response console', fil: 'Response console' },
   'topbar.floodDigest': { en: 'Flood digest', fil: 'Buod ng baha' },
   'topbar.nearbyAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
