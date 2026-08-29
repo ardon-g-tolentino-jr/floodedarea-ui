@@ -1,10 +1,11 @@
 import React from 'react';
 import type { NewReport, ReportStatus, Road } from '../../types';
 import { affectedRiseRatio, REPORT_TTL_MIN, type EnrichedReport } from '../../utils/viewModel';
-import { ADVICE, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
+import { ADVICE, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, TTL_STOPS_MIN, drainMinutes, nearestTtlStop, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
 import { formatDepth, formatDuration, timeAgo } from '../../utils/format';
 import { useI18n } from '../../i18n';
 import DepthReference from './DepthReference';
+import SliderRow from './SliderRow';
 
 interface ReportDetailCardProps {
   report: EnrichedReport;
@@ -29,6 +30,10 @@ interface ReportDetailCardProps {
   now: number;
   /** Admin save — reuses App's onUpdateReport (adminAction → refetch → toast). */
   onAdminUpdate: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
+  /** Admin reopen — same shape as onAdminUpdate but wired to its own toast/tab handling in App
+   *  (see onReopenReport), since bringing a report back is a different admin action than a plain
+   *  correction even though both PATCH the same endpoint. */
+  onReopenReport: (id: number, b: Partial<NewReport & { status: ReportStatus }>) => Promise<void>;
 }
 
 /** Neutral share glyph (24×24 fill path) — the share action isn't Facebook-specific: on mobile it
@@ -43,7 +48,7 @@ const DEPTH_TICKS = [
   { l: 'Chest', cm: 140 },
 ];
 
-const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose, isAdmin, rainActive, now, onAdminUpdate }) => {
+const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose, isAdmin, rainActive, now, onAdminUpdate, onReopenReport }) => {
   const { t } = useI18n();
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const rise = projectedRiseCm > 0 ? affectedRiseRatio(report.depthCm, projectedRiseCm) : null;
@@ -63,25 +68,64 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
   const depthPct = Math.min(report.depthCm / 150, 1) * 100;
   const edgeLabel = report.edgeKm <= 0 ? 'you are inside this zone' : `${report.distKm.toFixed(1)} km away`;
 
-  // ── Admin override: depth/road correction + TTL extension ──────────────────────────────────
-  const [adminDepth, setAdminDepth] = React.useState(report.projectedDepthCm);
+  // ── Admin override: depth/road correction + TTL extension (or, for an expired report, reopen) ──
+  // Seed from the OBSERVATION (report.depthCm), not the projection, when the report is expired: for
+  // an expired report projectedDepthCm is the drained figure (≈0–2 cm — see DRAINED_CM), which would
+  // make a reopen a no-op. A live report still seeds from the projection, as before.
+  const [adminDepth, setAdminDepth] = React.useState(report.expired ? report.depthCm : report.projectedDepthCm);
   const [adminRoad, setAdminRoad] = React.useState<Road>(report.road);
   const [savingOverride, setSavingOverride] = React.useState(false);
   const [extending, setExtending] = React.useState(false);
+  const [overrideError, setOverrideError] = React.useState<string | null>(null);
+  // The reopen TTL as an OVERRIDE, not a snapshot: null means "fall through to the estimate for
+  // whatever depth is currently in the stepper", so correcting the depth (or the global rain flag
+  // flipping) re-times the lifetime until the admin pins a value on the slider. Same auto/pinned
+  // rule AdminQuickReportView's per-row `ttls` map follows. Only meaningful while report.expired.
+  const [reopenTtl, setReopenTtl] = React.useState<number | null>(null);
   // Reset the draft when a different report is opened — but not on every prop refresh of the SAME
   // report, or the admin's in-progress edit would get clobbered by the next 15s tick's re-projection.
   React.useEffect(() => {
-    setAdminDepth(report.projectedDepthCm);
+    setAdminDepth(report.expired ? report.depthCm : report.projectedDepthCm);
     setAdminRoad(report.road);
+    setReopenTtl(null);
+    setOverrideError(null);
   }, [report.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const effectiveTtlMin = report.ttlMinutes && report.ttlMinutes > 0 ? report.ttlMinutes : REPORT_TTL_MIN[report.severity];
+  // How long the depth now in the stepper should take to drain, and the lifetime the reopen will
+  // actually send — the admin's pinned value when there is one, otherwise that estimate.
+  const reopenEstimateMin = drainMinutes(adminDepth, rainActive);
+  const reopenTtlMin = reopenTtl ?? reopenEstimateMin;
+  // Close on success, keep the sheet open with an inline error on failure — onClose() unmounts the
+  // card, so it must run only after the finally has settled savingOverride, and only once the PATCH
+  // is confirmed to have landed. Matches the AdminPanel.tsx submit() precedent.
   const handleSaveOverride = async (): Promise<void> => {
     setSavingOverride(true);
+    setOverrideError(null);
     try {
       await onAdminUpdate(report.id, { depthCm: adminDepth, road: adminRoad });
+    } catch {
+      setOverrideError('Could not save. Please try again.');
+      return;
     } finally {
       setSavingOverride(false);
     }
+    onClose(); // only after the finally has run, only on success
+  };
+  const handleReopen = async (): Promise<void> => {
+    setSavingOverride(true);
+    setOverrideError(null);
+    try {
+      // depthCm is what re-anchors observationAnchorMs server-side (see the comment on `expired`
+      // in viewModel.ts) — a ttlMinutes-only patch would leave the report `drained` and it would
+      // never actually reappear. severity is deliberately not re-derived, matching Save override.
+      await onReopenReport(report.id, { depthCm: adminDepth, road: adminRoad, ttlMinutes: reopenTtlMin });
+    } catch {
+      setOverrideError('Could not save. Please try again.');
+      return;
+    } finally {
+      setSavingOverride(false);
+    }
+    onClose();
   };
   const handleExtend = async (): Promise<void> => {
     setExtending(true);
@@ -318,26 +362,75 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
               })}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 9 }}>
-              <button
-                onClick={() => void handleExtend()}
-                disabled={extending}
-                style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '7px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: extending ? 'wait' : 'pointer', opacity: extending ? 0.7 : 1 }}
-              >
-                + Extend 1 hour
-              </button>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)' }}>
-                Expires in {report.expired ? '—' : formatDuration(report.expiresInMin)}
-              </span>
-            </div>
+            {overrideError && (
+              <div style={{ marginBottom: 9, padding: '8px 10px', background: 'var(--bw-tint-danger)', color: 'var(--bw-on-tint-danger)', borderRadius: 8, fontSize: 11.5, fontWeight: 700 }}>
+                {overrideError}
+              </div>
+            )}
 
-            <button
-              onClick={() => void handleSaveOverride()}
-              disabled={savingOverride}
-              style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
-            >
-              {savingOverride ? 'Saving…' : 'Save depth & road override'}
-            </button>
+            {report.expired ? (
+              <>
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--bw-ink-soft)', lineHeight: 1.4, marginBottom: 10 }}>
+                  Water still there? Reopen it instead of filing a new report.
+                </div>
+                <div style={{ marginBottom: 11 }}>
+                  <SliderRow
+                    label="lasts"
+                    min={0}
+                    max={TTL_STOPS_MIN.length - 1}
+                    step={1}
+                    value={TTL_STOPS_MIN.indexOf(nearestTtlStop(reopenTtlMin))}
+                    onChange={(i) => setReopenTtl(TTL_STOPS_MIN[i])}
+                    color="var(--bw-primary)"
+                    readout={formatDuration(reopenTtlMin)}
+                    aside={
+                      reopenTtl === null ? (
+                        <span style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 700 }}>estimated</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setReopenTtl(null)}
+                          title="Back to the estimate from this depth"
+                          style={{ border: 0, background: 'transparent', color: 'var(--bw-muted)', fontSize: 14, fontWeight: 800, cursor: 'pointer', padding: 0 }}
+                        >
+                          ⟲
+                        </button>
+                      )
+                    }
+                  />
+                </div>
+                <button
+                  onClick={() => void handleReopen()}
+                  disabled={savingOverride}
+                  style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
+                >
+                  {savingOverride ? 'Reopening…' : `↻ Reopen for ${formatDuration(reopenTtlMin)}`}
+                </button>
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 9 }}>
+                  <button
+                    onClick={() => void handleExtend()}
+                    disabled={extending}
+                    style={{ border: '1px solid var(--bw-line)', background: 'var(--bw-surface)', color: 'var(--bw-ink)', padding: '7px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 800, cursor: extending ? 'wait' : 'pointer', opacity: extending ? 0.7 : 1 }}
+                  >
+                    + Extend 1 hour
+                  </button>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)' }}>
+                    Expires in {formatDuration(report.expiresInMin)}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => void handleSaveOverride()}
+                  disabled={savingOverride}
+                  style={{ width: '100%', border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', padding: 10, borderRadius: 10, fontSize: 12.5, fontWeight: 800, cursor: savingOverride ? 'wait' : 'pointer', opacity: savingOverride ? 0.7 : 1 }}
+                >
+                  {savingOverride ? 'Saving…' : 'Save depth & road override'}
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

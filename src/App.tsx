@@ -1538,6 +1538,14 @@ const App: React.FC = () => {
     }
   };
   const onUpdateReport = (id: number, b: Partial<NewReport & { status: ReportStatus }>) => adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report updated.');
+  // Reopening an expired report is the same PATCH as onUpdateReport (see the `expired` comment in
+  // viewModel.ts — the patch must carry depthCm to re-anchor) — kept as its own handler only so the
+  // toast tells the truth ("reopened", not "updated") and so a successful reopen can bounce the
+  // admin off the Archive tab, which the report has just left.
+  const onReopenReport = async (id: number, b: Partial<NewReport & { status: ReportStatus }>): Promise<void> => {
+    await adminAction(() => mutations.updateReport(id, b), () => reports.refetch(true), 'Report reopened — live again.');
+    if (tab === 'archive') setTab('nearby');
+  };
   const onDeleteReport = (id: number) => adminAction(() => mutations.deleteReport(id), () => reports.refetch(true), 'Report removed.');
 
   // ZoneReportModal: turn one or more flood-prone zones into live system reports. Posted
@@ -2020,6 +2028,7 @@ const App: React.FC = () => {
               rainActive={rainActive}
               now={now}
               onAdminUpdate={onUpdateReport}
+              onReopenReport={onReopenReport}
             />
           )}
 
@@ -2427,7 +2436,7 @@ const App: React.FC = () => {
           hotlines={hotlineList}
           alerts={alertList}
           zones={floodProneList}
-          reports={reportList}
+          reports={enriched}
           liveStream={liveStream}
           onToggleLive={setLiveStream}
           chatEnabled={settings.data?.chatEnabled !== false}

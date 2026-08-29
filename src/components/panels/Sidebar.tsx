@@ -443,14 +443,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           : { flex: '1 0 50%', minHeight: 0, overflowY: 'auto', padding: '0 18px 12px', display: 'flex', flexDirection: 'column', gap: 9 }}>
         {list.map((r) => {
           const isArchive = tab === 'archive';
+          // Archive rows are inert for everyone except an admin — who instead needs to reach an
+          // expired report to reopen it (ADMIN OVERRIDE in ReportDetailCard). Citizens see the
+          // archive exactly as before: dimmed, unclickable, plain "expired" text.
+          const archiveLocked = isArchive && auth?.role !== 'ADMIN';
           const sel = !isArchive && r.id === selectedReportId;
           const tm = TREND_META[r.trend];
           const rm = ROAD_META[r.road];
           return (
             <div
               key={r.id}
-              onClick={isArchive ? undefined : () => onSelectReport(r.id)}
-              style={{ padding: '12px 13px', borderRadius: 14, cursor: isArchive ? 'default' : 'pointer', opacity: isArchive ? 0.72 : 1, display: 'block', border: sel ? `1.5px solid ${r.sev.color}` : '1px solid var(--bw-line-soft)', background: sel ? r.sev.soft : isArchive ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)', transition: 'all .12s', flex: 'none' }}
+              onClick={archiveLocked ? undefined : () => onSelectReport(r.id)}
+              style={{ padding: '12px 13px', borderRadius: 14, cursor: archiveLocked ? 'default' : 'pointer', opacity: archiveLocked ? 0.72 : 1, display: 'block', border: sel ? `1.5px solid ${r.sev.color}` : '1px solid var(--bw-line-soft)', background: sel ? r.sev.soft : isArchive ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)', transition: 'all .12s', flex: 'none' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', flex: 'none', background: r.sev.color }} />
@@ -471,7 +475,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                   <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--bw-accent-indigo)', background: 'var(--bw-tint-info)', padding: '2px 7px', borderRadius: 6 }}>🛈 {t('report.system')}</span>
                 )}
                 {r.expired
-                  ? <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-faint)' }}>{t('report.expired')}</span>
+                  ? (auth?.role === 'ADMIN'
+                      ? <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--bw-on-accent)', background: 'var(--bw-primary)', padding: '2px 7px', borderRadius: 6 }}>↻ {t('report.reopen')}</span>
+                      : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-faint)' }}>{t('report.expired')}</span>)
                   : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bw-on-tint-warn)' }}>⏳ {formatDuration(r.expiresInMin)} {t('report.left')}</span>}
               </div>
             </div>
