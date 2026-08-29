@@ -1,9 +1,21 @@
 import React from 'react';
 import type { FloodReport, LatLng } from '../types';
 import type { FloodHotspot } from '../data/floodHotspots';
-import { ROAD_META, SEV_META, SEVERITY_PRESET, TTL_OPTIONS, roadFromDepth, severityFromDepth } from '../utils/floodMeta';
+import {
+  DEPTH_SLIDER_MAX_CM,
+  DEPTH_SLIDER_MIN_CM,
+  ROAD_META,
+  SEVERITY_PRESET,
+  SEV_META,
+  TTL_OPTIONS,
+  TTL_STOPS_MIN,
+  drainMinutes,
+  nearestTtlStop,
+  roadFromDepth,
+  severityFromDepth,
+} from '../utils/floodMeta';
 import { alreadyReportedKeys } from '../utils/viewModel';
-import { cmToIn, formatDuration } from '../utils/format';
+import { cmToIn, formatDepth, formatDuration } from '../utils/format';
 import { cityOf, provinceOf } from '../utils/phGeo';
 import * as store from '../utils/hotspotStore';
 import { reverseGeocode } from '../api/geocode';
@@ -11,10 +23,12 @@ import PlaceField from '../components/panels/PlaceField';
 import MapPickField from '../components/panels/MapPickField';
 import DepthReference from '../components/panels/DepthReference';
 
-/** One line of the batch: which hotspot, and how deep the water is there right now. */
+/** One line of the batch: which hotspot, how deep the water is there right now, and how long that
+ *  particular flood should stay on the map. All three vary per row — see the page's doc comment. */
 export interface HotspotReport {
   hotspot: FloodHotspot;
   depthCm: number;
+  ttlMinutes: number;
 }
 
 /**
@@ -28,8 +42,11 @@ export interface HotspotReport {
  * every row carries its OWN depth, because the same storm puts gutter-deep water on Roxas Blvd and
  * above-head water in Barangay Damayan.
  *
- * Depth is the only thing the admin sets: severity, road passability and trend are all derived from
- * it (severityFromDepth / roadFromDepth), so a shallow row can never inherit a deep row's severity.
+ * Depth is the only thing the admin has to set: severity, road passability and trend are all derived
+ * from it (severityFromDepth / roadFromDepth), so a shallow row can never inherit a deep row's
+ * severity — and each row's time-to-live is estimated from that same depth (drainMinutes), so a
+ * gutter-deep arterial drops off the map hours before a chest-deep barangay does, with no per-row
+ * input at all. Both are still overridable per row.
  *
  * Deliberately does NOT auto-post to Facebook/X — N locations must never fan out into N social
  * posts. Same rule as ZoneReportModal; the Flood digest is how a roundup gets shared.
@@ -40,7 +57,10 @@ interface Props {
   reports: FloodReport[];
   /** Biases the "+ Add hotspot" place search toward where the admin is. */
   userLoc: LatLng;
-  onSubmit: (picked: HotspotReport[], opts: { ttlMinutes?: number }) => Promise<{ ok: number; failed: string[] }>;
+  /** The global "rain is falling now" setting. Water can't start draining until the rain stops, so
+   *  this lengthens every auto TTL estimate by RAIN_HOLD_MIN. */
+  rainActive: boolean;
+  onSubmit: (picked: HotspotReport[]) => Promise<{ ok: number; failed: string[] }>;
   onClose: () => void;
 }
 
@@ -48,8 +68,17 @@ const ALL = 'All';
 /** Past this many locations in one go, the admin has to confirm the blast radius first — mirrors
  *  AdminScopedWarnModal's BULK_CONFIRM_THRESHOLD, at the smaller scale a report batch warrants. */
 const BULK_CONFIRM_THRESHOLD = 10;
-/** '' = one of TTL_OPTIONS; this sentinel reveals the free-form hours box instead. */
+/** Batch TTL policy sentinels. 'auto' (the default) means every row derives its own lifetime from
+ *  its own depth; 'custom' reveals the free-form hours box; anything else is a fixed minute count
+ *  from TTL_OPTIONS applied to every row alike.
+ *
+ *  TTL_OPTIONS' own '' entry ("Default (by severity)") is deliberately filtered out here: it defers
+ *  to the server's 20/45/90-minute windows, which leaves no number for a row's slider to show and
+ *  is far shorter than an admin logging a known corridor flood wants. This page is the explicit
+ *  -control surface; the single-incident modal still offers it. */
+const TTL_AUTO = 'auto';
 const TTL_CUSTOM = 'custom';
+const TTL_FIXED_OPTIONS = TTL_OPTIONS.filter((o) => o.value !== '');
 
 type Unit = 'cm' | 'in';
 
@@ -65,6 +94,46 @@ const inputStyle: React.CSSProperties = {
 };
 const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'var(--bw-muted)', marginBottom: 4, display: 'block' };
 const linkBtn: React.CSSProperties = { border: 0, background: 'transparent', fontSize: 11.5, fontWeight: 800, cursor: 'pointer', padding: 0 };
+
+/** cm → the number shown in the active unit, and back. cm remains the stored unit throughout (see
+ *  the warning on `formatDepth`); inches are only ever a display/entry convenience. */
+const toUnit = (cm: number, unit: Unit): number => (unit === 'cm' ? cm : cmToIn(cm));
+const fromUnit = (v: number, unit: Unit): number => (unit === 'cm' ? Math.round(v) : Math.round(v * 2.54));
+
+/**
+ * One labelled slider with a readout and a trailing action, used for both a row's depth and its
+ * time-to-live so the two read as a pair. Kept generic over the value because the depth track is in
+ * the displayed unit while the TTL track is an index into TTL_STOPS_MIN.
+ */
+const SliderRow: React.FC<{
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (v: number) => void;
+  color: string;
+  readout: string;
+  aside?: React.ReactNode;
+}> = ({ label, min, max, step, value, onChange, color, readout, aside }) => (
+  // flexWrap + modest minWidths so the readout and action drop to a second line on a narrow phone
+  // rather than pushing the track off the edge — the label/track/readout/aside fixed widths would
+  // otherwise total more than a 320 px viewport can hold.
+  <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
+    <span style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--bw-muted)', width: 34, flex: 'none' }}>{label}</span>
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      style={{ flex: '1 1 110px', minWidth: 96, accentColor: color, cursor: 'pointer' }}
+    />
+    <span style={{ fontSize: 11.5, fontWeight: 800, minWidth: 84, textAlign: 'right', flex: 'none' }}>{readout}</span>
+    <span style={{ flex: 'none', minWidth: 62, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6 }}>{aside}</span>
+  </div>
+);
 
 /**
  * A depth box that reads and writes centimetres but can be *shown* in inches. cm stays the stored
@@ -94,16 +163,26 @@ const DepthField: React.FC<{ cm: number; unit: Unit; onChange: (cm: number) => v
   );
 };
 
-const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onSubmit, onClose }) => {
+/** "4h" when every row agrees, "2h–6h" when they don't — the point of per-row lifetimes is visible
+ *  right in the footer without opening a single row. */
+function spanLabel(mins: number[]): string {
+  const lo = Math.min(...mins);
+  const hi = Math.max(...mins);
+  return lo === hi ? formatDuration(lo) : `${formatDuration(lo)}–${formatDuration(hi)}`;
+}
+
+const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, rainActive, onSubmit, onClose }) => {
   const [hotspots, setHotspots] = React.useState<FloodHotspot[]>(() => store.loadHotspots());
   const reload = (): void => setHotspots(store.loadHotspots());
 
   const [checked, setChecked] = React.useState<Set<string>>(new Set());
   /** Per-row depth overrides, cm. Absent ⇒ the row uses the batch depth. */
   const [depths, setDepths] = React.useState<Record<string, number>>({});
+  /** Per-row TTL overrides, minutes. Absent ⇒ the row derives its own (see `ttlOf`). */
+  const [ttls, setTtls] = React.useState<Record<string, number>>({});
   const [batchCm, setBatchCm] = React.useState(SEVERITY_PRESET.medium.depthCm);
   const [unit, setUnit] = React.useState<Unit>('cm');
-  const [ttl, setTtl] = React.useState('');
+  const [ttl, setTtl] = React.useState(TTL_AUTO);
   const [customHours, setCustomHours] = React.useState('6');
 
   const [province, setProvince] = React.useState(ALL);
@@ -148,8 +227,23 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
       .sort((a, b) => b.timesReported - a.timesReported || a.city.localeCompare(b.city) || a.name.localeCompare(b.name));
   }, [inProvince, city, tier, query]);
 
+  // Fixed batch lifetime in minutes, or null when the policy is 'auto' and every row estimates its
+  // own. Custom hours are clamped into the slider's own range so a typed 999 can still be shown.
+  const batchFixedMin: number | null =
+    ttl === TTL_AUTO
+      ? null
+      : ttl === TTL_CUSTOM
+        ? Math.min(TTL_STOPS_MIN[TTL_STOPS_MIN.length - 1], Math.max(TTL_STOPS_MIN[0], Math.round((Number(customHours) || 0) * 60)))
+        : Number(ttl);
+
   const depthOf = (h: FloodHotspot): number => depths[h.id] ?? batchCm;
-  const picked: HotspotReport[] = hotspots.filter((h) => checked.has(h.id)).map((h) => ({ hotspot: h, depthCm: depthOf(h) }));
+  // A row's lifetime, in precedence order: what the admin dragged for THIS row, else the batch's
+  // fixed duration, else — the default — an estimate from this row's own depth. Falling through to
+  // the estimate rather than snapshotting it is what makes moving a row's depth slider re-time it.
+  const ttlOf = (h: FloodHotspot): number => ttls[h.id] ?? batchFixedMin ?? drainMinutes(depthOf(h), rainActive);
+  const picked: HotspotReport[] = hotspots
+    .filter((h) => checked.has(h.id))
+    .map((h) => ({ hotspot: h, depthCm: depthOf(h), ttlMinutes: ttlOf(h) }));
 
   const toggle = (id: string): void =>
     setChecked((s) => {
@@ -168,6 +262,13 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
       delete next[id];
       return next;
     });
+  const setRowTtl = (id: string, min: number): void => setTtls((t) => ({ ...t, [id]: min }));
+  const resetRowTtl = (id: string): void =>
+    setTtls((t) => {
+      const next = { ...t };
+      delete next[id];
+      return next;
+    });
   /** Fill every ticked row with its own Aug-2026 high-water mark — the catalog's per-location data. */
   const useHistoricalDepths = (): void =>
     setDepths((d) => {
@@ -175,8 +276,6 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
       for (const h of hotspots) if (checked.has(h.id)) next[h.id] = h.maxDepthCm;
       return next;
     });
-
-  const ttlMinutes = ttl === TTL_CUSTOM ? Math.max(1, Math.round((Number(customHours) || 0) * 60)) : ttl ? Number(ttl) : undefined;
 
   const movePin = (id: string, lat: number, lng: number): void => {
     store.setPin(id, lat, lng);
@@ -188,7 +287,7 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
     setBusy(true);
     setError(null);
     try {
-      const result = await onSubmit(picked, { ttlMinutes });
+      const result = await onSubmit(picked);
       if (result.failed.length > 0) {
         // Partial failure: stay open with the selection intact so a retry re-posts exactly what
         // didn't land, same as ZoneReportModal.
@@ -279,19 +378,35 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
                   {SEV_META[batchSev].label} · {ROAD_META[batchRoad].short}
                 </span>
               </div>
-              <div style={{ marginTop: 10 }}>
+              {/* The slider is the primary control; the box above it stays for typing an exact
+                  figure straight off an advisory ("45 in"). Both write the same cm. */}
+              <input
+                type="range"
+                min={toUnit(DEPTH_SLIDER_MIN_CM, unit)}
+                max={toUnit(DEPTH_SLIDER_MAX_CM, unit)}
+                step={1}
+                value={toUnit(batchCm, unit)}
+                onChange={(e) => setBatchCm(fromUnit(Number(e.target.value), unit))}
+                style={{ width: '100%', margin: '11px 0 0', accentColor: SEV_META[batchSev].color, cursor: 'pointer' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600 }}>
+                <span>{toUnit(DEPTH_SLIDER_MIN_CM, unit)} {unit}</span>
+                <span>{toUnit(DEPTH_SLIDER_MAX_CM, unit)} {unit}</span>
+              </div>
+              <div style={{ marginTop: 9 }}>
                 <DepthReference depthCm={batchCm} color={SEV_META[batchSev].color} />
               </div>
               <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 8, lineHeight: 1.5 }}>
-                Severity and road status are worked out from the depth, per location — set a row's own depth below when it differs.
+                Severity and road status are worked out from the depth, per location — tick a row below to give it its own depth.
               </div>
             </div>
 
             <div>
               <label style={labelStyle}>How long will it last?</label>
               <div style={{ display: 'flex', gap: 9, alignItems: 'center', flexWrap: 'wrap' }}>
-                <select value={ttl} onChange={(e) => setTtl(e.target.value)} style={{ ...inputStyle, width: 'auto', minWidth: 190, flex: '0 1 auto' }}>
-                  {TTL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                <select value={ttl} onChange={(e) => setTtl(e.target.value)} style={{ ...inputStyle, width: 'auto', minWidth: 240, flex: '0 1 auto' }}>
+                  <option value={TTL_AUTO}>Auto — from each location's depth</option>
+                  {TTL_FIXED_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label} — every location</option>)}
                   <option value={TTL_CUSTOM}>Custom…</option>
                 </select>
                 {ttl === TTL_CUSTOM && (
@@ -299,7 +414,7 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
                     <input
                       type="number"
                       min={1}
-                      max={168}
+                      max={48}
                       value={customHours}
                       onChange={(e) => setCustomHours(e.target.value)}
                       style={{ ...inputStyle, width: 82 }}
@@ -308,8 +423,18 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
                   </>
                 )}
               </div>
-              <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 5 }}>
-                {ttlMinutes ? `Reports drop off the map after ${formatDuration(ttlMinutes)}.` : 'Reports drop off the map on the default schedule for their severity.'}
+              <div style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 5, lineHeight: 1.5 }}>
+                {batchFixedMin === null ? (
+                  <>
+                    Each location gets its own estimate from how deep it is — about {formatDuration(drainMinutes(20, rainActive))} for
+                    gutter-deep, {formatDuration(drainMinutes(152, rainActive))} for above-head.
+                    {rainActive
+                      ? ' Rain is falling, so every estimate is extended.'
+                      : ' Turn on “Rain is falling now” in the admin console to extend them.'}
+                  </>
+                ) : (
+                  `Every ticked location stays live for ${formatDuration(batchFixedMin)}, however deep it is.`
+                )}
               </div>
             </div>
           </div>
@@ -368,7 +493,9 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
               const blocked = already.has(h.id);
               const cm = depthOf(h);
               const sev = severityFromDepth(cm);
-              const overridden = h.id in depths;
+              const rowTtl = ttlOf(h);
+              const depthOverridden = h.id in depths;
+              const ttlOverridden = h.id in ttls;
               const custom = store.isCustom(h.id);
               return (
                 <div
@@ -402,19 +529,17 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
                       )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, flex: 'none' }}>
-                      <div style={{ width: 78 }}>
-                        <DepthField cm={cm} unit={unit} onChange={(v) => setRowDepth(h.id, v)} />
-                      </div>
+                      {/* Unticked rows stay a single scannable line — the sliders below only appear
+                          once a row is actually going to be posted. 32 always-on slider pairs would
+                          make the list unusable to scroll during an event. */}
+                      {!isChecked && (
+                        <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)', flex: 'none' }}>
+                          {unit === 'cm' ? `${cm} cm` : `${cmToIn(cm)} in`} · {formatDuration(rowTtl)}
+                        </span>
+                      )}
                       <span style={{ fontSize: 10.5, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: SEV_META[sev].soft, color: SEV_META[sev].color, flex: 'none' }}>
                         {SEV_META[sev].label}
                       </span>
-                      {overridden ? (
-                        <button type="button" onClick={() => resetRowDepth(h.id)} title="Back to the batch depth" style={{ ...linkBtn, color: 'var(--bw-muted)', fontSize: 14 }}>⟲</button>
-                      ) : (
-                        <button type="button" onClick={() => setRowDepth(h.id, h.maxDepthCm)} title={`Use this location's deepest recorded water (${h.maxDepthCm} cm)`} style={{ ...linkBtn, color: 'var(--bw-faint)', fontSize: 10.5 }}>
-                          max {unit === 'cm' ? `${h.maxDepthCm} cm` : `${cmToIn(h.maxDepthCm)} in`}
-                        </button>
-                      )}
                       <button
                         type="button"
                         onClick={() => setPinEditId((cur) => (cur === h.id ? null : h.id))}
@@ -435,6 +560,51 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
                       )}
                     </div>
                   </div>
+                  {/* Ticked ⇒ this row's own depth and lifetime. Both fall back to a derived value
+                      (batch depth / depth-based estimate) until dragged, so the common case needs
+                      no interaction at all — see `depthOf` and `ttlOf`. */}
+                  {isChecked && (
+                    <div style={{ marginTop: 9, paddingTop: 9, borderTop: '1px solid var(--bw-line-soft)', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                      <SliderRow
+                        label="depth"
+                        min={toUnit(DEPTH_SLIDER_MIN_CM, unit)}
+                        max={toUnit(DEPTH_SLIDER_MAX_CM, unit)}
+                        step={1}
+                        value={toUnit(cm, unit)}
+                        onChange={(v) => setRowDepth(h.id, fromUnit(v, unit))}
+                        color={SEV_META[sev].color}
+                        readout={formatDepth(cm)}
+                        aside={
+                          depthOverridden ? (
+                            <button type="button" onClick={() => resetRowDepth(h.id)} title="Back to the batch depth" style={{ ...linkBtn, color: 'var(--bw-muted)', fontSize: 14 }}>⟲</button>
+                          ) : (
+                            <button type="button" onClick={() => setRowDepth(h.id, h.maxDepthCm)} title={`Use this location's deepest recorded water (${h.maxDepthCm} cm)`} style={{ ...linkBtn, color: 'var(--bw-faint)', fontSize: 10.5 }}>
+                              max {unit === 'cm' ? `${h.maxDepthCm} cm` : `${cmToIn(h.maxDepthCm)} in`}
+                            </button>
+                          )
+                        }
+                      />
+                      <SliderRow
+                        label="lasts"
+                        min={0}
+                        max={TTL_STOPS_MIN.length - 1}
+                        step={1}
+                        value={TTL_STOPS_MIN.indexOf(nearestTtlStop(rowTtl))}
+                        onChange={(i) => setRowTtl(h.id, TTL_STOPS_MIN[i])}
+                        color="var(--bw-primary)"
+                        readout={formatDuration(rowTtl)}
+                        aside={
+                          ttlOverridden ? (
+                            <button type="button" onClick={() => resetRowTtl(h.id)} title={batchFixedMin === null ? 'Back to the estimate from this depth' : 'Back to the batch duration'} style={{ ...linkBtn, color: 'var(--bw-muted)', fontSize: 14 }}>⟲</button>
+                          ) : (
+                            <span style={{ fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 700 }}>
+                              {batchFixedMin === null ? 'estimated' : 'batch'}
+                            </span>
+                          )
+                        }
+                      />
+                    </div>
+                  )}
                   {pinEditId === h.id && (
                     <div style={{ marginTop: 10 }}>
                       <MapPickField lat={h.lat} lng={h.lng} onPick={(la, ln) => movePin(h.id, la, ln)} />
@@ -481,7 +651,7 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, onS
             <div style={{ flex: '1 1 190px', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 700 }}>
               {picked.length === 0
                 ? 'Nothing selected yet.'
-                : `${picked.length} location${picked.length === 1 ? '' : 's'} · ${Math.min(...picked.map((p) => p.depthCm))}–${Math.max(...picked.map((p) => p.depthCm))} cm · ${ttlMinutes ? formatDuration(ttlMinutes) : 'default'} live`}
+                : `${picked.length} location${picked.length === 1 ? '' : 's'} · ${Math.min(...picked.map((p) => p.depthCm))}–${Math.max(...picked.map((p) => p.depthCm))} cm · ${spanLabel(picked.map((p) => p.ttlMinutes))} live`}
             </div>
             <button
               onClick={onReportClick}

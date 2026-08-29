@@ -1580,17 +1580,14 @@ const App: React.FC = () => {
   };
 
   // Quick report page: post one system report per ticked hotspot. Same sequential, tally-returning
-  // shape as reportZones above — but severity, road and trend are derived from EACH row's own depth
-  // rather than shared across the batch, because one storm leaves gutter-deep water on an arterial
-  // and above-head water in a riverside barangay, and a shallow row must not inherit a deep row's
-  // "High / impassable".
-  const reportHotspots = async (
-    picked: HotspotReport[],
-    opts: { ttlMinutes?: number }
-  ): Promise<{ ok: number; failed: string[] }> => {
+  // shape as reportZones above — but severity, road, trend AND lifetime are per row rather than
+  // shared across the batch, because one storm leaves gutter-deep water on an arterial and
+  // above-head water in a riverside barangay. A shallow row must not inherit a deep row's
+  // "High / impassable", and it must not linger on the map for the hours the deep one needs.
+  const reportHotspots = async (picked: HotspotReport[]): Promise<{ ok: number; failed: string[] }> => {
     let ok = 0;
     const failed: string[] = [];
-    for (const { hotspot, depthCm } of picked) {
+    for (const { hotspot, depthCm, ttlMinutes } of picked) {
       const severity = severityFromDepth(depthCm);
       const payload: NewReport = {
         name: hotspot.name,
@@ -1603,7 +1600,7 @@ const App: React.FC = () => {
         road: roadFromDepth(depthCm),
         system: true,
         reportedAt: new Date().toISOString(),
-        ttlMinutes: opts.ttlMinutes,
+        ttlMinutes,
       };
       try {
         await mutations.createReport(payload);
@@ -2383,6 +2380,7 @@ const App: React.FC = () => {
           isMobile={isMobile}
           reports={active}
           userLoc={userLoc}
+          rainActive={rainActive}
           onSubmit={reportHotspots}
           onClose={() => setQuickReportOpen(false)}
         />
