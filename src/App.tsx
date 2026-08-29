@@ -13,11 +13,12 @@ import { ApiError, API_BASE } from './api/client';
 import type { GeoResult } from './api/geocode';
 import { reverseGeocode } from './api/geocode';
 import type { MapFocus, SearchMark } from './components/map/FloodMap';
-import { SEVERITY_PRESET, SEV_RANK } from './utils/floodMeta';
+import { SEVERITY_PRESET, SEV_RANK, roadFromDepth, severityFromDepth } from './utils/floodMeta';
 import { buildShareText, buildShareLinks, buildReportShareText, buildReportUrl, buildReportOgUrl, buildFloodDigest, FB_PAGE_URL } from './utils/share';
 import {
   alertsForUser,
   alertsInMonitorArea,
+  alreadyReportedKeys,
   buildPossibleClosures,
   buildRoadDirectory,
   computeStatus,
@@ -79,6 +80,7 @@ import FloodDigestModal from './components/panels/FloodDigestModal';
 import AdminWarnZoneModal from './components/panels/AdminWarnZoneModal';
 import AdminScopedWarnModal from './components/panels/AdminScopedWarnModal';
 import ZoneReportModal, { type ZoneReportOptions } from './components/panels/ZoneReportModal';
+import AdminQuickReportView, { type HotspotReport } from './views/AdminQuickReportView';
 import ResponseConsole from './components/panels/ResponseConsole';
 import ChatWidget from './components/panels/ChatWidget';
 import TripPanel from './components/panels/TripPanel';
@@ -151,9 +153,6 @@ type AlertDialog = { alert: FloodAlert; action?: { label: string; run: () => voi
 const SEV_TO_LEVEL: Record<Severity, AlertLevel> = { high: 'red', medium: 'orange', low: 'yellow' };
 const ARCHIVE_MAX = 10; // Archive keeps the 10 most recent expired reports; they linger indefinitely
 // with no activity and are only pushed out as newer reports expire — a lasting record that flooding happened.
-// A zone counts as "already reported" (ZoneReportModal's disabled/unticked rows) when an active
-// report's center lies within this of the zone's own center.
-const ZONE_ALREADY_REPORTED_KM = 0.15;
 
 const App: React.FC = () => {
   const { auth, loginWithGoogle, ensureGuest, logout } = useAuth();
@@ -286,6 +285,9 @@ const App: React.FC = () => {
   // or a single zone preselected from a row's "⚡ Report now" or a map bubble tap.
   const [zoneReportOpen, setZoneReportOpen] = React.useState(false);
   const [zoneReportPreselect, setZoneReportPreselect] = React.useState<number | null>(null);
+  // Admin "Quick flood report" page (AdminQuickReportView) — the bulk hotspot reporter, worked off
+  // the bundled Metro Manila catalog rather than backend zone rows.
+  const [quickReportOpen, setQuickReportOpen] = React.useState(false);
   const [rescueBusyId, setRescueBusyId] = React.useState<number | null>(null);
   const [liveStream, setLiveStream] = React.useState<boolean>(loadLivePref);
   const [notifyPerm, setNotifyPerm] = React.useState<NotificationPermission | 'unsupported'>(
@@ -473,16 +475,12 @@ const App: React.FC = () => {
   // ones drop off the map, feed, status and counts.
   const active = React.useMemo(() => enriched.filter((r) => !r.expired), [enriched]);
 
-  // Zones ZoneReportModal should treat as "already reported" — a fixed ~150 m dedup gate distinct
-  // from zonesWithStatus's radius-based "is it currently flooded" signal (that one drives the map
-  // bubble color; this one just keeps the bulk-report checklist from posting an obvious duplicate).
+  // Zones ZoneReportModal should treat as "already reported" — the shared ~150 m dedup gate, which
+  // the Quick report page applies to its hotspots too. Distinct from zonesWithStatus's radius-based
+  // "is it currently flooded" signal (that one drives the map bubble color; this one just keeps a
+  // bulk-report checklist from posting an obvious duplicate).
   const alreadyReportedZoneIds = React.useMemo(
-    () =>
-      floodProneList
-        .filter((z) =>
-          active.some((r) => kmBetween({ lat: z.latitude, lng: z.longitude }, { lat: r.latitude, lng: r.longitude }) <= ZONE_ALREADY_REPORTED_KM)
-        )
-        .map((z) => z.id),
+    () => [...alreadyReportedKeys(active, floodProneList.map((z) => ({ key: z.id, lat: z.latitude, lng: z.longitude })))],
     [floodProneList, active]
   );
 
@@ -1581,6 +1579,45 @@ const App: React.FC = () => {
     return { ok, failed };
   };
 
+  // Quick report page: post one system report per ticked hotspot. Same sequential, tally-returning
+  // shape as reportZones above — but severity, road and trend are derived from EACH row's own depth
+  // rather than shared across the batch, because one storm leaves gutter-deep water on an arterial
+  // and above-head water in a riverside barangay, and a shallow row must not inherit a deep row's
+  // "High / impassable".
+  const reportHotspots = async (
+    picked: HotspotReport[],
+    opts: { ttlMinutes?: number }
+  ): Promise<{ ok: number; failed: string[] }> => {
+    let ok = 0;
+    const failed: string[] = [];
+    for (const { hotspot, depthCm } of picked) {
+      const severity = severityFromDepth(depthCm);
+      const payload: NewReport = {
+        name: hotspot.name,
+        district: hotspot.district,
+        latitude: hotspot.lat,
+        longitude: hotspot.lng,
+        severity,
+        depthCm,
+        trend: SEVERITY_PRESET[severity].trend,
+        road: roadFromDepth(depthCm),
+        system: true,
+        reportedAt: new Date().toISOString(),
+        ttlMinutes: opts.ttlMinutes,
+      };
+      try {
+        await mutations.createReport(payload);
+        ok++;
+      } catch {
+        failed.push(hotspot.name);
+      }
+    }
+    await reports.refetch(true);
+    const hint = ok > 1 ? ' Consider the flood digest to share them as one post.' : '';
+    showToast(`Posted ${ok} of ${picked.length} flood report${picked.length === 1 ? '' : 's'}.${hint}`);
+    return { ok, failed };
+  };
+
   // Admin: accept/decline a bug report or feature request; accepted items become public on the board.
   const updateFeedbackStatus = (id: number, status: FeedbackStatus) =>
     adminAction(
@@ -1837,6 +1874,7 @@ const App: React.FC = () => {
           void rescues.refetch(true);
         }}
         onReportIncident={() => setIncidentOpen(true)}
+        onQuickReport={() => setQuickReportOpen(true)}
         onFloodDigest={() => setDigestOpen(true)}
       />
 
@@ -2338,6 +2376,15 @@ const App: React.FC = () => {
           preselectId={zoneReportPreselect}
           onSubmit={reportZones}
           onClose={() => { setZoneReportOpen(false); setZoneReportPreselect(null); }}
+        />
+      )}
+      {quickReportOpen && isAdmin && (
+        <AdminQuickReportView
+          isMobile={isMobile}
+          reports={active}
+          userLoc={userLoc}
+          onSubmit={reportHotspots}
+          onClose={() => setQuickReportOpen(false)}
         />
       )}
       {supportOpen && (

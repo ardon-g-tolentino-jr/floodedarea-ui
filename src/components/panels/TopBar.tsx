@@ -33,6 +33,8 @@ interface TopBarProps {
   onAdmin: () => void;
   onResponse: () => void;
   onReportIncident: () => void;
+  /** Opens the admin "Quick flood report" page — the bulk hotspot reporter. */
+  onQuickReport: () => void;
   /** Opens the admin "Flood digest" modal — the consolidated all-active-reports social post. */
   onFloodDigest: () => void;
   onShowFeatures: () => void;
@@ -86,6 +88,7 @@ const TopBar: React.FC<TopBarProps> = ({
   isAdmin,
   onAdmin,
   onResponse,
+  onQuickReport,
   onReportIncident,
   onFloodDigest,
   onShowFeatures,
@@ -357,6 +360,7 @@ const TopBar: React.FC<TopBarProps> = ({
                     onClick={runAndClose(() => setThemeChoice(nextThemeChoice(themeChoice)))}
                   />
                   {/* Admin-only actions live in the menu on mobile so the bar never overflows. */}
+                  {isAdmin && <MenuItem icon="⚡" label={t('topbar.quickReport')} onClick={runAndClose(onQuickReport)} />}
                   {isAdmin && <MenuItem icon="🚑" label={t('topbar.responseConsole')} onClick={runAndClose(onResponse)} />}
                   {isAdmin && <MenuItem icon="📣" label={t('topbar.floodDigest')} onClick={runAndClose(onFloodDigest)} />}
                   {isAdmin && <MenuItem icon="⚙" label={t('topbar.adminConsole')} onClick={runAndClose(onAdmin)} />}

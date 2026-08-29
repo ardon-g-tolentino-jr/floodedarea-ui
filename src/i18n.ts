@@ -86,6 +86,7 @@ const MESSAGES = {
   'topbar.admin': { en: 'Admin', fil: 'Admin' },
   'topbar.adminConsole': { en: 'Admin console', fil: 'Admin console' },
   'topbar.response': { en: 'Response', fil: 'Tugon' },
+  'topbar.quickReport': { en: 'Quick flood report', fil: 'Mabilisang ulat ng baha' },
   'topbar.responseConsole': { en: 'Response console', fil: 'Response console' },
   'topbar.floodDigest': { en: 'Flood digest', fil: 'Buod ng baha' },
   'topbar.nearbyAlerts': { en: 'Nearby flood alerts', fil: 'Mga babala sa malapit na baha' },
