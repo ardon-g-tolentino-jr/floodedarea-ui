@@ -1,5 +1,6 @@
 import React from 'react';
 import { searchPlaces, MIN_QUERY_LENGTH, type GeoResult } from '../../api/geocode';
+import Icon from '../Icon';
 import PlaceSuggestion from './PlaceSuggestion';
 
 interface SearchBoxProps {
@@ -185,7 +186,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
           cursor: 'pointer',
         }}
       >
-        ⌕
+        <Icon name="search" size={16} />
       </button>
     );
   }
@@ -211,7 +212,7 @@ const SearchBox = React.forwardRef<SearchBoxHandle, SearchBoxProps>(({ isMobile,
           borderRadius: 11,
         }}
       >
-        <span style={{ fontSize: 14, color: 'var(--bw-faint)', flex: 'none' }}>⌕</span>
+        <span style={{ display: 'flex', color: 'var(--bw-faint)', flex: 'none' }}><Icon name="search" size={14} /></span>
         <input
           ref={inputRef}
           value={query}
