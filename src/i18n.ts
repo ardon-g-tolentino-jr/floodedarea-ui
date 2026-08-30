@@ -69,6 +69,18 @@ const MESSAGES = {
   'login.intro': { en: 'Sign in with your Google account. A FloodedArea account is created automatically on first use.', fil: 'Mag-sign in gamit ang iyong Google account. Awtomatikong gagawa ng FloodedArea account sa unang paggamit.' },
   'login.verifying': { en: 'Verifying…', fil: 'Bineberipika…' },
   'login.notConfigured': { en: 'Google SSO isn’t configured. Set VITE_GOOGLE_CLIENT_ID to enable sign-in.', fil: 'Hindi naka-configure ang Google SSO. Itakda ang VITE_GOOGLE_CLIENT_ID para paganahin ang sign-in.' },
+  'login.gsiLoading': { en: 'Loading Google sign-in…', fil: 'Nilo-load ang Google sign-in…' },
+  // Shown when the Google button never renders — almost always because the page is inside an app's
+  // built-in browser, which Google refuses to serve sign-in to.
+  'login.inApp.title': { en: 'Google sign-in isn’t available here', fil: 'Hindi available dito ang Google sign-in' },
+  'login.inApp.body': { en: 'Google blocks sign-in inside {app}’s built-in browser. Open FloodedArea in your normal browser to sign in.', fil: 'Hinaharangan ng Google ang sign-in sa loob ng built-in na browser ng {app}. Buksan ang FloodedArea sa iyong karaniwang browser para makapag-sign in.' },
+  'login.inApp.bodyGeneric': { en: 'Google blocks sign-in inside built-in app browsers. Open FloodedArea in your normal browser to sign in.', fil: 'Hinaharangan ng Google ang sign-in sa loob ng built-in na browser ng app. Buksan ang FloodedArea sa iyong karaniwang browser para makapag-sign in.' },
+  'login.inApp.openBrowser': { en: 'Open in browser', fil: 'Buksan sa browser' },
+  'login.inApp.stepsIos': { en: 'Tap the share or three-dot button at the bottom of this screen, then choose “Open in Safari”.', fil: 'I-tap ang share o three-dot button sa ibaba ng screen, pagkatapos piliin ang “Open in Safari”.' },
+  'login.inApp.stepsAndroid': { en: 'Or tap the three-dot menu at the bottom of this screen and choose “Open in browser”.', fil: 'O i-tap ang three-dot menu sa ibaba ng screen at piliin ang “Open in browser”.' },
+  'login.inApp.copyLink': { en: 'Copy link', fil: 'Kopyahin ang link' },
+  'login.inApp.copied': { en: 'Link copied', fil: 'Nakopya ang link' },
+  'login.inApp.guestNote': { en: 'You don’t have to sign in — you can still post flood reports as a guest right here.', fil: 'Hindi kailangang mag-sign in — maaari ka pa ring mag-post ng flood report bilang guest dito.' },
 
   // ── TopBar ──
   'topbar.region': { en: 'Philippines', fil: 'Pilipinas' },

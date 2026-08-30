@@ -1,9 +1,27 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { ApiError } from '../api/client';
-import { useI18n, type Lang } from '../i18n';
+import { useI18n, tFormat, type Lang, type MsgKey } from '../i18n';
+import { canOpenInSystemBrowser, detectInAppBrowser, inAppLabel, openInSystemBrowser } from '../utils/inAppBrowser';
 
 const GOOGLE_ENABLED = Boolean((import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim());
+
+// How long to wait for Google Identity Services to draw its button before deciding it never will.
+// In an embedded webview (X, Facebook) Google refuses the origin outright and nothing is ever
+// inserted, leaving a silent empty gap where the only sign-in control should be.
+const GSI_RENDER_TIMEOUT_MS = 2500;
+/** How often to re-check, so a healthy load clears the placeholder without waiting out the timeout. */
+const GSI_POLL_MS = 150;
+/**
+ * Whether GIS actually drew its button inside `el`. Deliberately *not* a height check: the
+ * `@react-oauth/google` wrapper gives its own container a fixed height from the `size` prop, so the
+ * container measures the same 38px whether Google filled it or ignored it. A real render inserts a
+ * subtree whose clickable root carries role="button" (older GIS builds use an iframe instead); a
+ * refused one leaves that container empty.
+ */
+function gsiButtonRendered(el: HTMLElement | null): boolean {
+  return Boolean(el?.querySelector('[role="button"], iframe'));
+}
 
 interface LoginViewProps {
   reason?: string;
@@ -15,6 +33,26 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
   const { lang, t, setLang } = useI18n();
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  // Whether Google's button actually rendered. Keyed off the DOM, never off the user agent: UA
+  // sniffing alone would risk hiding a perfectly good sign-in button (the Play Store TWA shell is a
+  // real case). Watching for the render also covers a blocked script or a dead network.
+  const [gsiState, setGsiState] = React.useState<'pending' | 'ready' | 'failed'>('pending');
+  const gsiRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!GOOGLE_ENABLED) return;
+    const startedAt = Date.now();
+    const poll = window.setInterval(() => {
+      if (gsiButtonRendered(gsiRef.current)) {
+        setGsiState('ready');
+        window.clearInterval(poll);
+      } else if (Date.now() - startedAt >= GSI_RENDER_TIMEOUT_MS) {
+        setGsiState('failed');
+        window.clearInterval(poll);
+      }
+    }, GSI_POLL_MS);
+    return () => window.clearInterval(poll);
+  }, []);
 
   const errMessage = (e: unknown, fallback: string): string =>
     e instanceof ApiError ? e.message : e instanceof Error ? e.message : fallback;
@@ -83,18 +121,29 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '14px 0', fontSize: 13, color: 'var(--bw-muted)' }}>{t('login.verifying')}</div>
+          ) : GOOGLE_ENABLED && gsiState === 'failed' ? (
+            <InAppSignInHelp lang={lang} t={t} />
           ) : GOOGLE_ENABLED ? (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <GoogleLogin
-                onSuccess={(res) => { if (res.credential) void submitGoogle(res.credential); }}
-                onError={() => setError('Google sign-in was cancelled or failed.')}
-                useOneTap={false}
-                shape="rectangular"
-                size="large"
-                text="signin_with"
-                width="336"
-              />
-            </div>
+            <>
+              <div ref={gsiRef} style={{ display: 'flex', justifyContent: 'center' }}>
+                <GoogleLogin
+                  onSuccess={(res) => { if (res.credential) void submitGoogle(res.credential); }}
+                  onError={() => setError('Google sign-in was cancelled or failed.')}
+                  useOneTap={false}
+                  shape="rectangular"
+                  size="large"
+                  text="signin_with"
+                  width="336"
+                />
+              </div>
+              {/* Placeholder under the (initially empty) container so the modal never shows a bare
+                  gap while GIS is still loading. Clears the moment the button lays out. */}
+              {gsiState === 'pending' && (
+                <div style={{ textAlign: 'center', padding: '10px 0 0', fontSize: 12.5, color: 'var(--bw-faint)' }}>
+                  {t('login.gsiLoading')}
+                </div>
+              )}
+            </>
           ) : (
             <div style={{ padding: '11px 14px', background: 'var(--bw-bg-subtle)', border: '1px solid var(--bw-line)', borderRadius: 8, fontSize: 12.5, color: 'var(--bw-muted)', lineHeight: 1.5 }}>
               {t('login.notConfigured')}
@@ -110,6 +159,62 @@ const LoginView: React.FC<LoginViewProps> = ({ reason, onGoogle, onClose }) => {
             {t('guest.keepBrowsing')}
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Shown in place of Google's button when it never rendered. On Android we can hand the current URL
+ * (deep-link and all) to the system browser outright; iOS has no equivalent API, so it gets the
+ * written steps plus a copyable link.
+ */
+const InAppSignInHelp: React.FC<{ lang: Lang; t: (k: MsgKey) => string }> = ({ lang, t }) => {
+  const app = React.useMemo(detectInAppBrowser, []);
+  const canHandOff = React.useMemo(canOpenInSystemBrowser, []);
+  const label = inAppLabel(app);
+  const [copied, setCopied] = React.useState(false);
+
+  const copyLink = async (): Promise<void> => {
+    try {
+      await navigator.clipboard?.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked — the written steps below still get the user out */
+    }
+  };
+
+  return (
+    <div style={{ padding: '13px 15px', background: 'var(--bw-tint-info)', border: '1px solid var(--bw-tint-info-border)', borderRadius: 10, color: 'var(--bw-on-tint-info)' }}>
+      <div style={{ fontSize: 13.5, fontWeight: 800, marginBottom: 6 }}>{t('login.inApp.title')}</div>
+      <div style={{ fontSize: 12.5, lineHeight: 1.55 }}>
+        {label ? tFormat(lang, 'login.inApp.body', { app: label }) : t('login.inApp.bodyGeneric')}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        {canHandOff && (
+          <button
+            onClick={() => { openInSystemBrowser(); }}
+            style={{ flex: 1, border: 0, background: 'var(--bw-primary)', color: 'var(--bw-on-accent)', borderRadius: 9, padding: '10px 12px', fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}
+          >
+            {t('login.inApp.openBrowser')}
+          </button>
+        )}
+        <button
+          onClick={() => void copyLink()}
+          style={{ flex: canHandOff ? 'none' : 1, border: '1px solid var(--bw-tint-info-border)', background: 'var(--bw-surface)', color: 'var(--bw-ink-soft)', borderRadius: 9, padding: '10px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+        >
+          {copied ? t('login.inApp.copied') : t('login.inApp.copyLink')}
+        </button>
+      </div>
+
+      <div style={{ fontSize: 11.5, lineHeight: 1.5, marginTop: 10, opacity: 0.85 }}>
+        {t(canHandOff ? 'login.inApp.stepsAndroid' : 'login.inApp.stepsIos')}
+      </div>
+
+      <div style={{ fontSize: 11.5, lineHeight: 1.5, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--bw-tint-info-border)' }}>
+        {t('login.inApp.guestNote')}
       </div>
     </div>
   );

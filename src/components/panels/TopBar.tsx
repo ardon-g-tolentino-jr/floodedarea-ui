@@ -4,6 +4,7 @@ import type { GeoResult } from '../../api/geocode';
 import { BUILD_COMMIT, BUILD_LABEL, BUILD_TIME } from '../../buildInfo';
 import { useI18n } from '../../i18n';
 import { useTheme, type ThemeChoice } from '../../theme';
+import Icon from '../Icon';
 import ReportOptions from './ReportOptions';
 import SearchBox, { type SearchBoxHandle } from './SearchBox';
 
@@ -53,6 +54,10 @@ const ICON_BTN: React.CSSProperties = {
   background: 'var(--bw-surface)',
   borderRadius: 11,
   fontSize: 16,
+  // Explicit, because styles.css gives <button> `font-family: inherit` but not `color` — without
+  // this a button falls back to the UA's `buttontext`, which the <Icon> SVGs would then inherit as
+  // `currentColor`. Emoji-labelled buttons ignore `color`, so nothing else changes.
+  color: 'var(--bw-ink-soft)',
   cursor: 'pointer',
 };
 
@@ -352,7 +357,7 @@ const TopBar: React.FC<TopBarProps> = ({
                 aria-expanded={menuOpen}
                 style={{ ...ICON_BTN, background: menuOpen ? 'var(--bw-bg-subtle)' : 'var(--bw-surface)' }}
               >
-                ⋯
+                <Icon name="more" />
               </button>
               {menuOpen && (
                 <div
