@@ -1,19 +1,21 @@
 import React from 'react';
 import type { Severity } from '../../types';
 import { SEV_META } from '../../utils/floodMeta';
-import { MONITOR_RADIUS_MAX, MONITOR_RADIUS_MIN, MONITOR_RADIUS_STEP } from '../../utils/viewModel';
-import { useI18n, sevLabel, type MsgKey } from '../../i18n';
+import { useI18n, sevLabel, tFormat, type MsgKey } from '../../i18n';
 
-/** A user's subscription to new-flood-report alerts. Persisted in localStorage. */
+/**
+ * A user's subscription to new-flood-report alerts. Persisted in localStorage.
+ * `radiusKm` used to live here as its own slider, duplicating the sidebar's "My area" (monitoring
+ * area) slider — two radii, two sources of truth, and this one never fed the map/banner at all.
+ * As of 085 there is exactly one radius (`monitorRadiusKm` in App.tsx); this modal only reads it.
+ */
 export interface NotifyPrefs {
   enabled: boolean;
-  radiusKm: number;
   severities: Record<Severity, boolean>;
 }
 
 export const DEFAULT_NOTIFY_PREFS: NotifyPrefs = {
   enabled: false,
-  radiusKm: 3,
   severities: { high: true, medium: true, low: true },
 };
 
@@ -22,6 +24,9 @@ const fmtKm = (km: number): string =>
 
 interface NotifyModalProps {
   prefs: NotifyPrefs;
+  /** The unified monitoring-area radius (App.tsx's `monitorRadiusKm`) — read-only here; set via the
+   *  sidebar's Monitoring area slider, not this modal. */
+  radiusKm: number;
   permission: NotificationPermission | 'unsupported';
   onEnable: (on: boolean) => void;
   onChange: (next: NotifyPrefs) => void;
@@ -30,7 +35,7 @@ interface NotifyModalProps {
 
 const SEV_ORDER: Severity[] = ['high', 'medium', 'low'];
 
-const NotifyModal: React.FC<NotifyModalProps> = ({ prefs, permission, onEnable, onChange, onClose }) => {
+const NotifyModal: React.FC<NotifyModalProps> = ({ prefs, radiusKm, permission, onEnable, onChange, onClose }) => {
   const { lang, t } = useI18n();
   const setSeverity = (s: Severity): void =>
     onChange({ ...prefs, severities: { ...prefs.severities, [s]: !prefs.severities[s] } });
@@ -68,26 +73,9 @@ const NotifyModal: React.FC<NotifyModalProps> = ({ prefs, permission, onEnable, 
 
           {/* Criteria */}
           <div style={{ opacity: prefs.enabled ? 1 : 0.45, pointerEvents: prefs.enabled ? 'auto' : 'none', transition: 'opacity .15s' }}>
-            {/* Distance */}
-            <div style={{ marginTop: 18 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.1em', color: 'var(--bw-faint)' }}>{t('notify.withinDistance')}</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--bw-primary-deep)' }}>{fmtKm(prefs.radiusKm)}</span>
-              </div>
-              <input
-                type="range"
-                min={MONITOR_RADIUS_MIN}
-                max={MONITOR_RADIUS_MAX}
-                step={MONITOR_RADIUS_STEP}
-                value={prefs.radiusKm}
-                onChange={(e) => onChange({ ...prefs, radiusKm: parseFloat(e.target.value) })}
-                aria-label="Alert distance in kilometers"
-                style={{ width: '100%', accentColor: 'var(--bw-primary)', cursor: 'pointer' }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--bw-muted)', marginTop: 1 }}>
-                <span>{fmtKm(MONITOR_RADIUS_MIN)}</span>
-                <span>{fmtKm(MONITOR_RADIUS_MAX)}</span>
-              </div>
+            {/* Range — read-only here; the one slider that sets it lives on the sidebar (My area). */}
+            <div style={{ marginTop: 18, fontSize: 11.5, color: 'var(--bw-muted)' }}>
+              {tFormat(lang, 'notify.rangeFromSidebar', { km: fmtKm(radiusKm) })}
             </div>
 
             {/* Severity */}

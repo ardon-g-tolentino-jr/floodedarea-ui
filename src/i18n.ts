@@ -142,7 +142,7 @@ const MESSAGES = {
 
   // ── Sidebar descriptions / affected-area readout ──
   'sidebar.affectedDesc': { en: 'Each report’s ring grows with its water depth. Drag to project how much higher the water rises — the dashed rings show how far flooding could spread.', fil: 'Lumalaki ang bilog ng bawat ulat ayon sa lalim ng tubig. I-drag para tantyahin kung gaano pa tataas ang tubig — ipinapakita ng mga putol-putol na bilog kung gaano kalayo maaaring kumalat ang baha.' },
-  'sidebar.monitorDesc': { en: 'The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding.', fil: 'Ang putol-putol na asul na bilog sa mapa sa paligid mo. I-drag para itakda kung gaano kalayo babantayan ang baha.' },
+  'sidebar.monitorDesc': { en: 'The dashed blue circle on the map around you. Drag to set how far out to keep watch for flooding — this also sets the range for your flood alerts.', fil: 'Ang putol-putol na asul na bilog sa mapa sa paligid mo. I-drag para itakda kung gaano kalayo babantayan ang baha — ito rin ang sakop ng iyong mga babala sa baha.' },
   'sidebar.affectedAt': { en: 'At', fil: 'Sa' },
   'sidebar.affectedSpread': { en: 'a typical flooded zone spreads', fil: 'kumakalat ang karaniwang binahang lugar nang' },
   'sidebar.affectedWider': { en: 'wider', fil: 'na mas malawak' },
@@ -160,7 +160,7 @@ const MESSAGES = {
   'status.rising': { en: ', rising', fil: ', tumataas' },
   'status.clear': { en: 'CLEAR', fil: 'LIGTAS' },
   'status.clearTitle': { en: 'No flooding near you', fil: 'Walang baha malapit sa iyo' },
-  'status.clearLine': { en: 'There are no reports within 2.5 km of your location.', fil: 'Walang ulat sa loob ng 2.5 km mula sa iyong lokasyon.' },
+  'status.clearLine': { en: 'There are no reports within {km} km of your location.', fil: 'Walang ulat sa loob ng {km} km mula sa iyong lokasyon.' },
   'status.clearSub': { en: 'Conditions change fast in heavy rain — keep this open to stay updated.', fil: 'Mabilis magbago ang kalagayan sa malakas na ulan — panatilihing bukas ito para sa mga update.' },
   'status.etaAtArea': { en: 'Water from {name} is at your area and still rising.', fil: 'Ang tubig mula sa {name} ay nasa lugar mo na at patuloy pang tumataas.' },
   'status.etaReach': { en: 'At the current rate, flooding from {name} could reach you in ~{lo}–{hi} hr (rough estimate).', fil: 'Sa kasalukuyang bilis, maaaring umabot sa iyo ang baha mula sa {name} sa loob ng ~{lo}–{hi} oras (tantya lamang).' },
@@ -169,14 +169,20 @@ const MESSAGES = {
   'notify.subtitle': { en: 'Get notified when a new flood is reported near you', fil: 'Mapaalalahanan kapag may bagong baha na naiulat malapit sa iyo' },
   'notify.master': { en: 'Notify me about new reports near me', fil: 'Abisuhan ako tungkol sa mga bagong ulat malapit sa akin' },
   'notify.criteria': { en: 'From other people, matching the criteria below', fil: 'Mula sa ibang tao, na tumutugma sa pamantayan sa ibaba' },
-  'notify.withinDistance': { en: 'WITHIN DISTANCE', fil: 'SA LOOB NG LAYO' },
   'notify.forLevels': { en: 'FOR THESE LEVELS', fil: 'PARA SA MGA ANTAS NA ITO' },
+  // Read-only range line that replaced NotifyModal's own distance slider (085) — the radius now
+  // lives in one place, the sidebar's "My area" slider, so this just states it and points there.
+  // {km} arrives pre-formatted via fmtKm (e.g. "3 km" / "500 m") — don't append a unit here.
+  'notify.rangeFromSidebar': { en: 'Alerts within your {km} monitoring area. Change the range with the sidebar’s Monitoring area slider.', fil: 'Mga babala sa loob ng iyong {km} na binabantayang lugar. Baguhin ang sakop gamit ang Monitoring area slider sa sidebar.' },
   'notify.permGranted': { en: 'Browser notifications are on — you’ll be alerted even when this tab is in the background.', fil: 'Naka-on ang mga abiso ng browser — aabisuhan ka kahit nasa background ang tab na ito.' },
   'notify.permDenied': { en: 'Browser notifications are blocked in your browser settings. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Naka-block ang mga abiso ng browser sa iyong settings. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
   'notify.permUnsupported': { en: 'This browser can’t show system notifications. You’ll still see in-app alerts while FloodedArea is open.', fil: 'Hindi maipapakita ng browser na ito ang mga system notification. Makikita mo pa rin ang mga in-app na abiso habang bukas ang FloodedArea.' },
   'notify.permDefault': { en: 'Turn the toggle on to allow notifications and get alerts even when this tab is in the background.', fil: 'I-on ang toggle para payagan ang mga abiso at makatanggap kahit nasa background ang tab na ito.' },
   'notify.alertTitleOne': { en: 'New flood reported nearby', fil: 'May bagong baha na naiulat malapit sa iyo' },
   'notify.alertTitleMany': { en: '{n} new flood reports near you', fil: '{n} bagong ulat ng baha malapit sa iyo' },
+  // Widen-backfill toast (085) — fires once when growing the monitoring-area slider brings an
+  // already-arrived report into range for the first time. See tripAddedFlooded for the house style.
+  'notify.areaWidened': { en: '{n} flood report(s) are already inside your {km} km area.', fil: '{n} ulat ng baha ang nasa loob na ng iyong {km} km na lugar.' },
 
   // ── Alert modal source chip — distinguishes which of the three alert systems fired ──
   'alert.sourceNearby': { en: 'Nearby', fil: 'Malapit' },
