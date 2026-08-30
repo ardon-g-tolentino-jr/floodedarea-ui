@@ -1296,7 +1296,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L1",
       "id": "playstore_assets_seed_mjs",
-      "community": 6,
+      "community": 33,
       "norm_label": "seed.mjs"
     },
     {
@@ -1305,7 +1305,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L19",
       "id": "playstore_assets_seed_here",
-      "community": 6,
+      "community": 33,
       "norm_label": "here"
     },
     {
@@ -1314,7 +1314,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L20",
       "id": "playstore_assets_seed_seed",
-      "community": 6,
+      "community": 33,
       "norm_label": "seed"
     },
     {
@@ -1323,7 +1323,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L28",
       "id": "playstore_assets_seed_now",
-      "community": 6,
+      "community": 33,
       "norm_label": "now"
     },
     {
@@ -1332,7 +1332,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L29",
       "id": "playstore_assets_seed_ago",
-      "community": 6,
+      "community": 33,
       "norm_label": "ago()"
     },
     {
@@ -1341,7 +1341,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L34",
       "id": "playstore_assets_seed_ages",
-      "community": 6,
+      "community": 33,
       "norm_label": "ages"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L48",
       "id": "playstore_assets_seed_fallback",
-      "community": 6,
+      "community": 33,
       "norm_label": "fallback"
     },
     {
@@ -1359,7 +1359,7 @@
       "source_file": "playstore-assets/seed.mjs",
       "source_location": "L50",
       "id": "playstore_assets_seed_db",
-      "community": 6,
+      "community": 33,
       "norm_label": "db"
     },
     {
@@ -1681,16 +1681,25 @@
       "label": "loadNotifyPrefs()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L100",
+      "source_location": "L104",
       "id": "src_app_loadnotifyprefs",
       "community": 5,
       "norm_label": "loadnotifyprefs()"
     },
     {
+      "label": "loadMonitorRadiusKm()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L127",
+      "id": "src_app_loadmonitorradiuskm",
+      "community": 23,
+      "norm_label": "loadmonitorradiuskm()"
+    },
+    {
       "label": "loadLivePref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L109",
+      "source_location": "L146",
       "id": "src_app_loadlivepref",
       "community": 5,
       "norm_label": "loadlivepref()"
@@ -1699,7 +1708,7 @@
       "label": "loadReportPref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L118",
+      "source_location": "L155",
       "id": "src_app_loadreportpref",
       "community": 5,
       "norm_label": "loadreportpref()"
@@ -1708,7 +1717,7 @@
       "label": "loadGuestNudgeDismissed()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L126",
+      "source_location": "L163",
       "id": "src_app_loadguestnudgedismissed",
       "community": 5,
       "norm_label": "loadguestnudgedismissed()"
@@ -1717,7 +1726,7 @@
       "label": "loadFloodPronePref()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L135",
+      "source_location": "L172",
       "id": "src_app_loadfloodpronepref",
       "community": 5,
       "norm_label": "loadfloodpronepref()"
@@ -1726,7 +1735,7 @@
       "label": "DEFAULT_LOCATION",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L143",
+      "source_location": "L180",
       "id": "src_app_default_location",
       "community": 5,
       "norm_label": "default_location"
@@ -1735,7 +1744,7 @@
       "label": "PendingPin",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L145",
+      "source_location": "L182",
       "id": "src_app_pendingpin",
       "community": 5,
       "norm_label": "pendingpin"
@@ -1744,7 +1753,7 @@
       "label": "AlertDialog",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L150",
+      "source_location": "L187",
       "id": "src_app_alertdialog",
       "community": 5,
       "norm_label": "alertdialog"
@@ -1753,7 +1762,7 @@
       "label": "SEV_TO_LEVEL",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L153",
+      "source_location": "L190",
       "id": "src_app_sev_to_level",
       "community": 5,
       "norm_label": "sev_to_level"
@@ -1762,7 +1771,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L157",
+      "source_location": "L194",
       "id": "src_app_app",
       "community": 5,
       "norm_label": "app()"
@@ -1800,7 +1809,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L1",
       "id": "src_i18n_ts",
-      "community": 8,
+      "community": 6,
       "norm_label": "i18n.ts"
     },
     {
@@ -1818,7 +1827,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L14",
       "id": "src_i18n_loadlang",
-      "community": 8,
+      "community": 6,
       "norm_label": "loadlang()"
     },
     {
@@ -1827,7 +1836,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L22",
       "id": "src_i18n_currentlang",
-      "community": 8,
+      "community": 6,
       "norm_label": "currentlang"
     },
     {
@@ -1836,7 +1845,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L23",
       "id": "src_i18n_listeners",
-      "community": 8,
+      "community": 6,
       "norm_label": "listeners"
     },
     {
@@ -1845,7 +1854,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L25",
       "id": "src_i18n_getlang",
-      "community": 8,
+      "community": 27,
       "norm_label": "getlang()"
     },
     {
@@ -1854,7 +1863,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L30",
       "id": "src_i18n_haschosenlang",
-      "community": 8,
+      "community": 6,
       "norm_label": "haschosenlang()"
     },
     {
@@ -1863,7 +1872,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L38",
       "id": "src_i18n_setlang",
-      "community": 8,
+      "community": 6,
       "norm_label": "setlang()"
     },
     {
@@ -1872,7 +1881,7 @@
       "source_file": "src/i18n.ts",
       "source_location": "L48",
       "id": "src_i18n_subscribe",
-      "community": 8,
+      "community": 6,
       "norm_label": "subscribe()"
     },
     {
@@ -1881,14 +1890,14 @@
       "source_file": "src/i18n.ts",
       "source_location": "L54",
       "id": "src_i18n_messages",
-      "community": 8,
+      "community": 6,
       "norm_label": "messages"
     },
     {
       "label": "MsgKey",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L445",
+      "source_location": "L451",
       "id": "src_i18n_msgkey",
       "community": 6,
       "norm_label": "msgkey"
@@ -1897,61 +1906,61 @@
       "label": "translate()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L447",
+      "source_location": "L453",
       "id": "src_i18n_translate",
-      "community": 8,
+      "community": 6,
       "norm_label": "translate()"
     },
     {
       "label": "tFormat()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L454",
+      "source_location": "L460",
       "id": "src_i18n_tformat",
-      "community": 8,
+      "community": 6,
       "norm_label": "tformat()"
     },
     {
       "label": "sevLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L462",
+      "source_location": "L468",
       "id": "src_i18n_sevlabel",
-      "community": 8,
+      "community": 6,
       "norm_label": "sevlabel()"
     },
     {
       "label": "roadLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L465",
+      "source_location": "L471",
       "id": "src_i18n_roadlabel",
-      "community": 8,
+      "community": 6,
       "norm_label": "roadlabel()"
     },
     {
       "label": "roadShort()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L468",
+      "source_location": "L474",
       "id": "src_i18n_roadshort",
-      "community": 8,
+      "community": 6,
       "norm_label": "roadshort()"
     },
     {
       "label": "trendLabel()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L471",
+      "source_location": "L477",
       "id": "src_i18n_trendlabel",
-      "community": 8,
+      "community": 6,
       "norm_label": "trendlabel()"
     },
     {
       "label": "useI18n()",
       "file_type": "code",
       "source_file": "src/i18n.ts",
-      "source_location": "L476",
+      "source_location": "L482",
       "id": "src_i18n_usei18n",
       "community": 6,
       "norm_label": "usei18n()"
@@ -1971,7 +1980,7 @@
       "source_file": "src/types.ts",
       "source_location": "L4",
       "id": "src_types_severity",
-      "community": 28,
+      "community": 13,
       "norm_label": "severity"
     },
     {
@@ -1989,7 +1998,7 @@
       "source_file": "src/types.ts",
       "source_location": "L6",
       "id": "src_types_road",
-      "community": 8,
+      "community": 27,
       "norm_label": "road"
     },
     {
@@ -2025,7 +2034,7 @@
       "source_file": "src/types.ts",
       "source_location": "L10",
       "id": "src_types_userrole",
-      "community": 46,
+      "community": 26,
       "norm_label": "userrole"
     },
     {
@@ -2043,7 +2052,7 @@
       "source_file": "src/types.ts",
       "source_location": "L17",
       "id": "src_types_floodreport",
-      "community": 27,
+      "community": 30,
       "norm_label": "floodreport"
     },
     {
@@ -2124,7 +2133,7 @@
       "source_file": "src/types.ts",
       "source_location": "L134",
       "id": "src_types_latlng",
-      "community": 27,
+      "community": 23,
       "norm_label": "latlng"
     },
     {
@@ -2430,7 +2439,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L1",
       "id": "src_utils_geolocate_ts",
-      "community": 26,
+      "community": 5,
       "norm_label": "geolocate.ts"
     },
     {
@@ -2439,7 +2448,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L7",
       "id": "utils_geolocate_fix",
-      "community": 26,
+      "community": 5,
       "norm_label": "fix"
     },
     {
@@ -2448,7 +2457,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L21",
       "id": "utils_geolocate_locateoptions",
-      "community": 26,
+      "community": 5,
       "norm_label": "locateoptions"
     },
     {
@@ -2457,7 +2466,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L35",
       "id": "utils_geolocate_locatewithaccuracy",
-      "community": 26,
+      "community": 5,
       "norm_label": "locatewithaccuracy()"
     },
     {
@@ -2466,7 +2475,7 @@
       "source_file": "src/utils/geolocate.ts",
       "source_location": "L106",
       "id": "utils_geolocate_watchlocation",
-      "community": 26,
+      "community": 5,
       "norm_label": "watchlocation()"
     },
     {
@@ -2475,7 +2484,7 @@
       "source_file": "src/utils/image.ts",
       "source_location": "L1",
       "id": "src_utils_image_ts",
-      "community": 24,
+      "community": 3,
       "norm_label": "image.ts"
     },
     {
@@ -2484,7 +2493,7 @@
       "source_file": "src/utils/image.ts",
       "source_location": "L15",
       "id": "utils_image_loadimage",
-      "community": 24,
+      "community": 3,
       "norm_label": "loadimage()"
     },
     {
@@ -2493,7 +2502,7 @@
       "source_file": "src/utils/image.ts",
       "source_location": "L35",
       "id": "utils_image_filetocompresseddataurl",
-      "community": 24,
+      "community": 3,
       "norm_label": "filetocompresseddataurl()"
     },
     {
@@ -2538,7 +2547,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L42",
       "id": "utils_waterchart_buildwaterchart",
-      "community": 0,
+      "community": 30,
       "norm_label": "buildwaterchart()"
     },
     {
@@ -2547,7 +2556,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L111",
       "id": "utils_waterchart_hourbucket",
-      "community": 30,
+      "community": 13,
       "norm_label": "hourbucket"
     },
     {
@@ -2565,7 +2574,7 @@
       "source_file": "src/utils/waterChart.ts",
       "source_location": "L127",
       "id": "utils_waterchart_futureprojection",
-      "community": 27,
+      "community": 30,
       "norm_label": "futureprojection"
     },
     {
@@ -2871,7 +2880,7 @@
       "source_file": "src/utils/share.ts",
       "source_location": "L141",
       "id": "utils_share_buildincidentcaption",
-      "community": 24,
+      "community": 3,
       "norm_label": "buildincidentcaption()"
     },
     {
@@ -3042,7 +3051,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L20",
       "id": "utils_viewmodel_affectedradiuskm",
-      "community": 0,
+      "community": 21,
       "norm_label": "affectedradiuskm()"
     },
     {
@@ -3060,7 +3069,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L57",
       "id": "utils_viewmodel_report_ttl_min",
-      "community": 0,
+      "community": 3,
       "norm_label": "report_ttl_min"
     },
     {
@@ -3069,7 +3078,7 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L91",
       "id": "utils_viewmodel_alertsforuser",
-      "community": 5,
+      "community": 27,
       "norm_label": "alertsforuser()"
     },
     {
@@ -3078,14 +3087,23 @@
       "source_file": "src/utils/viewModel.ts",
       "source_location": "L119",
       "id": "utils_viewmodel_alertsinmonitorarea",
-      "community": 5,
+      "community": 27,
       "norm_label": "alertsinmonitorarea()"
+    },
+    {
+      "label": "inMonitorArea()",
+      "file_type": "code",
+      "source_file": "src/utils/viewModel.ts",
+      "source_location": "L141",
+      "id": "utils_viewmodel_inmonitorarea",
+      "community": 27,
+      "norm_label": "inmonitorarea()"
     },
     {
       "label": "ZoneStatus",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L134",
+      "source_location": "L144",
       "id": "utils_viewmodel_zonestatus",
       "community": 27,
       "norm_label": "zonestatus"
@@ -3094,7 +3112,7 @@
       "label": "zonesWithStatus()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L148",
+      "source_location": "L158",
       "id": "utils_viewmodel_zoneswithstatus",
       "community": 21,
       "norm_label": "zoneswithstatus()"
@@ -3103,16 +3121,16 @@
       "label": "matchingProneZone()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L174",
+      "source_location": "L184",
       "id": "utils_viewmodel_matchingpronezone",
-      "community": 24,
+      "community": 3,
       "norm_label": "matchingpronezone()"
     },
     {
       "label": "alreadyReportedKeys()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L199",
+      "source_location": "L209",
       "id": "utils_viewmodel_alreadyreportedkeys",
       "community": 40,
       "norm_label": "alreadyreportedkeys()"
@@ -3121,43 +3139,43 @@
       "label": "EnrichedReport",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L213",
+      "source_location": "L223",
       "id": "utils_viewmodel_enrichedreport",
-      "community": 8,
+      "community": 2,
       "norm_label": "enrichedreport"
     },
     {
       "label": "SafetyStatus",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L235",
+      "source_location": "L245",
       "id": "utils_viewmodel_safetystatus",
-      "community": 8,
+      "community": 27,
       "norm_label": "safetystatus"
     },
     {
       "label": "enrichReports()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L244",
+      "source_location": "L254",
       "id": "utils_viewmodel_enrichreports",
-      "community": 5,
+      "community": 27,
       "norm_label": "enrichreports()"
     },
     {
       "label": "nearbyOwnActiveReport()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L309",
+      "source_location": "L319",
       "id": "utils_viewmodel_nearbyownactivereport",
-      "community": 5,
+      "community": 27,
       "norm_label": "nearbyownactivereport()"
     },
     {
       "label": "RoadEntry",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L322",
+      "source_location": "L332",
       "id": "utils_viewmodel_roadentry",
       "community": 27,
       "norm_label": "roadentry"
@@ -3166,7 +3184,7 @@
       "label": "DistrictRoads",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L340",
+      "source_location": "L350",
       "id": "utils_viewmodel_districtroads",
       "community": 27,
       "norm_label": "districtroads"
@@ -3175,16 +3193,16 @@
       "label": "buildRoadDirectory()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L356",
+      "source_location": "L366",
       "id": "utils_viewmodel_buildroaddirectory",
-      "community": 27,
+      "community": 23,
       "norm_label": "buildroaddirectory()"
     },
     {
       "label": "PossibleClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L428",
+      "source_location": "L438",
       "id": "utils_viewmodel_possibleclosure",
       "community": 27,
       "norm_label": "possibleclosure"
@@ -3193,16 +3211,16 @@
       "label": "buildPossibleClosures()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L445",
+      "source_location": "L455",
       "id": "utils_viewmodel_buildpossibleclosures",
-      "community": 3,
+      "community": 23,
       "norm_label": "buildpossibleclosures()"
     },
     {
       "label": "RescueDistrictCount",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L471",
+      "source_location": "L481",
       "id": "utils_viewmodel_rescuedistrictcount",
       "community": 27,
       "norm_label": "rescuedistrictcount"
@@ -3211,7 +3229,7 @@
       "label": "rescueCountsByDistrict()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L477",
+      "source_location": "L487",
       "id": "utils_viewmodel_rescuecountsbydistrict",
       "community": 46,
       "norm_label": "rescuecountsbydistrict()"
@@ -3220,7 +3238,7 @@
       "label": "localDateKey()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L489",
+      "source_location": "L499",
       "id": "utils_viewmodel_localdatekey",
       "community": 30,
       "norm_label": "localdatekey()"
@@ -3229,7 +3247,7 @@
       "label": "rescuesOnLocalDate()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L498",
+      "source_location": "L508",
       "id": "utils_viewmodel_rescuesonlocaldate",
       "community": 46,
       "norm_label": "rescuesonlocaldate()"
@@ -3238,52 +3256,52 @@
       "label": "EnrichedRescue",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L506",
+      "source_location": "L516",
       "id": "utils_viewmodel_enrichedrescue",
-      "community": 27,
+      "community": 8,
       "norm_label": "enrichedrescue"
     },
     {
       "label": "enrichRescues()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L519",
+      "source_location": "L529",
       "id": "utils_viewmodel_enrichrescues",
-      "community": 27,
+      "community": 8,
       "norm_label": "enrichrescues()"
     },
     {
       "label": "rescueQueue()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L542",
+      "source_location": "L552",
       "id": "utils_viewmodel_rescuequeue",
-      "community": 27,
+      "community": 8,
       "norm_label": "rescuequeue()"
     },
     {
       "label": "DistrictHotspot",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L548",
+      "source_location": "L558",
       "id": "utils_viewmodel_districthotspot",
-      "community": 28,
+      "community": 13,
       "norm_label": "districthotspot"
     },
     {
       "label": "districtHotspots()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L562",
+      "source_location": "L572",
       "id": "utils_viewmodel_districthotspots",
-      "community": 27,
+      "community": 8,
       "norm_label": "districthotspots()"
     },
     {
       "label": "SurgeBucket",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L591",
+      "source_location": "L601",
       "id": "utils_viewmodel_surgebucket",
       "community": 27,
       "norm_label": "surgebucket"
@@ -3292,16 +3310,16 @@
       "label": "hourlySurge()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L599",
+      "source_location": "L609",
       "id": "utils_viewmodel_hourlysurge",
-      "community": 27,
+      "community": 8,
       "norm_label": "hourlysurge()"
     },
     {
       "label": "localityParts()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L631",
+      "source_location": "L641",
       "id": "utils_viewmodel_localityparts",
       "community": 20,
       "norm_label": "localityparts()"
@@ -3310,25 +3328,25 @@
       "label": "NearbyClosure",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L639",
+      "source_location": "L649",
       "id": "utils_viewmodel_nearbyclosure",
-      "community": 8,
+      "community": 27,
       "norm_label": "nearbyclosure"
     },
     {
       "label": "closuresNearLocation()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L657",
+      "source_location": "L667",
       "id": "utils_viewmodel_closuresnearlocation",
-      "community": 8,
+      "community": 27,
       "norm_label": "closuresnearlocation()"
     },
     {
       "label": "RecentReportRow",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L708",
+      "source_location": "L718",
       "id": "utils_viewmodel_recentreportrow",
       "community": 30,
       "norm_label": "recentreportrow"
@@ -3337,16 +3355,16 @@
       "label": "recentReportRows()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L728",
+      "source_location": "L738",
       "id": "utils_viewmodel_recentreportrows",
-      "community": 8,
+      "community": 27,
       "norm_label": "recentreportrows()"
     },
     {
       "label": "RANK",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L756",
+      "source_location": "L766",
       "id": "utils_viewmodel_rank",
       "community": 27,
       "norm_label": "rank"
@@ -3355,9 +3373,9 @@
       "label": "computeStatus()",
       "file_type": "code",
       "source_file": "src/utils/viewModel.ts",
-      "source_location": "L758",
+      "source_location": "L774",
       "id": "utils_viewmodel_computestatus",
-      "community": 8,
+      "community": 6,
       "norm_label": "computestatus()"
     },
     {
@@ -3717,7 +3735,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L5",
       "id": "utils_floodmeta_sevmeta",
-      "community": 0,
+      "community": 27,
       "norm_label": "sevmeta"
     },
     {
@@ -3726,7 +3744,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L13",
       "id": "utils_floodmeta_sev_meta",
-      "community": 30,
+      "community": 27,
       "norm_label": "sev_meta"
     },
     {
@@ -3735,7 +3753,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L19",
       "id": "utils_floodmeta_trend_meta",
-      "community": 8,
+      "community": 27,
       "norm_label": "trend_meta"
     },
     {
@@ -3798,7 +3816,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L61",
       "id": "utils_floodmeta_roadfromdepth",
-      "community": 27,
+      "community": 23,
       "norm_label": "roadfromdepth()"
     },
     {
@@ -3807,7 +3825,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L74",
       "id": "utils_floodmeta_severityfromdepth",
-      "community": 0,
+      "community": 40,
       "norm_label": "severityfromdepth()"
     },
     {
@@ -3906,7 +3924,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L165",
       "id": "utils_floodmeta_depthreference",
-      "community": 28,
+      "community": 6,
       "norm_label": "depthreference()"
     },
     {
@@ -3924,7 +3942,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L185",
       "id": "utils_floodmeta_severity_preset",
-      "community": 28,
+      "community": 13,
       "norm_label": "severity_preset"
     },
     {
@@ -3933,7 +3951,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L192",
       "id": "utils_floodmeta_depth_range",
-      "community": 28,
+      "community": 13,
       "norm_label": "depth_range"
     },
     {
@@ -3942,7 +3960,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L209",
       "id": "utils_floodmeta_ttl_stops_min",
-      "community": 0,
+      "community": 40,
       "norm_label": "ttl_stops_min"
     },
     {
@@ -3969,7 +3987,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L238",
       "id": "utils_floodmeta_ttl_options",
-      "community": 28,
+      "community": 13,
       "norm_label": "ttl_options"
     },
     {
@@ -3978,7 +3996,7 @@
       "source_file": "src/utils/floodMeta.ts",
       "source_location": "L253",
       "id": "utils_floodmeta_waterseries",
-      "community": 0,
+      "community": 30,
       "norm_label": "waterseries()"
     },
     {
@@ -4059,7 +4077,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L1",
       "id": "src_utils_roadsnap_ts",
-      "community": 3,
+      "community": 23,
       "norm_label": "roadsnap.ts"
     },
     {
@@ -4068,7 +4086,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L8",
       "id": "utils_roadsnap_rawroad",
-      "community": 3,
+      "community": 23,
       "norm_label": "rawroad"
     },
     {
@@ -4077,7 +4095,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L9",
       "id": "utils_roadsnap_roadsasset",
-      "community": 3,
+      "community": 23,
       "norm_label": "roadsasset"
     },
     {
@@ -4086,7 +4104,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L11",
       "id": "utils_roadsnap_snappedroad",
-      "community": 3,
+      "community": 23,
       "norm_label": "snappedroad"
     },
     {
@@ -4095,7 +4113,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L24",
       "id": "utils_roadsnap_mperdeglng",
-      "community": 3,
+      "community": 23,
       "norm_label": "mperdeglng()"
     },
     {
@@ -4104,7 +4122,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L25",
       "id": "utils_roadsnap_cellkey",
-      "community": 3,
+      "community": 23,
       "norm_label": "cellkey()"
     },
     {
@@ -4113,7 +4131,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L27",
       "id": "utils_roadsnap_road",
-      "community": 3,
+      "community": 23,
       "norm_label": "road"
     },
     {
@@ -4122,7 +4140,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L28",
       "id": "utils_roadsnap_seg",
-      "community": 3,
+      "community": 23,
       "norm_label": "seg"
     },
     {
@@ -4131,7 +4149,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L33",
       "id": "utils_roadsnap_meters",
-      "community": 3,
+      "community": 23,
       "norm_label": "meters()"
     },
     {
@@ -4140,7 +4158,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L40",
       "id": "utils_roadsnap_project",
-      "community": 3,
+      "community": 23,
       "norm_label": "project()"
     },
     {
@@ -4149,7 +4167,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L52",
       "id": "utils_roadsnap_loadroads",
-      "community": 3,
+      "community": 23,
       "norm_label": "loadroads()"
     },
     {
@@ -4158,7 +4176,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L79",
       "id": "utils_roadsnap_roadsloaded",
-      "community": 3,
+      "community": 23,
       "norm_label": "roadsloaded()"
     },
     {
@@ -4167,7 +4185,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L82",
       "id": "utils_roadsnap_pointat",
-      "community": 3,
+      "community": 23,
       "norm_label": "pointat()"
     },
     {
@@ -4176,7 +4194,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L98",
       "id": "utils_roadsnap_snaptoroad",
-      "community": 3,
+      "community": 23,
       "norm_label": "snaptoroad()"
     },
     {
@@ -4185,7 +4203,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L132",
       "id": "utils_roadsnap_nearbyroad",
-      "community": 3,
+      "community": 23,
       "norm_label": "nearbyroad"
     },
     {
@@ -4194,7 +4212,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L140",
       "id": "utils_roadsnap_lerp",
-      "community": 3,
+      "community": 23,
       "norm_label": "lerp()"
     },
     {
@@ -4203,7 +4221,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L147",
       "id": "utils_roadsnap_roadswithinradius",
-      "community": 3,
+      "community": 23,
       "norm_label": "roadswithinradius()"
     },
     {
@@ -4212,7 +4230,7 @@
       "source_file": "src/utils/roadSnap.ts",
       "source_location": "L183",
       "id": "utils_roadsnap_cliptocircle",
-      "community": 3,
+      "community": 23,
       "norm_label": "cliptocircle()"
     },
     {
@@ -4356,7 +4374,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_zonereportmodal_tsx",
-      "community": 28,
+      "community": 13,
       "norm_label": "zonereportmodal.tsx"
     },
     {
@@ -4365,7 +4383,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L7",
       "id": "panels_zonereportmodal_zonereportoptions",
-      "community": 28,
+      "community": 13,
       "norm_label": "zonereportoptions"
     },
     {
@@ -4374,7 +4392,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L20",
       "id": "panels_zonereportmodal_props",
-      "community": 2,
+      "community": 13,
       "norm_label": "props"
     },
     {
@@ -4383,7 +4401,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L32",
       "id": "panels_zonereportmodal_sev_order",
-      "community": 28,
+      "community": 13,
       "norm_label": "sev_order"
     },
     {
@@ -4392,7 +4410,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L34",
       "id": "panels_zonereportmodal_inputstyle",
-      "community": 28,
+      "community": 13,
       "norm_label": "inputstyle"
     },
     {
@@ -4401,7 +4419,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L45",
       "id": "panels_zonereportmodal_labelstyle",
-      "community": 28,
+      "community": 13,
       "norm_label": "labelstyle"
     },
     {
@@ -4410,7 +4428,7 @@
       "source_file": "src/components/panels/ZoneReportModal.tsx",
       "source_location": "L47",
       "id": "panels_zonereportmodal_zonereportmodal",
-      "community": 28,
+      "community": 13,
       "norm_label": "zonereportmodal()"
     },
     {
@@ -4446,7 +4464,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_adminreportincidentmodal_tsx",
-      "community": 24,
+      "community": 3,
       "norm_label": "adminreportincidentmodal.tsx"
     },
     {
@@ -4464,7 +4482,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L39",
       "id": "panels_adminreportincidentmodal_sev_order",
-      "community": 24,
+      "community": 3,
       "norm_label": "sev_order"
     },
     {
@@ -4473,7 +4491,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L44",
       "id": "panels_adminreportincidentmodal_sev_to_level",
-      "community": 24,
+      "community": 3,
       "norm_label": "sev_to_level"
     },
     {
@@ -4482,7 +4500,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L48",
       "id": "panels_adminreportincidentmodal_source_options",
-      "community": 24,
+      "community": 3,
       "norm_label": "source_options"
     },
     {
@@ -4491,7 +4509,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L54",
       "id": "panels_adminreportincidentmodal_loadsocialautopostpref",
-      "community": 24,
+      "community": 3,
       "norm_label": "loadsocialautopostpref()"
     },
     {
@@ -4500,7 +4518,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L65",
       "id": "panels_adminreportincidentmodal_inputstyle",
-      "community": 24,
+      "community": 3,
       "norm_label": "inputstyle"
     },
     {
@@ -4509,7 +4527,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L76",
       "id": "panels_adminreportincidentmodal_labelstyle",
-      "community": 24,
+      "community": 3,
       "norm_label": "labelstyle"
     },
     {
@@ -4518,7 +4536,7 @@
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L78",
       "id": "panels_adminreportincidentmodal_adminreportincidentmodal",
-      "community": 24,
+      "community": 3,
       "norm_label": "adminreportincidentmodal()"
     },
     {
@@ -4590,7 +4608,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L1",
       "id": "src_components_panels_publicdashboardmodal_tsx",
-      "community": 8,
+      "community": 27,
       "norm_label": "publicdashboardmodal.tsx"
     },
     {
@@ -4608,7 +4626,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L26",
       "id": "panels_publicdashboardmodal_radius_options",
-      "community": 8,
+      "community": 27,
       "norm_label": "radius_options"
     },
     {
@@ -4617,7 +4635,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L28",
       "id": "panels_publicdashboardmodal_page_size_options",
-      "community": 8,
+      "community": 27,
       "norm_label": "page_size_options"
     },
     {
@@ -4626,7 +4644,7 @@
       "source_file": "src/components/panels/PublicDashboardModal.tsx",
       "source_location": "L32",
       "id": "panels_publicdashboardmodal_conditionpill",
-      "community": 8,
+      "community": 27,
       "norm_label": "conditionpill()"
     },
     {
@@ -4750,7 +4768,7 @@
       "label": "NotifyPrefs",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L8",
+      "source_location": "L12",
       "id": "panels_notifymodal_notifyprefs",
       "community": 6,
       "norm_label": "notifyprefs"
@@ -4759,7 +4777,7 @@
       "label": "DEFAULT_NOTIFY_PREFS",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L14",
+      "source_location": "L17",
       "id": "panels_notifymodal_default_notify_prefs",
       "community": 6,
       "norm_label": "default_notify_prefs"
@@ -4768,7 +4786,7 @@
       "label": "fmtKm()",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L20",
+      "source_location": "L22",
       "id": "panels_notifymodal_fmtkm",
       "community": 6,
       "norm_label": "fmtkm()"
@@ -4777,7 +4795,7 @@
       "label": "NotifyModalProps",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L23",
+      "source_location": "L25",
       "id": "panels_notifymodal_notifymodalprops",
       "community": 6,
       "norm_label": "notifymodalprops"
@@ -4786,7 +4804,7 @@
       "label": "SEV_ORDER",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L31",
+      "source_location": "L36",
       "id": "panels_notifymodal_sev_order",
       "community": 6,
       "norm_label": "sev_order"
@@ -4795,7 +4813,7 @@
       "label": "NotifyModal()",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L33",
+      "source_location": "L38",
       "id": "panels_notifymodal_notifymodal",
       "community": 6,
       "norm_label": "notifymodal()"
@@ -4804,7 +4822,7 @@
       "label": "PermissionNote()",
       "file_type": "code",
       "source_file": "src/components/panels/NotifyModal.tsx",
-      "source_location": "L123",
+      "source_location": "L111",
       "id": "panels_notifymodal_permissionnote",
       "community": 6,
       "norm_label": "permissionnote()"
@@ -4815,7 +4833,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L1",
       "id": "src_components_panels_mappickfield_tsx",
-      "community": 24,
+      "community": 36,
       "norm_label": "mappickfield.tsx"
     },
     {
@@ -4824,7 +4842,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L5",
       "id": "panels_mappickfield_pinicon",
-      "community": 24,
+      "community": 36,
       "norm_label": "pinicon()"
     },
     {
@@ -4833,7 +4851,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L10",
       "id": "panels_mappickfield_clicktomove",
-      "community": 24,
+      "community": 36,
       "norm_label": "clicktomove()"
     },
     {
@@ -4842,7 +4860,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L21",
       "id": "panels_mappickfield_recenter",
-      "community": 24,
+      "community": 36,
       "norm_label": "recenter()"
     },
     {
@@ -4851,7 +4869,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L34",
       "id": "panels_mappickfield_mappickfieldprops",
-      "community": 24,
+      "community": 36,
       "norm_label": "mappickfieldprops"
     },
     {
@@ -4860,7 +4878,7 @@
       "source_file": "src/components/panels/MapPickField.tsx",
       "source_location": "L51",
       "id": "panels_mappickfield_mappickfield",
-      "community": 24,
+      "community": 36,
       "norm_label": "mappickfield()"
     },
     {
@@ -4914,7 +4932,7 @@
       "source_file": "src/components/panels/PlaceSuggestion.tsx",
       "source_location": "L1",
       "id": "src_components_panels_placesuggestion_tsx",
-      "community": 26,
+      "community": 32,
       "norm_label": "placesuggestion.tsx"
     },
     {
@@ -4923,7 +4941,7 @@
       "source_file": "src/components/panels/PlaceSuggestion.tsx",
       "source_location": "L10",
       "id": "panels_placesuggestion_placesuggestion",
-      "community": 26,
+      "community": 32,
       "norm_label": "placesuggestion()"
     },
     {
@@ -5031,7 +5049,7 @@
       "source_file": "src/components/panels/SearchBox.tsx",
       "source_location": "L1",
       "id": "src_components_panels_searchbox_tsx",
-      "community": 26,
+      "community": 32,
       "norm_label": "searchbox.tsx"
     },
     {
@@ -5040,7 +5058,7 @@
       "source_file": "src/components/panels/SearchBox.tsx",
       "source_location": "L5",
       "id": "panels_searchbox_searchboxprops",
-      "community": 26,
+      "community": 32,
       "norm_label": "searchboxprops"
     },
     {
@@ -5058,7 +5076,7 @@
       "source_file": "src/components/panels/SearchBox.tsx",
       "source_location": "L21",
       "id": "panels_searchbox_searchbox",
-      "community": 26,
+      "community": 32,
       "norm_label": "searchbox"
     },
     {
@@ -5139,7 +5157,7 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L1",
       "id": "src_components_panels_placefield_tsx",
-      "community": 26,
+      "community": 32,
       "norm_label": "placefield.tsx"
     },
     {
@@ -5148,7 +5166,7 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L6",
       "id": "panels_placefield_inputstyle",
-      "community": 26,
+      "community": 32,
       "norm_label": "inputstyle"
     },
     {
@@ -5157,7 +5175,7 @@
       "source_file": "src/components/panels/PlaceField.tsx",
       "source_location": "L22",
       "id": "panels_placefield_placefield",
-      "community": 26,
+      "community": 32,
       "norm_label": "placefield()"
     },
     {
@@ -5166,7 +5184,7 @@
       "source_file": "src/components/panels/ActivityTicker.tsx",
       "source_location": "L1",
       "id": "src_components_panels_activityticker_tsx",
-      "community": 40,
+      "community": 2,
       "norm_label": "activityticker.tsx"
     },
     {
@@ -5175,7 +5193,7 @@
       "source_file": "src/components/panels/ActivityTicker.tsx",
       "source_location": "L8",
       "id": "panels_activityticker_activitytickerprops",
-      "community": 40,
+      "community": 2,
       "norm_label": "activitytickerprops"
     },
     {
@@ -5184,7 +5202,7 @@
       "source_file": "src/components/panels/ActivityTicker.tsx",
       "source_location": "L31",
       "id": "panels_activityticker_activityticker",
-      "community": 40,
+      "community": 6,
       "norm_label": "activityticker()"
     },
     {
@@ -5193,7 +5211,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L1",
       "id": "src_components_panels_responseconsole_tsx",
-      "community": 27,
+      "community": 8,
       "norm_label": "responseconsole.tsx"
     },
     {
@@ -5211,7 +5229,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L33",
       "id": "panels_responseconsole_alert_rank",
-      "community": 27,
+      "community": 8,
       "norm_label": "alert_rank"
     },
     {
@@ -5220,7 +5238,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L36",
       "id": "panels_responseconsole_tone",
-      "community": 27,
+      "community": 8,
       "norm_label": "tone"
     },
     {
@@ -5229,7 +5247,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L45",
       "id": "panels_responseconsole_kpi",
-      "community": 27,
+      "community": 8,
       "norm_label": "kpi()"
     },
     {
@@ -5238,7 +5256,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L55",
       "id": "panels_responseconsole_section",
-      "community": 27,
+      "community": 8,
       "norm_label": "section()"
     },
     {
@@ -5247,7 +5265,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L65",
       "id": "panels_responseconsole_muted",
-      "community": 27,
+      "community": 8,
       "norm_label": "muted()"
     },
     {
@@ -5256,7 +5274,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L69",
       "id": "panels_responseconsole_statuspill",
-      "community": 27,
+      "community": 8,
       "norm_label": "statuspill()"
     },
     {
@@ -5265,7 +5283,7 @@
       "source_file": "src/components/panels/ResponseConsole.tsx",
       "source_location": "L76",
       "id": "panels_responseconsole_responseconsole",
-      "community": 27,
+      "community": 8,
       "norm_label": "responseconsole()"
     },
     {
@@ -5787,7 +5805,7 @@
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L1",
       "id": "src_components_panels_severitypicker_tsx",
-      "community": 28,
+      "community": 13,
       "norm_label": "severitypicker.tsx"
     },
     {
@@ -5796,7 +5814,7 @@
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L10",
       "id": "panels_severitypicker_option",
-      "community": 28,
+      "community": 13,
       "norm_label": "option"
     },
     {
@@ -5805,7 +5823,7 @@
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L19",
       "id": "panels_severitypicker_options",
-      "community": 28,
+      "community": 13,
       "norm_label": "options"
     },
     {
@@ -5814,7 +5832,7 @@
       "source_file": "src/components/panels/SeverityPicker.tsx",
       "source_location": "L25",
       "id": "panels_severitypicker_severitypickerprops",
-      "community": 28,
+      "community": 13,
       "norm_label": "severitypickerprops"
     },
     {
@@ -5832,7 +5850,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L1",
       "id": "src_components_panels_sidebar_tsx",
-      "community": 8,
+      "community": 6,
       "norm_label": "sidebar.tsx"
     },
     {
@@ -5841,7 +5859,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L20",
       "id": "panels_sidebar_tab",
-      "community": 8,
+      "community": 6,
       "norm_label": "tab"
     },
     {
@@ -5850,7 +5868,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L22",
       "id": "panels_sidebar_sidebarprops",
-      "community": 8,
+      "community": 27,
       "norm_label": "sidebarprops"
     },
     {
@@ -5859,7 +5877,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L77",
       "id": "panels_sidebar_tone",
-      "community": 8,
+      "community": 6,
       "norm_label": "tone"
     },
     {
@@ -5868,7 +5886,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L84",
       "id": "panels_sidebar_fmtradius",
-      "community": 8,
+      "community": 6,
       "norm_label": "fmtradius()"
     },
     {
@@ -5877,7 +5895,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L89",
       "id": "panels_sidebar_panelkey",
-      "community": 8,
+      "community": 6,
       "norm_label": "panelkey"
     },
     {
@@ -5886,7 +5904,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L92",
       "id": "panels_sidebar_subhead",
-      "community": 8,
+      "community": 6,
       "norm_label": "subhead"
     },
     {
@@ -5895,7 +5913,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L97",
       "id": "panels_sidebar_stripchip",
-      "community": 8,
+      "community": 6,
       "norm_label": "stripchip()"
     },
     {
@@ -5904,7 +5922,7 @@
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L120",
       "id": "panels_sidebar_sidebar",
-      "community": 8,
+      "community": 6,
       "norm_label": "sidebar()"
     },
     {
@@ -5913,7 +5931,7 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L1",
       "id": "src_components_panels_depthreference_tsx",
-      "community": 28,
+      "community": 6,
       "norm_label": "depthreference.tsx"
     },
     {
@@ -5922,7 +5940,7 @@
       "source_file": "src/components/panels/DepthReference.tsx",
       "source_location": "L11",
       "id": "panels_depthreference_props",
-      "community": 28,
+      "community": 6,
       "norm_label": "props"
     },
     {
@@ -5976,7 +5994,7 @@
       "source_file": "src/components/panels/WaterLevelModal.tsx",
       "source_location": "L10",
       "id": "panels_waterlevelmodal_waterlevelmodalprops",
-      "community": 27,
+      "community": 30,
       "norm_label": "waterlevelmodalprops"
     },
     {
@@ -6219,7 +6237,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L11",
       "id": "map_floodmap_mapfocus",
-      "community": 21,
+      "community": 8,
       "norm_label": "mapfocus"
     },
     {
@@ -6237,7 +6255,7 @@
       "source_file": "src/components/map/FloodMap.tsx",
       "source_location": "L20",
       "id": "map_floodmap_floodmapprops",
-      "community": 27,
+      "community": 2,
       "norm_label": "floodmapprops"
     },
     {
@@ -6390,7 +6408,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L1",
       "id": "src_hooks_useauth_ts",
-      "community": 46,
+      "community": 26,
       "norm_label": "useauth.ts"
     },
     {
@@ -6399,7 +6417,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L13",
       "id": "hooks_useauth_getdeviceid",
-      "community": 46,
+      "community": 26,
       "norm_label": "getdeviceid()"
     },
     {
@@ -6417,7 +6435,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L35",
       "id": "hooks_useauth_authresponse",
-      "community": 46,
+      "community": 26,
       "norm_label": "authresponse"
     },
     {
@@ -6426,7 +6444,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L45",
       "id": "hooks_useauth_loadsession",
-      "community": 46,
+      "community": 26,
       "norm_label": "loadsession()"
     },
     {
@@ -6435,7 +6453,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L69",
       "id": "hooks_useauth_decodegooglejwt",
-      "community": 46,
+      "community": 26,
       "norm_label": "decodegooglejwt()"
     },
     {
@@ -6444,7 +6462,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L79",
       "id": "hooks_useauth_useauthresult",
-      "community": 46,
+      "community": 26,
       "norm_label": "useauthresult"
     },
     {
@@ -6453,7 +6471,7 @@
       "source_file": "src/hooks/useAuth.ts",
       "source_location": "L88",
       "id": "hooks_useauth_useauth",
-      "community": 46,
+      "community": 26,
       "norm_label": "useauth()"
     },
     {
@@ -6678,7 +6696,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L1",
       "id": "src_api_geocode_ts",
-      "community": 26,
+      "community": 28,
       "norm_label": "geocode.ts"
     },
     {
@@ -6687,7 +6705,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L19",
       "id": "api_geocode_nearviewbox",
-      "community": 26,
+      "community": 28,
       "norm_label": "nearviewbox()"
     },
     {
@@ -6696,7 +6714,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L27",
       "id": "api_geocode_georesult",
-      "community": 26,
+      "community": 32,
       "norm_label": "georesult"
     },
     {
@@ -6705,7 +6723,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L38",
       "id": "api_geocode_nominatimaddress",
-      "community": 26,
+      "community": 28,
       "norm_label": "nominatimaddress"
     },
     {
@@ -6714,7 +6732,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L55",
       "id": "api_geocode_nominatimrow",
-      "community": 26,
+      "community": 28,
       "norm_label": "nominatimrow"
     },
     {
@@ -6723,7 +6741,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L64",
       "id": "api_geocode_pickcity",
-      "community": 26,
+      "community": 28,
       "norm_label": "pickcity()"
     },
     {
@@ -6732,7 +6750,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L70",
       "id": "api_geocode_pickbarangay",
-      "community": 26,
+      "community": 28,
       "norm_label": "pickbarangay()"
     },
     {
@@ -6741,7 +6759,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L78",
       "id": "api_geocode_splitdisplayname",
-      "community": 26,
+      "community": 28,
       "norm_label": "splitdisplayname()"
     },
     {
@@ -6750,7 +6768,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L89",
       "id": "api_geocode_buildcontext",
-      "community": 26,
+      "community": 28,
       "norm_label": "buildcontext()"
     },
     {
@@ -6759,7 +6777,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L111",
       "id": "api_geocode_searchplaces",
-      "community": 26,
+      "community": 28,
       "norm_label": "searchplaces()"
     },
     {
@@ -6777,7 +6795,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L216",
       "id": "api_geocode_reverseresult",
-      "community": 26,
+      "community": 28,
       "norm_label": "reverseresult"
     },
     {
@@ -6786,7 +6804,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L224",
       "id": "api_geocode_nominatimreverserow",
-      "community": 26,
+      "community": 28,
       "norm_label": "nominatimreverserow"
     },
     {
@@ -6795,7 +6813,7 @@
       "source_file": "src/api/geocode.ts",
       "source_location": "L236",
       "id": "api_geocode_reversegeocode",
-      "community": 26,
+      "community": 28,
       "norm_label": "reversegeocode()"
     },
     {
@@ -6804,7 +6822,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L1",
       "id": "src_api_client_ts",
-      "community": 46,
+      "community": 26,
       "norm_label": "client.ts"
     },
     {
@@ -6813,7 +6831,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L8",
       "id": "api_client_apierror",
-      "community": 46,
+      "community": 26,
       "norm_label": "apierror"
     },
     {
@@ -6822,7 +6840,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L9",
       "id": "api_client_apierror_constructor",
-      "community": 46,
+      "community": 26,
       "norm_label": ".constructor()"
     },
     {
@@ -6831,7 +6849,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L19",
       "id": "api_client_request",
-      "community": 46,
+      "community": 26,
       "norm_label": "request()"
     },
     {
@@ -6840,7 +6858,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L70",
       "id": "api_client_api",
-      "community": 46,
+      "community": 26,
       "norm_label": "api"
     },
     {
@@ -6849,7 +6867,7 @@
       "source_file": "src/api/client.ts",
       "source_location": "L79",
       "id": "api_client_buildquery",
-      "community": 46,
+      "community": 26,
       "norm_label": "buildquery()"
     },
     {
@@ -6894,7 +6912,7 @@
       "source_file": "src/api/overpass.ts",
       "source_location": "L55",
       "id": "api_overpass_intersectionoutcome",
-      "community": 24,
+      "community": 3,
       "norm_label": "intersectionoutcome"
     },
     {
@@ -7083,7 +7101,7 @@
       "source_file": "src/views/AdminQuickReportView.tsx",
       "source_location": "L55",
       "id": "views_adminquickreportview_props",
-      "community": 27,
+      "community": 30,
       "norm_label": "props"
     },
     {
@@ -7191,7 +7209,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L1",
       "id": "src_views_loginview_tsx",
-      "community": 6,
+      "community": 26,
       "norm_label": "loginview.tsx"
     },
     {
@@ -7200,7 +7218,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L6",
       "id": "views_loginview_google_enabled",
-      "community": 6,
+      "community": 26,
       "norm_label": "google_enabled"
     },
     {
@@ -7209,7 +7227,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L8",
       "id": "views_loginview_loginviewprops",
-      "community": 6,
+      "community": 26,
       "norm_label": "loginviewprops"
     },
     {
@@ -7227,7 +7245,7 @@
       "source_file": "src/views/LoginView.tsx",
       "source_location": "L118",
       "id": "views_loginview_errorbox",
-      "community": 6,
+      "community": 26,
       "norm_label": "errorbox()"
     },
     {
@@ -7879,6 +7897,42 @@
       "norm_label": "rules"
     },
     {
+      "label": "todo.md",
+      "file_type": "document",
+      "source_file": "tasks/todo.md",
+      "source_location": "L1",
+      "id": "tasks_todo_md",
+      "community": 39,
+      "norm_label": "todo.md"
+    },
+    {
+      "label": "085-fix-monitoring-area-detection",
+      "file_type": "document",
+      "source_file": "tasks/todo.md",
+      "source_location": "L1",
+      "id": "tasks_todo_085_fix_monitoring_area_detection",
+      "community": 39,
+      "norm_label": "085-fix-monitoring-area-detection"
+    },
+    {
+      "label": "Items",
+      "file_type": "document",
+      "source_file": "tasks/todo.md",
+      "source_location": "L6",
+      "id": "tasks_todo_items",
+      "community": 39,
+      "norm_label": "items"
+    },
+    {
+      "label": "Review",
+      "file_type": "document",
+      "source_file": "tasks/todo.md",
+      "source_location": "L22",
+      "id": "tasks_todo_review",
+      "community": 39,
+      "norm_label": "review"
+    },
+    {
       "label": "RESUME.md",
       "file_type": "document",
       "source_file": ".claude/RESUME.md",
@@ -8144,7 +8198,7 @@
       "file_type": "code",
       "source_file": "src/components/panels/AdminReportIncidentModal.tsx",
       "source_location": "L25",
-      "community": 24,
+      "community": 3,
       "norm_label": "ttl_options",
       "id": "panels_adminreportincidentmodal_ttl_options"
     },
@@ -8153,7 +8207,7 @@
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L65",
-      "community": 8,
+      "community": 6,
       "norm_label": "sectionkey",
       "id": "panels_sidebar_sectionkey"
     },
@@ -8162,7 +8216,7 @@
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L69",
-      "community": 8,
+      "community": 6,
       "norm_label": "default_open",
       "id": "panels_sidebar_default_open"
     },
@@ -8171,7 +8225,7 @@
       "file_type": "code",
       "source_file": "src/components/panels/Sidebar.tsx",
       "source_location": "L72",
-      "community": 8,
+      "community": 6,
       "norm_label": "collapsiblesection()",
       "id": "panels_sidebar_collapsiblesection"
     },
@@ -11144,6 +11198,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "src_app_loadmonitorradiuskm",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L42",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -12418,6 +12482,17 @@
       "source_file": "src/App.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "source": "src_app_tsx",
+      "target": "utils_viewmodel_inmonitorarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_app_tsx",
       "target": "utils_viewmodel_matchingpronezone"
@@ -12476,6 +12551,17 @@
       "confidence_score": 1.0,
       "source": "src_main_tsx",
       "target": "src_app_tsx"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "source_location": "L132",
+      "weight": 1.0,
+      "source": "src_app_loadmonitorradiuskm",
+      "target": "utils_tripwatch_clamp"
     },
     {
       "relation": "calls",
@@ -13377,6 +13463,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "src/components/panels/NotifyModal.tsx",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "panels_notifymodal_notifymodal",
+      "target": "src_i18n_tformat"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "src/components/panels/ShareModal.tsx",
       "source_location": "L110",
       "weight": 1.0,
@@ -13415,6 +13512,17 @@
       "confidence_score": 1.0,
       "source": "src_components_panels_activityticker_tsx",
       "target": "src_i18n_tformat"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/panels/NotifyModal.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_panels_notifymodal_tsx",
+      "target": "src_i18n_tformat",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -19640,6 +19748,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/viewModel.ts",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "src_utils_viewmodel_ts",
+      "target": "utils_viewmodel_inmonitorarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/utils/viewModel.ts",
       "source_location": "L205",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -20009,9 +20127,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "panels_adminpanel_adminpanelprops",
-      "target": "utils_viewmodel_enrichedreport",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_enrichedreport"
     },
     {
       "relation": "references",
@@ -20075,9 +20193,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
-      "target": "utils_viewmodel_enrichedreport",
-      "confidence_score": 1.0
+      "target": "utils_viewmodel_enrichedreport"
     },
     {
       "relation": "imports",
@@ -22891,9 +23009,9 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_reportdetailcard_tsx",
-      "target": "utils_floodmeta_ttl_stops_min",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_ttl_stops_min"
     },
     {
       "relation": "imports",
@@ -22924,9 +23042,9 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_reportdetailcard_tsx",
-      "target": "utils_floodmeta_nearestttlstop",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_nearestttlstop"
     },
     {
       "relation": "imports",
@@ -22968,9 +23086,9 @@
       "source_file": "src/components/panels/AdminPanel.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_adminpanel_tsx",
-      "target": "utils_floodmeta_drainminutes",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_drainminutes"
     },
     {
       "relation": "imports",
@@ -22979,9 +23097,9 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_reportdetailcard_tsx",
-      "target": "utils_floodmeta_drainminutes",
-      "confidence_score": 1.0
+      "target": "utils_floodmeta_drainminutes"
     },
     {
       "relation": "imports",
@@ -25041,9 +25159,9 @@
       "source_file": "src/components/panels/ReportDetailCard.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_reportdetailcard_tsx",
-      "target": "src_components_panels_sliderrow_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_sliderrow_tsx"
     },
     {
       "relation": "contains",
@@ -25051,9 +25169,9 @@
       "source_file": "src/components/panels/SliderRow.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_panels_sliderrow_tsx",
-      "target": "panels_sliderrow_sliderrow",
-      "confidence_score": 1.0
+      "target": "panels_sliderrow_sliderrow"
     },
     {
       "relation": "imports_from",
@@ -25062,9 +25180,9 @@
       "source_file": "src/views/AdminQuickReportView.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_views_adminquickreportview_tsx",
-      "target": "src_components_panels_sliderrow_tsx",
-      "confidence_score": 1.0
+      "target": "src_components_panels_sliderrow_tsx"
     },
     {
       "relation": "imports_from",
@@ -28796,6 +28914,36 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tasks/todo.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tasks_todo_md",
+      "target": "tasks_todo_085_fix_monitoring_area_detection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/todo.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tasks_todo_085_fix_monitoring_area_detection",
+      "target": "tasks_todo_items",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/todo.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "tasks_todo_085_fix_monitoring_area_detection",
+      "target": "tasks_todo_review",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": ".claude/RESUME.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -29016,5 +29164,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "127dc3aa599632fbdc8f923d35da22d89242644e"
+  "built_at_commit": "34ea277d801dfacf383c61eab68f96f214ac1013"
 }

@@ -23,6 +23,7 @@ import {
   buildRoadDirectory,
   computeStatus,
   enrichReports,
+  inMonitorArea,
   matchingProneZone,
   nearbyOwnActiveReport,
   type EnrichedReport,
@@ -30,6 +31,8 @@ import {
   type RoadEntry,
   WATER_RISE_DEFAULT,
   MONITOR_RADIUS_KM,
+  MONITOR_RADIUS_MIN,
+  MONITOR_RADIUS_MAX,
 } from './utils/viewModel';
 import { loadRoads, roadsLoaded, snapToRoad } from './utils/roadSnap';
 import { locateWithAccuracy, watchLocation, WEAK_FIX_M } from './utils/geolocate';
@@ -89,6 +92,7 @@ import LoginView from './views/LoginView';
 import { formatDepth } from './utils/format';
 
 const NOTIFY_STORAGE_KEY = 'baha_notify_v1';
+const MONITOR_STORAGE_KEY = 'baha_monitor_v1';
 const LIVE_STORAGE_KEY = 'baha_live_v1';
 const REPORT_MODE_STORAGE_KEY = 'baha_report_mode_v1';
 const GUEST_NUDGE_STORAGE_KEY = 'baha_guest_nudge_v1';
@@ -100,9 +104,42 @@ const GCASH_QR_SRC = `${import.meta.env.BASE_URL}gcash-qr.png`;
 function loadNotifyPrefs(): NotifyPrefs {
   try {
     const raw = localStorage.getItem(NOTIFY_STORAGE_KEY);
-    return raw ? { ...DEFAULT_NOTIFY_PREFS, ...(JSON.parse(raw) as NotifyPrefs) } : DEFAULT_NOTIFY_PREFS;
+    if (!raw) return DEFAULT_NOTIFY_PREFS;
+    const parsed = { ...DEFAULT_NOTIFY_PREFS, ...(JSON.parse(raw) as NotifyPrefs) };
+    // Pre-085 saves carried their own `radiusKm` (a second, disconnected slider — see
+    // loadMonitorRadiusKm's migration below, which reads that same raw JSON for it before this
+    // strips it out). NotifyPrefs no longer has that field, so drop it rather than let it linger.
+    delete (parsed as Record<string, unknown>).radiusKm;
+    return parsed;
   } catch {
     return DEFAULT_NOTIFY_PREFS;
+  }
+}
+
+/**
+ * The user's monitoring-area radius (`monitorRadiusKm`), persisted separately from NotifyPrefs as
+ * of 085 — it used to live as `notifyPrefs.radiusKm`, a second slider that never actually drove the
+ * map/banner. Migrates an existing user's alert range forward instead of silently resetting it to
+ * MONITOR_RADIUS_KM: when this key has never been written but the OLD `baha_notify_v1` blob still
+ * carries a numeric `radiusKm` (pre-085), seed from that. Always clamped, so a hand-edited or
+ * stale-format value can't leave the slider's own min/max.
+ */
+function loadMonitorRadiusKm(): number {
+  const clamp = (n: number): number =>
+    Number.isFinite(n) ? Math.min(MONITOR_RADIUS_MAX, Math.max(MONITOR_RADIUS_MIN, n)) : MONITOR_RADIUS_KM;
+  try {
+    const raw = localStorage.getItem(MONITOR_STORAGE_KEY);
+    if (raw != null) return clamp(Number(raw));
+    // Migration: read the pre-085 notify-prefs blob directly (not loadNotifyPrefs, which strips
+    // `radiusKm` before this could ever see it) so an existing subscriber's alert range survives.
+    const notifyRaw = localStorage.getItem(NOTIFY_STORAGE_KEY);
+    if (notifyRaw) {
+      const legacy = JSON.parse(notifyRaw) as { radiusKm?: unknown };
+      if (typeof legacy.radiusKm === 'number') return clamp(legacy.radiusKm);
+    }
+    return MONITOR_RADIUS_KM;
+  } catch {
+    return MONITOR_RADIUS_KM;
   }
 }
 
@@ -229,7 +266,7 @@ const App: React.FC = () => {
   const [filters, setFilters] = React.useState<Record<Severity, boolean>>({ high: true, medium: true, low: true });
   const [roadFilters, setRoadFilters] = React.useState<Record<Road, boolean>>({ passable: true, risky: true, impassable: true });
   const [projectedRiseCm, setProjectedRiseCm] = React.useState<number>(WATER_RISE_DEFAULT);
-  const [monitorRadiusKm, setMonitorRadiusKm] = React.useState<number>(MONITOR_RADIUS_KM);
+  const [monitorRadiusKm, setMonitorRadiusKm] = React.useState<number>(loadMonitorRadiusKm);
   // Shelter markers start hidden — users opt in via the sidebar toggle.
   const [showShelters, setShowShelters] = React.useState(false);
   const [showRoads, setShowRoads] = React.useState(true);
@@ -390,6 +427,11 @@ const App: React.FC = () => {
     try { localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(notifyPrefs)); } catch {/* ignore */}
   }, [notifyPrefs]);
 
+  // Persist the monitoring-area radius across sessions (see loadMonitorRadiusKm's migration note).
+  React.useEffect(() => {
+    try { localStorage.setItem(MONITOR_STORAGE_KEY, String(monitorRadiusKm)); } catch {/* ignore */}
+  }, [monitorRadiusKm]);
+
   // Persist the trip (stops + active flag) across sessions.
   React.useEffect(() => {
     try { localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(trip)); } catch {/* ignore */}
@@ -547,16 +589,19 @@ const App: React.FC = () => {
     () => active.filter((r) => filters[r.severity] && roadFilters[r.road]),
     [active, filters, roadFilters]
   );
-  // Nearby must mean nearby — the safety banner already says "no flooding within 2.5 km" while this
-  // list used to show every visible report sorted but never cut off, including ones tens of km
-  // away. Cut to the "My area" monitoring radius. The selected report is kept regardless of
-  // distance so a deep link (?report=<id>) or a marker tap never selects a row that isn't in the
-  // list. Note: `visible` itself (below) is left unfiltered by radius — it still feeds the map,
-  // which must keep pinning every live report no matter how far.
+  // Nearby must mean nearby — the safety banner already says "no flooding within your area" while
+  // this list used to show every visible report sorted but never cut off, including ones tens of km
+  // away. Cut to the "My area" monitoring radius — by ring OVERLAP (inMonitorArea), not centre-to-
+  // centre distance, so a big report's ring reaching into the circle counts even if its pin sits
+  // outside it (see inMonitorArea's doc comment in viewModel.ts). The selected report is kept
+  // regardless of distance so a deep link (?report=<id>) or a marker tap never selects a row that
+  // isn't in the list. Note: `visible` itself (below) is left unfiltered by radius — it still feeds
+  // the map, which must keep pinning every live report no matter how far. The row still SORTS and
+  // DISPLAYS by distKm — only the cut itself changed.
   const nearby = React.useMemo(
     () =>
       visible
-        .filter((r) => r.distKm <= monitorRadiusKm || r.id === selectedReportId)
+        .filter((r) => inMonitorArea(r, monitorRadiusKm) || r.id === selectedReportId)
         .sort((a, b) => a.distKm - b.distKm),
     [visible, monitorRadiusKm, selectedReportId]
   );
@@ -575,7 +620,7 @@ const App: React.FC = () => {
         .slice(0, ARCHIVE_MAX),
     [enriched]
   );
-  const status = React.useMemo(() => computeStatus(active, lang), [active, lang]);
+  const status = React.useMemo(() => computeStatus(active, lang, monitorRadiusKm), [active, lang, monitorRadiusKm]);
 
   // ── Deep-link: open focused on a shared report (?report=<id>) ──
   // A shared social link is `…/?report=<id>`. On load, once reports arrive, select that report and
@@ -605,7 +650,18 @@ const App: React.FC = () => {
   // ── New-flood-report alert subscription ──
   // Detect reports that arrive (via the SSE-driven refetch) and alert when they match the
   // user's criteria. `enriched` already carries distance and `mine`, so matching is local.
-  const seenReportIds = React.useRef<Set<number>>(new Set());
+  //
+  // Two refs, not one — this used to be a single `seenReportIds` that got every id burned into it
+  // the instant a report was OBSERVED, before eligibility or radius were even checked. That meant a
+  // report which arrived outside the monitoring circle could never be surfaced later just by
+  // widening the circle: it was already "seen" and would never look "fresh" again.
+  //  - knownReportIds: every report this session has ever laid eyes on — drives "did this just
+  //    ARRIVE" below. Filled on every pass regardless of eligibility/range.
+  //  - notifiedReportIds: only reports that actually produced an alert (modal, toast, or OS
+  //    notification) — drives "have we already told them about this one" here AND in the
+  //    widen-backfill effect right after this one.
+  const knownReportIds = React.useRef<Set<number>>(new Set());
+  const notifiedReportIds = React.useRef<Set<number>>(new Set());
   const alertsPrimed = React.useRef(false);
 
   React.useEffect(() => {
@@ -615,16 +671,27 @@ const App: React.FC = () => {
     // "new" once the fetch actually resolves.
     if (reports.loading) return;
     if (!alertsPrimed.current) {
-      for (const r of enriched) seenReportIds.current.add(r.id);
+      for (const r of enriched) {
+        knownReportIds.current.add(r.id);
+        // Only reports ALREADY inside the circle at load count as surfaced: they sit in the Nearby
+        // list and the banner from the first paint, so a later widen shouldn't re-announce them.
+        // A report OUTSIDE the circle at load must stay un-notified — that is exactly the report
+        // the user later drags the circle out to reach, and priming it here would silence the
+        // widen backfill for the very case this branch exists to fix.
+        if (inMonitorArea(r, monitorRadiusKm)) notifiedReportIds.current.add(r.id);
+      }
       alertsPrimed.current = true;
       return;
     }
-    const fresh = enriched.filter((r) => !seenReportIds.current.has(r.id));
-    if (!fresh.length) return;
-    for (const r of fresh) seenReportIds.current.add(r.id);
+    const arrived = enriched.filter((r) => !knownReportIds.current.has(r.id));
+    // Every currently-visible report becomes "known" — but NEVER "notified" here. That's the crux
+    // of the widen fix: a report that arrives out of range still has to remain eligible for the
+    // widen-backfill effect below the moment the user's circle actually reaches it.
+    for (const r of enriched) knownReportIds.current.add(r.id);
+    if (!arrived.length) return;
 
     // Shared eligibility for both arms below.
-    const candidates = fresh.filter(
+    const candidates = arrived.filter(
       (r) => !r.mine && r.status === 'active' && !r.expired && notifyPrefs.severities[r.severity]
     );
     if (!candidates.length) return;
@@ -633,12 +700,18 @@ const App: React.FC = () => {
     const stopMatches = trip.active && trip.stops.length ? matchTripStops(candidates, trip.stops) : [];
     const claimedIds = new Set(stopMatches.map((m) => m.report.id));
 
-    // ── Arm 2: the existing personal-radius alert, minus anything arm 1 already claimed.
+    // ── Arm 2: the existing personal-radius alert, minus anything arm 1 already claimed. Ring
+    // overlap (inMonitorArea), not centre-to-centre distance — see its doc comment in viewModel.ts.
     const nearbyMatches = notifyPrefs.enabled
-      ? candidates.filter((r) => !claimedIds.has(r.id) && r.distKm <= notifyPrefs.radiusKm)
+      ? candidates.filter((r) => !claimedIds.has(r.id) && inMonitorArea(r, monitorRadiusKm))
       : [];
 
     if (!stopMatches.length && !nearbyMatches.length) return;
+
+    // Every report actually surfaced below (modal, toast, or OS notification) is now "notified" —
+    // this is what stops the widen-backfill effect from re-announcing it later.
+    for (const m of stopMatches) notifiedReportIds.current.add(m.report.id);
+    for (const r of nearbyMatches) notifiedReportIds.current.add(r.id);
 
     const nowIso = new Date().toISOString();
     // A stop the user explicitly tagged is a stronger signal than the ambient radius, so trip
@@ -762,7 +835,7 @@ const App: React.FC = () => {
         alert: {
           id: -worst.id,
           title: tFormat(lang, 'notify.alertTitleMany', { n: matches.length }),
-          body: `${matches.length} new floods reported within ${notifyPrefs.radiusKm} km. The nearest is ${worst.sev.label.toLowerCase()} at ${worst.name}.`,
+          body: `${matches.length} new floods reported within ${monitorRadiusKm} km. The nearest is ${worst.sev.label.toLowerCase()} at ${worst.name}.`,
           region: null,
           level: SEV_TO_LEVEL[worst.severity],
           active: true,
@@ -777,7 +850,46 @@ const App: React.FC = () => {
       });
     }
     playAlertSound();
-  }, [enriched, notifyPrefs, trip.active, trip.stops, lang, t, playAlertSound, showToast, reports.loading]);
+  }, [enriched, notifyPrefs, monitorRadiusKm, trip.active, trip.stops, lang, t, playAlertSound, showToast, reports.loading]);
+
+  // ── Widen backfill ──
+  // Growing "My area" can bring an already-arrived report into range for the first time. The effect
+  // above only ever looks at reports that just ARRIVED (`arrived`), so without this, dragging the
+  // monitoring circle out over a report that's been sitting there the whole time would silently do
+  // nothing — exactly the defect this branch fixes. Mirrors the one-shot rescan already done when a
+  // trip stop is added (see addStop's `matchTripStops(active, [newStop])`).
+  const prevMonitorRadiusRef = React.useRef(monitorRadiusKm);
+  React.useEffect(() => {
+    if (!alertsPrimed.current || reports.loading) return;
+    // A <input type="range"> fires onChange on every drag tick, so debounce ~400 ms — otherwise
+    // dragging e.g. 3 km → 10 km would toast once per tick instead of once for the whole gesture.
+    const id = window.setTimeout(() => {
+      const prevRadius = prevMonitorRadiusRef.current;
+      prevMonitorRadiusRef.current = monitorRadiusKm;
+      if (monitorRadiusKm <= prevRadius) return; // a shrink must never un-notify or re-toast
+      // The nearby list / safety banner / map circle already updated on widen regardless of any of
+      // this (that's the non-alert half of the fix). The toast below is the alert-SUBSCRIPTION
+      // half, so it's gated on the master toggle the same way Arm 2 above is.
+      if (!notifyPrefs.enabled) return;
+
+      const widened = enriched.filter(
+        (r) =>
+          !r.mine &&
+          r.status === 'active' &&
+          !r.expired &&
+          notifyPrefs.severities[r.severity] &&
+          inMonitorArea(r, monitorRadiusKm) &&
+          !notifiedReportIds.current.has(r.id)
+      );
+      if (!widened.length) return;
+      // Mark and toast together, never one without the other. With the subscription off we return
+      // before marking: consuming these ids silently would mean that turning alerts back on and
+      // widening again announces nothing, because they'd already look "notified".
+      for (const r of widened) notifiedReportIds.current.add(r.id);
+      showToast(tFormat(lang, 'notify.areaWidened', { n: widened.length, km: monitorRadiusKm }));
+    }, 400);
+    return () => window.clearTimeout(id);
+  }, [monitorRadiusKm, enriched, notifyPrefs, lang, showToast, reports.loading]);
 
   const filterCounts = React.useMemo(() => {
     const c: Record<Severity, number> = { high: 0, medium: 0, low: 0 };
@@ -2086,7 +2198,7 @@ const App: React.FC = () => {
           monitorRadiusKm={monitorRadiusKm}
           onChangeMonitor={setMonitorRadiusKm}
           notifyOn={notifyPrefs.enabled}
-          notifyRadiusKm={notifyPrefs.radiusKm}
+          notifyRadiusKm={monitorRadiusKm}
           onOpenNotify={() => setNotifyOpen(true)}
           showShelters={showShelters}
           onToggleShelters={() => setShowShelters((v) => !v)}
@@ -2249,6 +2361,7 @@ const App: React.FC = () => {
       {notifyOpen && (
         <NotifyModal
           prefs={notifyPrefs}
+          radiusKm={monitorRadiusKm}
           permission={notifyPerm}
           onEnable={(on) => void setNotifyEnabled(on)}
           onChange={setNotifyPrefs}

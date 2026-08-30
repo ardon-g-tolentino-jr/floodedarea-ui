@@ -130,6 +130,16 @@ export function alertsInMonitorArea(
     .map(({ a }) => a);
 }
 
+/**
+ * Whether a report's affected ring **overlaps** the user's monitoring-area circle — same
+ * ring-overlap idiom as `alertsInMonitorArea` above, just applied to a report instead of an alert
+ * zone. `enrichReports` already computes `edgeKm = distKm - affectedKm` (the gap between the two
+ * circles' edges, negative once they overlap), so this is the one true "is it in my area" test —
+ * every caller that currently compares `distKm` (the pin-to-pin distance) against a radius is
+ * checking the wrong geometry: two big rings can overlap while their *centers* are still far apart.
+ */
+export const inMonitorArea = (r: EnrichedReport, radiusKm: number): boolean => r.edgeKm <= radiusKm;
+
 /** A flood-prone zone augmented with its current live status, for the map's name-bubble labels. */
 export interface ZoneStatus extends FloodProneArea {
   /** Whether an active report's center currently lies within this zone's own radiusM. */
@@ -755,7 +765,20 @@ export function recentReportRows(reports: FloodReport[], hours = 12, now: number
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };
 
-export function computeStatus(enriched: EnrichedReport[], lang: Lang = getLang()): SafetyStatus {
+/**
+ * `radiusKm` is the user's own "monitoring area" slider (`monitorRadiusKm` in App.tsx), not a fixed
+ * constant — this banner used to hardcode 2.5/3 km regardless of what the sidebar circle said, so
+ * widening the circle over a report's ring did nothing here even though the ring visibly overlapped.
+ * Defaults to MONITOR_RADIUS_KM for any caller that hasn't threaded the user's value through yet.
+ */
+export function computeStatus(
+  enriched: EnrichedReport[],
+  lang: Lang = getLang(),
+  radiusKm: number = MONITOR_RADIUS_KM
+): SafetyStatus {
+  // "You are standing in it" (edgeKm <= 0, i.e. the pin is inside the report's own affected ring)
+  // is a fact about the report, not a function of how far out the user chose to watch — never gate
+  // this on radiusKm.
   const inside = enriched
     .filter((r) => r.edgeKm <= 0)
     .sort((a, b) => RANK[b.severity] - RANK[a.severity]);
@@ -772,7 +795,7 @@ export function computeStatus(enriched: EnrichedReport[], lang: Lang = getLang()
       eta: null,
     };
   } else {
-    const near = enriched.filter((r) => r.edgeKm <= 2.5).sort((a, b) => a.edgeKm - b.edgeKm);
+    const near = enriched.filter((r) => r.edgeKm <= radiusKm).sort((a, b) => a.edgeKm - b.edgeKm);
     if (near.length) {
       const ne = near[0];
       status = {
@@ -793,16 +816,17 @@ export function computeStatus(enriched: EnrichedReport[], lang: Lang = getLang()
         tone: 'ok',
         badge: translate(lang, 'status.clear'),
         title: translate(lang, 'status.clearTitle'),
-        line: translate(lang, 'status.clearLine'),
+        line: tFormat(lang, 'status.clearLine', { km: Math.round(radiusKm) }),
         sub: translate(lang, 'status.clearSub'),
         eta: null,
       };
     }
   }
 
-  // Spread ETA for nearby rising water.
+  // Spread ETA for nearby rising water — same user radius as the "stay alert" gate above, not a
+  // separate fixed 3 km.
   const risingNear = enriched
-    .filter((r) => r.severity !== 'low' && r.trend === 'rising' && r.edgeKm <= 3)
+    .filter((r) => r.severity !== 'low' && r.trend === 'rising' && r.edgeKm <= radiusKm)
     .sort((a, b) => a.edgeKm - b.edgeKm)[0];
   if (risingNear) {
     if (risingNear.edgeKm <= 0) {
