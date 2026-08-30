@@ -1,6 +1,7 @@
 // Severity / trend / road metadata and water-level math, ported from the FloodedArea design.
 
 import type { FloodReport, RescueStatus, Road, Severity, Trend } from '../types';
+import { formatDepth, formatRate } from './format';
 
 export interface SevMeta {
   label: string;
@@ -292,11 +293,11 @@ export function trendNote(depthCm: number, trend: Trend, rateCmPerHr: number): s
     let eta: string;
     if (depthCm < 100) {
       const h = (100 - depthCm) / Math.max(1, r);
-      eta = ` — could reach waist depth (~100 cm) in about ${h < 1 ? '<1' : Math.round(h)} hr`;
+      eta = ` — could reach waist depth, ~${formatDepth(100)}, in about ${h < 1 ? '<1' : Math.round(h)} hr`;
     } else {
       eta = ' — already above waist level';
     }
-    return `▲ Rising ~${r} cm/hr${eta}.`;
+    return `▲ Rising ~${formatRate(r)}${eta}.`;
   }
   if (trend === 'receding') {
     const r = Math.max(1, Math.round(-rateCmPerHr));
@@ -305,7 +306,7 @@ export function trendNote(depthCm: number, trend: Trend, rateCmPerHr: number): s
       const h = (depthCm - 20) / Math.max(1, r);
       eta = ` — roads may clear in ~${h < 1 ? '<1' : Math.round(h)} hr`;
     }
-    return `▼ Receding ~${r} cm/hr${eta}.`;
+    return `▼ Receding ~${formatRate(r)}${eta}.`;
   }
   return '■ Holding roughly steady over the last few hours.';
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import type { AlertLevel, FloodProneArea, NewFloodProneArea, NewReport, Severity, SocialNetwork } from '../../types';
 import { DEPTH_RANGE, SEVERITY_PRESET, SEV_META, TTL_OPTIONS } from '../../utils/floodMeta';
 import { matchingProneZone, REPORT_TTL_MIN } from '../../utils/viewModel';
-import { formatDuration } from '../../utils/format';
+import { formatDepth, formatDuration } from '../../utils/format';
 import { reverseGeocode } from '../../api/geocode';
 import { findIntersection, type Intersection, type IntersectionOutcome } from '../../api/overpass';
 import { fileToCompressedDataUrl } from '../../utils/image';
@@ -537,7 +537,7 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
         </div>
 
         <div>
-          <label style={labelStyle}>Water depth — {depth} cm</label>
+          <label style={labelStyle}>Water depth — {formatDepth(depth)}</label>
           <input
             type="range"
             min={range.min}
@@ -548,8 +548,8 @@ const AdminReportIncidentModal: React.FC<Props> = ({ isMobile, zones, onSubmit, 
             style={{ width: '100%', accentColor: SEV_META[severity].color }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600 }}>
-            <span>{range.min} cm</span>
-            <span>{range.max} cm</span>
+            <span>{formatDepth(range.min)}</span>
+            <span>{formatDepth(range.max)}</span>
           </div>
           <div style={{ marginTop: 9 }}>
             <DepthReference depthCm={depth} color={SEV_META[severity].color} />

@@ -5,7 +5,7 @@ import { buildDailyWaterBars } from '../../utils/waterChart';
 import { localDateKey } from '../../utils/viewModel';
 import { kmBetween } from '../../utils/geo';
 import { useReportHistory } from '../../hooks/useDomainData';
-import { formatDepth } from '../../utils/format';
+import { formatDepth, formatDepthAxis } from '../../utils/format';
 
 interface WaterLevelModalProps {
   userLoc: LatLng;
@@ -20,7 +20,7 @@ interface WaterLevelModalProps {
 // SVG plot geometry (viewBox units). Margins leave room for tick + axis-title labels.
 const VB_W = 560;
 const VB_H = 322;
-const M = { top: 14, right: 16, bottom: 50, left: 54 };
+const M = { top: 14, right: 16, bottom: 50, left: 66 };
 const PLOT_W = VB_W - M.left - M.right;
 const PLOT_H = VB_H - M.top - M.bottom;
 
@@ -124,7 +124,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
               strokeDasharray={b.cm >= 100 ? '4 4' : undefined}
             />
             <text x={M.left - 6} y={y(b.cm) + 3} textAnchor="end" fontSize={9} fontWeight={700} fill="var(--bw-faint)">
-              {b.cm}
+              {formatDepthAxis(b.cm)}
             </text>
           </g>
         ))}
@@ -170,7 +170,7 @@ const WaterLevelModal: React.FC<WaterLevelModalProps> = ({ userLoc, isMobile, on
           fill="var(--bw-muted)"
           transform={`rotate(-90 14 ${M.top + PLOT_H / 2})`}
         >
-          Water depth (cm)
+          Water depth (cm / in)
         </text>
       </svg>
     );

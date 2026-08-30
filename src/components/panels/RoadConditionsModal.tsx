@@ -150,7 +150,7 @@ const RoadConditionsModal: React.FC<RoadConditionsModalProps> = ({ directory, cl
                       {c.name}
                     </span>
                     <span style={{ display: 'block', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 600, marginTop: 2 }}>
-                      ~{Math.round(c.estDepthCm)} cm est. · possible closure
+                      ~{formatDepth(c.estDepthCm)} est. · possible closure
                     </span>
                   </span>
                   <span

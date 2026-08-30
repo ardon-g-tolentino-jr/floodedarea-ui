@@ -1,8 +1,8 @@
 import React from 'react';
 import type { NewReport, ReportStatus, Road } from '../../types';
 import { affectedRiseRatio, REPORT_TTL_MIN, type EnrichedReport } from '../../utils/viewModel';
-import { ADVICE, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, TTL_STOPS_MIN, drainMinutes, nearestTtlStop, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
-import { formatDepth, formatDuration, timeAgo } from '../../utils/format';
+import { ADVICE, DEPTH_TICKS, PROJECT_MAX_CM, ROAD_META, ROAD_ORDER, TREND_META, TTL_STOPS_MIN, drainMinutes, nearestTtlStop, projectedSeries, projectionRateCmPerHr, sparkPaths, trendNote } from '../../utils/floodMeta';
+import { formatDepth, formatDepthDelta, formatDuration, timeAgo } from '../../utils/format';
 import { useI18n } from '../../i18n';
 import DepthReference from './DepthReference';
 import SliderRow from './SliderRow';
@@ -40,13 +40,6 @@ interface ReportDetailCardProps {
  *  opens the native sheet, so the button must not imply one network. */
 const SHARE_GLYPH =
   'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z';
-
-const DEPTH_TICKS = [
-  { l: 'Ankle', cm: 15 },
-  { l: 'Knee', cm: 50 },
-  { l: 'Waist', cm: 100 },
-  { l: 'Chest', cm: 140 },
-];
 
 const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, canConfirm, confirming, onConfirm, canRemove, removing, onRemove, photoSrc, onShareReport, projectedRiseCm, onClose, isAdmin, rainActive, now, onAdminUpdate, onReopenReport }) => {
   const { t } = useI18n();
@@ -202,16 +195,16 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         </div>
         <div style={{ position: 'relative', height: 26, marginBottom: 10 }}>
           {DEPTH_TICKS.map((t) => (
-            <div key={t.l} style={{ position: 'absolute', transform: 'translateX(-50%)', textAlign: 'center', left: `${Math.min(t.cm / 150, 1) * 100}%` }}>
+            <div key={t.label} style={{ position: 'absolute', transform: 'translateX(-50%)', textAlign: 'center', left: `${Math.min(t.cm / 150, 1) * 100}%` }}>
               <div style={{ width: 1, height: 5, background: 'var(--bw-line-strong)', margin: '0 auto' }} />
-              <div style={{ fontSize: 9, color: 'var(--bw-faint)', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.l}</div>
+              <div style={{ fontSize: 9, color: 'var(--bw-faint)', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.label}</div>
             </div>
           ))}
         </div>
 
         {rise && (
           <div style={{ marginBottom: 10, padding: '9px 11px', background: 'var(--bw-bg-subtle)', borderRadius: 11, fontSize: 11.5, fontWeight: 700, color: 'var(--bw-ink-soft)', lineHeight: 1.4 }}>
-            📈 If water rises <strong>+{projectedRiseCm} cm</strong>, this zone spreads{' '}
+            📈 If water rises <strong>{formatDepthDelta(projectedRiseCm)}</strong>, this zone spreads{' '}
             <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{rise.diameter.toFixed(1)}× wider</strong> ·{' '}
             <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{rise.area.toFixed(1)}× area</strong>
           </div>
@@ -221,7 +214,7 @@ const ReportDetailCard: React.FC<ReportDetailCardProps> = ({ report, isMobile, c
         <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-ink-soft)', marginBottom: 6 }}>
           Reported {formatDepth(report.depthCm)} ({report.ageMin < 1 ? 'just now' : `${formatDuration(report.ageMin)} ago`})
           {report.predictive && (
-            <> · <span style={{ color: sev.color }}>Projected now {report.projectedDepthCm} cm · predictive</span></>
+            <> · <span style={{ color: sev.color }}>Projected now {formatDepth(report.projectedDepthCm)} · predictive</span></>
           )}
         </div>
         <div style={{ background: 'var(--bw-surface-sunken)', borderRadius: 11, padding: '10px 10px 6px', marginBottom: 10 }}>

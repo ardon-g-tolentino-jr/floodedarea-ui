@@ -700,6 +700,18 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         <input type="checkbox" checked={!!editing.form[f.key]} onChange={(e) => setField(f.key, e.target.checked)} />
                         {f.label}
                       </span>
+                    ) : f.key === 'depthCm' ? (
+                      /* Depth is typed and stored in cm (see the unit rule in utils/format.ts).
+                         Echo the imperial equivalent so this raw editor agrees with every
+                         read-only depth elsewhere in the app instead of being the cm-only corner. */
+                      <>
+                        <input type="number" value={String(editing.form[f.key] ?? '')} onChange={(e) => setField(f.key, e.target.value)} style={inputStyle} />
+                        {String(editing.form[f.key] ?? '') !== '' && Number.isFinite(Number(editing.form[f.key])) && (
+                          <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--bw-faint)', marginTop: 4 }}>
+                            {formatDepth(Number(editing.form[f.key]))}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <input type={f.type === 'number' ? 'number' : 'text'} value={String(editing.form[f.key] ?? '')} onChange={(e) => setField(f.key, e.target.value)} style={inputStyle} />
                     )}

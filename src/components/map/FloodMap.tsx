@@ -4,7 +4,7 @@ import { Circle, CircleMarker, MapContainer, Marker, Pane, Polyline, TileLayer, 
 import type { EvacuationCenter, FloodProneArea, LatLng, RoadSegment, TripStop } from '../../types';
 import { RESCUE_STATUS_META, ROAD_META, ZONE_LABEL_MIN_ZOOM } from '../../utils/floodMeta';
 import { affectedRadiusKm, zonesWithStatus, type EnrichedReport, type EnrichedRescue, type PossibleClosure } from '../../utils/viewModel';
-import { formatDepthShort, formatDuration } from '../../utils/format';
+import { formatDepth, formatDepthShort, formatDuration } from '../../utils/format';
 import { useTheme } from '../../theme';
 import { LEVEL_STYLE } from '../panels/AlertRibbon';
 
@@ -273,7 +273,7 @@ const FloodMap: React.FC<FloodMapProps> = ({
           return (
             <Polyline key={`closure-${c.roadId}`} positions={positions} pathOptions={{ color: rm.color, weight: 3, opacity: 0.55, dashArray: '4 7' }}>
               <Tooltip direction="top" sticky opacity={1}>
-                <span style={{ fontWeight: 700 }}>{c.name}</span> · possible closure · {rm.label} · ~{Math.round(c.estDepthCm)} cm
+                <span style={{ fontWeight: 700 }}>{c.name}</span> · possible closure · {rm.label} · ~{formatDepth(c.estDepthCm)}
               </Tooltip>
             </Polyline>
           );
