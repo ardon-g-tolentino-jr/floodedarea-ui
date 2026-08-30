@@ -297,7 +297,7 @@ const PublicDashboardModal: React.FC<PublicDashboardModalProps> = ({
                         </td>
                         <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
-                            <span style={{ fontWeight: 800, color: sev.color }}>{formatDepth(r.depthCm)} cm</span>
+                            <span style={{ fontWeight: 800, color: sev.color }}>{formatDepth(r.depthCm)}</span>
                             <span title={trendLabel(lang, r.trend)} style={{ color: tm.color, fontSize: 11 }}>{tm.sym}</span>
                           </span>
                         </td>

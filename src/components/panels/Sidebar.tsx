@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Road, Severity } from '../../types';
 import type { AuthState } from '../../hooks/useAuth';
-import { formatDepthShort, formatDuration } from '../../utils/format';
+import { formatDepthDelta, formatDepthDeltaShort, formatDepthShort, formatDuration } from '../../utils/format';
 import {
   type EnrichedReport,
   type SafetyStatus,
@@ -204,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               onClick={() => togglePanel('area')}
               badge={
                 <span style={{ fontWeight: 800, color: 'var(--bw-primary-deep)' }}>
-                  {projectedRiseCm > 0 ? `+${projectedRiseCm}cm` : fmtRadius(monitorRadiusKm)}
+                  {projectedRiseCm > 0 ? formatDepthDeltaShort(projectedRiseCm) : fmtRadius(monitorRadiusKm)}
                 </span>
               }
             />
@@ -327,7 +327,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '16px 0 9px', paddingTop: 14, borderTop: '1px solid var(--bw-line-soft)' }}>
                     <span style={{ ...SUBHEAD, marginBottom: 0 }}>{t('sidebar.affectedArea')}</span>
                     <span style={{ marginLeft: 'auto', fontSize: 12.5, fontWeight: 800, color: projectedRiseCm > 0 ? 'var(--bw-primary-deep)' : 'var(--bw-muted)' }}>
-                      {projectedRiseCm > 0 ? `+${projectedRiseCm} cm` : t('sidebar.now')}
+                      {projectedRiseCm > 0 ? formatDepthDelta(projectedRiseCm) : t('sidebar.now')}
                     </span>
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--bw-muted)', lineHeight: 1.4, marginBottom: 9 }}>
@@ -340,18 +340,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                     step={WATER_RISE_STEP}
                     value={projectedRiseCm}
                     onChange={(e) => onChangeRise(parseFloat(e.target.value))}
-                    aria-label="Projected additional water rise in centimeters"
+                    aria-label="Projected additional water rise, in centimeters (also shown in inches)"
                     style={{ width: '100%', accentColor: 'var(--bw-primary)', cursor: 'pointer' }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--bw-muted)', marginTop: 1 }}>
                     <span>Now (+0)</span>
-                    <span>+{WATER_RISE_MAX} cm</span>
+                    <span>{formatDepthDelta(WATER_RISE_MAX)}</span>
                   </div>
                   {projectedRiseCm > 0 && representativeDepthCm > 0 && (() => {
                     const { diameter, area } = affectedRiseRatio(representativeDepthCm, projectedRiseCm);
                     return (
                       <div style={{ marginTop: 9, padding: '8px 10px', background: 'var(--bw-bg-subtle)', borderRadius: 9, fontSize: 11.5, fontWeight: 600, color: 'var(--bw-ink-soft)', lineHeight: 1.4 }}>
-                        {t('sidebar.affectedAt')} <strong>+{projectedRiseCm} cm</strong>, {t('sidebar.affectedSpread')}{' '}
+                        {t('sidebar.affectedAt')} <strong>{formatDepthDelta(projectedRiseCm)}</strong>, {t('sidebar.affectedSpread')}{' '}
                         <strong style={{ color: 'var(--bw-primary-deep)' }}>≈{diameter.toFixed(1)}× {t('sidebar.affectedWider')}</strong>{' '}
                         (<strong style={{ color: 'var(--bw-primary-deep)' }}>≈{area.toFixed(1)}× {t('sidebar.theArea')}</strong>).
                       </div>

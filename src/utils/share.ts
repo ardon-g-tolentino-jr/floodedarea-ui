@@ -5,6 +5,7 @@ import type { AlertLevel, FloodReport, Severity, Trend } from '../types';
 import type { EnrichedReport } from './viewModel';
 import { localityParts } from './viewModel';
 import { ROAD_META, SEV_META, SEV_RANK, TREND_META } from './floodMeta';
+import { formatDepth, formatDepthCompact } from './format';
 
 const APP_NAME = 'FloodedArea';
 
@@ -92,7 +93,7 @@ export function buildShareText({ myReport, activeCount, alertLevel, url }: Share
       : '';
     const body =
       `⚠️ I just reported ${myReport.sev.label.toUpperCase()} flooding on ${where} — ` +
-      `~${myReport.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
+      `~${formatDepth(myReport.depthCm)}${trend}.${activityClause(activeCount, true)}\n\n` +
       `Track live flood conditions on ${PITCH}`;
     return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
   }
@@ -121,7 +122,7 @@ export function buildReportShareText(report: FloodReport, activeCount: number, u
     : '';
   const body =
     `⚠️ ${SEV_META[report.severity].label.toUpperCase()} flooding reported on ${where} — ` +
-    `~${report.depthCm} cm${trend}.${activityClause(activeCount, true)}\n\n` +
+    `~${formatDepth(report.depthCm)}${trend}.${activityClause(activeCount, true)}\n\n` +
     REPORT_PITCH;
   return { title: `Flood update — ${APP_NAME}`, body, text: `${body}\n${url}${FB_FOLLOW}` };
 }
@@ -141,7 +142,7 @@ export interface IncidentCaptionInputs {
 export function buildIncidentCaption({ name, district, severity, depthCm, trend }: IncidentCaptionInputs): string {
   const where = district ? `${name} (${district})` : name;
   const trendTxt = trend === 'rising' || trend === 'receding' ? `, ${TREND_META[trend].label.toLowerCase()}` : '';
-  return `⚠️ ${SEV_META[severity].label.toUpperCase()} flooding reported on ${where} — ~${depthCm} cm${trendTxt}.\n\n${REPORT_PITCH}`;
+  return `⚠️ ${SEV_META[severity].label.toUpperCase()} flooding reported on ${where} — ~${formatDepth(depthCm)}${trendTxt}.\n\n${REPORT_PITCH}`;
 }
 
 /** A single social-network share target. `href` opens that network's web (or app) composer. */
@@ -220,7 +221,7 @@ function digestReportLine(r: EnrichedReport): string {
   const trendTxt = r.trend === 'rising' || r.trend === 'receding' ? `, ${TREND_META[r.trend].label.toLowerCase()}` : '';
   const roadTxt = r.road === 'impassable' || r.road === 'risky' ? `, ${ROAD_META[r.road].label.toLowerCase()}` : '';
   const time = digestTimeLabel(new Date(r.reportedAt ?? r.createdAt));
-  return `${r.name} — ${SEV_META[r.severity].label.toUpperCase()}, ~${r.depthCm}cm${trendTxt}${roadTxt} (${time})`;
+  return `${r.name} — ${SEV_META[r.severity].label.toUpperCase()}, ~${formatDepthCompact(r.depthCm)}${trendTxt}${roadTxt} (${time})`;
 }
 
 interface DigestCityGroup {
@@ -273,7 +274,7 @@ export interface FloodDigest {
 function buildDigestXBody(now: Date, reportCount: number, groups: DigestCityGroup[], worst: EnrichedReport): { xBody: string; xCharCount: number } {
   const time = digestTimeLabel(now);
   const header = `🌊 FLOOD WATCH ${time} — ${reportCount} active report${reportCount === 1 ? '' : 's'}: `;
-  const worstLine = `Worst: ${worst.name}, ${localityParts(worst.district).city} — ${SEV_META[worst.severity].label.toUpperCase()} ~${worst.depthCm}cm${
+  const worstLine = `Worst: ${worst.name}, ${localityParts(worst.district).city} — ${SEV_META[worst.severity].label.toUpperCase()} ~${formatDepthCompact(worst.depthCm)}${
     worst.trend === 'rising' || worst.trend === 'receding' ? `, ${TREND_META[worst.trend].label.toLowerCase()}` : ''
   }.`;
   const cost = (s: string): number => s.length + 1 + X_URL_COST; // +1 for the newline the intent inserts before its url param

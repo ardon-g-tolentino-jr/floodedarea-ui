@@ -15,7 +15,7 @@ import {
   severityFromDepth,
 } from '../utils/floodMeta';
 import { alreadyReportedKeys } from '../utils/viewModel';
-import { cmToIn, formatDepth, formatDuration } from '../utils/format';
+import { cmToIn, formatDepth, formatDepthRange, formatDepthShort, formatDuration } from '../utils/format';
 import { cityOf, provinceOf } from '../utils/phGeo';
 import * as store from '../utils/hotspotStore';
 import { reverseGeocode } from '../api/geocode';
@@ -356,8 +356,8 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, rai
                 style={{ width: '100%', margin: '11px 0 0', accentColor: SEV_META[batchSev].color, cursor: 'pointer' }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600 }}>
-                <span>{toUnit(DEPTH_SLIDER_MIN_CM, unit)} {unit}</span>
-                <span>{toUnit(DEPTH_SLIDER_MAX_CM, unit)} {unit}</span>
+                <span>{formatDepth(DEPTH_SLIDER_MIN_CM)}</span>
+                <span>{formatDepth(DEPTH_SLIDER_MAX_CM)}</span>
               </div>
               <div style={{ marginTop: 9 }}>
                 <DepthReference depthCm={batchCm} color={SEV_META[batchSev].color} />
@@ -500,7 +500,7 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, rai
                           make the list unusable to scroll during an event. */}
                       {!isChecked && (
                         <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--bw-muted)', flex: 'none' }}>
-                          {unit === 'cm' ? `${cm} cm` : `${cmToIn(cm)} in`} · {formatDuration(rowTtl)}
+                          {formatDepthShort(cm)} · {formatDuration(rowTtl)}
                         </span>
                       )}
                       <span style={{ fontSize: 10.5, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: SEV_META[sev].soft, color: SEV_META[sev].color, flex: 'none' }}>
@@ -544,8 +544,8 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, rai
                           depthOverridden ? (
                             <button type="button" onClick={() => resetRowDepth(h.id)} title="Back to the batch depth" style={{ ...linkBtn, color: 'var(--bw-muted)', fontSize: 14 }}>⟲</button>
                           ) : (
-                            <button type="button" onClick={() => setRowDepth(h.id, h.maxDepthCm)} title={`Use this location's deepest recorded water (${h.maxDepthCm} cm)`} style={{ ...linkBtn, color: 'var(--bw-faint)', fontSize: 10.5 }}>
-                              max {unit === 'cm' ? `${h.maxDepthCm} cm` : `${cmToIn(h.maxDepthCm)} in`}
+                            <button type="button" onClick={() => setRowDepth(h.id, h.maxDepthCm)} title={`Use this location's deepest recorded water (${formatDepth(h.maxDepthCm)})`} style={{ ...linkBtn, color: 'var(--bw-faint)', fontSize: 10.5 }}>
+                              max {formatDepthShort(h.maxDepthCm)}
                             </button>
                           )
                         }
@@ -617,7 +617,7 @@ const AdminQuickReportView: React.FC<Props> = ({ isMobile, reports, userLoc, rai
             <div style={{ flex: '1 1 190px', fontSize: 11.5, color: 'var(--bw-muted)', fontWeight: 700 }}>
               {picked.length === 0
                 ? 'Nothing selected yet.'
-                : `${picked.length} location${picked.length === 1 ? '' : 's'} · ${Math.min(...picked.map((p) => p.depthCm))}–${Math.max(...picked.map((p) => p.depthCm))} cm · ${spanLabel(picked.map((p) => p.ttlMinutes))} live`}
+                : `${picked.length} location${picked.length === 1 ? '' : 's'} · ${formatDepthRange(Math.min(...picked.map((p) => p.depthCm)), Math.max(...picked.map((p) => p.depthCm)))} · ${spanLabel(picked.map((p) => p.ttlMinutes))} live`}
             </div>
             <button
               onClick={onReportClick}
@@ -719,6 +719,9 @@ const AddHotspotForm: React.FC<{
       <div style={{ maxWidth: 200 }}>
         <label style={labelStyle}>Typical depth here (cm)</label>
         <DepthField cm={depth} unit="cm" onChange={setDepth} />
+        {/* The field itself takes cm; echo both units so this form reads like every other depth
+            readout in the app rather than being the one cm-only corner. */}
+        <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--bw-faint)', marginTop: 4 }}>{formatDepth(depth)}</div>
       </div>
       <div style={{ display: 'flex', gap: 9 }}>
         <button

@@ -5,7 +5,7 @@ import { DEPTH_RANGE, SEVERITY_PRESET } from '../../utils/floodMeta';
 import { fileToCompressedDataUrl } from '../../utils/image';
 import DepthReference from './DepthReference';
 import TurnstileWidget from '../TurnstileWidget';
-import { cmToIn } from '../../utils/format';
+import { cmToIn, formatDepth } from '../../utils/format';
 
 interface Option {
   sev: Severity;
@@ -246,8 +246,8 @@ const SeverityPicker: React.FC<SeverityPickerProps> = ({ isMobile, busy, reporte
             style={{ width: '100%', accentColor: o.dot, cursor: busy ? 'wait' : 'pointer' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--bw-faint)', fontWeight: 600, marginTop: 2 }}>
-            <span>{range.min} cm</span>
-            <span>{range.max} cm</span>
+            <span>{formatDepth(range.min)}</span>
+            <span>{formatDepth(range.max)}</span>
           </div>
           <div style={{ marginTop: 10 }}>
             <DepthReference depthCm={depth} color={o.dot} />
